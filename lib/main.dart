@@ -45,7 +45,7 @@ class MyApp extends ConsumerWidget {
       initialRoute: 'Splash',
       title: 'ANNUJOOM',
       theme: ThemeData(
-        brightness: Brightness.dark,
+        brightness: Brightness.light,
         colorScheme: ColorScheme.fromSeed(
           seedColor: Colors.blue,
           brightness: Brightness.light,
