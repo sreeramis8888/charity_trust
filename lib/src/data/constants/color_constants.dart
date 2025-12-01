@@ -4,25 +4,23 @@ import 'package:flutter/material.dart';
 const kPrimaryColor = Color(0xFFBC092D); // cyan accent
 const kSecondaryColor = Color(0xFF145DA0); // optional darker accent
 // const Color kBackgroundColor = Color(0xFF0D0F22);
-const kBackgroundColor = Color(0xFF0A1931); // deep navy
+const kBackgroundColor = Color(0xFFF2F2F2); // deep navy
 // const Color kCardBackgroundColor = Color(0xFF021730);
-const kCardBackgroundColor =
-    Color(0xFF102542); // slightly lighter navy for cards
 
 const Color kPrimaryLightColor = Color(0xFFEEF1FF);
 // const Color kStrokeColor = Color(0xFF0D2A4D);
 const kStrokeColor = Color(0xFF1E3C72); // thin borders
 
 const Color kTertiary = Color(0xFFE8EAED);
-const Color kInputFieldcolor = Color(0xFFD8DADC);
+const Color kBorder = Color(0xFFD8DADC);
 //Common Colors
 const Color kWhite = Color(0xFFF7F7F7);
 const Color kGrey = Color.fromARGB(255, 200, 200, 200);
 
-const Color kTextColor = Color(0xFFF7F7F7);
+const Color kTextColor = Color(0xFF161616);
 
-// const Color kSecondaryTextColor = Color(0xFFAEB9E1);
-const kSecondaryTextColor = Color(0xFFB3E5FC); // light cyan for subtitles
+const Color kThirdTextColor = Color(0xFF0A39C4);
+const kSecondaryTextColor = Color(0xFF5A5E60); // light cyan for subtitles
 
 const Color kGreyLight = Color(0xFFCCCCCC);
 const Color kGreyDark = Color.fromARGB(255, 118, 121, 124);

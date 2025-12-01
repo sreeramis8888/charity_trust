@@ -3,7 +3,9 @@ import 'package:charity_trust/src/data/constants/color_constants.dart';
 import 'package:charity_trust/src/data/constants/style_constants.dart';
 import 'package:charity_trust/src/data/notifiers/loading_notifier.dart';
 import 'package:charity_trust/src/data/services/navigation_service.dart';
+import 'package:charity_trust/src/data/services/snackbar_service.dart';
 import 'package:charity_trust/src/interfaces/components/primaryButton.dart';
+import 'package:charity_trust/src/interfaces/animations/index.dart' as anim;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
@@ -44,7 +46,7 @@ class _PhoneNumberScreenState extends ConsumerState<PhoneNumberScreen> {
 
     return Scaffold(
         resizeToAvoidBottomInset: false,
-        backgroundColor: const Color(0xFF1D09CD),
+        backgroundColor: kWhite,
         body: SafeArea(
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -52,18 +54,13 @@ class _PhoneNumberScreenState extends ConsumerState<PhoneNumberScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const SizedBox(height: 70),
-                Center(
-                  child: Image.asset(
-                    'assets/png/annujoom_logo.png',
+                anim.AnimatedWidgetWrapper(
+                  animationType: anim.AnimationType.fadeSlideInFromLeft,
+                  duration: anim.AnimationDuration.normal,
+                  child: Text(
+                    'Phone Number',
+                    style: kHeadTitleM.copyWith(fontSize: 25),
                   ),
-                ),
-                const SizedBox(height: 70),
-                Text(
-                  'Verify your Phone Number',
-                  style: kHeadTitleB,
-                ),
-                SizedBox(
-                  height: 56,
                 ),
                 Expanded(
                   child: SingleChildScrollView(
@@ -72,109 +69,114 @@ class _PhoneNumberScreenState extends ConsumerState<PhoneNumberScreen> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text('Please enter your mobile number',
-                              style: kBodyTitleL.copyWith(color: kWhite)),
+                          anim.AnimatedWidgetWrapper(
+                            animationType: anim.AnimationType.fadeSlideInFromLeft,
+                            duration: anim.AnimationDuration.normal,
+                            delayMilliseconds: 100,
+                            child: Text('Please enter your mobile number',
+                                style: kSmallTitleR.copyWith(
+                                    color: kSecondaryTextColor)),
+                          ),
                           const SizedBox(height: 20),
-                          Theme(
-                            data: Theme.of(context).copyWith(
-                              textTheme: Theme.of(context).textTheme.apply(
-                                    bodyColor:
-                                        Colors.white, // search text color
-                                    displayColor: Colors.white,
-                                  ),
-                              inputDecorationTheme: const InputDecorationTheme(
-                                hintStyle: TextStyle(
-                                    color: Colors.white70), // search hint color
+                          anim.AnimatedWidgetWrapper(
+                            animationType: anim.AnimationType.fadeSlideInFromBottom,
+                            duration: anim.AnimationDuration.normal,
+                            delayMilliseconds: 200,
+                            child: IntlPhoneField(
+                            validator: (phone) {
+                              if (phone!.number.length > 9) {
+                                if (phone.number.length > 10) {
+                                  return 'Phone number cannot exceed 10 digits';
+                                }
+                              }
+                              return null;
+                            },
+                            style: const TextStyle(
+                              color: kTextColor,
+                              letterSpacing: 3,
+                              fontSize: 14,
+                              fontWeight: FontWeight.w400,
+                            ),
+                            controller: _mobileController,
+                            disableLengthCheck: true,
+                            showCountryFlag: true,
+                            cursorColor: kBlack,
+                            decoration: InputDecoration(
+                              filled: true,
+                              fillColor: kWhite,
+                              hintText: 'Enter your phone number',
+                              hintStyle: TextStyle(
+                                fontSize: 14,
+                                letterSpacing: .2,
+                                fontWeight: FontWeight.w200,
+                                color: kTextColor,
+                              ),
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(8.0),
+                                borderSide: BorderSide(color: kBorder),
+                              ),
+                              enabledBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(8.0),
+                                borderSide: BorderSide(color: kBorder),
+                              ),
+                              focusedBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(8.0),
+                                borderSide: const BorderSide(color: kBorder),
+                              ),
+                              contentPadding: const EdgeInsets.symmetric(
+                                vertical: 16.0,
+                                horizontal: 10.0,
                               ),
                             ),
-                            child: IntlPhoneField(
-                              validator: (phone) {
-                                if (phone!.number.length > 9) {
-                                  if (phone.number.length > 10) {
-                                    return 'Phone number cannot exceed 10 digits';
-                                  }
-                                }
-                                return null;
-                              },
-                              style: const TextStyle(
-                                color: kWhite,
-                                letterSpacing: 8,
-                                fontSize: 18,
-                                fontWeight: FontWeight.w400,
-                              ),
-                              controller: _mobileController,
-                              disableLengthCheck: true,
-                              showCountryFlag: true,
-                              cursorColor: kWhite,
-                              decoration: InputDecoration(
-                                filled: true,
-                                fillColor: kInputFieldcolor,
-                                hintText: 'Enter your phone number',
-                                hintStyle: TextStyle(
-                                  fontSize: 14,
-                                  letterSpacing: .2,
-                                  fontWeight: FontWeight.w200,
-                                  color: kSecondaryTextColor,
-                                ),
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(8.0),
-                                  borderSide:
-                                      BorderSide(color: kInputFieldcolor),
-                                ),
-                                enabledBorder: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(8.0),
-                                  borderSide:
-                                      BorderSide(color: kInputFieldcolor),
-                                ),
-                                focusedBorder: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(8.0),
-                                  borderSide:
-                                      const BorderSide(color: kInputFieldcolor),
-                                ),
-                                contentPadding: const EdgeInsets.symmetric(
-                                  vertical: 16.0,
-                                  horizontal: 10.0,
-                                ),
-                              ),
-                              onCountryChanged: (value) {
-                                ref.read(countryCodeProvider.notifier).state =
-                                    value.dialCode;
-                              },
-                              initialCountryCode: 'AE',
-                              onChanged: (phone) {
-                                print(phone.completeNumber);
-                              },
-                              flagsButtonPadding:
-                                  const EdgeInsets.only(left: 10, right: 10.0),
-                              showDropdownIcon: true,
-                              dropdownIcon: const Icon(
-                                Icons.arrow_drop_down_outlined,
-                                color: kWhite,
-                              ),
-                              dropdownIconPosition: IconPosition.trailing,
-                              dropdownTextStyle: const TextStyle(
-                                color: kWhite,
-                                fontSize: 15,
-                                fontWeight: FontWeight.w400,
-                              ),
+                            onCountryChanged: (value) {
+                              ref.read(countryCodeProvider.notifier).state =
+                                  value.dialCode;
+                            },
+                            initialCountryCode: 'AE',
+                            onChanged: (phone) {
+                              print(phone.completeNumber);
+                            },
+                            flagsButtonPadding:
+                                const EdgeInsets.only(left: 10, right: 10.0),
+                            showDropdownIcon: true,
+                            dropdownIcon: const Icon(
+                              Icons.arrow_drop_down_outlined,
+                              color: kTextColor,
+                            ),
+                            dropdownIconPosition: IconPosition.trailing,
+                            dropdownTextStyle: const TextStyle(
+                              color: kTextColor,
+                              fontSize: 15,
+                              fontWeight: FontWeight.w400,
+                            ),
                             ),
                           ),
                           const SizedBox(height: 16),
-                          Text('A 6 digit verification code will be sent',
-                              style: TextStyle(
-                                  color: kSecondaryTextColor,
-                                  fontWeight: FontWeight.w300)),
+                          anim.AnimatedWidgetWrapper(
+                            animationType: anim.AnimationType.fadeSlideInFromLeft,
+                            duration: anim.AnimationDuration.normal,
+                            delayMilliseconds: 300,
+                            child: Text('A 6 digit verification code will be sent',
+                                style: TextStyle(
+                                    color: kSecondaryTextColor,
+                                    fontWeight: FontWeight.w300)),
+                          ),
                           Padding(
                             padding: const EdgeInsets.only(top: 36),
-                            child: SizedBox(
-                              height: 50,
-                              width: double.infinity,
-                              child: primaryButton(
-                                label: 'Send OTP',
-                                onPressed: isLoading
-                                    ? null
-                                    : () => _handleOtpGeneration(context, ref),
-                                isLoading: isLoading,
+                            child: anim.AnimatedWidgetWrapper(
+                              animationType: anim.AnimationType.fadeScaleUp,
+                              duration: anim.AnimationDuration.normal,
+                              delayMilliseconds: 400,
+                              child: SizedBox(
+                                height: 50,
+                                width: double.infinity,
+                                child: primaryButton(
+                                  label: 'Send OTP',
+                                  onPressed: isLoading
+                                      ? null
+                                      : () => _handleOtpGeneration(context, ref),
+                                  isLoading: isLoading,
+                                ),
                               ),
                             ),
                           ),
@@ -190,7 +192,25 @@ class _PhoneNumberScreenState extends ConsumerState<PhoneNumberScreen> {
   }
 
   Future<void> _handleOtpGeneration(BuildContext context, WidgetRef ref) async {
-    // TODO: Implement OTP generation logic
+    final countryCode = ref.read(countryCodeProvider);
+    final phoneNumber = _mobileController.text;
+
+    if (phoneNumber.isEmpty) {
+      SnackbarService snackbarService = SnackbarService();
+      snackbarService.showSnackBar('Please enter a phone number');
+      return;
+    }
+
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => OTPScreen(
+          fullPhone: phoneNumber,
+          resendToken: '',
+          countryCode: countryCode ?? '91',
+          verificationId: '',
+        ),
+      ),
+    );
   }
 }
 
@@ -259,134 +279,136 @@ class _OTPScreenState extends ConsumerState<OTPScreen> {
   @override
   Widget build(BuildContext context) {
     final isLoading = ref.watch(loadingProvider);
-    NavigationService navigationService = NavigationService();
+    final bottomInset = MediaQuery.of(context).viewInsets.bottom;
+
     return Scaffold(
       resizeToAvoidBottomInset: false,
-      backgroundColor:
-          const Color(0xFF1D09CD), // Fallback color matching the theme
-      body: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [
-              const Color(0xFF1D09CD),
-              const Color.fromARGB(255, 33, 16, 73),
-              const Color.fromARGB(255, 14, 11, 78),
-            ],
-          ),
-          image: DecorationImage(
-            image: const AssetImage('assets/pngs/subcription_bg.png'),
-            fit: BoxFit.cover,
-            opacity: 0.9,
-          ),
-        ),
-        child: SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.all(20),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const SizedBox(height: 20),
-                // Add back button
-                Padding(
-                  padding: const EdgeInsets.all(8),
-                  child: GestureDetector(
-                      onTap: () => navigationService.pushNamed('PhoneNumber'),
-                      child: Icon(Icons.arrow_back_ios)),
+      backgroundColor: kWhite,
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 20),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const SizedBox(height: 70),
+              anim.AnimatedWidgetWrapper(
+                animationType: anim.AnimationType.fadeSlideInFromLeft,
+                duration: anim.AnimationDuration.normal,
+                child: Text(
+                  'Enter Code',
+                  style: kHeadTitleM.copyWith(fontSize: 25),
                 ),
-                const SizedBox(height: 30),
-                Center(
-                  child: Image.asset(
-                    'assets/png/annujoom_logo.png',
-                  ),
-                ),
-                const SizedBox(height: 70),
-                Text(
-                  'Verify OTP',
-                  style: kHeadTitleB.copyWith(color: kWhite),
-                ),
-                SizedBox(
-                  height: 56,
-                ),
-                Text('Enter the OTP to verify',
-                    style: kBodyTitleR.copyWith(
-                        fontSize: 16, color: kSecondaryTextColor)),
-                const SizedBox(height: 10),
-                PinCodeTextField(
-                  appContext: context,
-                  length: 6,
-                  obscureText: false,
-                  keyboardType: TextInputType.number,
-                  animationType: AnimationType.fade,
-                  textStyle: const TextStyle(
-                    color: kWhite,
-                    fontSize: 25,
-                    fontWeight: FontWeight.w300,
-                    letterSpacing: 5.0,
-                  ),
-                  pinTheme: PinTheme(
-                    shape: PinCodeFieldShape.box,
-                    borderRadius: BorderRadius.circular(5),
-                    fieldHeight: 55,
-                    fieldWidth: 50,
-                    selectedColor: kPrimaryColor,
-                    activeColor: const Color.fromARGB(255, 232, 226, 226),
-                    inactiveColor: kInputFieldcolor,
-                    activeFillColor: kInputFieldcolor,
-                    selectedFillColor: kInputFieldcolor,
-                    inactiveFillColor: kInputFieldcolor,
-                  ),
-                  animationDuration: const Duration(milliseconds: 300),
-                  backgroundColor: Colors.transparent,
-                  enableActiveFill: true,
-                  controller: _otpController,
-                  onChanged: (value) {},
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      _isButtonDisabled
-                          ? 'Resend OTP in $_start seconds'
-                          : 'Enter your OTP',
-                      style: TextStyle(
-                          fontWeight: FontWeight.w500,
-                          color:
-                              _isButtonDisabled ? kGrey : kSecondaryTextColor),
-                    ),
-                    GestureDetector(
-                      onTap: _isButtonDisabled ? null : resendCode,
-                      child: Padding(
-                        padding: const EdgeInsets.only(left: 10, right: 10),
-                        child: Text(
-                          _isButtonDisabled ? '' : 'Resend Code',
-                          style: TextStyle(
-                              fontWeight: FontWeight.w500,
-                              color: _isButtonDisabled ? kGrey : kRed),
+              ),
+              Expanded(
+                child: SingleChildScrollView(
+                  child: Padding(
+                    padding: EdgeInsets.only(bottom: bottomInset),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        anim.AnimatedWidgetWrapper(
+                          animationType: anim.AnimationType.fadeSlideInFromLeft,
+                          duration: anim.AnimationDuration.normal,
+                          delayMilliseconds: 100,
+                          child: Text(
+                              'Enter the 6-digit code sent to ${widget.fullPhone}',
+                              style: kSmallTitleR.copyWith(
+                                  color: kSecondaryTextColor)),
                         ),
-                      ),
-                    ),
-                  ],
-                ),
-                Padding(
-                  padding: const EdgeInsets.only(top: 36),
-                  child: SizedBox(
-                    height: 47,
-                    width: double.infinity,
-                    child: primaryButton(
-                      label: 'Verify',
-                      onPressed: isLoading
-                          ? null
-                          : () => _handleOtpVerification(context, ref),
-                      fontSize: 16,
-                      isLoading: isLoading,
+                        const SizedBox(height: 20),
+                        anim.AnimatedWidgetWrapper(
+                          animationType: anim.AnimationType.fadeSlideInFromBottom,
+                          duration: anim.AnimationDuration.normal,
+                          delayMilliseconds: 200,
+                          child: PinCodeTextField(
+                          appContext: context,
+                          length: 6,
+                          obscureText: false,
+                          keyboardType: TextInputType.number,
+                          animationType: AnimationType.fade,
+                          textStyle: const TextStyle(
+                            color: kTextColor,
+                            fontSize: 20,
+                            fontWeight: FontWeight.w300,
+                          ),
+                          pinTheme: PinTheme(
+                            shape: PinCodeFieldShape.circle,
+                            borderRadius: BorderRadius.circular(50),
+                            fieldHeight: 45,
+                            fieldWidth: 45,
+                            selectedColor: kPrimaryColor,
+                            activeColor: kBorder,
+                            inactiveColor: kBorder,
+                            activeFillColor: kWhite,
+                            selectedFillColor: kWhite,
+                            inactiveFillColor: kWhite,
+                          ),
+                          animationDuration: const Duration(milliseconds: 300),
+                          backgroundColor: Colors.transparent,
+                          enableActiveFill: true,
+                          controller: _otpController,
+                          onChanged: (value) {},
+                          ),
+                        ),
+                        const SizedBox(height: 20),
+                        anim.AnimatedWidgetWrapper(
+                          animationType: anim.AnimationType.fadeSlideInFromLeft,
+                          duration: anim.AnimationDuration.normal,
+                          delayMilliseconds: 300,
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                _isButtonDisabled
+                                    ? 'Resend OTP in $_start seconds'
+                                    : 'Didn\'t receive code?',
+                                style: TextStyle(
+                                    fontWeight: FontWeight.w500,
+                                    fontSize: 14,
+                                    color: _isButtonDisabled
+                                        ? kSecondaryTextColor
+                                        : kSecondaryTextColor),
+                              ),
+                              GestureDetector(
+                                onTap: _isButtonDisabled ? null : resendCode,
+                                child: Text(
+                                  _isButtonDisabled ? '' : 'Resend Code',
+                                  style: TextStyle(
+                                      fontWeight: FontWeight.w500,
+                                      fontSize: 14,
+                                      color: _isButtonDisabled
+                                          ? kSecondaryTextColor
+                                          : kPrimaryColor),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.only(top: 36),
+                          child: anim.AnimatedWidgetWrapper(
+                            animationType: anim.AnimationType.fadeScaleUp,
+                            duration: anim.AnimationDuration.normal,
+                            delayMilliseconds: 400,
+                            child: SizedBox(
+                              height: 50,
+                              width: double.infinity,
+                              child: primaryButton(
+                                label: 'Verify',
+                                onPressed: isLoading
+                                    ? null
+                                    : () => _handleOtpVerification(context, ref),
+                                isLoading: isLoading,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
         ),
       ),

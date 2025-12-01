@@ -1,5 +1,11 @@
+import 'package:charity_trust/src/interfaces/main_pages/campaign.dart';
+import 'package:charity_trust/src/interfaces/main_pages/campaign_detail.dart';
+import 'package:charity_trust/src/interfaces/main_pages/profile.dart';
 import 'package:charity_trust/src/interfaces/onboarding/login.dart';
-import 'package:charity_trust/src/interfaces/onboarding/splash_screen.dart';
+import 'package:charity_trust/src/interfaces/onboarding/registration.dart';
+import 'package:charity_trust/src/interfaces/onboarding/request_rejected_state.dart';
+import 'package:charity_trust/src/interfaces/onboarding/request_sent_state.dart';
+import 'package:charity_trust/src/interfaces/onboarding/splash.dart';
 import 'package:flutter/material.dart';
 
 /// Usage:
@@ -93,6 +99,40 @@ Route<dynamic> generateRoute(RouteSettings? settings) {
       page = PhoneNumberScreen();
       transitionToUse = TransitionType.fade;
       transitionDuration = const Duration(milliseconds: 500);
+      break;
+      
+    case 'Registration':
+      page = RegistrationPage();
+      transitionToUse = TransitionType.fade;
+      transitionDuration = const Duration(milliseconds: 500);
+      break;
+    case 'RequestRejected':
+      page = RequestRejectedState();
+      break;
+      
+    case 'RequestSent':
+      page = RequestSentState();
+      break;
+      
+    case 'Profile':
+      page = ProfilePage();
+      break;
+    case 'Campaign':
+      page = CampaignPage();
+      break;
+    case 'CampaignDetail':
+      if (settings?.arguments is Map) {
+        final args = settings!.arguments as Map;
+        page = CampaignDetailPage(
+          title: args['title'] ?? '',
+          description: args['description'] ?? '',
+          category: args['category'] ?? '',
+          date: args['date'] ?? '',
+          image: args['image'],
+          raised: args['raised'] ?? 0,
+          goal: args['goal'] ?? 0,
+        );
+      }
       break;
       
     // case 'Navbar':

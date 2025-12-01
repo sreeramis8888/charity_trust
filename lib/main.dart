@@ -42,7 +42,7 @@ class MyApp extends ConsumerWidget {
       navigatorKey: NavigationService.navigatorKey,
       scaffoldMessengerKey: SnackbarService.scaffoldMessengerKey,
       onGenerateRoute: router.generateRoute,
-      initialRoute: 'Splash',
+      initialRoute: 'Campaign',
       title: 'ANNUJOOM',
       theme: ThemeData(
         brightness: Brightness.light,

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../data/constants/color_constants.dart';
+import '../../data/services/navigation_service.dart';
 
 class SplashScreen extends ConsumerStatefulWidget {
   @override
@@ -82,7 +83,15 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
     ).chain(CurveTween(curve: Curves.easeOutBack)).animate(_textController);
 
     _controller.forward();
-    // TODO: Initialize app logic
+    _startNavigationTimer();
+  }
+
+  void _startNavigationTimer() {
+    Future.delayed(const Duration(seconds: 2, milliseconds: 500), () {
+      if (mounted) {
+        NavigationService().pushNamedAndRemoveUntil('Phone');
+      }
+    });
   }
 
   @override
@@ -110,49 +119,10 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor:
-          const Color(0xFF1D09CD), // Fallback color matching the theme
+      backgroundColor: kWhite,
       body: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [
-              const Color(0xFF1D09CD),
-              const Color.fromARGB(255, 33, 16, 73),
-              const Color.fromARGB(255, 14, 11, 78),
-            ],
-          ),
-          image: DecorationImage(
-            image: const AssetImage('assets/pngs/subcription_bg.png'),
-            fit: BoxFit.cover,
-            opacity: 0.9,
-          ),
-        ),
         child: Stack(
           children: [
-            // Animated background image for first-time users (on top)
-            if (isFirstLaunch == 'false')
-              AnimatedBuilder(
-                animation: _backgroundController,
-                builder: (context, child) {
-                  return SlideTransition(
-                    position: _backgroundSlideAnimation,
-                    child: FadeTransition(
-                      opacity: _backgroundOpacityAnimation,
-                      child: Align(
-                        alignment: Alignment.topCenter,
-                        child: Container(
-                          child: Image.asset(
-                              'assets/splash_assets/splash_intro_bg.png'),
-                        ),
-                      ),
-                    ),
-                  );
-                },
-              ),
-
-            // // Main logo animation
             Align(
               alignment: Alignment.center,
               child: AnimatedBuilder(
@@ -165,8 +135,6 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
                       child: Transform.scale(
                         scale: _scaleAnimation.value,
                         child: Container(
-                          width: 140,
-                          height: 140,
                           child: Image.asset(
                             'assets/png/annujoom_logo.png',
                           ),
@@ -177,8 +145,6 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
                 },
               ),
             ),
-
-            // Error message overlay - positioned above welcome text when both exist
             if (hasVersionCheckError)
               Align(
                 alignment: Alignment.bottomCenter,

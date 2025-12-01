@@ -28,7 +28,7 @@ const double kSize12 = 12;
 TextStyle kStyle(FontWeight weight, double size) => TextStyle(
       fontFamily: 'Manrope',
       fontWeight: weight,
-      color: kWhite,
+      color: kTextColor,
       fontSize: size,
     );
 

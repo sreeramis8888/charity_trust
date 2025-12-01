@@ -35,9 +35,9 @@ class InputField extends StatelessWidget {
       controller: controller,
       readOnly: type != CustomFieldType.text,
       validator: validator,
+      autovalidateMode: AutovalidateMode.onUserInteraction,
       style: kBodyTitleR,
       cursorColor: kPrimaryColor,
-
       onTap: () async {
         if (type == CustomFieldType.date) {
           final picked = await showDatePicker(
@@ -54,36 +54,41 @@ class InputField extends StatelessWidget {
         }
 
         if (type == CustomFieldType.document) {
-          onUpload?.call(); // You will pass doc-picker logic from parent
+          onUpload?.call();
         }
       },
-
       decoration: InputDecoration(
-        filled: true,
-        fillColor: kInputFieldcolor,
+        fillColor: kWhite,
         hintText: hint,
         hintStyle: const TextStyle(
-          color: Color(0xFF979797),
+          color: Color(0xFF9B9B9B),
           fontSize: 14,
         ),
-        contentPadding: const EdgeInsets.symmetric(
-            horizontal: 14, vertical: 12),
-
-        // Icons shown based on ENUM
+        errorStyle:
+            const TextStyle(height: 0), // 👈 hides error text when typing
+        contentPadding:
+            const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
         suffixIcon: type == CustomFieldType.date
             ? const Icon(Icons.calendar_today, size: 20, color: Colors.grey)
             : type == CustomFieldType.document
                 ? const Icon(Icons.cloud_upload_outlined,
                     size: 22, color: Colors.grey)
                 : null,
-
         enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
-          borderSide: BorderSide(color: kInputFieldcolor),
+          borderRadius: BorderRadius.circular(10),
+          borderSide: BorderSide(color: kBorder),
         ),
         focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
-          borderSide: BorderSide(color: kInputFieldcolor),
+          borderRadius: BorderRadius.circular(10),
+          borderSide: BorderSide(color: kBorder),
+        ),
+        errorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(10),
+          borderSide: const BorderSide(color: Colors.red, width: 1.5),
+        ),
+        focusedErrorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(10),
+          borderSide: const BorderSide(color: Colors.red, width: 1.5),
         ),
       ),
     );

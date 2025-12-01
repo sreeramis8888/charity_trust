@@ -9,7 +9,7 @@ Widget primaryButton({
   int fontSize = 14,
   int buttonHeight = 45,
   bool isLoading = false,
-  Color buttonColor = const Color(0xFF355BBB), 
+  Color buttonColor = kPrimaryColor,
   Color sideColor = Colors.transparent,
   Widget? icon,
 }) {
