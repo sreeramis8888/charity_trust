@@ -11,15 +11,21 @@ class UserModel {
   final int? aadharNumber;
   final String? aadharCopy;
   final String? address;
+  final String? area;
+  final String? district;
+  final String? country;
+  final String? pincode;
   final String? password;
   final String? status;
   final bool? isAdmin;
-  final String? adminRole; // ObjectId → String
+  final String? adminRole; // ObjectId
   final String? role;
   final DateTime? lastSeen;
   final bool? online;
   final DateTime? dob;
   final bool? isInstalled;
+  final String? recommendedBy;
+  final String? underTrustee; // ObjectId
   final DateTime? createdAt;
   final DateTime? updatedAt;
 
@@ -36,6 +42,10 @@ class UserModel {
     this.aadharNumber,
     this.aadharCopy,
     this.address,
+    this.area,
+    this.district,
+    this.country,
+    this.pincode,
     this.password,
     this.status,
     this.isAdmin,
@@ -45,13 +55,15 @@ class UserModel {
     this.online,
     this.dob,
     this.isInstalled,
+    this.recommendedBy,
+    this.underTrustee,
     this.createdAt,
     this.updatedAt,
   });
 
-  // ---------------------------
-  // FROM JSON
-  // ---------------------------
+  /// ------------------------------
+  /// fromJson → handles null values
+  /// ------------------------------
   factory UserModel.fromJson(Map<String, dynamic> json) {
     return UserModel(
       id: json['_id'] as String?,
@@ -68,6 +80,10 @@ class UserModel {
           : int.tryParse(json['aadhar_number']?.toString() ?? ''),
       aadharCopy: json['aadhar_copy'] as String?,
       address: json['address'] as String?,
+      area: json['area'] as String?,
+      district: json['district'] as String?,
+      country: json['country'] as String?,
+      pincode: json['pincode'] as String?,
       password: json['password'] as String?,
       status: json['status'] as String?,
       isAdmin: json['is_admin'] as bool?,
@@ -79,6 +95,8 @@ class UserModel {
       online: json['online'] as bool?,
       dob: json['dob'] != null ? DateTime.tryParse(json['dob']) : null,
       isInstalled: json['is_installed'] as bool?,
+      recommendedBy: json['recommended_by'] as String?,
+      underTrustee: json['under_trustee'] as String?,
       createdAt: json['createdAt'] != null
           ? DateTime.tryParse(json['createdAt'])
           : null,
@@ -88,9 +106,9 @@ class UserModel {
     );
   }
 
-  // ---------------------------
-  // TO JSON
-  // ---------------------------
+  /// ------------------------------
+  /// toJson → safely returns map
+  /// ------------------------------
   Map<String, dynamic> toJson() {
     return {
       '_id': id,
@@ -105,6 +123,10 @@ class UserModel {
       'aadhar_number': aadharNumber,
       'aadhar_copy': aadharCopy,
       'address': address,
+      'area': area,
+      'district': district,
+      'country': country,
+      'pincode': pincode,
       'password': password,
       'status': status,
       'is_admin': isAdmin,
@@ -114,14 +136,16 @@ class UserModel {
       'online': online,
       'dob': dob?.toIso8601String(),
       'is_installed': isInstalled,
+      'recommended_by': recommendedBy,
+      'under_trustee': underTrustee,
       'createdAt': createdAt?.toIso8601String(),
       'updatedAt': updatedAt?.toIso8601String(),
     };
   }
 
-  // ---------------------------
-  // COPYWITH
-  // ---------------------------
+  /// ------------------------------
+  /// copyWith
+  /// ------------------------------
   UserModel copyWith({
     String? id,
     String? name,
@@ -135,6 +159,10 @@ class UserModel {
     int? aadharNumber,
     String? aadharCopy,
     String? address,
+    String? area,
+    String? district,
+    String? country,
+    String? pincode,
     String? password,
     String? status,
     bool? isAdmin,
@@ -144,6 +172,8 @@ class UserModel {
     bool? online,
     DateTime? dob,
     bool? isInstalled,
+    String? recommendedBy,
+    String? underTrustee,
     DateTime? createdAt,
     DateTime? updatedAt,
   }) {
@@ -160,6 +190,10 @@ class UserModel {
       aadharNumber: aadharNumber ?? this.aadharNumber,
       aadharCopy: aadharCopy ?? this.aadharCopy,
       address: address ?? this.address,
+      area: area ?? this.area,
+      district: district ?? this.district,
+      country: country ?? this.country,
+      pincode: pincode ?? this.pincode,
       password: password ?? this.password,
       status: status ?? this.status,
       isAdmin: isAdmin ?? this.isAdmin,
@@ -169,6 +203,8 @@ class UserModel {
       online: online ?? this.online,
       dob: dob ?? this.dob,
       isInstalled: isInstalled ?? this.isInstalled,
+      recommendedBy: recommendedBy ?? this.recommendedBy,
+      underTrustee: underTrustee ?? this.underTrustee,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
     );

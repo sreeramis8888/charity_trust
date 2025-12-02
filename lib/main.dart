@@ -1,3 +1,9 @@
+import 'dart:ui';
+
+import 'package:charity_trust/firebase_options.dart';
+import 'package:charity_trust/src/data/services/crashlytics_service.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -12,15 +18,15 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   final checker = InstallChecker();
   await checker.checkFirstInstall();
-  // await Firebase.initializeApp(
-  //   options: DefaultFirebaseOptions.currentPlatform,
-  // );
-  // FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterFatalError;
-  // PlatformDispatcher.instance.onError = (error, stack) {
-  //   FirebaseCrashlytics.instance.recordError(error, stack, fatal: true);
-  //   return true;
-  // };
-  // await CrashlyticsService.setCrashlyticsCollectionEnabled(true);
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+  FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterFatalError;
+  PlatformDispatcher.instance.onError = (error, stack) {
+    FirebaseCrashlytics.instance.recordError(error, stack, fatal: true);
+    return true;
+  };
+  await CrashlyticsService.setCrashlyticsCollectionEnabled(true);
   await loadSecureData();
   await dotenv.load(fileName: ".env");
   runApp(ProviderScope(child: MyApp()));
@@ -42,7 +48,7 @@ class MyApp extends ConsumerWidget {
       navigatorKey: NavigationService.navigatorKey,
       scaffoldMessengerKey: SnackbarService.scaffoldMessengerKey,
       onGenerateRoute: router.generateRoute,
-      initialRoute: 'Campaign',
+      initialRoute: 'Splash',
       title: 'ANNUJOOM',
       theme: ThemeData(
         brightness: Brightness.light,

@@ -1,9 +1,14 @@
 import 'dart:async';
+import 'dart:developer';
 import 'package:charity_trust/src/data/constants/color_constants.dart';
 import 'package:charity_trust/src/data/constants/style_constants.dart';
 import 'package:charity_trust/src/data/notifiers/loading_notifier.dart';
 import 'package:charity_trust/src/data/services/navigation_service.dart';
 import 'package:charity_trust/src/data/services/snackbar_service.dart';
+import 'package:charity_trust/src/data/providers/auth_login_provider.dart';
+import 'package:charity_trust/src/data/providers/user_provider.dart';
+import 'package:charity_trust/src/data/models/user_model.dart';
+import 'package:charity_trust/src/data/utils/secure_storage.dart';
 import 'package:charity_trust/src/interfaces/components/primaryButton.dart';
 import 'package:charity_trust/src/interfaces/animations/index.dart' as anim;
 import 'package:flutter/material.dart';
@@ -70,7 +75,8 @@ class _PhoneNumberScreenState extends ConsumerState<PhoneNumberScreen> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           anim.AnimatedWidgetWrapper(
-                            animationType: anim.AnimationType.fadeSlideInFromLeft,
+                            animationType:
+                                anim.AnimationType.fadeSlideInFromLeft,
                             duration: anim.AnimationDuration.normal,
                             delayMilliseconds: 100,
                             child: Text('Please enter your mobile number',
@@ -79,84 +85,87 @@ class _PhoneNumberScreenState extends ConsumerState<PhoneNumberScreen> {
                           ),
                           const SizedBox(height: 20),
                           anim.AnimatedWidgetWrapper(
-                            animationType: anim.AnimationType.fadeSlideInFromBottom,
+                            animationType:
+                                anim.AnimationType.fadeSlideInFromBottom,
                             duration: anim.AnimationDuration.normal,
                             delayMilliseconds: 200,
                             child: IntlPhoneField(
-                            validator: (phone) {
-                              if (phone!.number.length > 9) {
-                                if (phone.number.length > 10) {
-                                  return 'Phone number cannot exceed 10 digits';
+                              validator: (phone) {
+                                if (phone!.number.length > 9) {
+                                  if (phone.number.length > 10) {
+                                    return 'Phone number cannot exceed 10 digits';
+                                  }
                                 }
-                              }
-                              return null;
-                            },
-                            style: const TextStyle(
-                              color: kTextColor,
-                              letterSpacing: 3,
-                              fontSize: 14,
-                              fontWeight: FontWeight.w400,
-                            ),
-                            controller: _mobileController,
-                            disableLengthCheck: true,
-                            showCountryFlag: true,
-                            cursorColor: kBlack,
-                            decoration: InputDecoration(
-                              filled: true,
-                              fillColor: kWhite,
-                              hintText: 'Enter your phone number',
-                              hintStyle: TextStyle(
+                                return null;
+                              },
+                              style: const TextStyle(
+                                color: kTextColor,
+                                letterSpacing: 3,
                                 fontSize: 14,
-                                letterSpacing: .2,
-                                fontWeight: FontWeight.w200,
+                                fontWeight: FontWeight.w400,
+                              ),
+                              controller: _mobileController,
+                              disableLengthCheck: true,
+                              showCountryFlag: true,
+                              cursorColor: kBlack,
+                              decoration: InputDecoration(
+                                filled: true,
+                                fillColor: kWhite,
+                                hintText: 'Enter your phone number',
+                                hintStyle: TextStyle(
+                                  fontSize: 14,
+                                  letterSpacing: .2,
+                                  fontWeight: FontWeight.w200,
+                                  color: kTextColor,
+                                ),
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(8.0),
+                                  borderSide: BorderSide(color: kBorder),
+                                ),
+                                enabledBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(8.0),
+                                  borderSide: BorderSide(color: kBorder),
+                                ),
+                                focusedBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(8.0),
+                                  borderSide: const BorderSide(color: kBorder),
+                                ),
+                                contentPadding: const EdgeInsets.symmetric(
+                                  vertical: 16.0,
+                                  horizontal: 10.0,
+                                ),
+                              ),
+                              onCountryChanged: (value) {
+                                ref.read(countryCodeProvider.notifier).state =
+                                    value.dialCode;
+                              },
+                              initialCountryCode: 'IN',
+                              onChanged: (phone) {
+                                print(phone.completeNumber);
+                              },
+                              flagsButtonPadding:
+                                  const EdgeInsets.only(left: 10, right: 10.0),
+                              showDropdownIcon: true,
+                              dropdownIcon: const Icon(
+                                Icons.arrow_drop_down_outlined,
                                 color: kTextColor,
                               ),
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(8.0),
-                                borderSide: BorderSide(color: kBorder),
+                              dropdownIconPosition: IconPosition.trailing,
+                              dropdownTextStyle: const TextStyle(
+                                color: kTextColor,
+                                fontSize: 15,
+                                fontWeight: FontWeight.w400,
                               ),
-                              enabledBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(8.0),
-                                borderSide: BorderSide(color: kBorder),
-                              ),
-                              focusedBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(8.0),
-                                borderSide: const BorderSide(color: kBorder),
-                              ),
-                              contentPadding: const EdgeInsets.symmetric(
-                                vertical: 16.0,
-                                horizontal: 10.0,
-                              ),
-                            ),
-                            onCountryChanged: (value) {
-                              ref.read(countryCodeProvider.notifier).state =
-                                  value.dialCode;
-                            },
-                            initialCountryCode: 'AE',
-                            onChanged: (phone) {
-                              print(phone.completeNumber);
-                            },
-                            flagsButtonPadding:
-                                const EdgeInsets.only(left: 10, right: 10.0),
-                            showDropdownIcon: true,
-                            dropdownIcon: const Icon(
-                              Icons.arrow_drop_down_outlined,
-                              color: kTextColor,
-                            ),
-                            dropdownIconPosition: IconPosition.trailing,
-                            dropdownTextStyle: const TextStyle(
-                              color: kTextColor,
-                              fontSize: 15,
-                              fontWeight: FontWeight.w400,
-                            ),
                             ),
                           ),
                           const SizedBox(height: 16),
                           anim.AnimatedWidgetWrapper(
-                            animationType: anim.AnimationType.fadeSlideInFromLeft,
+                            animationType:
+                                anim.AnimationType.fadeSlideInFromLeft,
                             duration: anim.AnimationDuration.normal,
                             delayMilliseconds: 300,
-                            child: Text('A 6 digit verification code will be sent',
+                            child: Text(
+                                'A 6 digit verification code will be sent',
                                 style: TextStyle(
                                     color: kSecondaryTextColor,
                                     fontWeight: FontWeight.w300)),
@@ -174,7 +183,8 @@ class _PhoneNumberScreenState extends ConsumerState<PhoneNumberScreen> {
                                   label: 'Send OTP',
                                   onPressed: isLoading
                                       ? null
-                                      : () => _handleOtpGeneration(context, ref),
+                                      : () =>
+                                          _handleOtpGeneration(context, ref),
                                   isLoading: isLoading,
                                 ),
                               ),
@@ -201,16 +211,44 @@ class _PhoneNumberScreenState extends ConsumerState<PhoneNumberScreen> {
       return;
     }
 
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (context) => OTPScreen(
-          fullPhone: phoneNumber,
-          resendToken: '',
-          countryCode: countryCode ?? '91',
-          verificationId: '',
-        ),
-      ),
-    );
+    try {
+      // Show loading
+      ref.read(loadingProvider.notifier).startLoading();
+
+      final authLoginApi = ref.read(authLoginApiProvider);
+      final response = await authLoginApi.sendOtp(phoneNumber);
+
+      ref.read(loadingProvider.notifier).stopLoading();
+
+      if (response.success && response.data != null) {
+        final otp = response.data!['data'] as String?;
+        if (otp != null) {
+          log('OTP: $otp', name: 'PhoneNumberScreen');
+          SnackbarService().showSnackBar('OTP sent successfully');
+
+          if (context.mounted) {
+            Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: (context) => OTPScreen(
+                  fullPhone: phoneNumber,
+                  resendToken: '',
+                  countryCode: countryCode ?? '91',
+                  verificationId: '',
+                ),
+              ),
+            );
+          }
+        }
+      } else {
+        SnackbarService().showSnackBar(
+          response.message ?? 'Failed to send OTP',
+        );
+      }
+    } catch (e) {
+      ref.read(loadingProvider.notifier).stopLoading();
+      SnackbarService().showSnackBar('Error: $e');
+      log('Error sending OTP: $e', name: 'PhoneNumberScreen');
+    }
   }
 }
 
@@ -273,7 +311,29 @@ class _OTPScreenState extends ConsumerState<OTPScreen> {
 
   void resendCode() {
     startTimer();
-    // TODO: Implement resend OTP logic
+    _resendOtp();
+  }
+
+  Future<void> _resendOtp() async {
+    try {
+      final authLoginApi = ref.read(authLoginApiProvider);
+      final response = await authLoginApi.sendOtp(widget.fullPhone);
+
+      if (response.success && response.data != null) {
+        final otp = response.data!['data'] as String?;
+        if (otp != null) {
+          log('OTP (Resend): $otp', name: 'OTPScreen');
+          SnackbarService().showSnackBar('OTP resent successfully');
+        }
+      } else {
+        SnackbarService().showSnackBar(
+          response.message ?? 'Failed to resend OTP',
+        );
+      }
+    } catch (e) {
+      SnackbarService().showSnackBar('Error: $e');
+      log('Error resending OTP: $e', name: 'OTPScreen');
+    }
   }
 
   @override
@@ -317,37 +377,39 @@ class _OTPScreenState extends ConsumerState<OTPScreen> {
                         ),
                         const SizedBox(height: 20),
                         anim.AnimatedWidgetWrapper(
-                          animationType: anim.AnimationType.fadeSlideInFromBottom,
+                          animationType:
+                              anim.AnimationType.fadeSlideInFromBottom,
                           duration: anim.AnimationDuration.normal,
                           delayMilliseconds: 200,
                           child: PinCodeTextField(
-                          appContext: context,
-                          length: 6,
-                          obscureText: false,
-                          keyboardType: TextInputType.number,
-                          animationType: AnimationType.fade,
-                          textStyle: const TextStyle(
-                            color: kTextColor,
-                            fontSize: 20,
-                            fontWeight: FontWeight.w300,
-                          ),
-                          pinTheme: PinTheme(
-                            shape: PinCodeFieldShape.circle,
-                            borderRadius: BorderRadius.circular(50),
-                            fieldHeight: 45,
-                            fieldWidth: 45,
-                            selectedColor: kPrimaryColor,
-                            activeColor: kBorder,
-                            inactiveColor: kBorder,
-                            activeFillColor: kWhite,
-                            selectedFillColor: kWhite,
-                            inactiveFillColor: kWhite,
-                          ),
-                          animationDuration: const Duration(milliseconds: 300),
-                          backgroundColor: Colors.transparent,
-                          enableActiveFill: true,
-                          controller: _otpController,
-                          onChanged: (value) {},
+                            appContext: context,
+                            length: 6,
+                            obscureText: false,
+                            keyboardType: TextInputType.number,
+                            animationType: AnimationType.fade,
+                            textStyle: const TextStyle(
+                              color: kTextColor,
+                              fontSize: 20,
+                              fontWeight: FontWeight.w300,
+                            ),
+                            pinTheme: PinTheme(
+                              shape: PinCodeFieldShape.circle,
+                              borderRadius: BorderRadius.circular(50),
+                              fieldHeight: 45,
+                              fieldWidth: 45,
+                              selectedColor: kPrimaryColor,
+                              activeColor: kBorder,
+                              inactiveColor: kBorder,
+                              activeFillColor: kWhite,
+                              selectedFillColor: kWhite,
+                              inactiveFillColor: kWhite,
+                            ),
+                            animationDuration:
+                                const Duration(milliseconds: 300),
+                            backgroundColor: Colors.transparent,
+                            enableActiveFill: true,
+                            controller: _otpController,
+                            onChanged: (value) {},
                           ),
                         ),
                         const SizedBox(height: 20),
@@ -397,7 +459,8 @@ class _OTPScreenState extends ConsumerState<OTPScreen> {
                                 label: 'Verify',
                                 onPressed: isLoading
                                     ? null
-                                    : () => _handleOtpVerification(context, ref),
+                                    : () =>
+                                        _handleOtpVerification(context, ref),
                                 isLoading: isLoading,
                               ),
                             ),
@@ -417,6 +480,57 @@ class _OTPScreenState extends ConsumerState<OTPScreen> {
 
   Future<void> _handleOtpVerification(
       BuildContext context, WidgetRef ref) async {
-    // TODO: Implement OTP verification logic
+    final otp = _otpController.text;
+
+    if (otp.isEmpty || otp.length != 6) {
+      SnackbarService().showSnackBar('Please enter a valid 6-digit OTP');
+      return;
+    }
+
+    try {
+      ref.read(loadingProvider.notifier).startLoading();
+
+      // Get FCM token
+      final fcmToken = await SecureStorage.read('fcmToken') ?? '';
+
+      final authLoginApi = ref.read(authLoginApiProvider);
+      final response =
+          await authLoginApi.verifyOtp(widget.fullPhone, otp, fcmToken);
+
+      ref.read(loadingProvider.notifier).stopLoading();
+
+      if (response.success && response.data != null) {
+        final data = response.data!['data'] as Map<String, dynamic>?;
+        if (data != null) {
+          final userData = data['user'] as Map<String, dynamic>?;
+          if (userData != null) {
+            final user = UserModel.fromJson(userData);
+
+            // Store user in provider
+            ref.read(userProvider.notifier).setUser(user);
+
+            log('OTP verified successfully', name: 'OTPScreen');
+            SnackbarService().showSnackBar('Login successful');
+
+            if (context.mounted) {
+              // Navigate based on user status
+              if (user.status == 'inactive') {
+                Navigator.of(context).pushReplacementNamed('registration');
+              } else {
+                Navigator.of(context).pushReplacementNamed('navbar');
+              }
+            }
+          }
+        }
+      } else {
+        SnackbarService().showSnackBar(
+          response.message ?? 'Failed to verify OTP',
+        );
+      }
+    } catch (e) {
+      ref.read(loadingProvider.notifier).stopLoading();
+      SnackbarService().showSnackBar('Error: $e');
+      log('Error verifying OTP: $e', name: 'OTPScreen');
+    }
   }
 }

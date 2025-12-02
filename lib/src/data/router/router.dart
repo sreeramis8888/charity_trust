@@ -1,6 +1,7 @@
 import 'package:charity_trust/src/interfaces/main_pages/campaign.dart';
 import 'package:charity_trust/src/interfaces/main_pages/campaign_detail.dart';
 import 'package:charity_trust/src/interfaces/main_pages/profile.dart';
+import 'package:charity_trust/src/interfaces/main_pages/navbar.dart';
 import 'package:charity_trust/src/interfaces/onboarding/login.dart';
 import 'package:charity_trust/src/interfaces/onboarding/registration.dart';
 import 'package:charity_trust/src/interfaces/onboarding/request_rejected_state.dart';
@@ -101,7 +102,7 @@ Route<dynamic> generateRoute(RouteSettings? settings) {
       transitionDuration = const Duration(milliseconds: 500);
       break;
       
-    case 'Registration':
+    case 'registration':
       page = RegistrationPage();
       transitionToUse = TransitionType.fade;
       transitionDuration = const Duration(milliseconds: 500);
@@ -135,9 +136,11 @@ Route<dynamic> generateRoute(RouteSettings? settings) {
       }
       break;
       
-    // case 'Navbar':
-    //   page = Navbar();
-    //   break;
+    case 'navbar':
+      page = NavBar();
+      transitionToUse = TransitionType.fade;
+      transitionDuration = const Duration(milliseconds: 500);
+      break;
 
     default:
       return MaterialPageRoute(

@@ -1,6 +1,6 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'api_service.dart';
+part of 'api_provider.dart';
 
 // **************************************************************************
 // RiverpodGenerator
@@ -9,43 +9,43 @@ part of 'api_service.dart';
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: type=lint, type=warning
 
-@ProviderFor(apiService)
-const apiServiceProvider = ApiServiceProvider._();
+@ProviderFor(apiProvider)
+const apiProviderProvider = ApiProviderProvider._();
 
-final class ApiServiceProvider
-    extends $FunctionalProvider<ApiService, ApiService, ApiService>
-    with $Provider<ApiService> {
-  const ApiServiceProvider._()
+final class ApiProviderProvider
+    extends $FunctionalProvider<ApiProvider, ApiProvider, ApiProvider>
+    with $Provider<ApiProvider> {
+  const ApiProviderProvider._()
       : super(
           from: null,
           argument: null,
           retry: null,
-          name: r'apiServiceProvider',
+          name: r'apiProviderProvider',
           isAutoDispose: true,
           dependencies: null,
           $allTransitiveDependencies: null,
         );
 
   @override
-  String debugGetCreateSourceHash() => _$apiServiceHash();
+  String debugGetCreateSourceHash() => _$apiProviderHash();
 
   @$internal
   @override
-  $ProviderElement<ApiService> $createElement($ProviderPointer pointer) =>
+  $ProviderElement<ApiProvider> $createElement($ProviderPointer pointer) =>
       $ProviderElement(pointer);
 
   @override
-  ApiService create(Ref ref) {
-    return apiService(ref);
+  ApiProvider create(Ref ref) {
+    return apiProvider(ref);
   }
 
   /// {@macro riverpod.override_with_value}
-  Override overrideWithValue(ApiService value) {
+  Override overrideWithValue(ApiProvider value) {
     return $ProviderOverride(
       origin: this,
-      providerOverride: $SyncValueProvider<ApiService>(value),
+      providerOverride: $SyncValueProvider<ApiProvider>(value),
     );
   }
 }
 
-String _$apiServiceHash() => r'54c85fa74fbca4ab4c2fcd0e90b7d900e7d32e85';
+String _$apiProviderHash() => r'96d16ab5ea1a3d192c11d0b29bf1f753bbea8866';
