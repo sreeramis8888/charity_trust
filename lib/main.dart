@@ -27,7 +27,6 @@ Future<void> main() async {
     return true;
   };
   await CrashlyticsService.setCrashlyticsCollectionEnabled(true);
-  await loadSecureData();
   await dotenv.load(fileName: ".env");
   runApp(ProviderScope(child: MyApp()));
 }

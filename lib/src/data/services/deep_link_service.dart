@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:charity_trust/src/data/router/nav_router.dart';
 import 'package:charity_trust/src/data/services/navigation_service.dart';
+import 'package:charity_trust/src/data/services/secure_storage_service.dart';
 import 'package:charity_trust/src/data/utils/globals.dart';
-import 'package:charity_trust/src/data/utils/secure_storage.dart';
 
 
 
@@ -49,10 +49,11 @@ class DeepLinkService {
     try {
       // First ensure token is loaded
       if (token.isEmpty) {
-        String? savedtoken = await SecureStorage.read('fcmToken');
-        String? savedId = await SecureStorage.read('id');
-        if (savedtoken != null && savedtoken.isNotEmpty && savedId != null) {
-          token = savedtoken;
+        final secureStorage = _ref.read(secureStorageServiceProvider);
+        String? savedToken = await secureStorage.getBearerToken();
+        String? savedId = await secureStorage.getUserId();
+        if (savedToken != null && savedToken.isNotEmpty && savedId != null) {
+          token = savedToken;
           id = savedId;
           LoggedIn = true;
         }

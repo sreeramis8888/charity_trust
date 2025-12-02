@@ -50,17 +50,12 @@ final class AuthProviderProvider
 
 String _$authProviderHash() => r'a4502b1140c660481ae30c43f258bbcb15bd86d6';
 
-/// Provider to check if user is authenticated
-
 @ProviderFor(isAuthenticated)
 const isAuthenticatedProvider = IsAuthenticatedProvider._();
-
-/// Provider to check if user is authenticated
 
 final class IsAuthenticatedProvider
     extends $FunctionalProvider<AsyncValue<bool>, bool, FutureOr<bool>>
     with $FutureModifier<bool>, $FutureProvider<bool> {
-  /// Provider to check if user is authenticated
   const IsAuthenticatedProvider._()
       : super(
           from: null,
@@ -88,17 +83,12 @@ final class IsAuthenticatedProvider
 
 String _$isAuthenticatedHash() => r'322b5da50fdc89eefe07ba9e2e0bdf0b8fdd50df';
 
-/// Provider to get current bearer token
-
 @ProviderFor(bearerToken)
 const bearerTokenProvider = BearerTokenProvider._();
-
-/// Provider to get current bearer token
 
 final class BearerTokenProvider
     extends $FunctionalProvider<AsyncValue<String?>, String?, FutureOr<String?>>
     with $FutureModifier<String?>, $FutureProvider<String?> {
-  /// Provider to get current bearer token
   const BearerTokenProvider._()
       : super(
           from: null,

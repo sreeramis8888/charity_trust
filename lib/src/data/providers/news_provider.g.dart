@@ -50,20 +50,12 @@ final class NewsApiProvider
 
 String _$newsApiHash() => r'f07272c2d7c6811c10fdd6dd15d1757adc6359df';
 
-/// Provider to fetch news with pagination
-/// Usage: ref.watch(newsProvider(pageNo: 1, limit: 10))
-
 @ProviderFor(news)
 const newsProvider = NewsFamily._();
-
-/// Provider to fetch news with pagination
-/// Usage: ref.watch(newsProvider(pageNo: 1, limit: 10))
 
 final class NewsProvider extends $FunctionalProvider<
         AsyncValue<PaginationState>, PaginationState, FutureOr<PaginationState>>
     with $FutureModifier<PaginationState>, $FutureProvider<PaginationState> {
-  /// Provider to fetch news with pagination
-  /// Usage: ref.watch(newsProvider(pageNo: 1, limit: 10))
   const NewsProvider._(
       {required NewsFamily super.from,
       required ({
@@ -121,9 +113,6 @@ final class NewsProvider extends $FunctionalProvider<
 
 String _$newsHash() => r'1a5264b287d7335a40681a1f55f3afec201e9b96';
 
-/// Provider to fetch news with pagination
-/// Usage: ref.watch(newsProvider(pageNo: 1, limit: 10))
-
 final class NewsFamily extends $Family
     with
         $FunctionalFamilyOverride<
@@ -141,9 +130,6 @@ final class NewsFamily extends $Family
           isAutoDispose: true,
         );
 
-  /// Provider to fetch news with pagination
-  /// Usage: ref.watch(newsProvider(pageNo: 1, limit: 10))
-
   NewsProvider call({
     int pageNo = 1,
     int limit = 10,
@@ -157,20 +143,12 @@ final class NewsFamily extends $Family
   String toString() => r'newsProvider';
 }
 
-/// Provider to fetch bookmarked news with pagination
-/// Usage: ref.watch(bookmarkedNewsProvider(pageNo: 1, limit: 10))
-
 @ProviderFor(bookmarkedNews)
 const bookmarkedNewsProvider = BookmarkedNewsFamily._();
-
-/// Provider to fetch bookmarked news with pagination
-/// Usage: ref.watch(bookmarkedNewsProvider(pageNo: 1, limit: 10))
 
 final class BookmarkedNewsProvider extends $FunctionalProvider<
         AsyncValue<PaginationState>, PaginationState, FutureOr<PaginationState>>
     with $FutureModifier<PaginationState>, $FutureProvider<PaginationState> {
-  /// Provider to fetch bookmarked news with pagination
-  /// Usage: ref.watch(bookmarkedNewsProvider(pageNo: 1, limit: 10))
   const BookmarkedNewsProvider._(
       {required BookmarkedNewsFamily super.from,
       required ({
@@ -228,9 +206,6 @@ final class BookmarkedNewsProvider extends $FunctionalProvider<
 
 String _$bookmarkedNewsHash() => r'0f4f3c037acaff69308bba276ef807ea77d81a5a';
 
-/// Provider to fetch bookmarked news with pagination
-/// Usage: ref.watch(bookmarkedNewsProvider(pageNo: 1, limit: 10))
-
 final class BookmarkedNewsFamily extends $Family
     with
         $FunctionalFamilyOverride<
@@ -248,9 +223,6 @@ final class BookmarkedNewsFamily extends $Family
           isAutoDispose: true,
         );
 
-  /// Provider to fetch bookmarked news with pagination
-  /// Usage: ref.watch(bookmarkedNewsProvider(pageNo: 1, limit: 10))
-
   BookmarkedNewsProvider call({
     int pageNo = 1,
     int limit = 10,
@@ -264,18 +236,11 @@ final class BookmarkedNewsFamily extends $Family
   String toString() => r'bookmarkedNewsProvider';
 }
 
-/// Notifier for managing news list state with pagination
-/// Allows for manual refresh, pagination, and bookmark management
-
 @ProviderFor(NewsListNotifier)
 const newsListProvider = NewsListNotifierProvider._();
 
-/// Notifier for managing news list state with pagination
-/// Allows for manual refresh, pagination, and bookmark management
 final class NewsListNotifierProvider
     extends $AsyncNotifierProvider<NewsListNotifier, PaginationState> {
-  /// Notifier for managing news list state with pagination
-  /// Allows for manual refresh, pagination, and bookmark management
   const NewsListNotifierProvider._()
       : super(
           from: null,
@@ -295,10 +260,7 @@ final class NewsListNotifierProvider
   NewsListNotifier create() => NewsListNotifier();
 }
 
-String _$newsListNotifierHash() => r'a085c7ed49587cae4bcef0970b534b43053622f3';
-
-/// Notifier for managing news list state with pagination
-/// Allows for manual refresh, pagination, and bookmark management
+String _$newsListNotifierHash() => r'eeedbbccd0e7c307eb808948c64c86c95cdb0bce';
 
 abstract class _$NewsListNotifier extends $AsyncNotifier<PaginationState> {
   FutureOr<PaginationState> build();
@@ -316,15 +278,11 @@ abstract class _$NewsListNotifier extends $AsyncNotifier<PaginationState> {
   }
 }
 
-/// Notifier for managing bookmarked news list state with pagination
-
 @ProviderFor(BookmarkedNewsListNotifier)
 const bookmarkedNewsListProvider = BookmarkedNewsListNotifierProvider._();
 
-/// Notifier for managing bookmarked news list state with pagination
 final class BookmarkedNewsListNotifierProvider extends $AsyncNotifierProvider<
     BookmarkedNewsListNotifier, PaginationState> {
-  /// Notifier for managing bookmarked news list state with pagination
   const BookmarkedNewsListNotifierProvider._()
       : super(
           from: null,
@@ -346,8 +304,6 @@ final class BookmarkedNewsListNotifierProvider extends $AsyncNotifierProvider<
 
 String _$bookmarkedNewsListNotifierHash() =>
     r'290e88d6a77319e2004236f96027366ac182dc22';
-
-/// Notifier for managing bookmarked news list state with pagination
 
 abstract class _$BookmarkedNewsListNotifier
     extends $AsyncNotifier<PaginationState> {

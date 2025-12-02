@@ -20,9 +20,6 @@ class AuthProvider {
 
   Future<void> login(String token, {String? refreshToken, String? userId}) async {
     await _secureStorage.saveBearerToken(token);
-    if (refreshToken != null) {
-      await _secureStorage.saveRefreshToken(refreshToken);
-    }
     if (userId != null) {
       await _secureStorage.saveUserId(userId);
     }

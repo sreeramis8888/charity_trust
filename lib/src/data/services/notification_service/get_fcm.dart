@@ -1,10 +1,11 @@
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:charity_trust/src/data/utils/globals.dart';
-import 'package:charity_trust/src/data/utils/secure_storage.dart';
+import 'package:charity_trust/src/data/services/secure_storage_service.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:permission_handler/permission_handler.dart';
 
-Future<void> getFcmToken(BuildContext context) async {
+Future<void> getFcmToken(BuildContext context, WidgetRef ref) async {
   final isIOS = Theme.of(context).platform == TargetPlatform.iOS;
   final notificationStatus = await Permission.notification.status;
 
@@ -27,7 +28,8 @@ Future<void> getFcmToken(BuildContext context) async {
       }
       String? token = await messaging.getToken();
       fcmToken = token ?? '';
-      SecureStorage.write('fcmToken', fcmToken);
+      final secureStorage = ref.read(secureStorageServiceProvider);
+      await secureStorage.saveFcmToken(fcmToken);
       print("FCM Token: $token");
     } else {
       print('User declined or has not accepted permission');

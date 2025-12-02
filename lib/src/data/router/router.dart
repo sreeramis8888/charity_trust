@@ -6,6 +6,7 @@ import 'package:charity_trust/src/interfaces/onboarding/login.dart';
 import 'package:charity_trust/src/interfaces/onboarding/registration.dart';
 import 'package:charity_trust/src/interfaces/onboarding/request_rejected_state.dart';
 import 'package:charity_trust/src/interfaces/onboarding/request_sent_state.dart';
+import 'package:charity_trust/src/interfaces/onboarding/account_suspended_state.dart';
 import 'package:charity_trust/src/interfaces/onboarding/splash.dart';
 import 'package:flutter/material.dart';
 
@@ -107,12 +108,22 @@ Route<dynamic> generateRoute(RouteSettings? settings) {
       transitionToUse = TransitionType.fade;
       transitionDuration = const Duration(milliseconds: 500);
       break;
-    case 'RequestRejected':
+    case 'requestRejected':
       page = RequestRejectedState();
+      transitionToUse = TransitionType.fade;
+      transitionDuration = const Duration(milliseconds: 500);
       break;
       
-    case 'RequestSent':
+    case 'requestSent':
       page = RequestSentState();
+      transitionToUse = TransitionType.fade;
+      transitionDuration = const Duration(milliseconds: 500);
+      break;
+
+    case 'accountSuspended':
+      page = AccountSuspendedState();
+      transitionToUse = TransitionType.fade;
+      transitionDuration = const Duration(milliseconds: 500);
       break;
       
     case 'Profile':

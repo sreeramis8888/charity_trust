@@ -50,15 +50,11 @@ final class AuthLoginApiProvider
 
 String _$authLoginApiHash() => r'348f7f7bbd0a3b28e21a9d4e77cb2a846478ae96';
 
-/// Notifier for managing login state
-
 @ProviderFor(LoginNotifier)
 const loginProvider = LoginNotifierProvider._();
 
-/// Notifier for managing login state
 final class LoginNotifierProvider
     extends $AsyncNotifierProvider<LoginNotifier, Map<String, dynamic>> {
-  /// Notifier for managing login state
   const LoginNotifierProvider._()
       : super(
           from: null,
@@ -78,9 +74,7 @@ final class LoginNotifierProvider
   LoginNotifier create() => LoginNotifier();
 }
 
-String _$loginNotifierHash() => r'182a68ad4930831e8449ad76b61d60d9a1506faf';
-
-/// Notifier for managing login state
+String _$loginNotifierHash() => r'f5697be860ec544d268ecb95f6fc8af59269cd50';
 
 abstract class _$LoginNotifier extends $AsyncNotifier<Map<String, dynamic>> {
   FutureOr<Map<String, dynamic>> build();

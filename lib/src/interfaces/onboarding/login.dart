@@ -4,6 +4,7 @@ import 'package:charity_trust/src/data/constants/color_constants.dart';
 import 'package:charity_trust/src/data/constants/style_constants.dart';
 import 'package:charity_trust/src/data/notifiers/loading_notifier.dart';
 import 'package:charity_trust/src/data/services/navigation_service.dart';
+import 'package:charity_trust/src/data/services/secure_storage_service.dart';
 import 'package:charity_trust/src/data/services/snackbar_service.dart';
 import 'package:charity_trust/src/data/providers/auth_login_provider.dart';
 import 'package:charity_trust/src/data/providers/user_provider.dart';
@@ -489,13 +490,13 @@ class _OTPScreenState extends ConsumerState<OTPScreen> {
 
     try {
       ref.read(loadingProvider.notifier).startLoading();
-
+      SecureStorageService secureStorage = SecureStorageService();
       // Get FCM token
-      final fcmToken = await SecureStorage.read('fcmToken') ?? '';
+      final fcmToken = await secureStorage.getFcmToken();
 
       final authLoginApi = ref.read(authLoginApiProvider);
       final response =
-          await authLoginApi.verifyOtp(widget.fullPhone, otp, fcmToken);
+          await authLoginApi.verifyOtp(widget.fullPhone, otp, fcmToken??'');
 
       ref.read(loadingProvider.notifier).stopLoading();
 
@@ -506,7 +507,7 @@ class _OTPScreenState extends ConsumerState<OTPScreen> {
           if (userData != null) {
             final user = UserModel.fromJson(userData);
 
-            // Store user in provider
+            // Store user in provider and secure storage
             ref.read(userProvider.notifier).setUser(user);
 
             log('OTP verified successfully', name: 'OTPScreen');
@@ -514,10 +515,25 @@ class _OTPScreenState extends ConsumerState<OTPScreen> {
 
             if (context.mounted) {
               // Navigate based on user status
-              if (user.status == 'inactive') {
-                Navigator.of(context).pushReplacementNamed('registration');
-              } else {
-                Navigator.of(context).pushReplacementNamed('navbar');
+              switch (user.status) {
+                case 'active':
+                  Navigator.of(context).pushReplacementNamed('navbar');
+                  break;
+                case 'inactive':
+                  Navigator.of(context).pushReplacementNamed('registration');
+                  break;
+                case 'pending':
+                  Navigator.of(context).pushReplacementNamed('requestSent');
+                  break;
+                case 'rejected':
+                  Navigator.of(context).pushReplacementNamed('requestRejected');
+                  break;
+                case 'suspended':
+                  Navigator.of(context)
+                      .pushReplacementNamed('accountSuspended');
+                  break;
+                default:
+                  Navigator.of(context).pushReplacementNamed('navbar');
               }
             }
           }

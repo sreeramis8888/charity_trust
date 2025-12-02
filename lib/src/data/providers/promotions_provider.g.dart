@@ -50,14 +50,8 @@ final class PromotionsApiProvider
 
 String _$promotionsApiHash() => r'09125daafced658dde894ae60b66212e13ab74af';
 
-/// Provider to fetch all promotions
-/// Usage: ref.watch(promotionsProvider)
-
 @ProviderFor(promotions)
 const promotionsProvider = PromotionsProvider._();
-
-/// Provider to fetch all promotions
-/// Usage: ref.watch(promotionsProvider)
 
 final class PromotionsProvider extends $FunctionalProvider<
         AsyncValue<Map<String, dynamic>>,
@@ -66,8 +60,6 @@ final class PromotionsProvider extends $FunctionalProvider<
     with
         $FutureModifier<Map<String, dynamic>>,
         $FutureProvider<Map<String, dynamic>> {
-  /// Provider to fetch all promotions
-  /// Usage: ref.watch(promotionsProvider)
   const PromotionsProvider._()
       : super(
           from: null,
@@ -96,14 +88,8 @@ final class PromotionsProvider extends $FunctionalProvider<
 
 String _$promotionsHash() => r'ace793d34a6dd269e2318b4f5c11007e8689196e';
 
-/// Provider to fetch a specific promotion by ID
-/// Usage: ref.watch(promotionByIdProvider('promotion-id'))
-
 @ProviderFor(promotionById)
 const promotionByIdProvider = PromotionByIdFamily._();
-
-/// Provider to fetch a specific promotion by ID
-/// Usage: ref.watch(promotionByIdProvider('promotion-id'))
 
 final class PromotionByIdProvider extends $FunctionalProvider<
         AsyncValue<Map<String, dynamic>>,
@@ -112,8 +98,6 @@ final class PromotionByIdProvider extends $FunctionalProvider<
     with
         $FutureModifier<Map<String, dynamic>>,
         $FutureProvider<Map<String, dynamic>> {
-  /// Provider to fetch a specific promotion by ID
-  /// Usage: ref.watch(promotionByIdProvider('promotion-id'))
   const PromotionByIdProvider._(
       {required PromotionByIdFamily super.from, required String super.argument})
       : super(
@@ -162,9 +146,6 @@ final class PromotionByIdProvider extends $FunctionalProvider<
 
 String _$promotionByIdHash() => r'a66c34584095dedddefc41f3ed9d8fb011f35e1c';
 
-/// Provider to fetch a specific promotion by ID
-/// Usage: ref.watch(promotionByIdProvider('promotion-id'))
-
 final class PromotionByIdFamily extends $Family
     with $FunctionalFamilyOverride<FutureOr<Map<String, dynamic>>, String> {
   const PromotionByIdFamily._()
@@ -176,9 +157,6 @@ final class PromotionByIdFamily extends $Family
           isAutoDispose: true,
         );
 
-  /// Provider to fetch a specific promotion by ID
-  /// Usage: ref.watch(promotionByIdProvider('promotion-id'))
-
   PromotionByIdProvider call(
     String id,
   ) =>
@@ -188,18 +166,11 @@ final class PromotionByIdFamily extends $Family
   String toString() => r'promotionByIdProvider';
 }
 
-/// Notifier for managing promotions list state
-/// Allows for manual refresh and state management
-
 @ProviderFor(PromotionsListNotifier)
 const promotionsListProvider = PromotionsListNotifierProvider._();
 
-/// Notifier for managing promotions list state
-/// Allows for manual refresh and state management
 final class PromotionsListNotifierProvider extends $AsyncNotifierProvider<
     PromotionsListNotifier, Map<String, dynamic>> {
-  /// Notifier for managing promotions list state
-  /// Allows for manual refresh and state management
   const PromotionsListNotifierProvider._()
       : super(
           from: null,
@@ -221,9 +192,6 @@ final class PromotionsListNotifierProvider extends $AsyncNotifierProvider<
 
 String _$promotionsListNotifierHash() =>
     r'63ffde1468a9d447fd39c9424ad4ff4eee80e039';
-
-/// Notifier for managing promotions list state
-/// Allows for manual refresh and state management
 
 abstract class _$PromotionsListNotifier
     extends $AsyncNotifier<Map<String, dynamic>> {
