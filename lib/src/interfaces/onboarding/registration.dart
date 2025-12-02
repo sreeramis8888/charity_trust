@@ -41,6 +41,8 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
   String? selectedCountry;
   XFile? profileImage;
   XFile? aadhaarImage;
+  String? recommendedByType = 'trustee'; 
+  String? selectedRecommendedBy;
 
   final Map<String, GlobalKey> _fieldKeys = {
     'name': GlobalKey(),
@@ -62,23 +64,19 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (!mounted) return;
         String? firstErrorKey;
-        
+
         if (nameController.text.trim().isEmpty) {
           firstErrorKey = 'name';
-        }
-        else if (mobileController.text.trim().length > 10) {
+        } else if (mobileController.text.trim().length > 10) {
           firstErrorKey = 'mobile';
-        }
-        else if (dobController.text.trim().isEmpty) {
+        } else if (dobController.text.trim().isEmpty) {
           firstErrorKey = 'dob';
-        }
-        else if (selectedDistrict == null || selectedDistrict!.isEmpty) {
+        } else if (selectedDistrict == null || selectedDistrict!.isEmpty) {
           firstErrorKey = 'district';
-        }
-        else if (aadhaarImage == null) {
+        } else if (aadhaarImage == null) {
           firstErrorKey = 'aadhaar';
-        }
-        else if (recommendedByController.text.trim().isEmpty) {
+        } else if (selectedRecommendedBy == null ||
+            selectedRecommendedBy!.isEmpty) {
           firstErrorKey = 'recommendedBy';
         }
 
@@ -171,6 +169,8 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
         'pincode': pincodeController.text.trim(),
         'dob': dobController.text.trim(),
         'recommended_by': recommendedByController.text.trim(),
+        'recommended_by_type': recommendedByType,
+        'status': "pending"
       };
 
       final result = await ref.read(updateUserProfileProvider(userData).future);
@@ -197,433 +197,504 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
-      body: GestureDetector(
-        onTap: () {
-          FocusScope.of(context).requestFocus(_unfocusNode);
-        },
-        child: Focus(
-          focusNode: _unfocusNode,
-          child: Form(
-            key: _formKey,
-            child: ScrollConfiguration(
-              behavior: ScrollBehavior().copyWith(scrollbars: false),
-              child: SingleChildScrollView(
-                controller: _scrollController,
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const SizedBox(height: 70),
-                anim.AnimatedWidgetWrapper(
-                  animationType: anim.AnimationType.scaleUp,
-                  duration: anim.AnimationDuration.normal,
-                  child: Center(
-                    child: GestureDetector(
-                      onTap: _pickProfilePicture,
-                      child: Stack(
-                        children: [
-                          Container(
-                            height: 110,
-                            width: 110,
-                            decoration: const BoxDecoration(
-                              shape: BoxShape.circle,
-                              color: Color(0xFFEAEAEA),
-                            ),
-                            child: profileImage != null
-                                ? ClipOval(
-                                    child: Image.file(
-                                      File(profileImage!.path),
-                                      fit: BoxFit.cover,
-                                    ),
-                                  )
-                                : const SizedBox(),
-                          ),
-                          Positioned(
-                            bottom: 4,
-                            right: 6,
-                            child: Container(
-                              padding: const EdgeInsets.all(6),
-                              decoration: const BoxDecoration(
-                                shape: BoxShape.circle,
-                                color: Colors.white,
-                              ),
-                              child: const Icon(Icons.camera_alt, size: 20),
-                            ),
-                          )
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 30),
-                anim.AnimatedWidgetWrapper(
-                  animationType: anim.AnimationType.fadeSlideInFromLeft,
-                  duration: anim.AnimationDuration.normal,
-                  delayMilliseconds: 100,
-                  child: Text("Full Name *", style: kSmallTitleR),
-                ),
-                const SizedBox(height: 6),
-                anim.AnimatedWidgetWrapper(
-                  animationType: anim.AnimationType.fadeSlideInFromBottom,
-                  duration: anim.AnimationDuration.normal,
-                  delayMilliseconds: 150,
-                  child: InputField(
-                    key: _fieldKeys['name'],
-                    type: CustomFieldType.text,
-                    hint: "Enter full name",
-                    controller: nameController,
-                    validator: (v) => v!.isEmpty ? "Required" : null,
-                  ),
-                ),
-                const SizedBox(height: 18),
-                anim.AnimatedWidgetWrapper(
-                  animationType: anim.AnimationType.fadeSlideInFromLeft,
-                  duration: anim.AnimationDuration.normal,
-                  delayMilliseconds: 200,
-                  child: Text("Mobile Number *", style: kSmallTitleR),
-                ),
-                const SizedBox(height: 6),
-                anim.AnimatedWidgetWrapper(
-                  animationType: anim.AnimationType.fadeSlideInFromBottom,
-                  duration: anim.AnimationDuration.normal,
-                  delayMilliseconds: 250,
-                  child: IntlPhoneField(
-                    key: _fieldKeys['mobile'],
-                    validator: (phone) {
-                      if (phone!.number.length > 9) {
-                        if (phone.number.length > 10) {
-                          return 'Phone number cannot exceed 10 digits';
-                        }
-                      }
-                      return null;
-                    },
-                    style: const TextStyle(
-                      color: kTextColor,
-                      letterSpacing: 3,
-                      fontSize: 14,
-                      fontWeight: FontWeight.w400,
-                    ),
-                    controller: mobileController,
-                    disableLengthCheck: true,
-                    showCountryFlag: true,
-                    cursorColor: kBlack,
-                    decoration: InputDecoration(
-                      fillColor: kWhite,
-                      hintText: 'Enter your phone number',
-                      hintStyle: TextStyle(
-                        fontSize: 14,
-                        letterSpacing: .2,
-                        fontWeight: FontWeight.w200,
-                        color: kTextColor,
-                      ),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8.0),
-                        borderSide: BorderSide(color: kBorder),
-                      ),
-                      enabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8.0),
-                        borderSide: BorderSide(color: kBorder),
-                      ),
-                      focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8.0),
-                        borderSide: const BorderSide(color: kBorder),
-                      ),
-                      contentPadding: const EdgeInsets.symmetric(
-                        vertical: 16.0,
-                        horizontal: 10.0,
-                      ),
-                    ),
-                    initialCountryCode: 'IN',
-                    flagsButtonPadding:
-                        const EdgeInsets.only(left: 10, right: 10.0),
-                    showDropdownIcon: true,
-                    dropdownIcon: const Icon(
-                      Icons.arrow_drop_down_outlined,
-                      color: kTextColor,
-                    ),
-                    dropdownIconPosition: IconPosition.trailing,
-                    dropdownTextStyle: const TextStyle(
-                      color: kTextColor,
-                      fontSize: 15,
-                      fontWeight: FontWeight.w400,
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 18),
-                anim.AnimatedWidgetWrapper(
-                  animationType: anim.AnimationType.fadeSlideInFromLeft,
-                  duration: anim.AnimationDuration.normal,
-                  delayMilliseconds: 300,
-                  child: Text("Email Address", style: kSmallTitleR),
-                ),
-                const SizedBox(height: 6),
-                anim.AnimatedWidgetWrapper(
-                  animationType: anim.AnimationType.fadeSlideInFromBottom,
-                  duration: anim.AnimationDuration.normal,
-                  delayMilliseconds: 350,
-                  child: InputField(
-                    key: _fieldKeys['email'],
-                    type: CustomFieldType.text,
-                    hint: "Enter address",
-                    controller: emailController,
-                  ),
-                ),
-                const SizedBox(height: 18),
-                anim.AnimatedWidgetWrapper(
-                  animationType: anim.AnimationType.fadeSlideInFromLeft,
-                  duration: anim.AnimationDuration.normal,
-                  delayMilliseconds: 400,
-                  child: Text("Addresss", style: kSmallTitleR),
-                ),
-                const SizedBox(height: 6),
-                anim.AnimatedWidgetWrapper(
-                  animationType: anim.AnimationType.fadeSlideInFromBottom,
-                  duration: anim.AnimationDuration.normal,
-                  delayMilliseconds: 450,
-                  child: InputField(
-                    key: _fieldKeys['address'],
-                    type: CustomFieldType.text,
-                    hint: "Enter address",
-                    controller: addressController,
-                  ),
-                ),
-                const SizedBox(height: 18),
-                anim.AnimatedWidgetWrapper(
-                  animationType: anim.AnimationType.fadeSlideInFromLeft,
-                  duration: anim.AnimationDuration.normal,
-                  delayMilliseconds: 500,
-                  child: Text("Area", style: kSmallTitleR),
-                ),
-                const SizedBox(height: 6),
-                anim.AnimatedWidgetWrapper(
-                  animationType: anim.AnimationType.fadeSlideInFromBottom,
-                  duration: anim.AnimationDuration.normal,
-                  delayMilliseconds: 550,
-                  child: InputField(
-                    key: _fieldKeys['area'],
-                    type: CustomFieldType.text,
-                    hint: "Enter area",
-                    controller: areaController,
-                  ),
-                ),
-                const SizedBox(height: 18),
-                anim.AnimatedWidgetWrapper(
-                  animationType: anim.AnimationType.fadeSlideInFromLeft,
-                  duration: anim.AnimationDuration.normal,
-                  delayMilliseconds: 600,
-                  child: Text("District *", style: kSmallTitleR),
-                ),
-                const SizedBox(height: 6),
-                anim.AnimatedWidgetWrapper(
-                  animationType: anim.AnimationType.fadeSlideInFromBottom,
-                  duration: anim.AnimationDuration.normal,
-                  delayMilliseconds: 650,
-                  child: AnimatedDropdown<String>(
-                    key: _fieldKeys['district'],
-                    hint: "Select",
-                    value: selectedDistrict,
-                    items: const ["Ernakulam", "Kollam", "Thrissur"],
-                    itemLabel: (item) => item,
-                    onChanged: (v) => setState(() => selectedDistrict = v),
-                  ),
-                ),
-                const SizedBox(height: 18),
-                anim.AnimatedWidgetWrapper(
-                  animationType: anim.AnimationType.fadeSlideInFromLeft,
-                  duration: anim.AnimationDuration.normal,
-                  delayMilliseconds: 700,
-                  child: Text("Country", style: kSmallTitleR),
-                ),
-                const SizedBox(height: 6),
-                anim.AnimatedWidgetWrapper(
-                  animationType: anim.AnimationType.fadeSlideInFromBottom,
-                  duration: anim.AnimationDuration.normal,
-                  delayMilliseconds: 750,
-                  child: AnimatedDropdown<String>(
-                    key: _fieldKeys['country'],
-                    hint: "Select",
-                    value: selectedCountry,
-                    items: const ["India", "USA", "UK"],
-                    itemLabel: (item) => item,
-                    onChanged: (v) => setState(() => selectedCountry = v),
-                  ),
-                ),
-                const SizedBox(height: 18),
-                anim.AnimatedWidgetWrapper(
-                  animationType: anim.AnimationType.fadeSlideInFromLeft,
-                  duration: anim.AnimationDuration.normal,
-                  delayMilliseconds: 800,
-                  child: Text("Pincode", style: kSmallTitleR),
-                ),
-                const SizedBox(height: 6),
-                anim.AnimatedWidgetWrapper(
-                  animationType: anim.AnimationType.fadeSlideInFromBottom,
-                  duration: anim.AnimationDuration.normal,
-                  delayMilliseconds: 850,
-                  child: InputField(
-                    key: _fieldKeys['pincode'],
-                    type: CustomFieldType.text,
-                    hint: "Enter pincode",
-                    controller: pincodeController,
-                  ),
-                ),
-                const SizedBox(height: 20),
-                anim.AnimatedWidgetWrapper(
-                  animationType: anim.AnimationType.fadeSlideInFromLeft,
-                  duration: anim.AnimationDuration.normal,
-                  delayMilliseconds: 900,
-                  child: Text("Upload Aadhar Card", style: kSmallTitleR),
-                ),
-                const SizedBox(height: 4),
-                anim.AnimatedWidgetWrapper(
-                  animationType: anim.AnimationType.fadeSlideInFromLeft,
-                  duration: anim.AnimationDuration.normal,
-                  delayMilliseconds: 950,
-                  child: Text(
-                    "Image (JPG/PNG) - Recommended size: 400x400",
-                    style: kSmallerTitleR.copyWith(color: Colors.grey),
-                  ),
-                ),
-                const SizedBox(height: 6),
-                anim.AnimatedWidgetWrapper(
-                  animationType: anim.AnimationType.fadeSlideInFromBottom,
-                  duration: anim.AnimationDuration.normal,
-                  delayMilliseconds: 1000,
-                  child: FormField<void>(
-                    key: _fieldKeys['aadhaar'],
-                    validator: (_) {
-                      // Example: make Aadhaar required; adjust if optional
-                      if (aadhaarImage == null) {
-                        return 'Required';
-                      }
-                      return null;
-                    },
-                    builder: (field) => Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        GestureDetector(
-                          onTap: _pickAadhaarCard,
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(
-                                vertical: 16, horizontal: 12),
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(8),
-                              border: Border.all(
-                                  color: field.hasError
-                                      ? Colors.red
-                                      : kBorder),
-                              color: kWhite,
-                            ),
-                            child: Row(
+        backgroundColor: Colors.white,
+        body: GestureDetector(
+          onTap: () {
+            FocusScope.of(context).requestFocus(_unfocusNode);
+          },
+          child: Focus(
+            focusNode: _unfocusNode,
+            child: Form(
+              key: _formKey,
+              child: ScrollConfiguration(
+                behavior: ScrollBehavior().copyWith(scrollbars: false),
+                child: SingleChildScrollView(
+                  controller: _scrollController,
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const SizedBox(height: 70),
+                      anim.AnimatedWidgetWrapper(
+                        animationType: anim.AnimationType.scaleUp,
+                        duration: anim.AnimationDuration.normal,
+                        child: Center(
+                          child: GestureDetector(
+                            onTap: _pickProfilePicture,
+                            child: Stack(
                               children: [
-                                const Icon(Icons.cloud_upload_outlined,
-                                    color: kTextColor),
-                                const SizedBox(width: 12),
-                                Expanded(
-                                  child: Text(
-                                    aadhaarImage != null
-                                        ? aadhaarImage!.name
-                                        : "Upload",
-                                    style: TextStyle(
-                                      fontSize: 14,
-                                      color: aadhaarImage != null
-                                          ? kTextColor
-                                          : kSecondaryTextColor,
-                                    ),
+                                Container(
+                                  height: 110,
+                                  width: 110,
+                                  decoration: const BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    color: Color(0xFFEAEAEA),
                                   ),
+                                  child: profileImage != null
+                                      ? ClipOval(
+                                          child: Image.file(
+                                            File(profileImage!.path),
+                                            fit: BoxFit.cover,
+                                          ),
+                                        )
+                                      : const SizedBox(),
                                 ),
+                                Positioned(
+                                  bottom: 4,
+                                  right: 6,
+                                  child: Container(
+                                    padding: const EdgeInsets.all(6),
+                                    decoration: const BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      color: Colors.white,
+                                    ),
+                                    child:
+                                        const Icon(Icons.camera_alt, size: 20),
+                                  ),
+                                )
                               ],
                             ),
                           ),
                         ),
-                        if (field.hasError)
-                          Padding(
-                            padding: const EdgeInsets.only(top: 4.0, left: 4.0),
-                            child: Text(
-                              field.errorText ?? '',
-                              style: const TextStyle(
-                                fontSize: 12,
-                                color: Colors.red,
-                              ),
+                      ),
+                      const SizedBox(height: 30),
+                      anim.AnimatedWidgetWrapper(
+                        animationType: anim.AnimationType.fadeSlideInFromLeft,
+                        duration: anim.AnimationDuration.normal,
+                        delayMilliseconds: 100,
+                        child: Text("Full Name *", style: kSmallTitleR),
+                      ),
+                      const SizedBox(height: 6),
+                      anim.AnimatedWidgetWrapper(
+                        animationType: anim.AnimationType.fadeSlideInFromBottom,
+                        duration: anim.AnimationDuration.normal,
+                        delayMilliseconds: 150,
+                        child: InputField(
+                          key: _fieldKeys['name'],
+                          type: CustomFieldType.text,
+                          hint: "Enter full name",
+                          controller: nameController,
+                          validator: (v) => v!.isEmpty ? "Required" : null,
+                        ),
+                      ),
+                      const SizedBox(height: 18),
+                      anim.AnimatedWidgetWrapper(
+                        animationType: anim.AnimationType.fadeSlideInFromLeft,
+                        duration: anim.AnimationDuration.normal,
+                        delayMilliseconds: 200,
+                        child: Text("Mobile Number *", style: kSmallTitleR),
+                      ),
+                      const SizedBox(height: 6),
+                      anim.AnimatedWidgetWrapper(
+                        animationType: anim.AnimationType.fadeSlideInFromBottom,
+                        duration: anim.AnimationDuration.normal,
+                        delayMilliseconds: 250,
+                        child: IntlPhoneField(
+                          key: _fieldKeys['mobile'],
+                          validator: (phone) {
+                            if (phone!.number.length > 9) {
+                              if (phone.number.length > 10) {
+                                return 'Phone number cannot exceed 10 digits';
+                              }
+                            }
+                            return null;
+                          },
+                          style: const TextStyle(
+                            color: kTextColor,
+                            letterSpacing: 3,
+                            fontSize: 14,
+                            fontWeight: FontWeight.w400,
+                          ),
+                          controller: mobileController,
+                          disableLengthCheck: true,
+                          showCountryFlag: true,
+                          cursorColor: kBlack,
+                          decoration: InputDecoration(
+                            fillColor: kWhite,
+                            hintText: 'Enter your phone number',
+                            hintStyle: TextStyle(
+                              fontSize: 14,
+                              letterSpacing: .2,
+                              fontWeight: FontWeight.w200,
+                              color: kTextColor,
+                            ),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(8.0),
+                              borderSide: BorderSide(color: kBorder),
+                            ),
+                            enabledBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(8.0),
+                              borderSide: BorderSide(color: kBorder),
+                            ),
+                            focusedBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(8.0),
+                              borderSide: const BorderSide(color: kBorder),
+                            ),
+                            contentPadding: const EdgeInsets.symmetric(
+                              vertical: 16.0,
+                              horizontal: 10.0,
                             ),
                           ),
-                      ],
-                    ),
+                          initialCountryCode: 'IN',
+                          flagsButtonPadding:
+                              const EdgeInsets.only(left: 10, right: 10.0),
+                          showDropdownIcon: true,
+                          dropdownIcon: const Icon(
+                            Icons.arrow_drop_down_outlined,
+                            color: kTextColor,
+                          ),
+                          dropdownIconPosition: IconPosition.trailing,
+                          dropdownTextStyle: const TextStyle(
+                            color: kTextColor,
+                            fontSize: 15,
+                            fontWeight: FontWeight.w400,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 18),
+                      anim.AnimatedWidgetWrapper(
+                        animationType: anim.AnimationType.fadeSlideInFromLeft,
+                        duration: anim.AnimationDuration.normal,
+                        delayMilliseconds: 300,
+                        child: Text("Email Address", style: kSmallTitleR),
+                      ),
+                      const SizedBox(height: 6),
+                      anim.AnimatedWidgetWrapper(
+                        animationType: anim.AnimationType.fadeSlideInFromBottom,
+                        duration: anim.AnimationDuration.normal,
+                        delayMilliseconds: 350,
+                        child: InputField(
+                          key: _fieldKeys['email'],
+                          type: CustomFieldType.text,
+                          hint: "Enter address",
+                          controller: emailController,
+                        ),
+                      ),
+                      const SizedBox(height: 18),
+                      anim.AnimatedWidgetWrapper(
+                        animationType: anim.AnimationType.fadeSlideInFromLeft,
+                        duration: anim.AnimationDuration.normal,
+                        delayMilliseconds: 400,
+                        child: Text("Addresss", style: kSmallTitleR),
+                      ),
+                      const SizedBox(height: 6),
+                      anim.AnimatedWidgetWrapper(
+                        animationType: anim.AnimationType.fadeSlideInFromBottom,
+                        duration: anim.AnimationDuration.normal,
+                        delayMilliseconds: 450,
+                        child: InputField(
+                          key: _fieldKeys['address'],
+                          type: CustomFieldType.text,
+                          hint: "Enter address",
+                          controller: addressController,
+                        ),
+                      ),
+                      const SizedBox(height: 18),
+                      anim.AnimatedWidgetWrapper(
+                        animationType: anim.AnimationType.fadeSlideInFromLeft,
+                        duration: anim.AnimationDuration.normal,
+                        delayMilliseconds: 500,
+                        child: Text("Area", style: kSmallTitleR),
+                      ),
+                      const SizedBox(height: 6),
+                      anim.AnimatedWidgetWrapper(
+                        animationType: anim.AnimationType.fadeSlideInFromBottom,
+                        duration: anim.AnimationDuration.normal,
+                        delayMilliseconds: 550,
+                        child: InputField(
+                          key: _fieldKeys['area'],
+                          type: CustomFieldType.text,
+                          hint: "Enter area",
+                          controller: areaController,
+                        ),
+                      ),
+                      const SizedBox(height: 18),
+                      anim.AnimatedWidgetWrapper(
+                        animationType: anim.AnimationType.fadeSlideInFromLeft,
+                        duration: anim.AnimationDuration.normal,
+                        delayMilliseconds: 600,
+                        child: Text("District *", style: kSmallTitleR),
+                      ),
+                      const SizedBox(height: 6),
+                      anim.AnimatedWidgetWrapper(
+                        animationType: anim.AnimationType.fadeSlideInFromBottom,
+                        duration: anim.AnimationDuration.normal,
+                        delayMilliseconds: 650,
+                        child: AnimatedDropdown<String>(
+                          key: _fieldKeys['district'],
+                          hint: "Select",
+                          value: selectedDistrict,
+                          items: const ["Ernakulam", "Kollam", "Thrissur"],
+                          itemLabel: (item) => item,
+                          onChanged: (v) =>
+                              setState(() => selectedDistrict = v),
+                        ),
+                      ),
+                      const SizedBox(height: 18),
+                      anim.AnimatedWidgetWrapper(
+                        animationType: anim.AnimationType.fadeSlideInFromLeft,
+                        duration: anim.AnimationDuration.normal,
+                        delayMilliseconds: 700,
+                        child: Text("Country", style: kSmallTitleR),
+                      ),
+                      const SizedBox(height: 6),
+                      anim.AnimatedWidgetWrapper(
+                        animationType: anim.AnimationType.fadeSlideInFromBottom,
+                        duration: anim.AnimationDuration.normal,
+                        delayMilliseconds: 750,
+                        child: AnimatedDropdown<String>(
+                          key: _fieldKeys['country'],
+                          hint: "Select",
+                          value: selectedCountry,
+                          items: const ["India", "USA", "UK"],
+                          itemLabel: (item) => item,
+                          onChanged: (v) => setState(() => selectedCountry = v),
+                        ),
+                      ),
+                      const SizedBox(height: 18),
+                      anim.AnimatedWidgetWrapper(
+                        animationType: anim.AnimationType.fadeSlideInFromLeft,
+                        duration: anim.AnimationDuration.normal,
+                        delayMilliseconds: 800,
+                        child: Text("Pincode", style: kSmallTitleR),
+                      ),
+                      const SizedBox(height: 6),
+                      anim.AnimatedWidgetWrapper(
+                        animationType: anim.AnimationType.fadeSlideInFromBottom,
+                        duration: anim.AnimationDuration.normal,
+                        delayMilliseconds: 850,
+                        child: InputField(
+                          key: _fieldKeys['pincode'],
+                          type: CustomFieldType.text,
+                          hint: "Enter pincode",
+                          controller: pincodeController,
+                        ),
+                      ),
+                      const SizedBox(height: 20),
+                      anim.AnimatedWidgetWrapper(
+                        animationType: anim.AnimationType.fadeSlideInFromLeft,
+                        duration: anim.AnimationDuration.normal,
+                        delayMilliseconds: 900,
+                        child: Text("Upload Aadhar Card", style: kSmallTitleR),
+                      ),
+                      const SizedBox(height: 4),
+                      anim.AnimatedWidgetWrapper(
+                        animationType: anim.AnimationType.fadeSlideInFromLeft,
+                        duration: anim.AnimationDuration.normal,
+                        delayMilliseconds: 950,
+                        child: Text(
+                          "Image (JPG/PNG) - Recommended size: 400x400",
+                          style: kSmallerTitleR.copyWith(color: Colors.grey),
+                        ),
+                      ),
+                      const SizedBox(height: 6),
+                      anim.AnimatedWidgetWrapper(
+                        animationType: anim.AnimationType.fadeSlideInFromBottom,
+                        duration: anim.AnimationDuration.normal,
+                        delayMilliseconds: 1000,
+                        child: FormField<void>(
+                          key: _fieldKeys['aadhaar'],
+                          validator: (_) {
+                            // Example: make Aadhaar required; adjust if optional
+                            if (aadhaarImage == null) {
+                              return 'Required';
+                            }
+                            return null;
+                          },
+                          builder: (field) => Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              GestureDetector(
+                                onTap: _pickAadhaarCard,
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(
+                                      vertical: 16, horizontal: 12),
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(8),
+                                    border: Border.all(
+                                        color: field.hasError
+                                            ? Colors.red
+                                            : kBorder),
+                                    color: kWhite,
+                                  ),
+                                  child: Row(
+                                    children: [
+                                      const Icon(Icons.cloud_upload_outlined,
+                                          color: kTextColor),
+                                      const SizedBox(width: 12),
+                                      Expanded(
+                                        child: Text(
+                                          aadhaarImage != null
+                                              ? aadhaarImage!.name
+                                              : "Upload",
+                                          style: TextStyle(
+                                            fontSize: 14,
+                                            color: aadhaarImage != null
+                                                ? kTextColor
+                                                : kSecondaryTextColor,
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                              if (field.hasError)
+                                Padding(
+                                  padding: const EdgeInsets.only(
+                                      top: 4.0, left: 4.0),
+                                  child: Text(
+                                    field.errorText ?? '',
+                                    style: const TextStyle(
+                                      fontSize: 12,
+                                      color: Colors.red,
+                                    ),
+                                  ),
+                                ),
+                            ],
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 20),
+                      anim.AnimatedWidgetWrapper(
+                        animationType: anim.AnimationType.fadeSlideInFromLeft,
+                        duration: anim.AnimationDuration.normal,
+                        delayMilliseconds: 1050,
+                        child: Text("Date of Birth *", style: kSmallTitleR),
+                      ),
+                      const SizedBox(height: 6),
+                      anim.AnimatedWidgetWrapper(
+                        animationType: anim.AnimationType.fadeSlideInFromBottom,
+                        duration: anim.AnimationDuration.normal,
+                        delayMilliseconds: 1100,
+                        child: InputField(
+                          key: _fieldKeys['dob'],
+                          type: CustomFieldType.date,
+                          hint: "dd/mm/yyyy",
+                          controller: dobController,
+                          validator: (v) => v!.isEmpty ? "Required" : null,
+                        ),
+                      ),
+                      const SizedBox(height: 20),
+                      anim.AnimatedWidgetWrapper(
+                        animationType: anim.AnimationType.fadeSlideInFromLeft,
+                        duration: anim.AnimationDuration.normal,
+                        delayMilliseconds: 1150,
+                        child: Text("Recommended By *", style: kSmallTitleR),
+                      ),
+                      const SizedBox(height: 12),
+                      anim.AnimatedWidgetWrapper(
+                        animationType: anim.AnimationType.fadeSlideInFromBottom,
+                        duration: anim.AnimationDuration.normal,
+                        delayMilliseconds: 1200,
+                        child: Row(
+                          children: [
+                            Row(
+                              children: [
+                                Radio<String>(
+                                  value: 'trustee',
+                                  groupValue: recommendedByType,
+                                  onChanged: (value) {
+                                    setState(() {
+                                      recommendedByType = value;
+                                      selectedRecommendedBy = null;
+                                      recommendedByController.clear();
+                                    });
+                                  },
+                                ),
+                                const Text("Trustee"),
+                              ],
+                            ),
+                            Row(
+                              children: [
+                                Radio<String>(
+                                  value: 'charity_member',
+                                  groupValue: recommendedByType,
+                                  onChanged: (value) {
+                                    setState(() {
+                                      recommendedByType = value;
+                                      selectedRecommendedBy = null;
+                                      recommendedByController.clear();
+                                    });
+                                  },
+                                ),
+                                const Text("Charity Member"),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      anim.AnimatedWidgetWrapper(
+                        animationType: anim.AnimationType.fadeSlideInFromBottom,
+                        duration: anim.AnimationDuration.normal,
+                        delayMilliseconds: 1250,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              recommendedByType == 'trustee'
+                                  ? "Choose Trustee *"
+                                  : "Choose Charity Member *",
+                              style: kSmallTitleR,
+                            ),
+                            const SizedBox(height: 6),
+                            AnimatedDropdown<String>(
+                              key: _fieldKeys['recommendedBy'],
+                              hint: recommendedByType == 'trustee'
+                                  ? "Select trustee"
+                                  : "Select charity member",
+                              value: selectedRecommendedBy,
+                              items: recommendedByType == 'trustee'
+                                  ? const [
+                                      "Trustee 1",
+                                      "Trustee 2",
+                                      "Trustee 3"
+                                    ]
+                                  : const [
+                                      "Charity Member 1",
+                                      "Charity Member 2",
+                                      "Charity Member 3"
+                                    ],
+                              itemLabel: (item) => item,
+                              onChanged: (v) {
+                                setState(() {
+                                  selectedRecommendedBy = v;
+                                  recommendedByController.text = v ?? "";
+                                });
+                              },
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 30),
+                      anim.AnimatedWidgetWrapper(
+                        animationType: anim.AnimationType.fadeScaleUp,
+                        duration: anim.AnimationDuration.normal,
+                        delayMilliseconds: 1250,
+                        child: SizedBox(
+                          height: 50,
+                          width: double.infinity,
+                          child: primaryButton(
+                            label: "Register",
+                            onPressed: () {
+                              if (_formKey.currentState!.validate()) {
+                                _handleRegistration();
+                              } else {
+                                _scrollToFirstError();
+                              }
+                            },
+                            isLoading: ref.watch(loadingProvider),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 30),
+                    ],
                   ),
                 ),
-                const SizedBox(height: 20),
-                anim.AnimatedWidgetWrapper(
-                  animationType: anim.AnimationType.fadeSlideInFromLeft,
-                  duration: anim.AnimationDuration.normal,
-                  delayMilliseconds: 1050,
-                  child: Text("Date of Birth *", style: kSmallTitleR),
-                ),
-                const SizedBox(height: 6),
-                anim.AnimatedWidgetWrapper(
-                  animationType: anim.AnimationType.fadeSlideInFromBottom,
-                  duration: anim.AnimationDuration.normal,
-                  delayMilliseconds: 1100,
-                  child: InputField(
-                    key: _fieldKeys['dob'],
-                    type: CustomFieldType.date,
-                    hint: "dd/mm/yyyy",
-                    controller: dobController,
-                    validator: (v) => v!.isEmpty ? "Required" : null,
-                  ),
-                ),
-                const SizedBox(height: 20),
-                anim.AnimatedWidgetWrapper(
-                  animationType: anim.AnimationType.fadeSlideInFromLeft,
-                  duration: anim.AnimationDuration.normal,
-                  delayMilliseconds: 1150,
-                  child: Text("Recommended By *", style: kSmallTitleR),
-                ),
-                const SizedBox(height: 6),
-                anim.AnimatedWidgetWrapper(
-                  animationType: anim.AnimationType.fadeSlideInFromBottom,
-                  duration: anim.AnimationDuration.normal,
-                  delayMilliseconds: 1200,
-                  child: AnimatedDropdown<String>(
-                    key: _fieldKeys['recommendedBy'],
-                    hint: "Select the trustee name",
-                    value: recommendedByController.text.isEmpty
-                        ? null
-                        : recommendedByController.text,
-                    items: const ["Trustee 1", "Trustee 2", "Trustee 3"],
-                    itemLabel: (item) => item,
-                    onChanged: (v) =>
-                        setState(() => recommendedByController.text = v ?? ""),
-                  ),
-                ),
-                const SizedBox(height: 30),
-                anim.AnimatedWidgetWrapper(
-                  animationType: anim.AnimationType.fadeScaleUp,
-                  duration: anim.AnimationDuration.normal,
-                  delayMilliseconds: 1250,
-                  child: SizedBox(
-                    height: 50,
-                    width: double.infinity,
-                    child: primaryButton(
-                      label: "Register",
-                      onPressed: () {
-                        if (_formKey.currentState!.validate()) {
-                          _handleRegistration();
-                        } else {
-                          _scrollToFirstError();
-                        }
-                      },
-                      isLoading: ref.watch(loadingProvider),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 30),
-              ],
-            ),
+              ),
             ),
           ),
-        ),
-      ),
-    ));
+        ));
   }
 }
