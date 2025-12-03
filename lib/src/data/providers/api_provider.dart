@@ -75,7 +75,7 @@ class ApiProvider {
 
       log(name: 'API GET', '$baseUrl$endpoint');
       final decoded = json.decode(response.body);
-
+      log(name: 'DATA', response.body);
       if (response.statusCode == 200) {
         return ApiResponse.success(decoded, response.statusCode);
       } else {

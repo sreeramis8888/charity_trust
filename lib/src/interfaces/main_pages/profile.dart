@@ -1,6 +1,7 @@
 import 'package:charity_trust/src/data/constants/color_constants.dart';
 import 'package:charity_trust/src/data/constants/style_constants.dart';
 import 'package:charity_trust/src/interfaces/animations/index.dart' as anim;
+import 'package:charity_trust/src/interfaces/main_pages/profile_pages/my_participations.dart';
 import 'package:flutter/material.dart';
 
 class ProfilePage extends StatelessWidget {
@@ -60,7 +61,9 @@ class ProfilePage extends StatelessWidget {
                     ),
                   ),
                   IconButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      Navigator.of(context).pushNamed('EditProfile');
+                    },
                     icon: const Icon(Icons.edit_square, color: kTextColor),
                   )
                 ],
@@ -115,12 +118,21 @@ class ProfilePage extends StatelessWidget {
                 padding: const EdgeInsets.symmetric(vertical: 8),
                 decoration: BoxDecoration(
                   border: Border.all(color: Color(0xFFD8DADC)),
-                  color: const Color(0xFFEBEBEB),
+                  color:  kCardBackgroundColor,
                   borderRadius: BorderRadius.circular(22),
                 ),
                 child: Column(
                 children: [
-                  _tile(Icons.volunteer_activism, "My Participations"),
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (context) => const MyParticipationsPage(),
+                        ),
+                      );
+                    },
+                    child: _tile(Icons.volunteer_activism, "My Participations"),
+                  ),
                   _divider(),
                   _tile(Icons.headset_mic_rounded, "Help & Support"),
                   _divider(),

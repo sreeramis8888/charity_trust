@@ -87,7 +87,7 @@ final class FetchUserProfileProvider extends $FunctionalProvider<
   }
 }
 
-String _$fetchUserProfileHash() => r'00a92e954b42bfdf2d73f086da3d8a62f312c8aa';
+String _$fetchUserProfileHash() => r'b7deacf1d1016d99d98ea2a4de0a99d98c173a2a';
 
 @ProviderFor(updateUserProfile)
 const updateUserProfileProvider = UpdateUserProfileFamily._();
@@ -141,7 +141,7 @@ final class UpdateUserProfileProvider extends $FunctionalProvider<
   }
 }
 
-String _$updateUserProfileHash() => r'1c5817fe6031570c245b5a62f301cf4f98a6b0a5';
+String _$updateUserProfileHash() => r'71143848b68553ff0a1586d803de8e385b89a0be';
 
 final class UpdateUserProfileFamily extends $Family
     with $FunctionalFamilyOverride<FutureOr<UserModel?>, Map<String, dynamic>> {
@@ -161,4 +161,79 @@ final class UpdateUserProfileFamily extends $Family
 
   @override
   String toString() => r'updateUserProfileProvider';
+}
+
+@ProviderFor(fetchUsersByRole)
+const fetchUsersByRoleProvider = FetchUsersByRoleFamily._();
+
+final class FetchUsersByRoleProvider extends $FunctionalProvider<
+        AsyncValue<List<UserModel>>, List<UserModel>, FutureOr<List<UserModel>>>
+    with $FutureModifier<List<UserModel>>, $FutureProvider<List<UserModel>> {
+  const FetchUsersByRoleProvider._(
+      {required FetchUsersByRoleFamily super.from,
+      required UsersListParams super.argument})
+      : super(
+          retry: null,
+          name: r'fetchUsersByRoleProvider',
+          isAutoDispose: true,
+          dependencies: null,
+          $allTransitiveDependencies: null,
+        );
+
+  @override
+  String debugGetCreateSourceHash() => _$fetchUsersByRoleHash();
+
+  @override
+  String toString() {
+    return r'fetchUsersByRoleProvider'
+        ''
+        '($argument)';
+  }
+
+  @$internal
+  @override
+  $FutureProviderElement<List<UserModel>> $createElement(
+          $ProviderPointer pointer) =>
+      $FutureProviderElement(pointer);
+
+  @override
+  FutureOr<List<UserModel>> create(Ref ref) {
+    final argument = this.argument as UsersListParams;
+    return fetchUsersByRole(
+      ref,
+      argument,
+    );
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other is FetchUsersByRoleProvider && other.argument == argument;
+  }
+
+  @override
+  int get hashCode {
+    return argument.hashCode;
+  }
+}
+
+String _$fetchUsersByRoleHash() => r'1d50f80ceecd19f9db215bc7ea232e931d540b29';
+
+final class FetchUsersByRoleFamily extends $Family
+    with $FunctionalFamilyOverride<FutureOr<List<UserModel>>, UsersListParams> {
+  const FetchUsersByRoleFamily._()
+      : super(
+          retry: null,
+          name: r'fetchUsersByRoleProvider',
+          dependencies: null,
+          $allTransitiveDependencies: null,
+          isAutoDispose: true,
+        );
+
+  FetchUsersByRoleProvider call(
+    UsersListParams params,
+  ) =>
+      FetchUsersByRoleProvider._(argument: params, from: this);
+
+  @override
+  String toString() => r'fetchUsersByRoleProvider';
 }

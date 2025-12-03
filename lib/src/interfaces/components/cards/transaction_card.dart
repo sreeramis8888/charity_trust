@@ -23,7 +23,7 @@ class TransactionCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: kWhite,
+        color: kCardBackgroundColor,
         borderRadius: BorderRadius.circular(22),
         border: Border.all(color: kBorder),
       ),

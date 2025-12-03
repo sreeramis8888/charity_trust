@@ -92,3 +92,56 @@ Future<UserModel?> updateUserProfile(Ref ref, Map<String, dynamic> userData) asy
     return null;
   }
 }
+
+class UsersListParams {
+  final String role;
+  final int pageNo;
+  final String? search;
+
+  UsersListParams({
+    required this.role,
+    this.pageNo = 1,
+    this.search,
+  });
+}
+
+@riverpod
+Future<List<UserModel>> fetchUsersByRole(
+  Ref ref,
+  UsersListParams params,
+) async {
+  try {
+    final apiProvider = ref.watch(apiProviderProvider);
+    final queryParams = {
+      'role': params.role,
+      'page_no': params.pageNo,
+      'limit': 10,
+    };
+    final search = params.search;
+    if (search != null && search.isNotEmpty) {
+      queryParams['search'] = search;
+    }
+
+    final queryString = queryParams.entries
+        .map((e) => '${e.key}=${Uri.encodeComponent(e.value.toString())}')
+        .join('&');
+
+    final response = await apiProvider.get(
+      '/user?$queryString',
+      requireAuth: true,
+    );
+
+    if (response.success && response.data != null) {
+      final data = response.data!['data'] as List?;
+      if (data != null) {
+        return data
+            .map((item) => UserModel.fromJson(item as Map<String, dynamic>))
+            .toList();
+      }
+    }
+    return [];
+  } catch (e) {
+    log('Error fetching users by role: $e', name: 'fetchUsersByRole');
+    return [];
+  }
+}

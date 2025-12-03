@@ -62,7 +62,7 @@ class _CampaignDetailPageState extends State<CampaignDetailPage> {
           icon: const Icon(
             Icons.arrow_back_ios,
             color: kTextColor,
-            size: 18,
+            size: 20,
           ),
           onPressed: () => Navigator.pop(context),
         ),
@@ -155,7 +155,8 @@ class _CampaignDetailPageState extends State<CampaignDetailPage> {
                     ),
                     child: Row(
                       children: [
-                        const Icon(Icons.calendar_month, color: kWhite, size: 14),
+                        const Icon(Icons.calendar_month,
+                            color: kWhite, size: 14),
                         const SizedBox(width: 6),
                         Text(
                           widget.date.toUpperCase(),

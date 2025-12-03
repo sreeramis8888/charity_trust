@@ -63,14 +63,13 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
       vsync: this,
       duration: Duration(milliseconds: 1200),
     );
-    
- 
+
     // Welcome text animations
     _textController = AnimationController(
       vsync: this,
       duration: Duration(milliseconds: 1000),
     );
-   
+
     _controller.forward();
     log('Starting app initialization', name: 'SplashScreen');
     _initializeApp();
@@ -84,11 +83,13 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
 
       // If update is required and forced, show dialog and don't proceed
       if (isAppUpdateRequired && forceUpdate) {
-        log('_initializeApp: Force update required, stopping initialization', name: 'SplashScreen');
+        log('_initializeApp: Force update required, stopping initialization',
+            name: 'SplashScreen');
         return;
       }
 
-      log('_initializeApp: Proceeding to authentication check', name: 'SplashScreen');
+      log('_initializeApp: Proceeding to authentication check',
+          name: 'SplashScreen');
       // Check authentication and load user
       await _checkAuthenticationAndLoadUser();
     } catch (e) {
@@ -104,24 +105,29 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
       final versionResponse = await versionCheckService.checkVersion();
 
       if (versionResponse != null) {
-        log('_checkAppVersion: Version response received - force: ${versionResponse.force}, version: ${versionResponse.version}', name: 'SplashScreen');
+        log('_checkAppVersion: Version response received - force: ${versionResponse.force}, version: ${versionResponse.version}',
+            name: 'SplashScreen');
         setState(() {
           isAppUpdateRequired = true;
           forceUpdate = versionResponse.force;
           errorMessage = versionResponse.updateMessage;
           updateLink = versionResponse.applink;
         });
-        log('_checkAppVersion: State updated - isAppUpdateRequired: $isAppUpdateRequired, forceUpdate: $forceUpdate', name: 'SplashScreen');
+        log('_checkAppVersion: State updated - isAppUpdateRequired: $isAppUpdateRequired, forceUpdate: $forceUpdate',
+            name: 'SplashScreen');
 
         if (forceUpdate) {
-          log('_checkAppVersion: Showing force update dialog', name: 'SplashScreen');
+          log('_checkAppVersion: Showing force update dialog',
+              name: 'SplashScreen');
           _showForceUpdateDialog();
         } else {
-          log('_checkAppVersion: Showing optional update dialog', name: 'SplashScreen');
+          log('_checkAppVersion: Showing optional update dialog',
+              name: 'SplashScreen');
           _showOptionalUpdateDialog();
         }
       } else {
-        log('_checkAppVersion: No version response received', name: 'SplashScreen');
+        log('_checkAppVersion: No version response received',
+            name: 'SplashScreen');
       }
     } catch (e) {
       log('Error checking version: $e', name: 'SplashScreen');
@@ -129,7 +135,8 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
   }
 
   void _showForceUpdateDialog() {
-    log('_showForceUpdateDialog: Displaying force update dialog', name: 'SplashScreen');
+    log('_showForceUpdateDialog: Displaying force update dialog',
+        name: 'SplashScreen');
     showDialog(
       context: context,
       barrierDismissible: false,
@@ -139,7 +146,8 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
         actions: [
           TextButton(
             onPressed: () {
-              log('_showForceUpdateDialog: User tapped Update Now', name: 'SplashScreen');
+              log('_showForceUpdateDialog: User tapped Update Now',
+                  name: 'SplashScreen');
               _openAppStore();
             },
             child: const Text('Update Now'),
@@ -150,7 +158,8 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
   }
 
   void _showOptionalUpdateDialog() {
-    log('_showOptionalUpdateDialog: Displaying optional update dialog', name: 'SplashScreen');
+    log('_showOptionalUpdateDialog: Displaying optional update dialog',
+        name: 'SplashScreen');
     showDialog(
       context: context,
       barrierDismissible: true,
@@ -160,7 +169,8 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
         actions: [
           TextButton(
             onPressed: () {
-              log('_showOptionalUpdateDialog: User tapped Later', name: 'SplashScreen');
+              log('_showOptionalUpdateDialog: User tapped Later',
+                  name: 'SplashScreen');
               Navigator.pop(context);
               _checkAuthenticationAndLoadUser();
             },
@@ -168,7 +178,8 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
           ),
           TextButton(
             onPressed: () {
-              log('_showOptionalUpdateDialog: User tapped Update', name: 'SplashScreen');
+              log('_showOptionalUpdateDialog: User tapped Update',
+                  name: 'SplashScreen');
               _openAppStore();
             },
             child: const Text('Update'),
@@ -179,18 +190,21 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
   }
 
   Future<void> _openAppStore() async {
-    log('_openAppStore: Attempting to open app store with link: $updateLink', name: 'SplashScreen');
+    log('_openAppStore: Attempting to open app store with link: $updateLink',
+        name: 'SplashScreen');
     if (updateLink != null && updateLink!.isNotEmpty) {
       try {
         if (await canLaunchUrl(Uri.parse(updateLink!))) {
-          log('_openAppStore: URL is launchable, opening...', name: 'SplashScreen');
+          log('_openAppStore: URL is launchable, opening...',
+              name: 'SplashScreen');
           await launchUrl(
             Uri.parse(updateLink!),
             mode: LaunchMode.externalApplication,
           );
           log('_openAppStore: URL launched successfully', name: 'SplashScreen');
         } else {
-          log('Could not launch update link: $updateLink', name: 'SplashScreen');
+          log('Could not launch update link: $updateLink',
+              name: 'SplashScreen');
         }
       } catch (e) {
         log('Error opening app store: $e', name: 'SplashScreen');
@@ -202,41 +216,54 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
 
   Future<void> _checkAuthenticationAndLoadUser() async {
     try {
-      log('_checkAuthenticationAndLoadUser: Starting authentication check', name: 'SplashScreen');
+      log('_checkAuthenticationAndLoadUser: Starting authentication check',
+          name: 'SplashScreen');
       final authProvider = ref.read(authProviderProvider);
       final isAuthenticated = await authProvider.isAuthenticated();
-      log('_checkAuthenticationAndLoadUser: isAuthenticated = $isAuthenticated', name: 'SplashScreen');
+      final bearer = await authProvider.getBearerToken();
+      log('$bearer', name: 'Bearer');
+      log('_checkAuthenticationAndLoadUser: isAuthenticated = $isAuthenticated',
+          name: 'SplashScreen');
 
       if (isAuthenticated) {
-        log('_checkAuthenticationAndLoadUser: User is authenticated, loading user data', name: 'SplashScreen');
+        log('_checkAuthenticationAndLoadUser: User is authenticated, loading user data',
+            name: 'SplashScreen');
         // Try to load user from local storage first
         final secureStorage = ref.read(secureStorageServiceProvider);
-        log('_checkAuthenticationAndLoadUser: Attempting to load user from secure storage', name: 'SplashScreen');
+        log('_checkAuthenticationAndLoadUser: Attempting to load user from secure storage',
+            name: 'SplashScreen');
         var user = await secureStorage.getUserData();
 
         if (user != null) {
-          log('_checkAuthenticationAndLoadUser: User loaded from secure storage - id: ${user.id}, status: ${user.status}', name: 'SplashScreen');
+          log('_checkAuthenticationAndLoadUser: User loaded from secure storage - id: ${user.id}, status: ${user.status}',
+              name: 'SplashScreen');
           // Set user in provider from local storage
           ref.read(userProvider.notifier).setUser(user);
         } else {
-          log('_checkAuthenticationAndLoadUser: No user in secure storage, fetching from API', name: 'SplashScreen');
+          log('_checkAuthenticationAndLoadUser: No user in secure storage, fetching from API',
+              name: 'SplashScreen');
           // If not in local storage or failed, fetch from API
           user = await ref.read(fetchUserProfileProvider.future);
           if (user != null) {
-            log('_checkAuthenticationAndLoadUser: User fetched from API - id: ${user.id}, status: ${user.status}', name: 'SplashScreen');
+            log('_checkAuthenticationAndLoadUser: User fetched from API - id: ${user.id}, status: ${user.status}',
+                name: 'SplashScreen');
           } else {
-            log('_checkAuthenticationAndLoadUser: Failed to fetch user from API', name: 'SplashScreen');
+            log('_checkAuthenticationAndLoadUser: Failed to fetch user from API',
+                name: 'SplashScreen');
           }
         }
 
         if (mounted) {
-          log('_checkAuthenticationAndLoadUser: Widget mounted, navigating based on status: ${user?.status}', name: 'SplashScreen');
+          log('_checkAuthenticationAndLoadUser: Widget mounted, navigating based on status: ${user?.status}',
+              name: 'SplashScreen');
           _navigateBasedOnUserStatus(user?.status);
         } else {
-          log('_checkAuthenticationAndLoadUser: Widget not mounted, skipping navigation', name: 'SplashScreen');
+          log('_checkAuthenticationAndLoadUser: Widget not mounted, skipping navigation',
+              name: 'SplashScreen');
         }
       } else {
-        log('_checkAuthenticationAndLoadUser: User is not authenticated, starting navigation timer to Phone screen', name: 'SplashScreen');
+        log('_checkAuthenticationAndLoadUser: User is not authenticated, starting navigation timer to Phone screen',
+            name: 'SplashScreen');
         // Not authenticated, go to phone login
         if (mounted) {
           _startNavigationTimer();
@@ -245,7 +272,8 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
     } catch (e) {
       log('Error checking authentication: $e', name: 'SplashScreen');
       if (mounted) {
-        log('_checkAuthenticationAndLoadUser: Error occurred, starting navigation timer to Phone screen', name: 'SplashScreen');
+        log('_checkAuthenticationAndLoadUser: Error occurred, starting navigation timer to Phone screen',
+            name: 'SplashScreen');
         _startNavigationTimer();
       }
     }
@@ -253,46 +281,57 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
 
   void _navigateBasedOnUserStatus(String? status) {
     if (!mounted) {
-      log('_navigateBasedOnUserStatus: Widget not mounted, skipping navigation', name: 'SplashScreen');
+      log('_navigateBasedOnUserStatus: Widget not mounted, skipping navigation',
+          name: 'SplashScreen');
       return;
     }
 
-    log('_navigateBasedOnUserStatus: Navigating based on status: $status', name: 'SplashScreen');
+    log('_navigateBasedOnUserStatus: Navigating based on status: $status',
+        name: 'SplashScreen');
     switch (status) {
       case 'active':
-        log('_navigateBasedOnUserStatus: Navigating to navbar', name: 'SplashScreen');
+        log('_navigateBasedOnUserStatus: Navigating to navbar',
+            name: 'SplashScreen');
         NavigationService().pushNamedAndRemoveUntil('navbar');
         break;
       case 'inactive':
-        log('_navigateBasedOnUserStatus: Navigating to registration', name: 'SplashScreen');
+        log('_navigateBasedOnUserStatus: Navigating to registration',
+            name: 'SplashScreen');
         NavigationService().pushNamedAndRemoveUntil('registration');
         break;
       case 'pending':
-        log('_navigateBasedOnUserStatus: Navigating to requestSent', name: 'SplashScreen');
+        log('_navigateBasedOnUserStatus: Navigating to requestSent',
+            name: 'SplashScreen');
         NavigationService().pushNamedAndRemoveUntil('requestSent');
         break;
       case 'rejected':
-        log('_navigateBasedOnUserStatus: Navigating to requestRejected', name: 'SplashScreen');
+        log('_navigateBasedOnUserStatus: Navigating to requestRejected',
+            name: 'SplashScreen');
         NavigationService().pushNamedAndRemoveUntil('requestRejected');
         break;
       case 'suspended':
-        log('_navigateBasedOnUserStatus: Navigating to accountSuspended', name: 'SplashScreen');
+        log('_navigateBasedOnUserStatus: Navigating to accountSuspended',
+            name: 'SplashScreen');
         NavigationService().pushNamedAndRemoveUntil('accountSuspended');
         break;
       default:
-        log('_navigateBasedOnUserStatus: Unknown status, navigating to Phone', name: 'SplashScreen');
+        log('_navigateBasedOnUserStatus: Unknown status, navigating to Phone',
+            name: 'SplashScreen');
         NavigationService().pushNamedAndRemoveUntil('Phone');
     }
   }
 
   void _startNavigationTimer() {
-    log('_startNavigationTimer: Starting 2.5 second timer before navigating to Phone', name: 'SplashScreen');
+    log('_startNavigationTimer: Starting 2.5 second timer before navigating to Phone',
+        name: 'SplashScreen');
     Future.delayed(const Duration(seconds: 2, milliseconds: 500), () {
       if (mounted) {
-        log('_startNavigationTimer: Timer completed, navigating to Phone', name: 'SplashScreen');
+        log('_startNavigationTimer: Timer completed, navigating to Phone',
+            name: 'SplashScreen');
         NavigationService().pushNamedAndRemoveUntil('Phone');
       } else {
-        log('_startNavigationTimer: Widget not mounted when timer completed', name: 'SplashScreen');
+        log('_startNavigationTimer: Widget not mounted when timer completed',
+            name: 'SplashScreen');
       }
     });
   }
@@ -310,11 +349,13 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
-    log('didChangeAppLifecycleState: App lifecycle changed to $state', name: 'SplashScreen');
+    log('didChangeAppLifecycleState: App lifecycle changed to $state',
+        name: 'SplashScreen');
   }
 
   Future<void> retryVersionCheck() async {
-    log('retryVersionCheck: User tapped retry, resetting state and reinitializing', name: 'SplashScreen');
+    log('retryVersionCheck: User tapped retry, resetting state and reinitializing',
+        name: 'SplashScreen');
     setState(() {
       hasVersionCheckError = false;
       errorMessage = '';
@@ -322,7 +363,8 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
       forceUpdate = false;
       updateLink = null;
     });
-    log('retryVersionCheck: State reset, calling _initializeApp', name: 'SplashScreen');
+    log('retryVersionCheck: State reset, calling _initializeApp',
+        name: 'SplashScreen');
     await _initializeApp();
   }
 

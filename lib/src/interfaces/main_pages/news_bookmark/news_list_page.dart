@@ -1,4 +1,5 @@
 import 'package:charity_trust/src/data/providers/news_provider.dart';
+import 'package:charity_trust/src/interfaces/components/cards/news_card.dart';
 import 'package:charity_trust/src/interfaces/components/loading_indicator.dart';
 import 'package:charity_trust/src/interfaces/animations/index.dart' as anim;
 import 'package:flutter/material.dart';
@@ -42,6 +43,78 @@ class _NewsListPageState extends ConsumerState<NewsListPage> {
     }
   }
 
+  List<Widget> _buildStatisticsGrid(List<dynamic> statistics) {
+    final widgets = <Widget>[];
+
+    for (int i = 0; i < statistics.length; i += 2) {
+      final row = <Widget>[];
+
+      // First item
+      if (i < statistics.length) {
+        row.add(
+          Expanded(
+            child: _statItem(
+              statistics[i]['count']?.toString() ?? '0',
+              statistics[i]['name']?.toString() ?? '',
+            ),
+          ),
+        );
+      }
+
+      // Divider
+      row.add(
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 12),
+          child: Container(
+              width: 2, height: 50, color: kStrokeColor.withOpacity(0.06)),
+        ),
+      );
+
+      // Second item
+      if (i + 1 < statistics.length) {
+        row.add(
+          Expanded(
+            child: _statItem(
+              statistics[i + 1]['count']?.toString() ?? '0',
+              statistics[i + 1]['name']?.toString() ?? '',
+            ),
+          ),
+        );
+      } else {
+        row.add(Expanded(child: SizedBox()));
+      }
+
+      widgets.add(Row(children: row));
+
+      // Add divider between rows if not last row
+      if (i + 2 < statistics.length) {
+        widgets.add(const SizedBox(height: 18));
+        widgets
+            .add(Container(height: 2, color: kStrokeColor.withOpacity(0.06)));
+        widgets.add(const SizedBox(height: 18));
+      }
+    }
+
+    return widgets;
+  }
+
+  Widget _statItem(String value, String label) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          value,
+          style: kBodyTitleSB.copyWith(color: kBlue),
+        ),
+        const SizedBox(height: 8),
+        Text(
+          label,
+          style: kSmallTitleM,
+        ),
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final asyncNewsState = ref.watch(newsListProvider);
@@ -50,19 +123,16 @@ class _NewsListPageState extends ConsumerState<NewsListPage> {
         backgroundColor: kBackgroundColor,
         appBar: AppBar(
           automaticallyImplyLeading: false,
-          backgroundColor: kBackgroundColor,
+          backgroundColor: kWhite,
           scrolledUnderElevation: 0,
           titleSpacing: 0,
           title: Padding(
             padding: const EdgeInsets.only(left: 16.0),
             child: Row(
               children: [
-                Icon(Icons.feed_outlined, color: kPrimaryColor, size: 22),
-                SizedBox(width: 8),
                 Text(
                   "News",
-                  style: TextStyle(
-                      fontSize: 20, fontWeight: FontWeight.bold, color: kWhite),
+                  style: kSubHeadingM,
                 ),
               ],
             ),
@@ -71,13 +141,34 @@ class _NewsListPageState extends ConsumerState<NewsListPage> {
             Stack(
               children: [
                 IconButton(
-                  icon: Icon(Icons.bookmark, color: kPrimaryColor, size: 22),
+                  icon: Icon(Icons.bookmark, color: kPrimaryColor, size: 25),
                   onPressed: () {
                     Navigator.push(
                       context,
                       MaterialPageRoute(builder: (context) => BookmarkPage()),
                     );
                   },
+                ),
+                Positioned(
+                  right: 8,
+                  top: 8,
+                  child: Container(
+                    padding: EdgeInsets.all(4),
+                    decoration: BoxDecoration(
+                        color: Color(0xFFF3EFEF), shape: BoxShape.circle),
+                    constraints: BoxConstraints(minWidth: 18, minHeight: 18),
+                    child: Text(
+                      '${asyncNewsState.maybeWhen(
+                        data: (paginationState) => paginationState.news
+                            .where(
+                                (news) => news.bookmarked?.isNotEmpty ?? false)
+                            .length,
+                        orElse: () => 0,
+                      )}',
+                      style: kSmallTitleR.copyWith(fontSize: 10),
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
                 ),
               ],
             ),
@@ -89,20 +180,57 @@ class _NewsListPageState extends ConsumerState<NewsListPage> {
             if (paginationState.news.isNotEmpty) {
               return Column(
                 children: [
-                  anim.AnimatedWidgetWrapper(
-                    animationType: anim.AnimationType.fadeSlideInFromLeft,
-                    duration: anim.AnimationDuration.normal,
-                    child: Padding(
-                      padding: EdgeInsets.only(left: 16, right: 16, top: 8),
-                      child: Row(
-                        children: [
-                          Icon(Icons.feed_outlined,
-                              color: kPrimaryColor, size: 18),
-                          SizedBox(width: 6),
-                          Text('Latest News', style: kBodyTitleB),
-                        ],
-                      ),
+                  SizedBox(
+                    height: 15,
+                  ),
+                  if (paginationState.statistics.isNotEmpty)
+                    anim.AnimatedWidgetWrapper(
+                      animationType: anim.AnimationType.fadeSlideInFromBottom,
+                      duration: anim.AnimationDuration.normal,
+                      delayMilliseconds: 50,
+                      child: Padding(
+                          padding: const EdgeInsets.all(10),
+                          child: Container(
+                            decoration: BoxDecoration(
+                              gradient: LinearGradient(
+                                colors: [
+                                  const Color(0xFFFFFFFF), // solid white
+                                  const Color(0xFFFFFFFF)
+                                      .withOpacity(0), // fades to transparent
+                                ],
+                                begin: Alignment.topCenter,
+                                end: Alignment.bottomCenter,
+                              ),
+                              borderRadius: BorderRadius.circular(22),
+                            ),
+                            child: Padding(
+                              padding:
+                                  const EdgeInsets.all(1.2), // border thickness
+                              child: Container(
+                                padding: const EdgeInsets.all(18),
+                                decoration: BoxDecoration(
+                                  gradient: const LinearGradient(
+                                    colors: [
+                                      Color(0xFFF0F0F0),
+                                      Color(0xFFF1F8CE),
+                                    ],
+                                    begin: Alignment.topCenter,
+                                    end: Alignment.bottomCenter,
+                                  ),
+                                  borderRadius: BorderRadius.circular(22),
+                                ),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: _buildStatisticsGrid(
+                                    paginationState.statistics,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          )),
                     ),
+                  SizedBox(
+                    height: 15,
                   ),
                   Expanded(
                     child: anim.AnimatedWidgetWrapper(
@@ -118,7 +246,7 @@ class _NewsListPageState extends ConsumerState<NewsListPage> {
                             return Padding(
                               padding: EdgeInsets.all(16),
                               child: Center(
-                                child: CircularProgressIndicator(),
+                                child: LoadingAnimation(),
                               ),
                             );
                           }
@@ -161,100 +289,5 @@ class _NewsListPageState extends ConsumerState<NewsListPage> {
             ),
           ),
         ));
-  }
-}
-
-class NewsCard extends ConsumerWidget {
-  final NewsModel news;
-  final List<NewsModel> allNews;
-
-  const NewsCard({Key? key, required this.news, required this.allNews})
-      : super(key: key);
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final time = timeAgo(news.updatedAt!);
-
-    return GestureDetector(
-      onTap: () {
-        final initialIndex = allNews.indexOf(news);
-        if (initialIndex != -1) {
-          ref.read(currentNewsIndexProvider.notifier).state = initialIndex;
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => NewsDetailView(news: allNews),
-            ),
-          );
-        }
-      },
-      child: Container(
-        margin: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-        decoration: BoxDecoration(
-            color: kBackgroundColor,
-            border: Border.all(color: kStrokeColor),
-            borderRadius: BorderRadius.circular(10)),
-        child: Row(
-          children: [
-            ClipRRect(
-              borderRadius: BorderRadius.circular(9),
-              child: Image.network(
-                news.media ?? '',
-                width: 90,
-                height: 90,
-                fit: BoxFit.cover,
-                errorBuilder: (context, error, stackTrace) => Container(
-                  width: 90,
-                  height: 90,
-                  decoration: BoxDecoration(
-                    color: Colors.grey[300],
-                    borderRadius: BorderRadius.only(
-                      topLeft: Radius.circular(9),
-                      bottomLeft: Radius.circular(9),
-                    ),
-                  ),
-                  child: Icon(Icons.broken_image, color: Colors.grey[600]),
-                ),
-              ),
-            ),
-            Expanded(
-              child: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      news.title ?? '',
-                      style: kBodyTitleB,
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    SizedBox(height: 4),
-                    Text(
-                      time,
-                      style: TextStyle(
-                        color: Colors.grey,
-                        fontSize: 12,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.only(right: 8.0),
-              child: IconButton(
-                icon: Icon(Icons.bookmark_border, color: kPrimaryColor),
-                onPressed: () {
-                  ref
-                      .read(newsListProvider.notifier)
-                      .toggleBookmark(news.id ?? '');
-                },
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
   }
 }

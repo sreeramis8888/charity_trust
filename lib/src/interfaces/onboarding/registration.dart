@@ -6,8 +6,12 @@ import 'package:charity_trust/src/data/utils/media_picker.dart';
 import 'package:charity_trust/src/data/notifiers/loading_notifier.dart';
 import 'package:charity_trust/src/data/services/snackbar_service.dart';
 import 'package:charity_trust/src/data/providers/user_provider.dart';
+import 'package:charity_trust/src/data/providers/location_provider.dart';
+import 'package:charity_trust/src/data/models/user_model.dart';
 import 'package:charity_trust/src/interfaces/components/input_field.dart';
 import 'package:charity_trust/src/interfaces/components/dropdown.dart';
+import 'package:charity_trust/src/interfaces/components/loading_indicator.dart';
+import 'package:charity_trust/src/interfaces/components/searchable_dropdown.dart';
 import 'package:charity_trust/src/interfaces/components/primaryButton.dart';
 import 'package:charity_trust/src/interfaces/animations/index.dart' as anim;
 import 'package:flutter/material.dart';
@@ -37,12 +41,13 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
   final documentController = TextEditingController();
   final recommendedByController = TextEditingController();
 
-  String? selectedDistrict;
-  String? selectedCountry;
+  String? selectedCountryCode;
+  String? selectedStateCode;
+  String? selectedDistrictCode;
   XFile? profileImage;
   XFile? aadhaarImage;
-  String? recommendedByType = 'trustee'; 
-  String? selectedRecommendedBy;
+  String? recommendedByType = 'trustee';
+  UserModel? selectedRecommendedBy;
 
   final Map<String, GlobalKey> _fieldKeys = {
     'name': GlobalKey(),
@@ -50,8 +55,9 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
     'email': GlobalKey(),
     'address': GlobalKey(),
     'area': GlobalKey(),
-    'district': GlobalKey(),
     'country': GlobalKey(),
+    'state': GlobalKey(),
+    'district': GlobalKey(),
     'pincode': GlobalKey(),
     'aadhaar': GlobalKey(),
     'dob': GlobalKey(),
@@ -71,12 +77,17 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
           firstErrorKey = 'mobile';
         } else if (dobController.text.trim().isEmpty) {
           firstErrorKey = 'dob';
-        } else if (selectedDistrict == null || selectedDistrict!.isEmpty) {
+        } else if (selectedCountryCode == null ||
+            selectedCountryCode!.isEmpty) {
+          firstErrorKey = 'country';
+        } else if (selectedStateCode == null || selectedStateCode!.isEmpty) {
+          firstErrorKey = 'state';
+        } else if (selectedDistrictCode == null ||
+            selectedDistrictCode!.isEmpty) {
           firstErrorKey = 'district';
         } else if (aadhaarImage == null) {
           firstErrorKey = 'aadhaar';
-        } else if (selectedRecommendedBy == null ||
-            selectedRecommendedBy!.isEmpty) {
+        } else if (selectedRecommendedBy == null) {
           firstErrorKey = 'recommendedBy';
         }
 
@@ -164,11 +175,12 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
         'email': emailController.text.trim(),
         'address': addressController.text.trim(),
         'area': areaController.text.trim(),
-        'district': selectedDistrict,
-        'country': selectedCountry,
+        'country': selectedCountryCode,
+        'state': selectedStateCode,
+        'district': selectedDistrictCode,
         'pincode': pincodeController.text.trim(),
         'dob': dobController.text.trim(),
-        'recommended_by': recommendedByController.text.trim(),
+        'recommended_by': selectedRecommendedBy?.id,
         'recommended_by_type': recommendedByType,
         'status': "pending"
       };
@@ -413,56 +425,182 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
                         animationType: anim.AnimationType.fadeSlideInFromLeft,
                         duration: anim.AnimationDuration.normal,
                         delayMilliseconds: 600,
-                        child: Text("District *", style: kSmallTitleR),
+                        child: Text("Country *", style: kSmallTitleR),
                       ),
                       const SizedBox(height: 6),
                       anim.AnimatedWidgetWrapper(
                         animationType: anim.AnimationType.fadeSlideInFromBottom,
                         duration: anim.AnimationDuration.normal,
                         delayMilliseconds: 650,
-                        child: AnimatedDropdown<String>(
-                          key: _fieldKeys['district'],
-                          hint: "Select",
-                          value: selectedDistrict,
-                          items: const ["Ernakulam", "Kollam", "Thrissur"],
-                          itemLabel: (item) => item,
-                          onChanged: (v) =>
-                              setState(() => selectedDistrict = v),
+                        child: Consumer(
+                          builder: (context, ref, _) {
+                            final countriesAsync =
+                                ref.watch(getAllCountriesProvider);
+                            return countriesAsync.when(
+                              data: (countries) {
+                                return AnimatedDropdown<String>(
+                                  key: _fieldKeys['country'],
+                                  hint: "Select country",
+                                  value: selectedCountryCode,
+                                  items: countries
+                                      .map((c) => c.iso2 ?? '')
+                                      .cast<String>()
+                                      .where((code) => code.isNotEmpty)
+                                      .toList(),
+                                  itemLabel: (code) {
+                                    try {
+                                      return countries
+                                              .firstWhere((c) => c.iso2 == code)
+                                              .name ??
+                                          'Unknown';
+                                    } catch (e) {
+                                      return code;
+                                    }
+                                  },
+                                  onChanged: (v) {
+                                    setState(() {
+                                      selectedCountryCode = v;
+                                      selectedStateCode = null;
+                                      selectedDistrictCode = null;
+                                    });
+                                  },
+                                );
+                              },
+                              loading: () => const Center(
+                                child: LoadingAnimation(),
+                              ),
+                              error: (err, stack) => Text('Error: $err'),
+                            );
+                          },
                         ),
                       ),
                       const SizedBox(height: 18),
-                      anim.AnimatedWidgetWrapper(
-                        animationType: anim.AnimationType.fadeSlideInFromLeft,
-                        duration: anim.AnimationDuration.normal,
-                        delayMilliseconds: 700,
-                        child: Text("Country", style: kSmallTitleR),
-                      ),
-                      const SizedBox(height: 6),
-                      anim.AnimatedWidgetWrapper(
-                        animationType: anim.AnimationType.fadeSlideInFromBottom,
-                        duration: anim.AnimationDuration.normal,
-                        delayMilliseconds: 750,
-                        child: AnimatedDropdown<String>(
-                          key: _fieldKeys['country'],
-                          hint: "Select",
-                          value: selectedCountry,
-                          items: const ["India", "USA", "UK"],
-                          itemLabel: (item) => item,
-                          onChanged: (v) => setState(() => selectedCountry = v),
+                      if (selectedCountryCode != null)
+                        anim.AnimatedWidgetWrapper(
+                          animationType: anim.AnimationType.fadeSlideInFromLeft,
+                          duration: anim.AnimationDuration.normal,
+                          delayMilliseconds: 700,
+                          child: Text("State *", style: kSmallTitleR),
                         ),
-                      ),
-                      const SizedBox(height: 18),
+                      if (selectedCountryCode != null)
+                        const SizedBox(height: 6),
+                      if (selectedCountryCode != null)
+                        anim.AnimatedWidgetWrapper(
+                          animationType:
+                              anim.AnimationType.fadeSlideInFromBottom,
+                          duration: anim.AnimationDuration.normal,
+                          delayMilliseconds: 750,
+                          child: Consumer(
+                            builder: (context, ref, _) {
+                              final statesAsync = ref.watch(
+                                  getStatesByCountryProvider(
+                                      selectedCountryCode!));
+                              return statesAsync.when(
+                                data: (states) {
+                                  return AnimatedDropdown<String>(
+                                    key: _fieldKeys['state'],
+                                    hint: "Select state",
+                                    value: selectedStateCode,
+                                    items: states
+                                        .map((s) => s.stateCode.toString())
+                                        .toList(),
+                                    itemLabel: (code) {
+                                      try {
+                                        return states
+                                                .firstWhere((s) =>
+                                                    s.stateCode.toString() ==
+                                                    code)
+                                                .name ??
+                                            'Unknown';
+                                      } catch (e) {
+                                        return code;
+                                      }
+                                    },
+                                    onChanged: (v) {
+                                      setState(() {
+                                        selectedStateCode = v;
+                                        selectedDistrictCode = null;
+                                      });
+                                    },
+                                  );
+                                },
+                                loading: () => const Center(
+                                  child: LoadingAnimation(),
+                                ),
+                                error: (err, stack) => Text('Error: $err'),
+                              );
+                            },
+                          ),
+                        ),
+                      if (selectedCountryCode != null)
+                        const SizedBox(height: 18),
+                      if (selectedStateCode != null)
+                        anim.AnimatedWidgetWrapper(
+                          animationType: anim.AnimationType.fadeSlideInFromLeft,
+                          duration: anim.AnimationDuration.normal,
+                          delayMilliseconds: 800,
+                          child: Text("District *", style: kSmallTitleR),
+                        ),
+                      if (selectedStateCode != null) const SizedBox(height: 6),
+                      if (selectedStateCode != null)
+                        anim.AnimatedWidgetWrapper(
+                          animationType:
+                              anim.AnimationType.fadeSlideInFromBottom,
+                          duration: anim.AnimationDuration.normal,
+                          delayMilliseconds: 850,
+                          child: Consumer(
+                            builder: (context, ref, _) {
+                              final citiesAsync = ref.watch(
+                                  getDistrictsByStateProvider(
+                                      selectedCountryCode!,
+                                      selectedStateCode!));
+                              return citiesAsync.when(
+                                data: (cities) {
+                                  return AnimatedDropdown<String>(
+                                    key: _fieldKeys['district'],
+                                    hint: "Select district / city",
+                                    value: selectedDistrictCode,
+                                    items: cities
+                                        .map((c) => c.id.toString())
+                                        .toList(),
+                                    itemLabel: (id) {
+                                      try {
+                                        return cities
+                                                .firstWhere((c) =>
+                                                    c.id.toString() == id)
+                                                .name ??
+                                            'Unknown';
+                                      } catch (e) {
+                                        return id;
+                                      }
+                                    },
+                                    onChanged: (v) {
+                                      setState(() {
+                                        selectedDistrictCode = v;
+                                      });
+                                    },
+                                  );
+                                },
+                                loading: () => const Center(
+                                  child: LoadingAnimation(),
+                                ),
+                                error: (err, stack) => Text('Error: $err'),
+                              );
+                            },
+                          ),
+                        ),
+                      if (selectedStateCode != null) const SizedBox(height: 18),
                       anim.AnimatedWidgetWrapper(
                         animationType: anim.AnimationType.fadeSlideInFromLeft,
                         duration: anim.AnimationDuration.normal,
-                        delayMilliseconds: 800,
+                        delayMilliseconds: 900,
                         child: Text("Pincode", style: kSmallTitleR),
                       ),
                       const SizedBox(height: 6),
                       anim.AnimatedWidgetWrapper(
                         animationType: anim.AnimationType.fadeSlideInFromBottom,
                         duration: anim.AnimationDuration.normal,
-                        delayMilliseconds: 850,
+                        delayMilliseconds: 950,
                         child: InputField(
                           key: _fieldKeys['pincode'],
                           type: CustomFieldType.text,
@@ -474,14 +612,14 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
                       anim.AnimatedWidgetWrapper(
                         animationType: anim.AnimationType.fadeSlideInFromLeft,
                         duration: anim.AnimationDuration.normal,
-                        delayMilliseconds: 900,
+                        delayMilliseconds: 1000,
                         child: Text("Upload Aadhar Card", style: kSmallTitleR),
                       ),
                       const SizedBox(height: 4),
                       anim.AnimatedWidgetWrapper(
                         animationType: anim.AnimationType.fadeSlideInFromLeft,
                         duration: anim.AnimationDuration.normal,
-                        delayMilliseconds: 950,
+                        delayMilliseconds: 1050,
                         child: Text(
                           "Image (JPG/PNG) - Recommended size: 400x400",
                           style: kSmallerTitleR.copyWith(color: Colors.grey),
@@ -491,7 +629,7 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
                       anim.AnimatedWidgetWrapper(
                         animationType: anim.AnimationType.fadeSlideInFromBottom,
                         duration: anim.AnimationDuration.normal,
-                        delayMilliseconds: 1000,
+                        delayMilliseconds: 1100,
                         child: FormField<void>(
                           key: _fieldKeys['aadhaar'],
                           validator: (_) {
@@ -559,14 +697,14 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
                       anim.AnimatedWidgetWrapper(
                         animationType: anim.AnimationType.fadeSlideInFromLeft,
                         duration: anim.AnimationDuration.normal,
-                        delayMilliseconds: 1050,
+                        delayMilliseconds: 1150,
                         child: Text("Date of Birth *", style: kSmallTitleR),
                       ),
                       const SizedBox(height: 6),
                       anim.AnimatedWidgetWrapper(
                         animationType: anim.AnimationType.fadeSlideInFromBottom,
                         duration: anim.AnimationDuration.normal,
-                        delayMilliseconds: 1100,
+                        delayMilliseconds: 1200,
                         child: InputField(
                           key: _fieldKeys['dob'],
                           type: CustomFieldType.date,
@@ -579,14 +717,14 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
                       anim.AnimatedWidgetWrapper(
                         animationType: anim.AnimationType.fadeSlideInFromLeft,
                         duration: anim.AnimationDuration.normal,
-                        delayMilliseconds: 1150,
+                        delayMilliseconds: 1250,
                         child: Text("Recommended By *", style: kSmallTitleR),
                       ),
                       const SizedBox(height: 12),
                       anim.AnimatedWidgetWrapper(
                         animationType: anim.AnimationType.fadeSlideInFromBottom,
                         duration: anim.AnimationDuration.normal,
-                        delayMilliseconds: 1200,
+                        delayMilliseconds: 1300,
                         child: Row(
                           children: [
                             Row(
@@ -598,7 +736,6 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
                                     setState(() {
                                       recommendedByType = value;
                                       selectedRecommendedBy = null;
-                                      recommendedByController.clear();
                                     });
                                   },
                                 ),
@@ -614,7 +751,6 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
                                     setState(() {
                                       recommendedByType = value;
                                       selectedRecommendedBy = null;
-                                      recommendedByController.clear();
                                     });
                                   },
                                 ),
@@ -628,7 +764,7 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
                       anim.AnimatedWidgetWrapper(
                         animationType: anim.AnimationType.fadeSlideInFromBottom,
                         duration: anim.AnimationDuration.normal,
-                        delayMilliseconds: 1250,
+                        delayMilliseconds: 1350,
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
@@ -639,29 +775,29 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
                               style: kSmallTitleR,
                             ),
                             const SizedBox(height: 6),
-                            AnimatedDropdown<String>(
+                            SearchableDropdown<UserModel>(
                               key: _fieldKeys['recommendedBy'],
                               hint: recommendedByType == 'trustee'
-                                  ? "Select trustee"
-                                  : "Select charity member",
+                                  ? "Search trustee"
+                                  : "Search charity member",
                               value: selectedRecommendedBy,
-                              items: recommendedByType == 'trustee'
-                                  ? const [
-                                      "Trustee 1",
-                                      "Trustee 2",
-                                      "Trustee 3"
-                                    ]
-                                  : const [
-                                      "Charity Member 1",
-                                      "Charity Member 2",
-                                      "Charity Member 3"
-                                    ],
-                              itemLabel: (item) => item,
-                              onChanged: (v) {
+                              itemLabel: (user) => user.name ?? 'Unknown',
+                              onChanged: (user) {
                                 setState(() {
-                                  selectedRecommendedBy = v;
-                                  recommendedByController.text = v ?? "";
+                                  selectedRecommendedBy = user;
                                 });
+                              },
+                              onFetch: (search, page) async {
+                                final params = UsersListParams(
+                                  role: recommendedByType == 'trustee'
+                                      ? 'trustee'
+                                      : 'member',
+                                  pageNo: page,
+                                  search: search.isEmpty ? null : search,
+                                );
+                                return ref.read(
+                                  fetchUsersByRoleProvider(params).future,
+                                );
                               },
                             ),
                           ],
@@ -671,7 +807,7 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
                       anim.AnimatedWidgetWrapper(
                         animationType: anim.AnimationType.fadeScaleUp,
                         duration: anim.AnimationDuration.normal,
-                        delayMilliseconds: 1250,
+                        delayMilliseconds: 1400,
                         child: SizedBox(
                           height: 50,
                           width: double.infinity,

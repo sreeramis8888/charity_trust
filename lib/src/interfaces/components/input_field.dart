@@ -33,7 +33,7 @@ class InputField extends StatelessWidget {
   Widget build(BuildContext context) {
     return TextFormField(
       controller: controller,
-      readOnly: type != CustomFieldType.text,
+      readOnly: readOnly || type != CustomFieldType.text,
       validator: validator,
       autovalidateMode: AutovalidateMode.onUserInteraction,
       style: kBodyTitleR,
@@ -42,9 +42,57 @@ class InputField extends StatelessWidget {
         if (type == CustomFieldType.date) {
           final picked = await showDatePicker(
             context: context,
+            initialDate: DateTime.now(),
             firstDate: DateTime(1900),
             lastDate: DateTime(2100),
-            initialDate: DateTime.now(),
+            builder: (context, child) {
+              return Theme(
+                data: Theme.of(context).copyWith(
+                  colorScheme: const ColorScheme.light(
+                    primary: Colors.black, // Header background
+                    onPrimary: Colors.white, // Header text
+                    onSurface: Colors.black, // Body text color
+                  ),
+                  datePickerTheme: DatePickerThemeData(
+                    backgroundColor: Colors.white,
+                    elevation: 8,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+
+                    // Header
+                    headerBackgroundColor: Colors.white,
+                    headerHeadlineStyle: const TextStyle(
+                      fontSize: 22,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black,
+                    ),
+                    headerHelpStyle: const TextStyle(
+                      color: Colors.grey,
+                      fontSize: 14,
+                    ),
+
+                    // Calendar day styles
+                    dayStyle: const TextStyle(
+                      fontSize: 16,
+                      color: Colors.black,
+                    ),
+                    dayOverlayColor: MaterialStatePropertyAll(Colors.black12),
+
+                    todayForegroundColor:
+                        const MaterialStatePropertyAll(Colors.black),
+                    todayBackgroundColor:
+                        const MaterialStatePropertyAll(Colors.black12),
+
+                    yearStyle: const TextStyle(
+                      fontSize: 18,
+                      color: Colors.black,
+                    ),
+                  ),
+                ),
+                child: child!,
+              );
+            },
           );
 
           if (picked != null) {

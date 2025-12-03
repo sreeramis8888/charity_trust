@@ -66,7 +66,7 @@ dependencies:
   image_picker: ^1.2.1
   image_cropper: ^11.0.0
   firebase_core: ^4.2.1
-
+  flutter_countries: ^1.0.2
 
 dev_dependencies:
   flutter_test:

@@ -5,7 +5,7 @@ const kPrimaryColor = Color(0xFFBC092D); // cyan accent
 const kSecondaryColor = Color(0xFF145DA0); // optional darker accent
 // const Color kBackgroundColor = Color(0xFF0D0F22);
 const kBackgroundColor = Color(0xFFF2F2F2); // deep navy
-// const Color kCardBackgroundColor = Color(0xFF021730);
+const Color kCardBackgroundColor = Color(0xFFEBEBEB);
 
 const Color kPrimaryLightColor = Color(0xFFEEF1FF);
 // const Color kStrokeColor = Color(0xFF0D2A4D);
@@ -14,7 +14,7 @@ const kStrokeColor = Color(0xFF1E3C72); // thin borders
 const Color kTertiary = Color(0xFFE8EAED);
 const Color kBorder = Color(0xFFD8DADC);
 //Common Colors
-const Color kWhite = Color(0xFFF7F7F7);
+const Color kWhite = Color(0xFFFFFFFF);
 const Color kGrey = Color.fromARGB(255, 200, 200, 200);
 
 const Color kTextColor = Color(0xFF161616);

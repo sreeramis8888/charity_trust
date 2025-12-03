@@ -13,19 +13,22 @@ class UserModel {
   final String? address;
   final String? area;
   final String? district;
+  final String? state;
   final String? country;
   final String? pincode;
   final String? password;
   final String? status;
   final bool? isAdmin;
-  final String? adminRole; // ObjectId
+  final String? adminRole;
   final String? role;
   final DateTime? lastSeen;
   final bool? online;
   final DateTime? dob;
   final bool? isInstalled;
   final String? recommendedBy;
-  final String? underTrustee; // ObjectId
+  final String? underTrustee;
+  final String? underCharityMember;
+  final String? rejectReason;
   final DateTime? createdAt;
   final DateTime? updatedAt;
 
@@ -44,6 +47,7 @@ class UserModel {
     this.address,
     this.area,
     this.district,
+    this.state,
     this.country,
     this.pincode,
     this.password,
@@ -57,95 +61,101 @@ class UserModel {
     this.isInstalled,
     this.recommendedBy,
     this.underTrustee,
+    this.underCharityMember,
+    this.rejectReason,
     this.createdAt,
     this.updatedAt,
   });
 
-  /// ------------------------------
-  /// fromJson → handles null values
-  /// ------------------------------
+  // -----------------------------
+  // FROM JSON
+  // -----------------------------
   factory UserModel.fromJson(Map<String, dynamic> json) {
     return UserModel(
-      id: json['_id'] as String?,
-      name: json['name'] as String?,
-      email: json['email'] as String?,
-      image: json['image'] as String?,
-      phone: json['phone'] as String?,
-      fcm: json['fcm'] as String?,
-      otp: json['otp'] as String?,
-      gender: json['gender'] as String?,
-      bloodGroup: json['blood_group'] as String?,
-      aadharNumber: json['aadhar_number'] is int
-          ? json['aadhar_number']
-          : int.tryParse(json['aadhar_number']?.toString() ?? ''),
-      aadharCopy: json['aadhar_copy'] as String?,
-      address: json['address'] as String?,
-      area: json['area'] as String?,
-      district: json['district'] as String?,
-      country: json['country'] as String?,
-      pincode: json['pincode'] as String?,
-      password: json['password'] as String?,
-      status: json['status'] as String?,
-      isAdmin: json['is_admin'] as bool?,
-      adminRole: json['admin_role'] as String?,
-      role: json['role'] as String?,
-      lastSeen: json['last_seen'] != null
-          ? DateTime.tryParse(json['last_seen'])
+      id: json["_id"],
+      name: json["name"],
+      email: json["email"],
+      image: json["image"],
+      phone: json["phone"],
+      fcm: json["fcm"],
+      otp: json["otp"],
+      gender: json["gender"],
+      bloodGroup: json["blood_group"],
+      aadharNumber: json["aadhar_number"],
+      aadharCopy: json["aadhar_copy"],
+      address: json["address"],
+      area: json["area"],
+      district: json["district"],
+      state: json["state"],
+      country: json["country"],
+      pincode: json["pincode"],
+      password: json["password"],
+      status: json["status"],
+      isAdmin: json["is_admin"],
+      adminRole: json["admin_role"],
+      role: json["role"],
+      lastSeen: json["last_seen"] != null
+          ? DateTime.tryParse(json["last_seen"])
           : null,
-      online: json['online'] as bool?,
-      dob: json['dob'] != null ? DateTime.tryParse(json['dob']) : null,
-      isInstalled: json['is_installed'] as bool?,
-      recommendedBy: json['recommended_by'] as String?,
-      underTrustee: json['under_trustee'] as String?,
-      createdAt: json['createdAt'] != null
-          ? DateTime.tryParse(json['createdAt'])
+      online: json["online"],
+      dob: json["dob"] != null ? DateTime.tryParse(json["dob"]) : null,
+      isInstalled: json["is_installed"],
+      recommendedBy: json["recommended_by"],
+      underTrustee: json["under_trustee"],
+      underCharityMember: json["under_charity_member"],
+      rejectReason: json["reject_reason"],
+      createdAt: json["createdAt"] != null
+          ? DateTime.tryParse(json["createdAt"])
           : null,
-      updatedAt: json['updatedAt'] != null
-          ? DateTime.tryParse(json['updatedAt'])
+      updatedAt: json["updatedAt"] != null
+          ? DateTime.tryParse(json["updatedAt"])
           : null,
     );
   }
 
-  /// ------------------------------
-  /// toJson → safely returns map
-  /// ------------------------------
+  // -----------------------------
+  // TO JSON
+  // -----------------------------
   Map<String, dynamic> toJson() {
     return {
-      '_id': id,
-      'name': name,
-      'email': email,
-      'image': image,
-      'phone': phone,
-      'fcm': fcm,
-      'otp': otp,
-      'gender': gender,
-      'blood_group': bloodGroup,
-      'aadhar_number': aadharNumber,
-      'aadhar_copy': aadharCopy,
-      'address': address,
-      'area': area,
-      'district': district,
-      'country': country,
-      'pincode': pincode,
-      'password': password,
-      'status': status,
-      'is_admin': isAdmin,
-      'admin_role': adminRole,
-      'role': role,
-      'last_seen': lastSeen?.toIso8601String(),
-      'online': online,
-      'dob': dob?.toIso8601String(),
-      'is_installed': isInstalled,
-      'recommended_by': recommendedBy,
-      'under_trustee': underTrustee,
-      'createdAt': createdAt?.toIso8601String(),
-      'updatedAt': updatedAt?.toIso8601String(),
+      "_id": id,
+      "name": name,
+      "email": email,
+      "image": image,
+      "phone": phone,
+      "fcm": fcm,
+      "otp": otp,
+      "gender": gender,
+      "blood_group": bloodGroup,
+      "aadhar_number": aadharNumber,
+      "aadhar_copy": aadharCopy,
+      "address": address,
+      "area": area,
+      "district": district,
+      "state": state,
+      "country": country,
+      "pincode": pincode,
+      "password": password,
+      "status": status,
+      "is_admin": isAdmin,
+      "admin_role": adminRole,
+      "role": role,
+      "last_seen": lastSeen?.toIso8601String(),
+      "online": online,
+      "dob": dob?.toIso8601String(),
+      "is_installed": isInstalled,
+      "recommended_by": recommendedBy,
+      "under_trustee": underTrustee,
+      "under_charity_member": underCharityMember,
+      "reject_reason": rejectReason,
+      "createdAt": createdAt?.toIso8601String(),
+      "updatedAt": updatedAt?.toIso8601String(),
     };
   }
 
-  /// ------------------------------
-  /// copyWith
-  /// ------------------------------
+  // -----------------------------
+  // COPY WITH
+  // -----------------------------
   UserModel copyWith({
     String? id,
     String? name,
@@ -161,6 +171,7 @@ class UserModel {
     String? address,
     String? area,
     String? district,
+    String? state,
     String? country,
     String? pincode,
     String? password,
@@ -174,6 +185,8 @@ class UserModel {
     bool? isInstalled,
     String? recommendedBy,
     String? underTrustee,
+    String? underCharityMember,
+    String? rejectReason,
     DateTime? createdAt,
     DateTime? updatedAt,
   }) {
@@ -192,6 +205,7 @@ class UserModel {
       address: address ?? this.address,
       area: area ?? this.area,
       district: district ?? this.district,
+      state: state ?? this.state,
       country: country ?? this.country,
       pincode: pincode ?? this.pincode,
       password: password ?? this.password,
@@ -205,6 +219,8 @@ class UserModel {
       isInstalled: isInstalled ?? this.isInstalled,
       recommendedBy: recommendedBy ?? this.recommendedBy,
       underTrustee: underTrustee ?? this.underTrustee,
+      underCharityMember: underCharityMember ?? this.underCharityMember,
+      rejectReason: rejectReason ?? this.rejectReason,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
     );

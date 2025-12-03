@@ -1,10 +1,9 @@
-
 import 'package:charity_trust/src/data/constants/color_constants.dart';
 import 'package:charity_trust/src/data/constants/style_constants.dart';
 import 'package:charity_trust/src/data/models/news_model.dart';
 import 'package:charity_trust/src/data/utils/get_time_ago.dart';
+import 'package:charity_trust/src/interfaces/components/text_pill.dart';
 import 'package:charity_trust/src/interfaces/main_pages/news_bookmark/news_page.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -12,8 +11,7 @@ class NewsCard extends ConsumerWidget {
   final NewsModel news;
   final List<NewsModel> allNews;
 
-  const NewsCard({Key? key, required this.news, required this.allNews})
-      : super(key: key);
+  const NewsCard({super.key, required this.news, required this.allNews});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -21,79 +19,94 @@ class NewsCard extends ConsumerWidget {
 
     return GestureDetector(
       onTap: () {
-        final initialIndex = allNews.indexOf(news);
-        if (initialIndex != -1) {
-          ref.read(currentNewsIndexProvider.notifier).state = initialIndex;
+        final index = allNews.indexOf(news);
+        if (index != -1) {
+          ref.read(currentNewsIndexProvider.notifier).state = index;
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => NewsDetailView(news: allNews),
+              builder: (_) => NewsDetailView(news: allNews),
             ),
           );
         }
       },
       child: Container(
-        margin: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        padding: const EdgeInsets.all(5),
         decoration: BoxDecoration(
-            color: kBackgroundColor,
-            border: Border.all(color: kStrokeColor),
-            borderRadius: BorderRadius.circular(10)),
+          color: kCardBackgroundColor,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: kBorder),
+        ),
         child: Row(
           children: [
             ClipRRect(
-              borderRadius: BorderRadius.circular(9),
+              borderRadius: BorderRadius.circular(4),
               child: Image.network(
                 news.media ?? '',
-                width: 90,
-                height: 90,
+                width: 85,
+                height: 85,
                 fit: BoxFit.cover,
-                errorBuilder: (context, error, stackTrace) => Container(
-                  width: 90,
-                  height: 90,
+                errorBuilder: (_, __, ___) => Container(
+                  width: 85,
+                  height: 85,
+                  alignment: Alignment.center,
                   decoration: BoxDecoration(
                     color: Colors.grey[300],
-                    borderRadius: BorderRadius.only(
-                      topLeft: Radius.circular(9),
-                      bottomLeft: Radius.circular(9),
-                    ),
+                    borderRadius: BorderRadius.circular(12),
                   ),
                   child: Icon(Icons.broken_image, color: Colors.grey[600]),
                 ),
               ),
             ),
+            const SizedBox(width: 12),
             Expanded(
-              child: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      news.title ?? '',
-                      style: kBodyTitleB,
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    SizedBox(height: 4),
-                    Text(
-                      time,
-                      style: TextStyle(
-                        color: Colors.grey,
-                        fontSize: 12,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      TextPill(
+                        text: news.category ?? "Latest",
+                        color: kCardBackgroundColor,
+                        borderColor: const Color(0xFF2EC866),
+                        textStyle: kSmallTitleSB.copyWith(
+                          color: const Color(0xFF2EC866),
+                          fontSize: 10,
+                        ),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 4,
+                        ),
                       ),
+                      Text(
+                        time,
+                        style:
+                            const TextStyle(fontSize: 10, color: Colors.grey),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 6),
+                  Text(
+                    news.title ?? '',
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: kSmallTitleM.copyWith(fontSize: 14),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    news.subTitle ?? '',
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: kSmallerTitleL.copyWith(
+                      color: Colors.grey[600],
+                      fontSize: 12,
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
             ),
-            // Padding(
-            //   padding: const EdgeInsets.only(right: 8.0),
-            //   child: IconButton(
-            //     icon: Icon(Icons.more_vert, color: Colors.grey),
-            //     onPressed: () {
-            //       // More options action
-            //     },
-            //   ),
-            // ),
           ],
         ),
       ),

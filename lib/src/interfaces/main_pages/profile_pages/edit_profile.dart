@@ -1,0 +1,323 @@
+import 'dart:io';
+import 'dart:developer';
+import 'package:charity_trust/src/data/constants/color_constants.dart';
+import 'package:charity_trust/src/data/constants/style_constants.dart';
+import 'package:charity_trust/src/data/utils/media_picker.dart';
+import 'package:charity_trust/src/data/notifiers/loading_notifier.dart';
+import 'package:charity_trust/src/data/services/snackbar_service.dart';
+import 'package:charity_trust/src/data/providers/user_provider.dart';
+import 'package:charity_trust/src/interfaces/components/input_field.dart';
+import 'package:charity_trust/src/interfaces/components/loading_indicator.dart';
+import 'package:charity_trust/src/interfaces/components/primaryButton.dart';
+import 'package:charity_trust/src/interfaces/animations/index.dart' as anim;
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:image_cropper/image_cropper.dart';
+import 'package:image_picker/image_picker.dart';
+
+class EditProfilePage extends ConsumerStatefulWidget {
+  const EditProfilePage({super.key});
+
+  @override
+  ConsumerState<EditProfilePage> createState() => _EditProfilePageState();
+}
+
+class _EditProfilePageState extends ConsumerState<EditProfilePage> {
+  final _formKey = GlobalKey<FormState>();
+  final _scrollController = ScrollController();
+  final FocusNode _unfocusNode = FocusNode();
+  final emailController = TextEditingController();
+  final addressController = TextEditingController();
+  final dobController = TextEditingController();
+  final recommendedByController = TextEditingController();
+
+  XFile? profileImage;
+
+  final Map<String, GlobalKey> _fieldKeys = {
+    'email': GlobalKey(),
+    'address': GlobalKey(),
+    'dob': GlobalKey(),
+    'recommendedBy': GlobalKey(),
+  };
+
+  void _scrollToFirstError() {
+    Future.delayed(const Duration(milliseconds: 50), () {
+      if (!mounted) return;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted) return;
+        String? firstErrorKey;
+
+        if (emailController.text.trim().isEmpty) {
+          firstErrorKey = 'email';
+        } else if (addressController.text.trim().isEmpty) {
+          firstErrorKey = 'address';
+        } else if (dobController.text.trim().isEmpty) {
+          firstErrorKey = 'dob';
+        }
+
+        if (firstErrorKey != null) {
+          final key = _fieldKeys[firstErrorKey];
+          final context = key?.currentContext;
+          if (context != null) {
+            Scrollable.ensureVisible(
+              context,
+              duration: const Duration(milliseconds: 300),
+              curve: Curves.easeInOut,
+              alignment: 0.1,
+            );
+          }
+        }
+      });
+    });
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    _unfocusNode.dispose();
+    emailController.dispose();
+    addressController.dispose();
+    dobController.dispose();
+    recommendedByController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _pickProfilePicture() async {
+    FocusScope.of(context).requestFocus(_unfocusNode);
+
+    final result = await pickMedia(
+      context: context,
+      enableCrop: true,
+      cropRatio: const CropAspectRatio(ratioX: 1, ratioY: 1),
+      showDocument: false,
+    );
+
+    if (!mounted) return;
+
+    if (result != null && result is XFile) {
+      setState(() {
+        profileImage = result;
+      });
+    }
+    if (mounted) {
+      FocusScope.of(context).requestFocus(_unfocusNode);
+    }
+  }
+
+  Future<void> _handleSaveProfile() async {
+    try {
+      ref.read(loadingProvider.notifier).startLoading();
+
+      final userData = <String, dynamic>{
+        'email': emailController.text.trim(),
+        'address': addressController.text.trim(),
+        'dob': dobController.text.trim(),
+      };
+
+      final result = await ref.read(updateUserProfileProvider(userData).future);
+
+      ref.read(loadingProvider.notifier).stopLoading();
+
+      if (result != null) {
+        log('Profile updated successfully', name: 'EditProfilePage');
+        SnackbarService().showSnackBar('Profile updated successfully');
+
+        if (mounted) {
+          Navigator.of(context).pop();
+        }
+      } else {
+        SnackbarService().showSnackBar('Failed to update profile');
+      }
+    } catch (e) {
+      ref.read(loadingProvider.notifier).stopLoading();
+      SnackbarService().showSnackBar('Error: $e');
+      log('Error during profile update: $e', name: 'EditProfilePage');
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.white,
+      appBar: AppBar(
+        backgroundColor: kWhite,
+        leading: IconButton(
+          icon: const Icon(
+            Icons.arrow_back_ios,
+            color: kTextColor,
+            size: 20,
+          ),
+          onPressed: () => Navigator.of(context).pop(),
+        ),
+      ),
+      body: GestureDetector(
+        onTap: () {
+          FocusScope.of(context).requestFocus(_unfocusNode);
+        },
+        child: Focus(
+          focusNode: _unfocusNode,
+          child: Form(
+            key: _formKey,
+            child: ScrollConfiguration(
+              behavior: ScrollBehavior().copyWith(scrollbars: false),
+              child: SingleChildScrollView(
+                controller: _scrollController,
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const SizedBox(height: 30),
+                    anim.AnimatedWidgetWrapper(
+                      animationType: anim.AnimationType.scaleUp,
+                      duration: anim.AnimationDuration.normal,
+                      child: Center(
+                        child: GestureDetector(
+                          onTap: _pickProfilePicture,
+                          child: Stack(
+                            children: [
+                              Container(
+                                height: 110,
+                                width: 110,
+                                decoration: const BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  color: Color(0xFFEAEAEA),
+                                ),
+                                child: profileImage != null
+                                    ? ClipOval(
+                                        child: Image.file(
+                                          File(profileImage!.path),
+                                          fit: BoxFit.cover,
+                                        ),
+                                      )
+                                    : const Icon(Icons.person,
+                                        color: kGreyDark, size: 50),
+                              ),
+                              Positioned(
+                                bottom: 4,
+                                right: 6,
+                                child: Container(
+                                  padding: const EdgeInsets.all(6),
+                                  decoration: const BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    color: Colors.white,
+                                  ),
+                                  child: const Icon(Icons.camera_alt, size: 20),
+                                ),
+                              )
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 30),
+                    anim.AnimatedWidgetWrapper(
+                      animationType: anim.AnimationType.fadeSlideInFromLeft,
+                      duration: anim.AnimationDuration.normal,
+                      delayMilliseconds: 100,
+                      child: Text("Email Address", style: kSmallTitleR),
+                    ),
+                    const SizedBox(height: 6),
+                    anim.AnimatedWidgetWrapper(
+                      animationType: anim.AnimationType.fadeSlideInFromBottom,
+                      duration: anim.AnimationDuration.normal,
+                      delayMilliseconds: 150,
+                      child: InputField(
+                        key: _fieldKeys['email'],
+                        type: CustomFieldType.text,
+                        hint: "Enter email address",
+                        controller: emailController,
+                        validator: (v) => v!.isEmpty ? "Required" : null,
+                      ),
+                    ),
+                    const SizedBox(height: 18),
+                    anim.AnimatedWidgetWrapper(
+                      animationType: anim.AnimationType.fadeSlideInFromLeft,
+                      duration: anim.AnimationDuration.normal,
+                      delayMilliseconds: 200,
+                      child: Text("Address", style: kSmallTitleR),
+                    ),
+                    const SizedBox(height: 6),
+                    anim.AnimatedWidgetWrapper(
+                      animationType: anim.AnimationType.fadeSlideInFromBottom,
+                      duration: anim.AnimationDuration.normal,
+                      delayMilliseconds: 250,
+                      child: InputField(
+                        key: _fieldKeys['address'],
+                        type: CustomFieldType.text,
+                        hint: "Enter address",
+                        controller: addressController,
+                        validator: (v) => v!.isEmpty ? "Required" : null,
+                      ),
+                    ),
+                    const SizedBox(height: 18),
+                    anim.AnimatedWidgetWrapper(
+                      animationType: anim.AnimationType.fadeSlideInFromLeft,
+                      duration: anim.AnimationDuration.normal,
+                      delayMilliseconds: 300,
+                      child: Text("Date of Birth", style: kSmallTitleR),
+                    ),
+                    const SizedBox(height: 6),
+                    anim.AnimatedWidgetWrapper(
+                      animationType: anim.AnimationType.fadeSlideInFromBottom,
+                      duration: anim.AnimationDuration.normal,
+                      delayMilliseconds: 350,
+                      child: InputField(
+                        key: _fieldKeys['dob'],
+                        type: CustomFieldType.date,
+                        hint: "dd/mm/yyyy",
+                        controller: dobController,
+                        validator: (v) => v!.isEmpty ? "Required" : null,
+                      ),
+                    ),
+                    const SizedBox(height: 18),
+                    anim.AnimatedWidgetWrapper(
+                      animationType: anim.AnimationType.fadeSlideInFromLeft,
+                      duration: anim.AnimationDuration.normal,
+                      delayMilliseconds: 400,
+                      child: Text("Recommended By", style: kSmallTitleR),
+                    ),
+                    const SizedBox(height: 6),
+                    anim.AnimatedWidgetWrapper(
+                      animationType: anim.AnimationType.fadeSlideInFromBottom,
+                      duration: anim.AnimationDuration.normal,
+                      delayMilliseconds: 450,
+                      child: InputField(
+                        key: _fieldKeys['recommendedBy'],
+                        type: CustomFieldType.text,
+                        hint: "Recommended by",
+                        controller: recommendedByController,
+                        readOnly: true,
+                      ),
+                    ),
+                    const SizedBox(height: 30),
+                    anim.AnimatedWidgetWrapper(
+                      animationType: anim.AnimationType.fadeScaleUp,
+                      duration: anim.AnimationDuration.normal,
+                      delayMilliseconds: 500,
+                      child: SizedBox(
+                        height: 50,
+                        width: double.infinity,
+                        child: primaryButton(
+                          label: "Save",
+                          onPressed: () {
+                            if (_formKey.currentState!.validate()) {
+                              _handleSaveProfile();
+                            } else {
+                              _scrollToFirstError();
+                            }
+                          },
+                          isLoading: ref.watch(loadingProvider),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 30),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}

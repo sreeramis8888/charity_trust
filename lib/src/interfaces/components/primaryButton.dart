@@ -7,7 +7,7 @@ Widget primaryButton({
   required Function()? onPressed,
   Color labelColor = kWhite,
   int fontSize = 14,
-  int buttonHeight = 45,
+  int buttonHeight = 40,
   bool isLoading = false,
   Color buttonColor = kPrimaryColor,
   Color sideColor = Colors.transparent,

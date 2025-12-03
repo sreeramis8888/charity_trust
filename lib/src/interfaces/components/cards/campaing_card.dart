@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 
 class CampaignCard extends StatelessWidget {
   final String title;
-  final String description; 
+  final String description;
   final String category;
   final String date;
   final String? image;
@@ -36,7 +36,7 @@ class CampaignCard extends StatelessWidget {
 
     return Container(
       decoration: BoxDecoration(
-        color: const Color(0xFFEBEBEB),
+        color: kCardBackgroundColor,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: kBorder),
       ),
@@ -151,9 +151,9 @@ class CampaignCard extends StatelessWidget {
                       },
                     );
                   },
-                  buttonColor: kWhite,
+                  buttonColor: kCardBackgroundColor,
                   labelColor: kTextColor,
-                  sideColor: kTertiary,
+                  sideColor: kTextColor,
                 ),
               ),
               if (!isMyCampaign) ...[

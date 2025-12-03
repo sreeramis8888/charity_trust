@@ -1,6 +1,10 @@
 import 'package:charity_trust/src/interfaces/main_pages/campaign.dart';
 import 'package:charity_trust/src/interfaces/main_pages/campaign_detail.dart';
+import 'package:charity_trust/src/interfaces/main_pages/home.dart';
+import 'package:charity_trust/src/interfaces/main_pages/news_bookmark/news_list_page.dart';
 import 'package:charity_trust/src/interfaces/main_pages/profile.dart';
+import 'package:charity_trust/src/interfaces/main_pages/profile_pages/edit_profile.dart';
+import 'package:charity_trust/src/interfaces/main_pages/profile_pages/my_participations.dart';
 import 'package:charity_trust/src/interfaces/main_pages/navbar.dart';
 import 'package:charity_trust/src/interfaces/onboarding/login.dart';
 import 'package:charity_trust/src/interfaces/onboarding/registration.dart';
@@ -102,6 +106,12 @@ Route<dynamic> generateRoute(RouteSettings? settings) {
       transitionToUse = TransitionType.fade;
       transitionDuration = const Duration(milliseconds: 500);
       break;
+
+    case 'Home':
+      page = HomePage();
+      transitionToUse = TransitionType.fade;
+      transitionDuration = const Duration(milliseconds: 500);
+      break;
       
     case 'registration':
       page = RegistrationPage();
@@ -128,6 +138,15 @@ Route<dynamic> generateRoute(RouteSettings? settings) {
       
     case 'Profile':
       page = ProfilePage();
+      break;
+    case 'EditProfile':
+      page = EditProfilePage();
+      break;
+    case 'MyParticipations':
+      page = MyParticipationsPage();
+      break;
+    case 'News':
+      page = NewsListPage();
       break;
     case 'Campaign':
       page = CampaignPage();

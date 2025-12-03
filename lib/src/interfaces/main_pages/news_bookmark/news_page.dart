@@ -7,7 +7,10 @@ import 'package:charity_trust/src/data/constants/color_constants.dart';
 import 'package:charity_trust/src/data/constants/style_constants.dart';
 import 'package:charity_trust/src/data/models/news_model.dart';
 import 'package:charity_trust/src/data/providers/news_provider.dart';
+import 'package:charity_trust/src/data/feature_tours/news_swipe_tour.dart';
+import 'package:charity_trust/src/data/feature_tours/feature_tour_provider.dart';
 import 'package:charity_trust/src/interfaces/animations/index.dart' as anim;
+import 'package:charity_trust/src/interfaces/components/feature_tour_overlay.dart';
 import 'package:shimmer/shimmer.dart';
 
 final currentNewsIndexProvider = StateProvider<int>((ref) => 0);
@@ -27,41 +30,77 @@ class NewsDetailView extends ConsumerWidget {
             padding: const EdgeInsets.all(8),
             child: GestureDetector(
                 onTap: () => Navigator.pop(context),
-                child: Icon(Icons.arrow_back_ios)),
+                child: Icon(
+                  Icons.arrow_back_ios,
+                  size: 20,
+                )),
           ),
-          // actions: [
-          //   IconButton(
-          //     icon: Icon(
-          //       Icons.bookmark_border,
-          //       color: kWhite,
-          //     ),
-          //     onPressed: () {
-          //       Navigator.push(
-          //         context,
-          //         MaterialPageRoute(builder: (context) => BookmarkPage()),
-          //       );
-          //     },
-          //   ),
-          // ],
+          actions: [
+            Consumer(
+              builder: (context, ref, child) {
+                final currentIndex = ref.watch(currentNewsIndexProvider);
+                final newsListState = ref.watch(newsListProvider);
+
+                return newsListState.maybeWhen(
+                  data: (paginationState) {
+                    final currentNews = news[currentIndex];
+                    final updatedNews = paginationState.news.firstWhere(
+                      (n) => n.id == currentNews.id,
+                      orElse: () => currentNews,
+                    );
+
+                    return IconButton(
+                      icon: Icon(
+                        (updatedNews.bookmarked?.isNotEmpty ?? false)
+                            ? Icons.bookmark
+                            : Icons.bookmark_border,
+                        color: kSecondaryTextColor,
+                        size: 22,
+                      ),
+                      onPressed: () {
+                        ref
+                            .read(newsListProvider.notifier)
+                            .toggleBookmark(currentNews.id ?? '');
+                      },
+                    );
+                  },
+                  orElse: () => IconButton(
+                    icon: Icon(
+                      Icons.bookmark_border,
+                      color: kSecondaryTextColor,
+                      size: 22,
+                    ),
+                    onPressed: () {
+                      ref
+                          .read(newsListProvider.notifier)
+                          .toggleBookmark(news[currentIndex].id ?? '');
+                    },
+                  ),
+                );
+              },
+            ),
+            SizedBox(width: 8),
+          ],
         ),
-        body: NewsModelDetailContentView(news: news));
+        body: NewsDetailContentView(news: news));
   }
 }
 
-class NewsModelDetailContentView extends ConsumerStatefulWidget {
+class NewsDetailContentView extends ConsumerStatefulWidget {
   final List<NewsModel> news;
 
-  const NewsModelDetailContentView({Key? key, required this.news})
-      : super(key: key);
+  const NewsDetailContentView({Key? key, required this.news}) : super(key: key);
 
   @override
-  ConsumerState<NewsModelDetailContentView> createState() =>
+  ConsumerState<NewsDetailContentView> createState() =>
       _NewsModelDetailContentViewState();
 }
 
 class _NewsModelDetailContentViewState
-    extends ConsumerState<NewsModelDetailContentView> {
+    extends ConsumerState<NewsDetailContentView> {
   late final PageController _pageController;
+  final GlobalKey _pageViewKey = GlobalKey();
+  bool _tourShown = false;
 
   @override
   void initState() {
@@ -69,12 +108,31 @@ class _NewsModelDetailContentViewState
     _pageController = PageController(
       initialPage: ref.read(currentNewsIndexProvider),
     );
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _showFeatureTourIfNeeded();
+    });
   }
 
   @override
   void dispose() {
     _pageController.dispose();
     super.dispose();
+  }
+
+  void _showFeatureTourIfNeeded() {
+    if (_tourShown || widget.news.length <= 1) return;
+
+    final completedTours = ref.read(completedFeatureToursProvider);
+    if (!completedTours.contains(NewsSwipeTour.tourId)) {
+      _tourShown = true;
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (context) => FeatureTourOverlay(
+          tour: NewsSwipeTour.create(pageViewKey: _pageViewKey),
+        ),
+      );
+    }
   }
 
   @override
@@ -89,6 +147,7 @@ class _NewsModelDetailContentViewState
           children: [
             Expanded(
                 child: PageView.builder(
+                    key: _pageViewKey,
                     controller: _pageController,
                     itemCount: widget.news.length,
                     onPageChanged: (index) {
@@ -100,71 +159,6 @@ class _NewsModelDetailContentViewState
                         newsItem: widget.news[index],
                       );
                     })),
-            if (widget.news.length > 1)
-              Padding(
-                padding: const EdgeInsets.only(
-                    left: 15, right: 15, bottom: 10, top: 10),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    OutlinedButton(
-                      style: OutlinedButton.styleFrom(
-                        backgroundColor: kBackgroundColor,
-                        side: const BorderSide(color: kStrokeColor),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 25, vertical: 10),
-                      ),
-                      onPressed: () {
-                        int currentIndex = ref.read(currentNewsIndexProvider);
-                        if (currentIndex > 0) {
-                          _pageController.previousPage(
-                            duration: const Duration(milliseconds: 300),
-                            curve: Curves.easeInOut,
-                          );
-                        }
-                      },
-                      child: const Row(
-                        children: [
-                          Icon(Icons.arrow_back, color: kWhite),
-                          SizedBox(width: 8),
-                          Text('Previous', style: TextStyle(color: kWhite)),
-                        ],
-                      ),
-                    ),
-                    SizedBox(width: 10),
-                    OutlinedButton(
-                      style: OutlinedButton.styleFrom(
-                        backgroundColor: kBackgroundColor,
-                        side: const BorderSide(color: kStrokeColor),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 25, vertical: 10),
-                      ),
-                      onPressed: () {
-                        int currentIndex = ref.read(currentNewsIndexProvider);
-                        if (currentIndex < widget.news.length - 1) {
-                          _pageController.nextPage(
-                            duration: const Duration(milliseconds: 300),
-                            curve: Curves.easeInOut,
-                          );
-                        }
-                      },
-                      child: const Row(
-                        children: [
-                          Text('Next', style: TextStyle(color: kWhite)),
-                          SizedBox(width: 8),
-                          Icon(Icons.arrow_forward, color: kWhite),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
           ],
         ),
       ],
@@ -196,31 +190,47 @@ class NewsContent extends ConsumerWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                anim.AnimatedWidgetWrapper(
-                  animationType: anim.AnimationType.fadeSlideInFromTop,
-                  duration: anim.AnimationDuration.normal,
-                  child: AspectRatio(
-                    aspectRatio: 16 / 9,
-                    child: Image.network(
-                      newsItem.media ?? '',
-                      fit: BoxFit.cover,
-                      loadingBuilder: (context, child, loadingProgress) {
-                        if (loadingProgress == null) return child;
-                        return ShimmerLoadingEffect(
-                          child: Container(
-                            width: double.infinity,
-                            color: Colors.grey[300],
-                          ),
-                        );
-                      },
-                      errorBuilder: (context, error, stackTrace) {
-                        return ShimmerLoadingEffect(
-                          child: Container(
-                            width: double.infinity,
-                            color: Colors.grey[300],
-                          ),
-                        );
-                      },
+                const SizedBox(height: 8),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: Text(
+                    newsItem.title ?? '',
+                    style: kBodyTitleB,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Padding(
+                  padding:
+                      const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16),
+                  child: anim.AnimatedWidgetWrapper(
+                    animationType: anim.AnimationType.fadeSlideInFromTop,
+                    duration: anim.AnimationDuration.normal,
+                    child: AspectRatio(
+                      aspectRatio: 16 / 9,
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(4),
+                        child: Image.network(
+                          newsItem.media ?? '',
+                          fit: BoxFit.cover,
+                          loadingBuilder: (context, child, loadingProgress) {
+                            if (loadingProgress == null) return child;
+                            return ShimmerLoadingEffect(
+                              child: Container(
+                                width: double.infinity,
+                                color: Colors.grey[300],
+                              ),
+                            );
+                          },
+                          errorBuilder: (context, error, stackTrace) {
+                            return ShimmerLoadingEffect(
+                              child: Container(
+                                width: double.infinity,
+                                color: Colors.grey[300],
+                              ),
+                            );
+                          },
+                        ),
+                      ),
                     ),
                   ),
                 ),
@@ -233,32 +243,6 @@ class NewsContent extends ConsumerWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Container(
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(5),
-                            color: Color.fromARGB(255, 192, 252, 194),
-                          ),
-                          child: Padding(
-                            padding: const EdgeInsets.symmetric(
-                              vertical: 2,
-                              horizontal: 10,
-                            ),
-                            child: Text(
-                              newsItem.category ?? '',
-                              style: TextStyle(
-                                fontSize: 12,
-                                color: Colors.green,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ),
-                        ),
-                        const SizedBox(height: 8),
-                        Text(
-                          newsItem.title ?? '',
-                          style: kHeadTitleB,
-                        ),
-                        const SizedBox(height: 8),
                         Row(
                           children: [
                             Text(
@@ -278,38 +262,22 @@ class NewsContent extends ConsumerWidget {
                             ),
                           ],
                         ),
+                        SizedBox(
+                          height: 10,
+                        ),
+                        Text(newsItem.subTitle ?? '',
+                            style: kSmallTitleL.copyWith(
+                                color: kSecondaryTextColor)),
                         const SizedBox(height: 16),
                         Text(newsItem.content ?? '',
-                            style: TextStyle(
-                                color: kSecondaryTextColor,
-                                fontWeight: FontWeight.w300,
-                                fontSize: 15)),
+                            style: kSmallTitleR.copyWith(
+                                color: kSecondaryTextColor)),
                       ],
                     ),
                   ),
                 ),
               ],
             ),
-          ),
-        ),
-        Positioned(
-          top: 16,
-          right: 16,
-          child: Consumer(
-            builder: (context, ref, child) {
-              return IconButton(
-                icon: Icon(
-                  Icons.bookmark_border,
-                  color: kPrimaryColor,
-                  size: 28,
-                ),
-                onPressed: () {
-                  ref
-                      .read(newsListProvider.notifier)
-                      .toggleBookmark(newsItem.id ?? '');
-                },
-              );
-            },
           ),
         ),
       ],
