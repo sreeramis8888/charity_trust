@@ -67,6 +67,7 @@ dependencies:
   image_cropper: ^11.0.0
   firebase_core: ^4.2.1
   flutter_countries: ^1.0.2
+  page_view_dot_indicator: ^2.3.0
 
 dev_dependencies:
   flutter_test:
