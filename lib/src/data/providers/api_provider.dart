@@ -109,6 +109,7 @@ class ApiProvider {
         return ApiResponse.success(decoded, response.statusCode);
       } else {
         final message = decoded['message'] ?? 'Failed to post data';
+        log(name: 'API POST ERROR', '$message');
         return ApiResponse.error(message, response.statusCode);
       }
     } catch (e, stackTrace) {

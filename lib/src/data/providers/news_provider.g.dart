@@ -111,7 +111,7 @@ final class NewsProvider extends $FunctionalProvider<
   }
 }
 
-String _$newsHash() => r'1a5264b287d7335a40681a1f55f3afec201e9b96';
+String _$newsHash() => r'c536197adfd931ae31788c4d7eaf31785c49b0fb';
 
 final class NewsFamily extends $Family
     with
@@ -204,7 +204,7 @@ final class BookmarkedNewsProvider extends $FunctionalProvider<
   }
 }
 
-String _$bookmarkedNewsHash() => r'0f4f3c037acaff69308bba276ef807ea77d81a5a';
+String _$bookmarkedNewsHash() => r'ce472156803fe674edeaf8468db8e9c4957b968a';
 
 final class BookmarkedNewsFamily extends $Family
     with
@@ -260,7 +260,7 @@ final class NewsListNotifierProvider
   NewsListNotifier create() => NewsListNotifier();
 }
 
-String _$newsListNotifierHash() => r'eeedbbccd0e7c307eb808948c64c86c95cdb0bce';
+String _$newsListNotifierHash() => r'c1a75afb0795d867bc7f2aa8eced341aa921aba4';
 
 abstract class _$NewsListNotifier extends $AsyncNotifier<PaginationState> {
   FutureOr<PaginationState> build();
@@ -303,7 +303,7 @@ final class BookmarkedNewsListNotifierProvider extends $AsyncNotifierProvider<
 }
 
 String _$bookmarkedNewsListNotifierHash() =>
-    r'290e88d6a77319e2004236f96027366ac182dc22';
+    r'ca0102bf1e6ff24efa7954e75f03a8a9d61c61cf';
 
 abstract class _$BookmarkedNewsListNotifier
     extends $AsyncNotifier<PaginationState> {

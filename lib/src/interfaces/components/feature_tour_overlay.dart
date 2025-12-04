@@ -109,34 +109,34 @@ class _FeatureTourOverlayState extends ConsumerState<FeatureTourOverlay>
           ),
         ),
         // Animated spotlight/glow effect
-        Positioned(
-          left: targetOffset.dx - step.padding.left,
-          top: targetOffset.dy - step.padding.top,
-          width: targetSize.width + step.padding.horizontal,
-          height: targetSize.height + step.padding.vertical,
-          child: ScaleTransition(
-            scale: Tween<double>(begin: 0.95, end: 1.05).animate(
-              CurvedAnimation(
-                  parent: _pulseController, curve: Curves.easeInOut),
-            ),
-            child: Container(
-              decoration: BoxDecoration(
-                border: Border.all(
-                  color: Colors.white.withOpacity(0.8),
-                  width: 2.5,
-                ),
-                borderRadius: BorderRadius.circular(12),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.white.withOpacity(0.3),
-                    blurRadius: 20,
-                    spreadRadius: 5,
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ),
+        // Positioned(
+        //   left: targetOffset.dx - step.padding.left,
+        //   top: targetOffset.dy - step.padding.top,
+        //   width: targetSize.width + step.padding.horizontal,
+        //   height: targetSize.height + step.padding.vertical,
+        //   child: ScaleTransition(
+        //     scale: Tween<double>(begin: 0.95, end: 1.05).animate(
+        //       CurvedAnimation(
+        //           parent: _pulseController, curve: Curves.easeInOut),
+        //     ),
+        //     child: Container(
+        //       decoration: BoxDecoration(
+        //         border: Border.all(
+        //           color: Colors.white.withOpacity(0.8),
+        //           width: 2.5,
+        //         ),
+        //         borderRadius: BorderRadius.circular(12),
+        //         boxShadow: [
+        //           BoxShadow(
+        //             color: Colors.white.withOpacity(0.3),
+        //             blurRadius: 20,
+        //             spreadRadius: 5,
+        //           ),
+        //         ],
+        //       ),
+        //     ),
+        //   ),
+        // ),
         // Gesture animation (if applicable)
         if (step.gestureType != GestureType.none)
           Positioned(
@@ -302,9 +302,8 @@ class _FeatureTourOverlayState extends ConsumerState<FeatureTourOverlay>
   }
 
   Widget _buildSwipeGesture(double progress) {
-    final xOffset = progress < 0.5
-        ? (progress * 2) * 60
-        : ((1 - progress) * 2) * 60;
+    final xOffset =
+        progress < 0.5 ? (progress * 2) * 60 : ((1 - progress) * 2) * 60;
 
     return Transform.translate(
       offset: Offset(xOffset - 30, 0),

@@ -14,6 +14,7 @@ import 'package:charity_trust/src/interfaces/components/loading_indicator.dart';
 import 'package:charity_trust/src/interfaces/components/searchable_dropdown.dart';
 import 'package:charity_trust/src/interfaces/components/primaryButton.dart';
 import 'package:charity_trust/src/interfaces/animations/index.dart' as anim;
+import 'package:charity_trust/src/interfaces/onboarding/charity_member_otp_verification.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_cropper/image_cropper.dart';
@@ -169,9 +170,21 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
     try {
       ref.read(loadingProvider.notifier).startLoading();
 
+      // Convert date from dd/mm/yyyy to yyyy-mm-dd format
+      String formattedDob = dobController.text.trim();
+      if (formattedDob.isNotEmpty) {
+        try {
+          final parts = formattedDob.split('/');
+          if (parts.length == 3) {
+            formattedDob = '${parts[2]}-${parts[1]}-${parts[0]}';
+          }
+        } catch (e) {
+          log('Error formatting date: $e', name: 'RegistrationPage');
+        }
+      }
+
       final userData = <String, dynamic>{
         'name': nameController.text.trim(),
-        'phone': mobileController.text.trim(),
         'email': emailController.text.trim(),
         'address': addressController.text.trim(),
         'area': areaController.text.trim(),
@@ -179,13 +192,19 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
         'state': selectedStateCode,
         'district': selectedDistrictCode,
         'pincode': pincodeController.text.trim(),
-        'dob': dobController.text.trim(),
-        'recommended_by': selectedRecommendedBy?.id,
-        'recommended_by_type': recommendedByType,
-        'status': "pending"
+        'dob': formattedDob,
+        'recommended_by': recommendedByType == 'trustee' ? 'trustee' : 'charity-member',
+        if (recommendedByType == 'trustee')
+          'under_trustee': selectedRecommendedBy?.id
+        else
+          'under_charity_member': selectedRecommendedBy?.id,
+        'status': recommendedByType == 'charity_member' ? 'inactive' : 'pending'
       };
 
       final result = await ref.read(updateUserProfileProvider(userData).future);
+
+      // Check if widget is still mounted before using ref
+      if (!mounted) return;
 
       ref.read(loadingProvider.notifier).stopLoading();
 
@@ -194,13 +213,29 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
         SnackbarService().showSnackBar('Registration submitted successfully');
 
         if (mounted) {
-          Navigator.of(context).pushReplacementNamed('requestSent');
+          // If recommended by charity member, navigate to OTP verification
+          if (recommendedByType == 'charity_member' &&
+              selectedRecommendedBy != null) {
+            Navigator.of(context).pushReplacementNamed(
+              'charityMemberOtpVerification',
+              arguments: {
+                'charityMemberId': selectedRecommendedBy!.id,
+                'charityMemberName': selectedRecommendedBy!.name,
+              },
+            );
+          } else {
+            Navigator.of(context).pushReplacementNamed('requestSent');
+          }
         }
       } else {
-        SnackbarService().showSnackBar('Failed to submit registration');
+        SnackbarService().showSnackBar('Failed to submit registration',
+            type: SnackbarType.error);
       }
     } catch (e) {
-      ref.read(loadingProvider.notifier).stopLoading();
+      // Check if widget is still mounted before using ref
+      if (mounted) {
+        ref.read(loadingProvider.notifier).stopLoading();
+      }
       SnackbarService().showSnackBar('Error: $e');
       log('Error during registration: $e', name: 'RegistrationPage');
     }
@@ -289,80 +324,80 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
                           validator: (v) => v!.isEmpty ? "Required" : null,
                         ),
                       ),
-                      const SizedBox(height: 18),
-                      anim.AnimatedWidgetWrapper(
-                        animationType: anim.AnimationType.fadeSlideInFromLeft,
-                        duration: anim.AnimationDuration.normal,
-                        delayMilliseconds: 200,
-                        child: Text("Mobile Number *", style: kSmallTitleR),
-                      ),
-                      const SizedBox(height: 6),
-                      anim.AnimatedWidgetWrapper(
-                        animationType: anim.AnimationType.fadeSlideInFromBottom,
-                        duration: anim.AnimationDuration.normal,
-                        delayMilliseconds: 250,
-                        child: IntlPhoneField(
-                          key: _fieldKeys['mobile'],
-                          validator: (phone) {
-                            if (phone!.number.length > 9) {
-                              if (phone.number.length > 10) {
-                                return 'Phone number cannot exceed 10 digits';
-                              }
-                            }
-                            return null;
-                          },
-                          style: const TextStyle(
-                            color: kTextColor,
-                            letterSpacing: 3,
-                            fontSize: 14,
-                            fontWeight: FontWeight.w400,
-                          ),
-                          controller: mobileController,
-                          disableLengthCheck: true,
-                          showCountryFlag: true,
-                          cursorColor: kBlack,
-                          decoration: InputDecoration(
-                            fillColor: kWhite,
-                            hintText: 'Enter your phone number',
-                            hintStyle: TextStyle(
-                              fontSize: 14,
-                              letterSpacing: .2,
-                              fontWeight: FontWeight.w200,
-                              color: kTextColor,
-                            ),
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(8.0),
-                              borderSide: BorderSide(color: kBorder),
-                            ),
-                            enabledBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(8.0),
-                              borderSide: BorderSide(color: kBorder),
-                            ),
-                            focusedBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(8.0),
-                              borderSide: const BorderSide(color: kBorder),
-                            ),
-                            contentPadding: const EdgeInsets.symmetric(
-                              vertical: 16.0,
-                              horizontal: 10.0,
-                            ),
-                          ),
-                          initialCountryCode: 'IN',
-                          flagsButtonPadding:
-                              const EdgeInsets.only(left: 10, right: 10.0),
-                          showDropdownIcon: true,
-                          dropdownIcon: const Icon(
-                            Icons.arrow_drop_down_outlined,
-                            color: kTextColor,
-                          ),
-                          dropdownIconPosition: IconPosition.trailing,
-                          dropdownTextStyle: const TextStyle(
-                            color: kTextColor,
-                            fontSize: 15,
-                            fontWeight: FontWeight.w400,
-                          ),
-                        ),
-                      ),
+                      // const SizedBox(height: 18),
+                      // anim.AnimatedWidgetWrapper(
+                      //   animationType: anim.AnimationType.fadeSlideInFromLeft,
+                      //   duration: anim.AnimationDuration.normal,
+                      //   delayMilliseconds: 200,
+                      //   child: Text("Mobile Number *", style: kSmallTitleR),
+                      // ),
+                      // const SizedBox(height: 6),
+                      // anim.AnimatedWidgetWrapper(
+                      //   animationType: anim.AnimationType.fadeSlideInFromBottom,
+                      //   duration: anim.AnimationDuration.normal,
+                      //   delayMilliseconds: 250,
+                      //   child: IntlPhoneField(
+                      //     key: _fieldKeys['mobile'],
+                      //     validator: (phone) {
+                      //       if (phone!.number.length > 9) {
+                      //         if (phone.number.length > 10) {
+                      //           return 'Phone number cannot exceed 10 digits';
+                      //         }
+                      //       }
+                      //       return null;
+                      //     },
+                      //     style: const TextStyle(
+                      //       color: kTextColor,
+                      //       letterSpacing: 3,
+                      //       fontSize: 14,
+                      //       fontWeight: FontWeight.w400,
+                      //     ),
+                      //     controller: mobileController,
+                      //     disableLengthCheck: true,
+                      //     showCountryFlag: true,
+                      //     cursorColor: kBlack,
+                      //     decoration: InputDecoration(
+                      //       fillColor: kWhite,
+                      //       hintText: 'Enter your phone number',
+                      //       hintStyle: TextStyle(
+                      //         fontSize: 14,
+                      //         letterSpacing: .2,
+                      //         fontWeight: FontWeight.w200,
+                      //         color: kTextColor,
+                      //       ),
+                      //       border: OutlineInputBorder(
+                      //         borderRadius: BorderRadius.circular(8.0),
+                      //         borderSide: BorderSide(color: kBorder),
+                      //       ),
+                      //       enabledBorder: OutlineInputBorder(
+                      //         borderRadius: BorderRadius.circular(8.0),
+                      //         borderSide: BorderSide(color: kBorder),
+                      //       ),
+                      //       focusedBorder: OutlineInputBorder(
+                      //         borderRadius: BorderRadius.circular(8.0),
+                      //         borderSide: const BorderSide(color: kBorder),
+                      //       ),
+                      //       contentPadding: const EdgeInsets.symmetric(
+                      //         vertical: 16.0,
+                      //         horizontal: 10.0,
+                      //       ),
+                      //     ),
+                      //     initialCountryCode: 'IN',
+                      //     flagsButtonPadding:
+                      //         const EdgeInsets.only(left: 10, right: 10.0),
+                      //     showDropdownIcon: true,
+                      //     dropdownIcon: const Icon(
+                      //       Icons.arrow_drop_down_outlined,
+                      //       color: kTextColor,
+                      //     ),
+                      //     dropdownIconPosition: IconPosition.trailing,
+                      //     dropdownTextStyle: const TextStyle(
+                      //       color: kTextColor,
+                      //       fontSize: 15,
+                      //       fontWeight: FontWeight.w400,
+                      //     ),
+                      //   ),
+                      // ),
                       const SizedBox(height: 18),
                       anim.AnimatedWidgetWrapper(
                         animationType: anim.AnimationType.fadeSlideInFromLeft,

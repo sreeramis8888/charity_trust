@@ -233,29 +233,24 @@ class _NewsListPageState extends ConsumerState<NewsListPage> {
                     height: 15,
                   ),
                   Expanded(
-                    child: anim.AnimatedWidgetWrapper(
-                      animationType: anim.AnimationType.fadeSlideInFromBottom,
-                      duration: anim.AnimationDuration.normal,
-                      delayMilliseconds: 100,
-                      child: ListView.builder(
-                        controller: _scrollController,
-                        itemCount: paginationState.news.length +
-                            (paginationState.hasMore ? 1 : 0),
-                        itemBuilder: (context, index) {
-                          if (index == paginationState.news.length) {
-                            return Padding(
-                              padding: EdgeInsets.all(16),
-                              child: Center(
-                                child: LoadingAnimation(),
-                              ),
-                            );
-                          }
-                          return NewsCard(
-                            news: paginationState.news[index],
-                            allNews: paginationState.news,
+                    child: ListView.builder(
+                      controller: _scrollController,
+                      itemCount: paginationState.news.length +
+                          (paginationState.hasMore ? 1 : 0),
+                      itemBuilder: (context, index) {
+                        if (index == paginationState.news.length) {
+                          return Padding(
+                            padding: EdgeInsets.all(16),
+                            child: Center(
+                              child: LoadingAnimation(),
+                            ),
                           );
-                        },
-                      ),
+                        }
+                        return NewsCard(
+                          news: paginationState.news[index],
+                          allNews: paginationState.news,
+                        );
+                      },
                     ),
                   ),
                 ],

@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:developer';
+import 'package:charity_trust/src/data/models/user_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -228,27 +229,28 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
       if (isAuthenticated) {
         log('_checkAuthenticationAndLoadUser: User is authenticated, loading user data',
             name: 'SplashScreen');
-        // Try to load user from local storage first
-        final secureStorage = ref.read(secureStorageServiceProvider);
-        log('_checkAuthenticationAndLoadUser: Attempting to load user from secure storage',
+        // Fetch current user status from API
+        log('_checkAuthenticationAndLoadUser: Fetching current user status from API',
             name: 'SplashScreen');
-        var user = await secureStorage.getUserData();
+        var user = await ref.read(fetchCurrentUserStatusProvider.future);
+
+        if (!mounted) {
+          log('_checkAuthenticationAndLoadUser: Widget not mounted after API call, skipping navigation',
+              name: 'SplashScreen');
+          return;
+        }
 
         if (user != null) {
-          log('_checkAuthenticationAndLoadUser: User loaded from secure storage - id: ${user.id}, status: ${user.status}',
+          log('_checkAuthenticationAndLoadUser: User status fetched from API - id: ${user.id}, status: ${user.status}',
               name: 'SplashScreen');
-          // Set user in provider from local storage
-          ref.read(userProvider.notifier).setUser(user);
         } else {
-          log('_checkAuthenticationAndLoadUser: No user in secure storage, fetching from API',
+          log('_checkAuthenticationAndLoadUser: Failed to fetch user status from API, trying local storage',
               name: 'SplashScreen');
-          // If not in local storage or failed, fetch from API
-          user = await ref.read(fetchUserProfileProvider.future);
+          // Fallback to local storage if API fails
+          final secureStorage = ref.read(secureStorageServiceProvider);
+          user = await secureStorage.getUserData();
           if (user != null) {
-            log('_checkAuthenticationAndLoadUser: User fetched from API - id: ${user.id}, status: ${user.status}',
-                name: 'SplashScreen');
-          } else {
-            log('_checkAuthenticationAndLoadUser: Failed to fetch user from API',
+            log('_checkAuthenticationAndLoadUser: User loaded from secure storage - id: ${user.id}, status: ${user.status}',
                 name: 'SplashScreen');
           }
         }

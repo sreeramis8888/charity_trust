@@ -546,3 +546,177 @@ class HomeYoutubePlayerCard extends StatelessWidget {
     );
   }
 }
+
+// ============================================================================
+// HOME GRADIENT CAMPAIGN CARD - For Active Campaigns with Gradient Background
+// ============================================================================
+class HomeGradientCampaignCard extends StatelessWidget {
+  final String title;
+  final String description;
+  final String? image;
+  final int raised;
+  final int goal;
+  final String dueDate;
+  final VoidCallback onViewDetails;
+  final VoidCallback? onDonate;
+
+  const HomeGradientCampaignCard({
+    super.key,
+    required this.title,
+    required this.description,
+    required this.raised,
+    required this.goal,
+    required this.dueDate,
+    required this.onViewDetails,
+    this.onDonate,
+    this.image,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final percent = (raised / goal).clamp(0.0, 1.0);
+
+    return Container(
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [const Color(0xFF0A39C4), const Color(0xFF181818)],
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+        ),
+        borderRadius: BorderRadius.circular(16),
+      ),
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                "DUE DATE",
+                style: kSmallerTitleSB.copyWith(
+                  fontSize: 10,
+                  color: kWhite,
+                ),
+              ),
+              Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                decoration: BoxDecoration(
+                  color: Colors.black.withOpacity(0.3),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Row(
+                  children: [
+                    const Icon(Icons.calendar_today, color: kWhite, size: 14),
+                    const SizedBox(width: 6),
+                    Text(
+                      dueDate,
+                      style: kSmallerTitleM.copyWith(
+                        fontSize: 10,
+                        color: kWhite,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          ClipRRect(
+            borderRadius: BorderRadius.circular(12),
+            child: Image.network(
+              image ?? '',
+              height: 180,
+              width: double.infinity,
+              fit: BoxFit.cover,
+              errorBuilder: (_, __, ___) => Container(
+                height: 120,
+                color: Colors.grey[300],
+                child: Icon(Icons.broken_image, color: Colors.grey[600]),
+              ),
+            ),
+          ),
+          const SizedBox(height: 12),
+          Text(
+            title,
+            style: kBodyTitleSB.copyWith(color: kWhite),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            description,
+            style: kSmallerTitleR.copyWith(
+              color: kWhite.withOpacity(0.8),
+            ),
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+          ),
+          const SizedBox(height: 12),
+          LinearProgressIndicator(
+            color: const Color(0xFFFFD400),
+            minHeight: 8,
+            borderRadius: BorderRadius.circular(10),
+            value: percent,
+            backgroundColor: Colors.white.withOpacity(0.3),
+          ),
+          const SizedBox(height: 8),
+          Row(
+            children: [
+              Text(
+                "₹$raised",
+                style: kSmallTitleM.copyWith(color: const Color(0xFFFFD400)),
+              ),
+              const SizedBox(width: 4),
+              Text(
+                "raised of",
+                style: kSmallTitleR.copyWith(color: kWhite),
+              ),
+              const SizedBox(width: 4),
+              Text(
+                "₹$goal",
+                style: kSmallTitleSB.copyWith(color: kWhite),
+              ),
+              const SizedBox(width: 4),
+              Text(
+                "goal",
+                style: kSmallTitleR.copyWith(color: kWhite),
+              ),
+              const Spacer(),
+              Text(
+                "${(percent * 100).toInt()}%",
+                style: kSmallTitleSB.copyWith(color: kWhite),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          Row(
+            children: [
+              Expanded(
+                child: primaryButton(
+                  label: "View details",
+                  onPressed: onViewDetails,
+                  buttonColor: kWhite.withOpacity(0.2),
+                  labelColor: kWhite,
+                  sideColor: kWhite,
+                  fontSize: 14,
+                  buttonHeight: 40,
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: primaryButton(
+                  label: "Donate",
+                  onPressed: onDonate,
+                  buttonColor: kWhite,
+                  labelColor: kPrimaryColor,
+                  fontSize: 14,
+                  buttonHeight: 40,
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}

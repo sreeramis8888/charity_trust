@@ -217,7 +217,7 @@ class _PhoneNumberScreenState extends ConsumerState<PhoneNumberScreen> {
       ref.read(loadingProvider.notifier).startLoading();
 
       final authLoginApi = ref.read(authLoginApiProvider);
-      final response = await authLoginApi.sendOtp(phoneNumber);
+      final response = await authLoginApi.sendOtp("+$countryCode$phoneNumber");
 
       ref.read(loadingProvider.notifier).stopLoading();
 
@@ -231,7 +231,7 @@ class _PhoneNumberScreenState extends ConsumerState<PhoneNumberScreen> {
             Navigator.of(context).push(
               MaterialPageRoute(
                 builder: (context) => OTPScreen(
-                  fullPhone: phoneNumber,
+                  fullPhone: "+$countryCode$phoneNumber",
                   resendToken: '',
                   countryCode: countryCode ?? '91',
                   verificationId: '',
@@ -496,7 +496,7 @@ class _OTPScreenState extends ConsumerState<OTPScreen> {
 
       final authLoginApi = ref.read(authLoginApiProvider);
       final response =
-          await authLoginApi.verifyOtp(widget.fullPhone, otp, fcmToken??'');
+          await authLoginApi.verifyOtp(widget.fullPhone, otp, fcmToken ?? '');
 
       ref.read(loadingProvider.notifier).stopLoading();
 

@@ -72,20 +72,32 @@ Future<UserModel?> fetchUserProfile(Ref ref) async {
 }
 
 @riverpod
-Future<UserModel?> updateUserProfile(Ref ref, Map<String, dynamic> userData) async {
+Future<UserModel?> updateUserProfile(
+  Ref ref,
+  Map<String, dynamic> userData,
+) async {
   try {
+    final cleanedData = Map<String, dynamic>.from(userData)
+      ..removeWhere((key, value) => value == "" || value == null);
+
+    log("Cleaned data: $cleanedData");
+
     final apiProvider = ref.watch(apiProviderProvider);
-    final response = await apiProvider.post(
+    final response = await apiProvider.patch(
       '/user/update',
-      userData,
+      cleanedData,
       requireAuth: true,
     );
-
+    
     if (response.success) {
-      final user = UserModel.fromJson(userData);
-      ref.read(userProvider.notifier).setUser(user);
+      final user = UserModel.fromJson(cleanedData);
+      // Check if ref is still valid before using it
+      if (ref.mounted) {
+        ref.read(userProvider.notifier).setUser(user);
+      }
       return user;
     }
+
     return null;
   } catch (e) {
     log('Error updating user profile: $e', name: 'updateUserProfile');
@@ -143,5 +155,70 @@ Future<List<UserModel>> fetchUsersByRole(
   } catch (e) {
     log('Error fetching users by role: $e', name: 'fetchUsersByRole');
     return [];
+  }
+}
+
+@riverpod
+Future<bool> verifyOtpForCharityMember(
+  Ref ref,
+  String charityMemberId,
+  String otp,
+) async {
+  try {
+    final apiProvider = ref.watch(apiProviderProvider);
+    final response = await apiProvider.post(
+      '/user/verify-otp',
+      {
+        'charity_member_id': charityMemberId,
+        'otp': otp,
+      },
+      requireAuth: true,
+    );
+
+    if (response.success) {
+      log('OTP verified successfully for charity member: $charityMemberId',
+          name: 'verifyOtpForCharityMember');
+      return true;
+    }
+    return false;
+  } catch (e) {
+    log('Error verifying OTP for charity member: $e',
+        name: 'verifyOtpForCharityMember');
+    return false;
+  }
+}
+
+@riverpod
+Future<UserModel?> fetchCurrentUserStatus(Ref ref) async {
+  try {
+    final apiProvider = ref.watch(apiProviderProvider);
+    final secureStorage = ref.watch(secureStorageServiceProvider);
+    
+    final response = await apiProvider.get('/user/current-status', requireAuth: true);
+
+    if (response.success && response.data != null) {
+      final statusData = response.data!['data'];
+      
+      if (statusData != null) {
+        // Get existing user from local storage to preserve other fields
+        var existingUser = await secureStorage.getUserData();
+        
+        // Create updated user with current status, preserving existing data
+        final updatedUser = (existingUser ?? UserModel()).copyWith(
+          id: statusData['_id'] ?? existingUser?.id,
+          status: statusData['status'] ?? existingUser?.status,
+        );
+        
+        // Only update provider if ref is still mounted
+        if (ref.mounted) {
+          ref.read(userProvider.notifier).setUser(updatedUser);
+        }
+        return updatedUser;
+      }
+    }
+    return null;
+  } catch (e) {
+    log('Error fetching current user status: $e', name: 'fetchCurrentUserStatus');
+    return null;
   }
 }

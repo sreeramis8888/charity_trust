@@ -141,7 +141,7 @@ final class UpdateUserProfileProvider extends $FunctionalProvider<
   }
 }
 
-String _$updateUserProfileHash() => r'71143848b68553ff0a1586d803de8e385b89a0be';
+String _$updateUserProfileHash() => r'978cc9aa5146f96e49a77b2b11253a45cf91fe20';
 
 final class UpdateUserProfileFamily extends $Family
     with $FunctionalFamilyOverride<FutureOr<UserModel?>, Map<String, dynamic>> {
@@ -216,7 +216,7 @@ final class FetchUsersByRoleProvider extends $FunctionalProvider<
   }
 }
 
-String _$fetchUsersByRoleHash() => r'1d50f80ceecd19f9db215bc7ea232e931d540b29';
+String _$fetchUsersByRoleHash() => r'60629ad86a3e7044e9b3a72c6fd3dfd1b81a750c';
 
 final class FetchUsersByRoleFamily extends $Family
     with $FunctionalFamilyOverride<FutureOr<List<UserModel>>, UsersListParams> {
@@ -237,3 +237,131 @@ final class FetchUsersByRoleFamily extends $Family
   @override
   String toString() => r'fetchUsersByRoleProvider';
 }
+
+@ProviderFor(verifyOtpForCharityMember)
+const verifyOtpForCharityMemberProvider = VerifyOtpForCharityMemberFamily._();
+
+final class VerifyOtpForCharityMemberProvider
+    extends $FunctionalProvider<AsyncValue<bool>, bool, FutureOr<bool>>
+    with $FutureModifier<bool>, $FutureProvider<bool> {
+  const VerifyOtpForCharityMemberProvider._(
+      {required VerifyOtpForCharityMemberFamily super.from,
+      required (
+        String,
+        String,
+      )
+          super.argument})
+      : super(
+          retry: null,
+          name: r'verifyOtpForCharityMemberProvider',
+          isAutoDispose: true,
+          dependencies: null,
+          $allTransitiveDependencies: null,
+        );
+
+  @override
+  String debugGetCreateSourceHash() => _$verifyOtpForCharityMemberHash();
+
+  @override
+  String toString() {
+    return r'verifyOtpForCharityMemberProvider'
+        ''
+        '$argument';
+  }
+
+  @$internal
+  @override
+  $FutureProviderElement<bool> $createElement($ProviderPointer pointer) =>
+      $FutureProviderElement(pointer);
+
+  @override
+  FutureOr<bool> create(Ref ref) {
+    final argument = this.argument as (
+      String,
+      String,
+    );
+    return verifyOtpForCharityMember(
+      ref,
+      argument.$1,
+      argument.$2,
+    );
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other is VerifyOtpForCharityMemberProvider &&
+        other.argument == argument;
+  }
+
+  @override
+  int get hashCode {
+    return argument.hashCode;
+  }
+}
+
+String _$verifyOtpForCharityMemberHash() =>
+    r'114ad52d6ddae8475db1289c29e589dc5d3abb79';
+
+final class VerifyOtpForCharityMemberFamily extends $Family
+    with
+        $FunctionalFamilyOverride<
+            FutureOr<bool>,
+            (
+              String,
+              String,
+            )> {
+  const VerifyOtpForCharityMemberFamily._()
+      : super(
+          retry: null,
+          name: r'verifyOtpForCharityMemberProvider',
+          dependencies: null,
+          $allTransitiveDependencies: null,
+          isAutoDispose: true,
+        );
+
+  VerifyOtpForCharityMemberProvider call(
+    String charityMemberId,
+    String otp,
+  ) =>
+      VerifyOtpForCharityMemberProvider._(argument: (
+        charityMemberId,
+        otp,
+      ), from: this);
+
+  @override
+  String toString() => r'verifyOtpForCharityMemberProvider';
+}
+
+@ProviderFor(fetchCurrentUserStatus)
+const fetchCurrentUserStatusProvider = FetchCurrentUserStatusProvider._();
+
+final class FetchCurrentUserStatusProvider extends $FunctionalProvider<
+        AsyncValue<UserModel?>, UserModel?, FutureOr<UserModel?>>
+    with $FutureModifier<UserModel?>, $FutureProvider<UserModel?> {
+  const FetchCurrentUserStatusProvider._()
+      : super(
+          from: null,
+          argument: null,
+          retry: null,
+          name: r'fetchCurrentUserStatusProvider',
+          isAutoDispose: true,
+          dependencies: null,
+          $allTransitiveDependencies: null,
+        );
+
+  @override
+  String debugGetCreateSourceHash() => _$fetchCurrentUserStatusHash();
+
+  @$internal
+  @override
+  $FutureProviderElement<UserModel?> $createElement($ProviderPointer pointer) =>
+      $FutureProviderElement(pointer);
+
+  @override
+  FutureOr<UserModel?> create(Ref ref) {
+    return fetchCurrentUserStatus(ref);
+  }
+}
+
+String _$fetchCurrentUserStatusHash() =>
+    r'716a193aeb5da5ed93e572d1c9f30dccbcd2a894';

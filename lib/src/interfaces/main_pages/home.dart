@@ -40,7 +40,7 @@ class _HomePageState extends State<HomePage> {
       'title': 'Landslide Relief Fund',
       'description':
           'Help us build homes for families displaced by the recent landslides.',
-      'image': 'https://via.placeholder.com/400x200?text=Landslide+Relief',
+      'image': 'https://picsum.photos/id/237/200/300',
       'raised': 2500,
       'goal': 250000,
       'dueDate': '02 JAN 2023',
@@ -180,8 +180,37 @@ class _HomePageState extends State<HomePage> {
                   ],
                 ),
               ),
-
-              // --------------------- FUNDING CAMPAIGNS ---------------------
+              Padding(
+                padding: const EdgeInsets.only(
+                    top: 16, bottom: 8, left: 16, right: 16),
+                child: Container(
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                        colors: [Color(0xFFCFDBFF), Color(0xFFEFF3FF)],
+                        begin: AlignmentGeometry.centerLeft,
+                        stops: [.1, .7],
+                        end: AlignmentGeometry.centerRight),
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 25),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Hello, Sunitha Raheem!',
+                        style: kHeadTitleSB.copyWith(
+                            fontSize: 20, color: kThirdTextColor),
+                      ),
+                      Text(
+                        "Let's empowering lives through kindness",
+                        style: kSmallTitleL.copyWith(color: kThirdTextColor),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
               Padding(
                 padding: const EdgeInsets.all(16),
                 child: Column(
@@ -190,11 +219,10 @@ class _HomePageState extends State<HomePage> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text('Funding Campaigns',
-                            style: kHeadTitleM.copyWith(fontSize: 18)),
+                        Text('Funding Campaigns', style: kBodyTitleM),
                         GestureDetector(
                           onTap: () {},
-                          child: Text('See All',
+                          child: Text('See All >',
                               style: kSmallTitleM.copyWith(
                                   color: kThirdTextColor)),
                         ),
@@ -204,7 +232,7 @@ class _HomePageState extends State<HomePage> {
                     ...activeCampaigns.map((campaign) {
                       return Padding(
                         padding: const EdgeInsets.only(bottom: 16),
-                        child: HomeCampaignCard(
+                        child: HomeGradientCampaignCard(
                           title: campaign['title'],
                           description: campaign['description'],
                           image: campaign['image'],
@@ -219,60 +247,91 @@ class _HomePageState extends State<HomePage> {
                   ],
                 ),
               ),
-
-              // --------------------- COMPLETED CAMPAIGNS ---------------------
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('Completed Campaigns',
-                        style: kHeadTitleM.copyWith(fontSize: 18)),
-                    const SizedBox(height: 4),
-                    Text('Together, We Made It Happen!',
-                        style:
-                            kSmallTitleR.copyWith(color: kSecondaryTextColor)),
-                    const SizedBox(height: 12),
+                    Text('Completed Campaigns', style: kBodyTitleM),
                   ],
                 ),
               ),
-
-              SizedBox(
-                height: 280,
-                child: PageView(
-                  controller: _completedCampaignController,
-                  onPageChanged: (page) {
-                    setState(() => _completedCampaignIndex = page);
-                  },
-                  children: completedCampaigns.map((campaign) {
-                    return Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 24),
-                      child: HomeCompletedCampaignCard(
-                        heading: campaign['heading'],
-                        subtitle: campaign['subtitle'],
-                        goal: campaign['goal'],
-                        collected: campaign['collected'],
-                        posterImage: campaign['posterImage'],
-                        isImagePoster: campaign['isImagePoster'],
-                        onTap: () {},
-                      ),
-                    );
-                  }).toList(),
-                ),
-              ),
-
               const SizedBox(height: 12),
-              Center(
-                child: PageViewDotIndicator(
-                  currentItem: _completedCampaignIndex,
-                  count: completedCampaigns.length,
-                  unselectedColor: kBorder,
-                  selectedColor: kPrimaryColor,
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                child: Container(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(16),
+                    gradient: LinearGradient(
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                      colors: [Color(0xFFFCEAEA), Color(0xFFFFF9E4)],
+                    ),
+                  ),
+                  child: Column(
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.only(
+                            left: 16.0, right: 16, top: 16),
+                        child: Row(
+                          children: [
+                            Text('Together, We Made It Happen!',
+                                style: kBodyTitleSB),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      SizedBox(
+                        height: 280,
+                        child: CarouselSlider(
+                          options: CarouselOptions(
+                            height: 280,
+                            viewportFraction: 1,
+                            enableInfiniteScroll: true,
+                            autoPlay: false,
+                            onPageChanged: (index, reason) {
+                              setState(() => _completedCampaignIndex = index);
+                            },
+                          ),
+                          items: completedCampaigns.map((campaign) {
+                            return Padding(
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 16.0),
+                              child: HomeCompletedCampaignCard(
+                                heading: campaign['heading'],
+                                subtitle: campaign['subtitle'],
+                                goal: campaign['goal'],
+                                collected: campaign['collected'],
+                                posterImage: campaign['posterImage'],
+                                isImagePoster: campaign['isImagePoster'],
+                                onTap: () {},
+                              ),
+                            );
+                          }).toList(),
+                        ),
+                      ),
+                      const SizedBox(height: 14),
+                      Padding(
+                        padding: const EdgeInsets.only(
+                          bottom: 16.0,
+                        ),
+                        child: Center(
+                          child: PageViewDotIndicator(
+                            size: Size(8, 8),
+                            unselectedSize: Size(7, 7),
+                            currentItem: _completedCampaignIndex,
+                            count: completedCampaigns.length,
+                            unselectedColor: Color(0xFFAEB9E1),
+                            selectedColor: Color(0xFF0D74BC),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
-              const SizedBox(height: 24),
 
-              // --------------------- LATEST NEWS ---------------------
+              const SizedBox(height: 24),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 child: Column(
@@ -355,10 +414,12 @@ class _HomePageState extends State<HomePage> {
               const SizedBox(height: 12),
               Center(
                 child: PageViewDotIndicator(
+                  unselectedSize: Size(8, 8),
+                  size: Size(9, 9),
                   currentItem: _videoIndex,
                   count: videos.length,
-                  unselectedColor: kBorder,
-                  selectedColor: kPrimaryColor,
+                  unselectedColor: Color(0xFFAEB9E1),
+                  selectedColor: Color(0xFF0D74BC),
                 ),
               ),
               const SizedBox(height: 24),

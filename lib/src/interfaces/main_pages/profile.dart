@@ -71,18 +71,9 @@ class ProfilePage extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 22),
-            anim.AnimatedWidgetWrapper(
-              animationType: anim.AnimationType.fadeSlideInFromLeft,
-              duration: anim.AnimationDuration.normal,
-              delayMilliseconds: 100,
-              child: Text("Account Statistics", style: kBodyTitleM),
-            ),
+            Text("Account Statistics", style: kBodyTitleM),
             const SizedBox(height: 10),
-            anim.AnimatedWidgetWrapper(
-              animationType: anim.AnimationType.fadeSlideInFromBottom,
-              duration: anim.AnimationDuration.normal,
-              delayMilliseconds: 150,
-              child: Container(
+            Container(
                 padding: const EdgeInsets.all(18),
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
@@ -107,14 +98,9 @@ class ProfilePage extends StatelessWidget {
                   _statItem("₹10,000", "Zakat"),
                 ],
               ),
-              ),
             ),
             const SizedBox(height: 26),
-            anim.AnimatedWidgetWrapper(
-              animationType: anim.AnimationType.fadeSlideInFromBottom,
-              duration: anim.AnimationDuration.normal,
-              delayMilliseconds: 200,
-              child: Container(
+            Container(
                 padding: const EdgeInsets.symmetric(vertical: 8),
                 decoration: BoxDecoration(
                   border: Border.all(color: Color(0xFFD8DADC)),
@@ -146,7 +132,6 @@ class ProfilePage extends StatelessWidget {
                   _divider(),
                   _tile(Icons.logout, "Logout"),
                 ],
-              ),
               ),
             )
           ],

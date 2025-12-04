@@ -183,101 +183,88 @@ class NewsContent extends ConsumerWidget {
 
     return Stack(
       children: [
-        anim.AnimatedWidgetWrapper(
-          animationType: anim.AnimationType.fadeSlideInFromBottom,
-          duration: anim.AnimationDuration.normal,
-          child: SingleChildScrollView(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const SizedBox(height: 8),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  child: Text(
-                    newsItem.title ?? '',
-                    style: kBodyTitleB,
-                  ),
+        SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const SizedBox(height: 8),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: Text(
+                  newsItem.title ?? '',
+                  style: kBodyTitleB,
                 ),
-                const SizedBox(height: 8),
-                Padding(
-                  padding:
-                      const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16),
-                  child: anim.AnimatedWidgetWrapper(
-                    animationType: anim.AnimationType.fadeSlideInFromTop,
-                    duration: anim.AnimationDuration.normal,
-                    child: AspectRatio(
-                      aspectRatio: 16 / 9,
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(4),
-                        child: Image.network(
-                          newsItem.media ?? '',
-                          fit: BoxFit.cover,
-                          loadingBuilder: (context, child, loadingProgress) {
-                            if (loadingProgress == null) return child;
-                            return ShimmerLoadingEffect(
-                              child: Container(
-                                width: double.infinity,
-                                color: Colors.grey[300],
-                              ),
-                            );
-                          },
-                          errorBuilder: (context, error, stackTrace) {
-                            return ShimmerLoadingEffect(
-                              child: Container(
-                                width: double.infinity,
-                                color: Colors.grey[300],
-                              ),
-                            );
-                          },
-                        ),
-                      ),
+              ),
+              const SizedBox(height: 8),
+              Padding(
+                padding:
+                    const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16),
+                child: AspectRatio(
+                  aspectRatio: 16 / 9,
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(4),
+                    child: Image.network(
+                      newsItem.media ?? '',
+                      fit: BoxFit.cover,
+                      loadingBuilder: (context, child, loadingProgress) {
+                        if (loadingProgress == null) return child;
+                        return ShimmerLoadingEffect(
+                          child: Container(
+                            width: double.infinity,
+                            color: Colors.grey[300],
+                          ),
+                        );
+                      },
+                      errorBuilder: (context, error, stackTrace) {
+                        return ShimmerLoadingEffect(
+                          child: Container(
+                            width: double.infinity,
+                            color: Colors.grey[300],
+                          ),
+                        );
+                      },
                     ),
                   ),
                 ),
-                anim.AnimatedWidgetWrapper(
-                  animationType: anim.AnimationType.fadeSlideInFromBottom,
-                  duration: anim.AnimationDuration.normal,
-                  delayMilliseconds: 100,
-                  child: Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+              ),
+              Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
                       children: [
-                        Row(
-                          children: [
-                            Text(
-                              formattedDate,
-                              style: const TextStyle(
-                                color: Colors.grey,
-                                fontSize: 12,
-                              ),
-                            ),
-                            const Spacer(),
-                            Text(
-                              minsToRead,
-                              style: const TextStyle(
-                                color: Colors.grey,
-                                fontSize: 12,
-                              ),
-                            ),
-                          ],
+                        Text(
+                          formattedDate,
+                          style: const TextStyle(
+                            color: Colors.grey,
+                            fontSize: 12,
+                          ),
                         ),
-                        SizedBox(
-                          height: 10,
+                        const Spacer(),
+                        Text(
+                          minsToRead,
+                          style: const TextStyle(
+                            color: Colors.grey,
+                            fontSize: 12,
+                          ),
                         ),
-                        Text(newsItem.subTitle ?? '',
-                            style: kSmallTitleL.copyWith(
-                                color: kSecondaryTextColor)),
-                        const SizedBox(height: 16),
-                        Text(newsItem.content ?? '',
-                            style: kSmallTitleR.copyWith(
-                                color: kSecondaryTextColor)),
                       ],
                     ),
-                  ),
+                    SizedBox(
+                      height: 10,
+                    ),
+                    Text(newsItem.subTitle ?? '',
+                        style: kSmallTitleL.copyWith(
+                            color: kSecondaryTextColor)),
+                    const SizedBox(height: 16),
+                    Text(newsItem.content ?? '',
+                        style: kSmallTitleR.copyWith(
+                            color: kSecondaryTextColor)),
+                  ],
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
         ),
       ],

@@ -15,7 +15,7 @@ class UserModel {
   final String? district;
   final String? state;
   final String? country;
-  final String? pincode;
+  final int? pincode;
   final String? password;
   final String? status;
   final bool? isAdmin;
@@ -173,7 +173,7 @@ class UserModel {
     String? district,
     String? state,
     String? country,
-    String? pincode,
+    int? pincode,
     String? password,
     String? status,
     bool? isAdmin,

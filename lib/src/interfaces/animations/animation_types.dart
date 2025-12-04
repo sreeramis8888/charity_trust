@@ -72,10 +72,10 @@ enum AnimationCurveType {
 
 /// Enum defining animation duration presets
 enum AnimationDuration {
-  fast(Duration(milliseconds: 300)),
-  normal(Duration(milliseconds: 500)),
-  slow(Duration(milliseconds: 800)),
-  verySlow(Duration(milliseconds: 1200));
+  fast(Duration(milliseconds: 100)),
+  normal(Duration(milliseconds: 200)),
+  slow(Duration(milliseconds: 300)),
+  verySlow(Duration(milliseconds: 500));
 
   final Duration value;
   const AnimationDuration(this.value);

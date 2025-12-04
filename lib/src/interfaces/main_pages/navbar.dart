@@ -5,6 +5,7 @@ import 'package:charity_trust/src/interfaces/main_pages/news_bookmark/news_list_
 import 'package:charity_trust/src/interfaces/main_pages/profile.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 class NavBar extends ConsumerStatefulWidget {
   const NavBar({super.key});
@@ -25,18 +26,18 @@ class _NavBarState extends ConsumerState<NavBar> {
 
   static const List<String> _labels = ['Home', 'Campaigns', 'News', 'Profile'];
 
-  static const List<IconData> _inactiveIcons = [
-    Icons.home_outlined,
-    Icons.campaign_outlined,
-    Icons.newspaper_outlined,
-    Icons.person_outline,
+  static const List<String> _inactiveIcons = [
+    'assets/svg/inactive_home.svg',
+    'assets/svg/inactive_campaign.svg',
+    'assets/svg/inactive_news.svg',
+    'assets/svg/inactive_profile.svg',
   ];
 
-  static const List<IconData> _activeIcons = [
-    Icons.home,
-    Icons.campaign,
-    Icons.newspaper,
-    Icons.person,
+  static const List<String> _activeIcons = [
+    'assets/svg/active_home.svg',
+    'assets/svg/active_campaign.svg',
+    'assets/svg/active_news.svg',
+    'assets/svg/active_profile.svg',
   ];
 
   void _onItemTapped(int index) {
@@ -52,10 +53,14 @@ class _NavBarState extends ConsumerState<NavBar> {
       body: _widgetOptions.elementAt(_selectedIndex),
       bottomNavigationBar: Container(
         decoration: BoxDecoration(
-          border: Border(
-            top: BorderSide(color: kBorder, width: 0.5),
-          ),
           color: kWhite,
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.1),
+              blurRadius: 8,
+              offset: const Offset(0, -2),
+            ),
+          ],
         ),
         child: SafeArea(
           top: false,
@@ -78,21 +83,29 @@ class _NavBarState extends ConsumerState<NavBar> {
                               AnimatedScale(
                                 duration: const Duration(milliseconds: 200),
                                 scale: isSelected ? 1.2 : 1.0,
-                                child: Icon(
+                                child: SvgPicture.asset(
                                   isSelected
                                       ? _activeIcons[index]
                                       : _inactiveIcons[index],
-                                  color: isSelected ? kPrimaryColor : kSecondaryTextColor,
-                                  size: 24,
+                                  colorFilter: ColorFilter.mode(
+                                    isSelected
+                                        ? kPrimaryColor
+                                        : Color(0xFF99A1AF),
+                                    BlendMode.srcIn,
+                                  ),
+                                  width: 24,
+                                  height: 24,
                                 ),
                               ),
                               const SizedBox(height: 4),
                               Text(
                                 _labels[index],
                                 style: TextStyle(
-                                  color: isSelected ? kPrimaryColor : kSecondaryTextColor,
+                                  color: isSelected
+                                      ? kPrimaryColor
+                                      : Color(0xFF99A1AF),
                                   fontSize: 10,
-                                  fontWeight: FontWeight.w500,
+                                  fontWeight: FontWeight.w400,
                                 ),
                               ),
                             ],
@@ -100,35 +113,6 @@ class _NavBarState extends ConsumerState<NavBar> {
                         ),
                       );
                     }),
-                  ),
-                ),
-                Positioned(
-                  bottom: 0,
-                  left: 0,
-                  right: 0,
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    child: Row(
-                      children: List.generate(4, (index) {
-                        final bool isSelected = _selectedIndex == index;
-                        return Expanded(
-                          child: Center(
-                            child: AnimatedContainer(
-                              duration: const Duration(milliseconds: 200),
-                              width: isSelected ? 50 : 0,
-                              height: 3.5,
-                              decoration: BoxDecoration(
-                                color: isSelected ? kPrimaryColor : Colors.transparent,
-                                borderRadius: const BorderRadius.only(
-                                  topLeft: Radius.circular(45),
-                                  topRight: Radius.circular(45),
-                                ),
-                              ),
-                            ),
-                          ),
-                        );
-                      }),
-                    ),
                   ),
                 ),
               ],
