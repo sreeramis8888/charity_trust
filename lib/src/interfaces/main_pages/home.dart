@@ -2,18 +2,22 @@ import 'package:carousel_slider/carousel_slider.dart';
 import 'package:charity_trust/src/data/constants/color_constants.dart';
 import 'package:charity_trust/src/data/constants/style_constants.dart';
 import 'package:charity_trust/src/interfaces/components/cards/index.dart';
+import 'package:charity_trust/src/data/providers/home_provider.dart';
+import 'package:charity_trust/src/interfaces/components/cards/video_card.dart';
+import 'package:charity_trust/src/interfaces/components/loading_indicator.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:page_view_dot_indicator/page_view_dot_indicator.dart';
 
-class HomePage extends StatefulWidget {
+class HomePage extends ConsumerStatefulWidget {
   const HomePage({super.key});
 
   @override
-  State<HomePage> createState() => _HomePageState();
+  ConsumerState<HomePage> createState() => _HomePageState();
 }
 
-class _HomePageState extends State<HomePage> {
+class _HomePageState extends ConsumerState<HomePage> {
   late PageController _completedCampaignController;
   late PageController _videoController;
   int _completedCampaignIndex = 0;
@@ -34,99 +38,14 @@ class _HomePageState extends State<HomePage> {
     super.dispose();
   }
 
-  // Sample data - Replace with actual data from providers
-  final List<Map<String, dynamic>> activeCampaigns = [
-    {
-      'title': 'Landslide Relief Fund',
-      'description':
-          'Help us build homes for families displaced by the recent landslides.',
-      'image': 'https://picsum.photos/id/237/200/300',
-      'raised': 2500,
-      'goal': 250000,
-      'dueDate': '02 JAN 2023',
-    },
-  ];
-
-  final List<Map<String, dynamic>> completedCampaigns = [
-    {
-      'heading': 'Medical Camp for Remote Villages',
-      'subtitle': 'Successfully Completed on 02 Jan 2023',
-      'goal': '₹50,000',
-      'collected': '₹52,300',
-      'posterImage': 'https://via.placeholder.com/400x280?text=Medical+Camp',
-      'isImagePoster': true,
-    },
-    {
-      'heading': 'Education Initiative for Underprivileged',
-      'subtitle': 'Successfully Completed on 15 Dec 2022',
-      'goal': '₹1,00,000',
-      'collected': '₹1,25,500',
-      'posterImage': 'https://via.placeholder.com/400x280?text=Education',
-      'isImagePoster': true,
-    },
-    {
-      'heading': 'Clean Water Project',
-      'subtitle': 'Successfully Completed on 10 Nov 2022',
-      'goal': '₹75,000',
-      'collected': '₹80,000',
-      'posterImage': 'https://via.placeholder.com/400x280?text=Water+Project',
-      'isImagePoster': true,
-    },
-  ];
-
-  final List<Map<String, dynamic>> newsList = [
-    {
-      'title': 'Sewing Machines Distributed to Empower Women',
-      'subtitle':
-          'To support women affected by the landslide, Annujoom distributed sewing machines.',
-      'image': 'https://via.placeholder.com/400x200?text=Sewing+Machines',
-      'authorName': 'Rachel Kim',
-      'authorImage': 'https://via.placeholder.com/50x50?text=Rachel',
-      'timeAgo': '1h ago',
-    },
-    {
-      'title': 'Donates Auto-Rickshaw to Landslide-Hit Family',
-      'subtitle':
-          'Annujoom donated an auto-rickshaw to help families rebuild their lives.',
-      'image': 'https://via.placeholder.com/400x200?text=Auto+Rickshaw',
-      'authorName': 'John Smith',
-      'authorImage': 'https://via.placeholder.com/50x50?text=John',
-      'timeAgo': '3h ago',
-    },
-    {
-      'title': 'Times of India Interview',
-      'subtitle':
-          'Our founder shares insights on community-driven charitable initiatives.',
-      'image': 'https://via.placeholder.com/400x200?text=Interview',
-      'authorName': 'Media Team',
-      'authorImage': 'https://via.placeholder.com/50x50?text=Media',
-      'timeAgo': '5h ago',
-    },
-  ];
-
-  final List<Map<String, dynamic>> videos = [
-    {
-      'videoId': 'dQw4w9WgXcQ',
-      'title': 'Charity Trust Impact: How Your Donations Change Lives',
-      'thumbnail': 'https://via.placeholder.com/400x200?text=Video+1',
-    },
-    {
-      'videoId': 'jNQXAC9IVRw',
-      'title': 'Behind the Scenes: Our Latest Campaign',
-      'thumbnail': 'https://via.placeholder.com/400x200?text=Video+2',
-    },
-    {
-      'videoId': 'dQw4w9WgXcQ',
-      'title': 'Testimonials from Beneficiaries',
-      'thumbnail': 'https://via.placeholder.com/400x200?text=Video+3',
-    },
-  ];
-
   @override
   Widget build(BuildContext context) {
+    final homeDataAsync = ref.watch(homePageDataProvider);
+
     return Scaffold(
-        backgroundColor: kWhite,
-        body: SingleChildScrollView(
+      backgroundColor: Color(0xFFF2F2F2),
+      body: homeDataAsync.when(
+        data: (homeData) => SingleChildScrollView(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -211,220 +130,268 @@ class _HomePageState extends State<HomePage> {
                   ),
                 ),
               ),
-              Padding(
-                padding: const EdgeInsets.all(16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text('Funding Campaigns', style: kBodyTitleM),
-                        GestureDetector(
-                          onTap: () {},
-                          child: Text('See All >',
-                              style: kSmallTitleM.copyWith(
-                                  color: kThirdTextColor)),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 12),
-                    ...activeCampaigns.map((campaign) {
-                      return Padding(
-                        padding: const EdgeInsets.only(bottom: 16),
-                        child: HomeGradientCampaignCard(
-                          title: campaign['title'],
-                          description: campaign['description'],
-                          image: campaign['image'],
-                          raised: campaign['raised'],
-                          goal: campaign['goal'],
-                          dueDate: campaign['dueDate'],
-                          onViewDetails: () {},
-                          onDonate: () {},
-                        ),
-                      );
-                    }).toList(),
-                  ],
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text('Completed Campaigns', style: kBodyTitleM),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 12),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                child: Container(
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(16),
-                    gradient: LinearGradient(
-                      begin: Alignment.topCenter,
-                      end: Alignment.bottomCenter,
-                      colors: [Color(0xFFFCEAEA), Color(0xFFFFF9E4)],
-                    ),
-                  ),
+              if (homeData.endingCampaign != null)
+                Padding(
+                  padding: const EdgeInsets.all(16),
                   child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Padding(
-                        padding: const EdgeInsets.only(
-                            left: 16.0, right: 16, top: 16),
-                        child: Row(
-                          children: [
-                            Text('Together, We Made It Happen!',
-                                style: kBodyTitleSB),
-                          ],
-                        ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text('Funding Campaigns', style: kBodyTitleM),
+                          GestureDetector(
+                            onTap: () {},
+                            child: Text('See All >',
+                                style: kSmallTitleM.copyWith(
+                                    color: kThirdTextColor)),
+                          ),
+                        ],
                       ),
                       const SizedBox(height: 12),
-                      SizedBox(
-                        height: 280,
-                        child: CarouselSlider(
-                          options: CarouselOptions(
-                            height: 280,
-                            viewportFraction: 1,
-                            enableInfiniteScroll: true,
-                            autoPlay: false,
-                            onPageChanged: (index, reason) {
-                              setState(() => _completedCampaignIndex = index);
-                            },
-                          ),
-                          items: completedCampaigns.map((campaign) {
-                            return Padding(
-                              padding:
-                                  const EdgeInsets.symmetric(horizontal: 16.0),
-                              child: HomeCompletedCampaignCard(
-                                heading: campaign['heading'],
-                                subtitle: campaign['subtitle'],
-                                goal: campaign['goal'],
-                                collected: campaign['collected'],
-                                posterImage: campaign['posterImage'],
-                                isImagePoster: campaign['isImagePoster'],
-                                onTap: () {},
-                              ),
-                            );
-                          }).toList(),
-                        ),
-                      ),
-                      const SizedBox(height: 14),
                       Padding(
-                        padding: const EdgeInsets.only(
-                          bottom: 16.0,
-                        ),
-                        child: Center(
-                          child: PageViewDotIndicator(
-                            size: Size(8, 8),
-                            unselectedSize: Size(7, 7),
-                            currentItem: _completedCampaignIndex,
-                            count: completedCampaigns.length,
-                            unselectedColor: Color(0xFFAEB9E1),
-                            selectedColor: Color(0xFF0D74BC),
-                          ),
+                        padding: const EdgeInsets.only(bottom: 16),
+                        child: HomeGradientCampaignCard(
+                          title: homeData.endingCampaign!.title ?? '',
+                          description:
+                              homeData.endingCampaign!.description ?? '',
+                          image: homeData.endingCampaign!.coverImage ?? '',
+                          raised: homeData.endingCampaign!.collectedAmount
+                                  ?.toInt() ??
+                              0,
+                          goal:
+                              homeData.endingCampaign!.targetAmount?.toInt() ??
+                                  0,
+                          dueDate: homeData.endingCampaign!.targetDate
+                                  ?.toString()
+                                  .split(' ')[0] ??
+                              '',
+                          onViewDetails: () {},
+                          onDonate: () {},
                         ),
                       ),
                     ],
                   ),
                 ),
-              ),
-
-              const SizedBox(height: 24),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              if (homeData.posterPromotions.isNotEmpty)
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text('Completed Campaigns', style: kBodyTitleM),
+                    ],
+                  ),
+                ),
+              if (homeData.posterPromotions.isNotEmpty)
+                const SizedBox(height: 12),
+              if (homeData.posterPromotions.isNotEmpty)
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(16),
+                      gradient: LinearGradient(
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                        colors: [Color(0xFFFCEAEA), Color(0xFFFFF9E4)],
+                      ),
+                    ),
+                    child: Column(
                       children: [
-                        Text('Latest News',
-                            style: kHeadTitleM.copyWith(fontSize: 18)),
-                        GestureDetector(
-                          onTap: () {},
-                          child: Text('See All',
-                              style: kSmallTitleM.copyWith(
-                                  color: kThirdTextColor)),
+                        Padding(
+                          padding: const EdgeInsets.only(
+                              left: 16.0, right: 16, top: 16),
+                          child: Row(
+                            children: [
+                              Text('Together, We Made It Happen!',
+                                  style: kBodyTitleSB),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+                        SizedBox(
+                          height: 280,
+                          child: CarouselSlider(
+                            options: CarouselOptions(
+                              height: 280,
+                              viewportFraction: 1,
+                              enableInfiniteScroll: true,
+                              autoPlay: false,
+                              onPageChanged: (index, reason) {
+                                setState(() => _completedCampaignIndex = index);
+                              },
+                            ),
+                            items: homeData.posterPromotions.map((promotion) {
+                              return Padding(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 16.0),
+                                child: HomeCompletedCampaignCard(
+                                  heading: promotion.title ?? '',
+                                  subtitle: promotion.description ?? '',
+                                  goal: 0,
+                                  collected: 0,
+                                  posterImage: promotion.media ?? '',
+                                  isImagePoster: true,
+                                  onTap: () {},
+                                ),
+                              );
+                            }).toList(),
+                          ),
+                        ),
+                        const SizedBox(height: 14),
+                        Padding(
+                          padding: const EdgeInsets.only(
+                            bottom: 16.0,
+                          ),
+                          child: Center(
+                            child: PageViewDotIndicator(
+                              size: Size(8, 8),
+                              unselectedSize: Size(7, 7),
+                              currentItem: _completedCampaignIndex,
+                              count: homeData.posterPromotions.length,
+                              unselectedColor: Color(0xFFAEB9E1),
+                              selectedColor: Color(0xFF0D74BC),
+                            ),
+                          ),
                         ),
                       ],
                     ),
-                    const SizedBox(height: 12),
-                  ],
+                  ),
                 ),
-              ),
-
-              CarouselSlider(
-                options: CarouselOptions(
-                  height: 220,
-                  viewportFraction: 0.75,
-                  enableInfiniteScroll: true,
-                  autoPlay: false,
-                ),
-                items: newsList.map((news) {
-                  return HomeNewsCard(
-                    title: news['title'],
-                    subtitle: news['subtitle'],
-                    image: news['image'],
-                    authorName: news['authorName'],
-                    authorImage: news['authorImage'],
-                    timeAgo: news['timeAgo'],
-                    onTap: () {},
-                  );
-                }).toList(),
-              ),
-
               const SizedBox(height: 24),
-
-              // --------------------- FEATURED VIDEOS ---------------------
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text('Featured Videos',
-                        style: kHeadTitleM.copyWith(fontSize: 18)),
-                    const SizedBox(height: 12),
-                  ],
+              if (homeData.latestNews.isNotEmpty)
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text('Latest News',
+                              style: kHeadTitleM.copyWith(fontSize: 18)),
+                          GestureDetector(
+                            onTap: () {},
+                            child: Text('See All >',
+                                style: kSmallTitleM.copyWith(
+                                    color: kThirdTextColor)),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 12),
+                    ],
+                  ),
                 ),
-              ),
-
-              SizedBox(
-                height: 200,
-                child: PageView(
-                  controller: _videoController,
-                  onPageChanged: (page) {
-                    setState(() => _videoIndex = page);
-                  },
-                  children: videos.map((video) {
+              if (homeData.latestNews.isNotEmpty)
+                CarouselSlider(
+                  options: CarouselOptions(
+                      height: 200,
+                      viewportFraction: 0.55,
+                      enableInfiniteScroll: true,
+                      autoPlay: true,
+                      autoPlayInterval: const Duration(seconds: 4),
+                      autoPlayAnimationDuration:
+                          const Duration(milliseconds: 600),
+                      autoPlayCurve: Curves.easeInOut,
+                      enlargeCenterPage: false,
+                      padEnds: false,
+                      initialPage: 0,
+                      pauseAutoPlayOnTouch: true),
+                  items: homeData.latestNews.map((news) {
                     return Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 24),
-                      child: HomeYoutubePlayerCard(
-                        videoId: video['videoId'],
-                        title: video['title'],
-                        thumbnail: video['thumbnail'],
+                      padding: const EdgeInsets.only(left: 16.0),
+                      child: HomeNewsCard(
+                        title: news.title ?? '',
+                        subtitle: news.subTitle ?? '',
+                        image: news.media ?? '',
                         onTap: () {},
                       ),
                     );
                   }).toList(),
                 ),
-              ),
-
-              const SizedBox(height: 12),
-              Center(
-                child: PageViewDotIndicator(
-                  unselectedSize: Size(8, 8),
-                  size: Size(9, 9),
-                  currentItem: _videoIndex,
-                  count: videos.length,
-                  unselectedColor: Color(0xFFAEB9E1),
-                  selectedColor: Color(0xFF0D74BC),
+              const SizedBox(height: 24),
+              if (homeData.videoPromotions.isNotEmpty)
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text('Featured Videos',
+                          style: kHeadTitleM.copyWith(fontSize: 18)),
+                      const SizedBox(height: 12),
+                    ],
+                  ),
                 ),
-              ),
+              if (homeData.videoPromotions.isNotEmpty)
+                SizedBox(
+                  height: 200,
+                  child: PageView(
+                    controller: _videoController,
+                    onPageChanged: (page) {
+                      setState(() => _videoIndex = page);
+                    },
+                    children: homeData.videoPromotions.map((video) {
+                      final videoId = _extractYoutubeId(video.link ?? '');
+                      return Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        child: videoId != null
+                            ? youtubeVideoCard(
+                                videoId: videoId,
+                                title: video.title ?? '',
+                              )
+                            : Center(
+                                child: Text('Something went Wrong'),
+                              ),
+                      );
+                    }).toList(),
+                  ),
+                ),
+              if (homeData.videoPromotions.isNotEmpty)
+                const SizedBox(height: 12),
+              if (homeData.videoPromotions.isNotEmpty)
+                Center(
+                  child: PageViewDotIndicator(
+                    unselectedSize: Size(8, 8),
+                    size: Size(9, 9),
+                    currentItem: _videoIndex,
+                    count: homeData.videoPromotions.length,
+                    unselectedColor: Color(0xFFAEB9E1),
+                    selectedColor: Color(0xFF0D74BC),
+                  ),
+                ),
               const SizedBox(height: 24),
             ],
           ),
-        ));
+        ),
+        loading: () => Center(
+          child: LoadingAnimation(),
+        ),
+        error: (error, stackTrace) => Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text('Error loading home data'),
+              SizedBox(height: 16),
+              ElevatedButton(
+                onPressed: () {
+                  ref.read(homePageProvider.notifier).refresh();
+                },
+                child: Text('Retry'),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  String? _extractYoutubeId(String url) {
+    final RegExp regExp = RegExp(
+      r'(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([^&\n?#]+)',
+      caseSensitive: false,
+    );
+    final match = regExp.firstMatch(url);
+    return match?.group(1);
   }
 }

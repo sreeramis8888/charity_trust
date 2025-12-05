@@ -1,0 +1,141 @@
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:charity_trust/src/data/providers/api_provider.dart';
+import 'package:charity_trust/src/data/models/campaign_model.dart';
+import 'package:charity_trust/src/data/models/promotions_model.dart';
+import 'package:charity_trust/src/data/models/news_model.dart';
+
+part 'home_provider.g.dart';
+
+class HomeApi {
+  static const String _endpoint = '/home';
+
+  final ApiProvider _apiProvider;
+
+  HomeApi({required ApiProvider apiProvider}) : _apiProvider = apiProvider;
+
+  Future<ApiResponse<Map<String, dynamic>>> getHomeData() async {
+    return await _apiProvider.get(
+      _endpoint,
+      requireAuth: true,
+    );
+  }
+}
+
+@riverpod
+HomeApi homeApi(Ref ref) {
+  final apiProvider = ref.watch(apiProviderProvider);
+  return HomeApi(apiProvider: apiProvider);
+}
+
+class HomePageData {
+  final CampaignModel? endingCampaign;
+  final List<NewsModel> latestNews;
+  final List<Promotions> posterPromotions;
+  final List<Promotions> videoPromotions;
+
+  HomePageData({
+    this.endingCampaign,
+    required this.latestNews,
+    required this.posterPromotions,
+    required this.videoPromotions,
+  });
+
+  HomePageData copyWith({
+    CampaignModel? endingCampaign,
+    List<NewsModel>? latestNews,
+    List<Promotions>? posterPromotions,
+    List<Promotions>? videoPromotions,
+  }) {
+    return HomePageData(
+      endingCampaign: endingCampaign ?? this.endingCampaign,
+      latestNews: latestNews ?? this.latestNews,
+      posterPromotions: posterPromotions ?? this.posterPromotions,
+      videoPromotions: videoPromotions ?? this.videoPromotions,
+    );
+  }
+}
+
+@riverpod
+Future<HomePageData> homePageData(Ref ref) async {
+  final homeApi = ref.watch(homeApiProvider);
+  final response = await homeApi.getHomeData();
+
+  if (response.success && response.data != null) {
+    final data = response.data!['data'] as Map<String, dynamic>?;
+
+    final endingCampaign = data?['ending_campaign'] != null
+        ? CampaignModel.fromJson(data!['ending_campaign'] as Map<String, dynamic>)
+        : null;
+
+    final latestNews = (data?['latest_news'] as List<dynamic>?)
+            ?.map((item) => NewsModel.fromJson(item as Map<String, dynamic>))
+            .toList() ??
+        [];
+
+    final posterPromotions = (data?['poster_promotion'] as List<dynamic>?)
+            ?.map((item) => Promotions.fromJson(item as Map<String, dynamic>))
+            .toList() ??
+        [];
+
+    final videoPromotions = (data?['video_promotion'] as List<dynamic>?)
+            ?.map((item) => Promotions.fromJson(item as Map<String, dynamic>))
+            .toList() ??
+        [];
+
+    return HomePageData(
+      endingCampaign: endingCampaign,
+      latestNews: latestNews,
+      posterPromotions: posterPromotions,
+      videoPromotions: videoPromotions,
+    );
+  } else {
+    throw Exception(response.message ?? 'Failed to fetch home page data');
+  }
+}
+
+@riverpod
+class HomePageNotifier extends _$HomePageNotifier {
+  @override
+  Future<HomePageData> build() async {
+    final homeApi = ref.watch(homeApiProvider);
+    final response = await homeApi.getHomeData();
+
+    if (response.success && response.data != null) {
+      final data = response.data!['data'] as Map<String, dynamic>?;
+
+      final endingCampaign = data?['ending_campaign'] != null
+          ? CampaignModel.fromJson(data!['ending_campaign'] as Map<String, dynamic>)
+          : null;
+
+      final latestNews = (data?['latest_news'] as List<dynamic>?)
+              ?.map((item) => NewsModel.fromJson(item as Map<String, dynamic>))
+              .toList() ??
+          [];
+
+      final posterPromotions = (data?['poster_promotion'] as List<dynamic>?)
+              ?.map((item) => Promotions.fromJson(item as Map<String, dynamic>))
+              .toList() ??
+          [];
+
+      final videoPromotions = (data?['video_promotion'] as List<dynamic>?)
+              ?.map((item) => Promotions.fromJson(item as Map<String, dynamic>))
+              .toList() ??
+          [];
+
+      return HomePageData(
+        endingCampaign: endingCampaign,
+        latestNews: latestNews,
+        posterPromotions: posterPromotions,
+        videoPromotions: videoPromotions,
+      );
+    } else {
+      throw Exception(response.message ?? 'Failed to fetch home page data');
+    }
+  }
+
+  Future<void> refresh() async {
+    state = const AsyncValue.loading();
+    state = await AsyncValue.guard(() => build());
+  }
+}

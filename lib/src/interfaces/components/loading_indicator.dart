@@ -4,8 +4,8 @@ import 'package:loading_indicator/loading_indicator.dart';
 
 class LoadingAnimation extends StatelessWidget {
   final double size;
-
-  const LoadingAnimation({super.key, this.size = 30});
+  final Color? loadingColor;
+  const LoadingAnimation({super.key, this.size = 30,this.loadingColor});
 
   @override
   Widget build(BuildContext context) {
@@ -14,7 +14,7 @@ class LoadingAnimation extends StatelessWidget {
       height: size,
       child: LoadingIndicator(
         indicatorType: Indicator.lineSpinFadeLoader,
-        colors: const [kWhite],
+        colors: [loadingColor?? kPrimaryColor],
         strokeWidth: 2,
       ),
     );

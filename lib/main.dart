@@ -10,7 +10,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:charity_trust/src/data/services/navigation_service.dart';
 import 'package:charity_trust/src/data/services/notification_service/notification_service.dart';
 import 'package:charity_trust/src/data/utils/install_checker.dart';
-import 'package:charity_trust/src/data/utils/secure_storage.dart';
 import 'package:charity_trust/src/data/services/snackbar_service.dart';
 import 'package:charity_trust/src/data/router/router.dart' as router;
 

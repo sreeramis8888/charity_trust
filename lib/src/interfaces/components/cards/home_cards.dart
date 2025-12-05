@@ -1,5 +1,6 @@
 import 'package:charity_trust/src/data/constants/color_constants.dart';
 import 'package:charity_trust/src/data/constants/style_constants.dart';
+import 'package:charity_trust/src/data/utils/currency_formatter.dart';
 import 'package:charity_trust/src/interfaces/components/primaryButton.dart';
 import 'package:charity_trust/src/interfaces/components/text_pill.dart';
 import 'package:flutter/material.dart';
@@ -154,14 +155,11 @@ class HomeCampaignCard extends StatelessWidget {
   }
 }
 
-// ============================================================================
-// HOME COMPLETED CAMPAIGN CARD - For Completed Campaigns (poster style)
-// ============================================================================
 class HomeCompletedCampaignCard extends StatelessWidget {
   final String heading;
   final String subtitle;
-  final String goal;
-  final String collected;
+  final dynamic goal;
+  final dynamic collected;
   final String? posterImage;
   final bool isImagePoster;
   final VoidCallback? onTap;
@@ -189,7 +187,6 @@ class HomeCompletedCampaignCard extends StatelessWidget {
         clipBehavior: Clip.antiAlias,
         child: Stack(
           children: [
-            // Background Image or Gradient
             if (isImagePoster && posterImage != null)
               Image.network(
                 posterImage!,
@@ -216,7 +213,6 @@ class HomeCompletedCampaignCard extends StatelessWidget {
                   ),
                 ),
               ),
-            // Dark overlay
             Container(
               height: 280,
               width: double.infinity,
@@ -254,7 +250,7 @@ class HomeCompletedCampaignCard extends StatelessWidget {
                   children: [
                     Text(
                       heading,
-                      style: kBodyTitleB.copyWith(
+                      style: kBodyTitleSB.copyWith(
                         color: kWhite,
                         fontSize: 18,
                       ),
@@ -264,7 +260,7 @@ class HomeCompletedCampaignCard extends StatelessWidget {
                     const SizedBox(height: 4),
                     Text(
                       subtitle,
-                      style: kSmallerTitleR.copyWith(
+                      style: kSmallTitleL.copyWith(
                         color: kWhite.withOpacity(0.8),
                       ),
                       maxLines: 1,
@@ -274,34 +270,16 @@ class HomeCompletedCampaignCard extends StatelessWidget {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              "Goal: $goal",
-                              style: kSmallerTitleR.copyWith(
-                                color: kWhite.withOpacity(0.7),
-                              ),
-                            ),
-                            const SizedBox(height: 4),
-                            Text(
-                              "Collected: $collected",
-                              style: kSmallTitleSB.copyWith(
-                                color: kWhite,
-                              ),
-                            ),
-                          ],
-                        ),
-                        Container(
-                          padding: const EdgeInsets.all(8),
-                          decoration: BoxDecoration(
-                            color: const Color(0xFF4CAF50),
-                            shape: BoxShape.circle,
-                          ),
-                          child: const Icon(
-                            Icons.check,
+                        Text(
+                          "Goal: ${formatCurrency(goal)}",
+                          style: kSmallTitleM.copyWith(
                             color: kWhite,
-                            size: 20,
+                          ),
+                        ),
+                        Text(
+                          "Collected: ${formatCurrency(collected)} ✅",
+                          style: kSmallTitleM.copyWith(
+                            color: kWhite,
                           ),
                         ),
                       ],
@@ -317,26 +295,17 @@ class HomeCompletedCampaignCard extends StatelessWidget {
   }
 }
 
-// ============================================================================
-// HOME NEWS CARD - For News/Updates
-// ============================================================================
 class HomeNewsCard extends StatelessWidget {
   final String title;
   final String subtitle;
   final String? image;
-  final String authorName;
-  final String? authorImage;
-  final String timeAgo;
   final VoidCallback? onTap;
 
   const HomeNewsCard({
     super.key,
     required this.title,
     required this.subtitle,
-    required this.authorName,
-    required this.timeAgo,
     this.image,
-    this.authorImage,
     this.onTap,
   });
 
@@ -344,98 +313,42 @@ class HomeNewsCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: onTap,
-      child: Container(
-        decoration: BoxDecoration(
-          color: kCardBackgroundColor,
+      child: Card(
+        color: kWhite,
+        shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: kBorder),
         ),
-        clipBehavior: Clip.antiAlias,
+        elevation: 0,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Image
-            if (image != null)
-              ClipRRect(
-                borderRadius: const BorderRadius.only(
-                  topLeft: Radius.circular(16),
-                  topRight: Radius.circular(16),
-                ),
-                child: Image.network(
-                  image!,
-                  height: 140,
-                  width: double.infinity,
-                  fit: BoxFit.cover,
-                  errorBuilder: (_, __, ___) => Container(
-                    height: 140,
-                    color: Colors.grey[300],
-                    child: Icon(Icons.broken_image, color: Colors.grey[600]),
-                  ),
-                ),
-              ),
-            // Content
             Padding(
-              padding: const EdgeInsets.all(12),
+              padding: const EdgeInsets.only(left: 12, right: 12, top: 12),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(12),
+                child: image != null && image!.isNotEmpty
+                    ? Image.network(
+                        image!,
+                        height: 70,
+                        width: double.infinity,
+                        fit: BoxFit.cover,
+                        errorBuilder: (_, __, ___) => _shimmerPlaceholder(),
+                      )
+                    : _shimmerPlaceholder(),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(12.0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Author info
-                  Row(
-                    children: [
-                      if (authorImage != null)
-                        ClipOval(
-                          child: Image.network(
-                            authorImage!,
-                            height: 32,
-                            width: 32,
-                            fit: BoxFit.cover,
-                            errorBuilder: (_, __, ___) => Container(
-                              height: 32,
-                              width: 32,
-                              decoration: BoxDecoration(
-                                color: Colors.grey[300],
-                                shape: BoxShape.circle,
-                              ),
-                              child: Icon(
-                                Icons.person,
-                                color: Colors.grey[600],
-                                size: 16,
-                              ),
-                            ),
-                          ),
-                        ),
-                      const SizedBox(width: 8),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              authorName,
-                              style: kSmallTitleSB,
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                            Text(
-                              timeAgo,
-                              style: kSmallerTitleL.copyWith(
-                                color: kSecondaryTextColor,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 8),
-                  // Title
                   Text(
                     title,
-                    style: kSmallTitleSB,
+                    style: kBodyTitleSB,
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                   ),
-                  const SizedBox(height: 4),
-                  // Subtitle
+                  const SizedBox(height: 6),
                   Text(
                     subtitle,
                     style: kSmallerTitleR.copyWith(
@@ -450,6 +363,14 @@ class HomeNewsCard extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+
+  Widget _shimmerPlaceholder() {
+    return Container(
+      height: 70,
+      width: double.infinity,
+      color: Colors.grey[300],
     );
   }
 }

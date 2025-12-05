@@ -100,7 +100,6 @@ class _NewsModelDetailContentViewState
     extends ConsumerState<NewsDetailContentView> {
   late final PageController _pageController;
   final GlobalKey _pageViewKey = GlobalKey();
-  bool _tourShown = false;
 
   @override
   void initState() {
@@ -119,20 +118,27 @@ class _NewsModelDetailContentViewState
     super.dispose();
   }
 
-  void _showFeatureTourIfNeeded() {
-    if (_tourShown || widget.news.length <= 1) return;
+  void _showFeatureTourIfNeeded() async {
+    if (widget.news.length <= 1) return;
 
-    final completedTours = ref.read(completedFeatureToursProvider);
-    if (!completedTours.contains(NewsSwipeTour.tourId)) {
-      _tourShown = true;
-      showDialog(
-        context: context,
-        barrierDismissible: false,
-        builder: (context) => FeatureTourOverlay(
-          tour: NewsSwipeTour.create(pageViewKey: _pageViewKey),
-        ),
-      );
-    }
+    await ref
+        .read(completedFeatureToursProvider.notifier)
+        .loadTourStatus(NewsSwipeTour.tourId);
+
+    Future.delayed(Duration(milliseconds: 500), () {
+      if (!mounted) return;
+      
+      final completedTours = ref.read(completedFeatureToursProvider);
+      if (!completedTours.contains(NewsSwipeTour.tourId)) {
+        showDialog(
+          context: context,
+          barrierDismissible: false,
+          builder: (context) => FeatureTourOverlay(
+            tour: NewsSwipeTour.create(pageViewKey: _pageViewKey),
+          ),
+        );
+      }
+    });
   }
 
   @override

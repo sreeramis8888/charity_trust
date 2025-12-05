@@ -14,27 +14,30 @@ final completedFeatureToursProvider =
 class CompletedFeatureToursNotifier extends StateNotifier<Set<String>> {
   final Ref ref;
 
-  CompletedFeatureToursNotifier(this.ref) : super({}) {
-    _loadCompletedTours();
-  }
-
-  Future<void> _loadCompletedTours() async {
-    final prefs = await SharedPreferences.getInstance();
-    final completed = prefs.getStringList('completed_feature_tours') ?? [];
-    state = completed.toSet();
-  }
+  CompletedFeatureToursNotifier(this.ref) : super({});
 
   Future<void> markTourAsCompleted(String tourId) async {
     state = {...state, tourId};
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setStringList('completed_feature_tours', state.toList());
+    await prefs.setBool('tour_completed_$tourId', true);
   }
 
   Future<void> resetTour(String tourId) async {
     state = state.where((id) => id != tourId).toSet();
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setStringList('completed_feature_tours', state.toList());
+    await prefs.remove('tour_completed_$tourId');
   }
 
-  bool isTourCompleted(String tourId) => state.contains(tourId);
+  Future<bool> isTourCompleted(String tourId) async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getBool('tour_completed_$tourId') ?? false;
+  }
+
+  Future<void> loadTourStatus(String tourId) async {
+    final prefs = await SharedPreferences.getInstance();
+    final isCompleted = prefs.getBool('tour_completed_$tourId') ?? false;
+    if (isCompleted) {
+      state = {...state, tourId};
+    }
+  }
 }

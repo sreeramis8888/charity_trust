@@ -35,7 +35,7 @@ Widget primaryButton({
                 ? const SizedBox(
                     height: 20,
                     width: 20,
-                    child: LoadingAnimation(),
+                    child: LoadingAnimation(loadingColor: kWhite,),
                   )
                 : Row(
                     mainAxisSize: MainAxisSize.min,
