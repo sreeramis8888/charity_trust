@@ -81,7 +81,7 @@ class _MyParticipationsPageState extends State<MyParticipationsPage>
         anim.AnimatedWidgetWrapper(
           animationType: anim.AnimationType.fadeSlideInFromBottom,
           duration: anim.AnimationDuration.normal,
-          child: CampaignCard(
+          child: CampaignCard(id: 'BAR',
             description:
                 'Help us build homes for families displaced by the recent landslides. Your donation provides shelter and hope.',
             title: "My Flood Relief",

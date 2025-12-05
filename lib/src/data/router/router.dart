@@ -167,6 +167,7 @@ Route<dynamic> generateRoute(RouteSettings? settings) {
       if (settings?.arguments is Map) {
         final args = settings!.arguments as Map;
         page = CampaignDetailPage(
+          id: args['_id'] ?? '',
           title: args['title'] ?? '',
           description: args['description'] ?? '',
           category: args['category'] ?? '',

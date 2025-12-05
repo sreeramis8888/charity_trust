@@ -75,7 +75,7 @@ final class GeneralCampaignsNotifierProvider extends $AsyncNotifierProvider<
 }
 
 String _$generalCampaignsNotifierHash() =>
-    r'b2a68c6eae04bc7357542f5bb8e9ba7cf6f470e2';
+    r'db9ddb7d506952a5ffbf0d02dfdccd40142b4baa';
 
 abstract class _$GeneralCampaignsNotifier
     extends $AsyncNotifier<CampaignPaginationState> {
@@ -121,7 +121,7 @@ final class MyCampaignsNotifierProvider extends $AsyncNotifierProvider<
 }
 
 String _$myCampaignsNotifierHash() =>
-    r'b988a779a86332da7eec3fa63592def93b806a41';
+    r'24e41d04479e8fb4b83b6afa3a02cbeab1f0c9b8';
 
 abstract class _$MyCampaignsNotifier
     extends $AsyncNotifier<CampaignPaginationState> {

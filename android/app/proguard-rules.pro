@@ -8,3 +8,12 @@
 
 # Keep the SecureStorageService class
 -keep class com.skybertech.charity_trust.** { *; }
+
+# Razorpay
+-keepattributes *Annotation*
+-dontwarn com.razorpay.**
+-keep class com.razorpay.** { *; }
+-optimizations !method/inlining/
+-keepclasseswithmembers class * {
+    public void onPayment*(...);
+}

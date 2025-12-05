@@ -5,6 +5,7 @@ import 'package:charity_trust/src/interfaces/components/text_pill.dart';
 import 'package:flutter/material.dart';
 
 class CampaignCard extends StatelessWidget {
+  final String id;
   final String title;
   final String description;
   final String category;
@@ -18,6 +19,7 @@ class CampaignCard extends StatelessWidget {
 
   const CampaignCard({
     super.key,
+    required this.id,
     required this.title,
     required this.description,
     required this.category,
@@ -143,6 +145,7 @@ class CampaignCard extends StatelessWidget {
                     Navigator.of(context).pushNamed(
                       'CampaignDetail',
                       arguments: {
+                        '_id': id,
                         'title': title,
                         'description': description,
                         'category': category,

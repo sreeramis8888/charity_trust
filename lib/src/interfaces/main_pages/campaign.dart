@@ -116,7 +116,7 @@ class _CampaignPageState extends ConsumerState<CampaignPage>
                 animationType: anim.AnimationType.fadeSlideInFromBottom,
                 duration: anim.AnimationDuration.normal,
                 delayMilliseconds: index * 50,
-                child: CampaignCard(
+                child: CampaignCard(id: campaign.id??'',
                   description: campaign.description ?? '',
                   title: campaign.title ?? '',
                   category: campaign.category ?? '',
@@ -200,7 +200,7 @@ class _CampaignPageState extends ConsumerState<CampaignPage>
                 animationType: anim.AnimationType.fadeSlideInFromBottom,
                 duration: anim.AnimationDuration.normal,
                 delayMilliseconds: index * 50,
-                child: CampaignCard(
+                child: CampaignCard(id: campaign.id??'',
                   description: campaign.description ?? '',
                   title: campaign.title ?? '',
                   category: campaign.category ?? '',
