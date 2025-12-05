@@ -3,8 +3,10 @@ import 'package:charity_trust/src/data/constants/color_constants.dart';
 import 'package:charity_trust/src/data/constants/style_constants.dart';
 import 'package:charity_trust/src/interfaces/components/cards/index.dart';
 import 'package:charity_trust/src/data/providers/home_provider.dart';
+import 'package:charity_trust/src/data/services/secure_storage_service.dart';
 import 'package:charity_trust/src/interfaces/components/cards/video_card.dart';
 import 'package:charity_trust/src/interfaces/components/loading_indicator.dart';
+import 'package:charity_trust/src/interfaces/animations/index.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
@@ -45,10 +47,42 @@ class _HomePageState extends ConsumerState<HomePage> {
     return Scaffold(
       backgroundColor: Color(0xFFF2F2F2),
       body: homeDataAsync.when(
-        data: (homeData) => SingleChildScrollView(
+        data: (homeData) => _buildHomeContent(context, ref, homeData),
+        loading: () => Center(
+          child: LoadingAnimation(),
+        ),
+        error: (error, stackTrace) => Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text('Error loading home data'),
+              SizedBox(height: 16),
+              ElevatedButton(
+                onPressed: () {
+                  ref.read(homePageProvider.notifier).refresh();
+                },
+                child: Text('Retry'),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildHomeContent(
+      BuildContext context, WidgetRef ref, HomePageData homeData) {
+    return FutureBuilder<String?>(
+      future: ref.read(secureStorageServiceProvider).getUserData().then(
+            (userData) => userData?.name,
+          ),
+      builder: (context, snapshot) {
+        final userName = snapshot.data ?? '';
+
+        return SingleChildScrollView(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
+            children: <Widget>[
               Container(
                 padding: const EdgeInsets.only(top: 30, left: 16, right: 16),
                 decoration: BoxDecoration(
@@ -102,31 +136,36 @@ class _HomePageState extends ConsumerState<HomePage> {
               Padding(
                 padding: const EdgeInsets.only(
                     top: 16, bottom: 8, left: 16, right: 16),
-                child: Container(
-                  width: double.infinity,
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                        colors: [Color(0xFFCFDBFF), Color(0xFFEFF3FF)],
-                        begin: AlignmentGeometry.centerLeft,
-                        stops: [.1, .7],
-                        end: AlignmentGeometry.centerRight),
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 16, vertical: 25),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Hello, Sunitha Raheem!',
-                        style: kHeadTitleSB.copyWith(
-                            fontSize: 20, color: kThirdTextColor),
-                      ),
-                      Text(
-                        "Let's empowering lives through kindness",
-                        style: kSmallTitleL.copyWith(color: kThirdTextColor),
-                      ),
-                    ],
+                child: AnimatedWidgetWrapper(
+                  animationType: AnimationType.fadeSlideInFromBottom,
+                  duration: AnimationDuration.slow,
+                  curveType: AnimationCurveType.easeOut,
+                  child: Container(
+                    width: double.infinity,
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                          colors: [Color(0xFFCFDBFF), Color(0xFFEFF3FF)],
+                          begin: AlignmentGeometry.centerLeft,
+                          stops: [.1, .7],
+                          end: AlignmentGeometry.centerRight),
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 16, vertical: 25),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Hello, $userName!',
+                          style: kHeadTitleSB.copyWith(
+                              fontSize: 20, color: kThirdTextColor),
+                        ),
+                        Text(
+                          "Let's empowering lives through kindness",
+                          style: kSmallTitleL.copyWith(color: kThirdTextColor),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),
@@ -363,26 +402,8 @@ class _HomePageState extends ConsumerState<HomePage> {
               const SizedBox(height: 24),
             ],
           ),
-        ),
-        loading: () => Center(
-          child: LoadingAnimation(),
-        ),
-        error: (error, stackTrace) => Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text('Error loading home data'),
-              SizedBox(height: 16),
-              ElevatedButton(
-                onPressed: () {
-                  ref.read(homePageProvider.notifier).refresh();
-                },
-                child: Text('Retry'),
-              ),
-            ],
-          ),
-        ),
-      ),
+        );
+      },
     );
   }
 

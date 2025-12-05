@@ -1,18 +1,21 @@
+import 'package:charity_trust/src/data/utils/date_formatter.dart';
 import 'package:charity_trust/src/interfaces/components/cards/campaing_card.dart';
 import 'package:charity_trust/src/interfaces/components/cards/transaction_card.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:charity_trust/src/data/constants/color_constants.dart';
 import 'package:charity_trust/src/data/constants/style_constants.dart';
 import 'package:charity_trust/src/interfaces/animations/index.dart' as anim;
+import 'package:charity_trust/src/data/providers/campaigns_provider.dart';
 
-class CampaignPage extends StatefulWidget {
+class CampaignPage extends ConsumerStatefulWidget {
   const CampaignPage({super.key});
 
   @override
-  State<CampaignPage> createState() => _CampaignPageState();
+  ConsumerState<CampaignPage> createState() => _CampaignPageState();
 }
 
-class _CampaignPageState extends State<CampaignPage>
+class _CampaignPageState extends ConsumerState<CampaignPage>
     with SingleTickerProviderStateMixin {
   late TabController _controller;
 
@@ -81,102 +84,154 @@ class _CampaignPageState extends State<CampaignPage>
 
   // ---------------- TAB 1 ---------------- //
   Widget _generalCampaignTab() {
-    return ListView(
-      padding: const EdgeInsets.all(16),
-      children: [
-        anim.AnimatedWidgetWrapper(
-          animationType: anim.AnimationType.fadeSlideInFromBottom,
-          duration: anim.AnimationDuration.normal,
-          child: CampaignCard(
-            description:
-                'Help us build homes for families displaced by the recent landslides. Your donation provides shelter and hope.',
-            title: "Landslide Relief Fund",
-            category: "Funding Campaigns",
-            date: "02 Jan 2023",
-            image: "https://picsum.photos/id/237/200/300",
-            raised: 75000,
-            goal: 150000,
-            onDetails: () {},
-            onDonate: () {},
-          ),
+    final campaignsState = ref.watch(generalCampaignsProvider);
+
+    return campaignsState.when(
+      data: (paginationState) {
+        return ListView.builder(
+          padding: const EdgeInsets.all(16),
+          itemCount: paginationState.campaigns.length +
+              (paginationState.hasMore ? 1 : 0),
+          itemBuilder: (context, index) {
+            if (index == paginationState.campaigns.length) {
+              return Padding(
+                padding: const EdgeInsets.symmetric(vertical: 16),
+                child: Center(
+                  child: ElevatedButton(
+                    onPressed: () {
+                      ref
+                          .read(generalCampaignsProvider.notifier)
+                          .loadNextPage();
+                    },
+                    child: const Text('Load More'),
+                  ),
+                ),
+              );
+            }
+
+            final campaign = paginationState.campaigns[index];
+            return Padding(
+              padding: const EdgeInsets.only(bottom: 16),
+              child: anim.AnimatedWidgetWrapper(
+                animationType: anim.AnimationType.fadeSlideInFromBottom,
+                duration: anim.AnimationDuration.normal,
+                delayMilliseconds: index * 50,
+                child: CampaignCard(
+                  description: campaign.description ?? '',
+                  title: campaign.title ?? '',
+                  category: campaign.category ?? '',
+                  date: formatDate(campaign.targetDate) ?? '',
+                  image: campaign.coverImage ?? '',
+                  raised: campaign.collectedAmount?.toInt() ?? 0,
+                  goal: campaign.targetAmount?.toInt() ?? 0,
+                  onDetails: () {},
+                  onDonate: () {},
+                ),
+              ),
+            );
+          },
+        );
+      },
+      loading: () => const Center(child: CircularProgressIndicator()),
+      error: (error, stackTrace) => Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text('Error: $error'),
+            const SizedBox(height: 16),
+            ElevatedButton(
+              onPressed: () {
+                ref.read(generalCampaignsProvider.notifier).refresh();
+              },
+              child: const Text('Retry'),
+            ),
+          ],
         ),
-        const SizedBox(height: 16),
-        anim.AnimatedWidgetWrapper(
-          animationType: anim.AnimationType.fadeSlideInFromBottom,
-          duration: anim.AnimationDuration.normal,
-          delayMilliseconds: 150,
-          child: CampaignCard(
-            description:
-                'Help us build homes for families displaced by the recent landslides. Your donation provides shelter and hope.',
-            title: "Medical Relief Fund",
-            category: "General Donations",
-            date: "02 Jan 2023",
-            raised: 30000,
-            goal: 50000,
-            image: "https://picsum.photos/id/237/200/300",
-            onDetails: () {},
-            onDonate: () {},
-          ),
-        ),
-      ],
+      ),
     );
   }
 
   // ---------------- TAB 2 ---------------- //
   Widget _yourTransactionsTab() {
-    return ListView(
-      padding: const EdgeInsets.all(16),
-      children: [
-        anim.AnimatedWidgetWrapper(
-          animationType: anim.AnimationType.fadeSlideInFromBottom,
-          duration: anim.AnimationDuration.normal,
-          child: const TransactionCard(
-            id: "VCRU65789900",
-            type: "Campaigns",
-            date: "18th May 2025, 10:45 am",
-            amount: "₹1500",
-            status: "Success",
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          const Text('Transactions feature coming soon'),
+          const SizedBox(height: 16),
+          ElevatedButton(
+            onPressed: () {},
+            child: const Text('View Transactions'),
           ),
-        ),
-        const SizedBox(height: 16),
-        anim.AnimatedWidgetWrapper(
-          animationType: anim.AnimationType.fadeSlideInFromBottom,
-          duration: anim.AnimationDuration.normal,
-          delayMilliseconds: 150,
-          child: const TransactionCard(
-            id: "VCRU65789900",
-            type: "Campaigns",
-            date: "18th May 2025, 10:45 am",
-            amount: "₹1500",
-            status: "Success",
-          ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 
   // ---------------- TAB 3 ---------------- //
   Widget _myCampaignsTab() {
-    return ListView(
-      padding: const EdgeInsets.all(16),
-      children: [
-        anim.AnimatedWidgetWrapper(
-          animationType: anim.AnimationType.fadeSlideInFromBottom,
-          duration: anim.AnimationDuration.normal,
-          child: CampaignCard(
-            description:
-                'Help us build homes for families displaced by the recent landslides. Your donation provides shelter and hope.',
-            title: "My Flood Relief",
-            category: "Funding Campaigns",
-            date: "02 Jan 2023",
-            raised: 75000,
-            goal: 150000,
-            image: "https://picsum.photos/id/237/200/300",
-            onDetails: () {},
-            isMyCampaign: true, // removes donate button
-          ),
+    final myCampaignsState = ref.watch(myCampaignsProvider);
+
+    return myCampaignsState.when(
+      data: (paginationState) {
+        return ListView.builder(
+          padding: const EdgeInsets.all(16),
+          itemCount: paginationState.campaigns.length +
+              (paginationState.hasMore ? 1 : 0),
+          itemBuilder: (context, index) {
+            if (index == paginationState.campaigns.length) {
+              return Padding(
+                padding: const EdgeInsets.symmetric(vertical: 16),
+                child: Center(
+                  child: ElevatedButton(
+                    onPressed: () {
+                      ref.read(myCampaignsProvider.notifier).loadNextPage();
+                    },
+                    child: const Text('Load More'),
+                  ),
+                ),
+              );
+            }
+
+            final campaign = paginationState.campaigns[index];
+            return Padding(
+              padding: const EdgeInsets.only(bottom: 16),
+              child: anim.AnimatedWidgetWrapper(
+                animationType: anim.AnimationType.fadeSlideInFromBottom,
+                duration: anim.AnimationDuration.normal,
+                delayMilliseconds: index * 50,
+                child: CampaignCard(
+                  description: campaign.description ?? '',
+                  title: campaign.title ?? '',
+                  category: campaign.category ?? '',
+                  date: formatDate(campaign.targetDate) ?? '',
+                  image: campaign.coverImage ?? '',
+                  raised: campaign.collectedAmount?.toInt() ?? 0,
+                  goal: campaign.targetAmount?.toInt() ?? 0,
+                  onDetails: () {},
+                  isMyCampaign: true,
+                ),
+              ),
+            );
+          },
+        );
+      },
+      loading: () => const Center(child: CircularProgressIndicator()),
+      error: (error, stackTrace) => Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text('Error: $error'),
+            const SizedBox(height: 16),
+            ElevatedButton(
+              onPressed: () {
+                ref.read(myCampaignsProvider.notifier).refresh();
+              },
+              child: const Text('Retry'),
+            ),
+          ],
         ),
-      ],
+      ),
     );
   }
 }

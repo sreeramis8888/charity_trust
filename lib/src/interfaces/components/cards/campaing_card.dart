@@ -80,6 +80,8 @@ class CampaignCard extends StatelessWidget {
                     const SizedBox(height: 4),
                     Text(
                       description,
+                      maxLines: 3,
+                      overflow: TextOverflow.ellipsis,
                       style: kSmallerTitleR.copyWith(
                         fontSize: 12,
                         color: kSecondaryTextColor,
@@ -156,16 +158,16 @@ class CampaignCard extends StatelessWidget {
                   sideColor: kTextColor,
                 ),
               ),
-              if (!isMyCampaign) ...[
-                const SizedBox(width: 12),
-                Expanded(
-                  child: primaryButton(
-                    label: "Donate",
-                    onPressed: onDonate,
-                    buttonColor: kPrimaryColor,
-                  ),
-                ),
-              ],
+              // if (!isMyCampaign) ...[
+              //   const SizedBox(width: 12),
+              //   Expanded(
+              //     child: primaryButton(
+              //       label: "Donate",
+              //       onPressed: onDonate,
+              //       buttonColor: kPrimaryColor,
+              //     ),
+              //   ),
+              // ],
             ],
           ),
         ],

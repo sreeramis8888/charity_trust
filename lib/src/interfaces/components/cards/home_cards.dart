@@ -5,9 +5,6 @@ import 'package:charity_trust/src/interfaces/components/primaryButton.dart';
 import 'package:charity_trust/src/interfaces/components/text_pill.dart';
 import 'package:flutter/material.dart';
 
-// ============================================================================
-// HOME CAMPAIGN CARD - For Active Campaigns (with progress bar)
-// ============================================================================
 class HomeCampaignCard extends StatelessWidget {
   final String title;
   final String description;
@@ -137,16 +134,16 @@ class HomeCampaignCard extends StatelessWidget {
                   buttonHeight: 40,
                 ),
               ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: primaryButton(
-                  label: "Donate",
-                  onPressed: onDonate,
-                  buttonColor: kPrimaryColor,
-                  fontSize: 14,
-                  buttonHeight: 40,
-                ),
-              ),
+              // const SizedBox(width: 12),
+              // Expanded(
+              //   child: primaryButton(
+              //     label: "Donate",
+              //     onPressed: onDonate,
+              //     buttonColor: kPrimaryColor,
+              //     fontSize: 14,
+              //     buttonHeight: 40,
+              //   ),
+              // ),
             ],
           ),
         ],
@@ -623,17 +620,17 @@ class HomeGradientCampaignCard extends StatelessWidget {
                   buttonHeight: 40,
                 ),
               ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: primaryButton(
-                  label: "Donate",
-                  onPressed: onDonate,
-                  buttonColor: kWhite,
-                  labelColor: kPrimaryColor,
-                  fontSize: 14,
-                  buttonHeight: 40,
-                ),
-              ),
+              // const SizedBox(width: 12),
+              // Expanded(
+              //   child: primaryButton(
+              //     label: "Donate",
+              //     onPressed: onDonate,
+              //     buttonColor: kWhite,
+              //     labelColor: kPrimaryColor,
+              //     fontSize: 14,
+              //     buttonHeight: 40,
+              //   ),
+              // ),
             ],
           ),
         ],
