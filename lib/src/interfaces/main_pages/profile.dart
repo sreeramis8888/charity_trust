@@ -44,92 +44,96 @@ class ProfilePage extends ConsumerWidget {
                     ),
                     padding: const EdgeInsets.all(20),
                     child: Row(
-                    children: [
-                      ClipRRect(
-                        borderRadius: BorderRadius.circular(60),
-                        child: Container(
-                          width: 60,
-                          height: 60,
-                          color: kGreyDark,
-                          child: const Icon(Icons.person, color: kWhite, size: 40),
+                      children: [
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(60),
+                          child: Container(
+                            width: 60,
+                            height: 60,
+                            color: kGreyDark,
+                            child: const Icon(Icons.person,
+                                color: kWhite, size: 40),
+                          ),
                         ),
-                      ),
-                      const SizedBox(width: 18),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              userName,
-                              style: kHeadTitleR,
-                            ),
-                            const SizedBox(height: 4),
-                            Text(
-                              userPhone,
-                              style:
-                                  kBodyTitleR.copyWith(color: kSecondaryTextColor),
-                            ),
-                          ],
+                        const SizedBox(width: 18),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                userName,
+                                style: kHeadTitleR,
+                              ),
+                              const SizedBox(height: 4),
+                              Text(
+                                userPhone,
+                                style: kBodyTitleR.copyWith(
+                                    color: kSecondaryTextColor),
+                              ),
+                            ],
+                          ),
                         ),
-                      ),
-                      IconButton(
-                        onPressed: () {
-                          Navigator.of(context).pushNamed('EditProfile');
-                        },
-                        icon: const Icon(Icons.edit_square, color: kTextColor),
-                      )
-                    ],
-                  ),
-                  ),
-                ),
-                const SizedBox(height: 22),
-                Text("Account Statistics", style: kBodyTitleM),
-                const SizedBox(height: 10),
-                Container(
-                    padding: const EdgeInsets.all(18),
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                          colors: [Color(0xFFFFFFFF), Color(0xFFEEEDFF)],
-                          begin: AlignmentGeometry.topCenter,
-                          end: AlignmentGeometry.bottomCenter),
-                      borderRadius: BorderRadius.circular(22),
+                        IconButton(
+                          onPressed: () {
+                            Navigator.of(context).pushNamed('EditProfile');
+                          },
+                          icon:
+                              const Icon(Icons.edit_square, color: kTextColor),
+                        )
+                      ],
                     ),
-                    child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          _statItem("10", "My Participations"),
-                          _statItem("₹12,500", "Contributions"),
-                        ],
-                      ),
-                      const SizedBox(height: 18),
-                      Container(height: 2, color: kStrokeColor.withOpacity(0.06)),
-                      const SizedBox(height: 18),
-                      _statItem("₹10,000", "Zakat"),
-                    ],
                   ),
                 ),
+                // const SizedBox(height: 22),
+                // Text("Account Statistics", style: kBodyTitleM),
+                // const SizedBox(height: 10),
+                // Container(
+                //     padding: const EdgeInsets.all(18),
+                //     decoration: BoxDecoration(
+                //       gradient: LinearGradient(
+                //           colors: [Color(0xFFFFFFFF), Color(0xFFEEEDFF)],
+                //           begin: AlignmentGeometry.topCenter,
+                //           end: AlignmentGeometry.bottomCenter),
+                //       borderRadius: BorderRadius.circular(22),
+                //     ),
+                //     child: Column(
+                //     crossAxisAlignment: CrossAxisAlignment.start,
+                //     children: [
+                //       Row(
+                //         mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                //         children: [
+                //           _statItem("10", "My Participations"),
+                //           _statItem("₹12,500", "Contributions"),
+                //         ],
+                //       ),
+                //       const SizedBox(height: 18),
+                //       Container(height: 2, color: kStrokeColor.withOpacity(0.06)),
+                //       const SizedBox(height: 18),
+                //       _statItem("₹10,000", "Zakat"),
+                //     ],
+                //   ),
+                // ),
                 const SizedBox(height: 26),
                 Container(
-                    padding: const EdgeInsets.symmetric(vertical: 8),
-                    decoration: BoxDecoration(
-                      border: Border.all(color: Color(0xFFD8DADC)),
-                      color:  kCardBackgroundColor,
-                      borderRadius: BorderRadius.circular(22),
-                    ),
-                    child: Column(
+                  padding: const EdgeInsets.symmetric(vertical: 8),
+                  decoration: BoxDecoration(
+                    border: Border.all(color: Color(0xFFD8DADC)),
+                    color: kCardBackgroundColor,
+                    borderRadius: BorderRadius.circular(22),
+                  ),
+                  child: Column(
                     children: [
                       GestureDetector(
                         onTap: () {
                           Navigator.of(context).push(
                             MaterialPageRoute(
-                              builder: (context) => const MyParticipationsPage(),
+                              builder: (context) =>
+                                  const MyParticipationsPage(),
                             ),
                           );
                         },
-                        child: _tile(Icons.volunteer_activism, "My Participations"),
+                        child: _tile(
+                            Icons.volunteer_activism, "My Participations"),
                       ),
                       _divider(),
                       GestureDetector(
@@ -139,7 +143,8 @@ class ProfilePage extends ConsumerWidget {
                       _divider(),
                       GestureDetector(
                         onTap: () => _handleDeleteAccount(context, ref),
-                        child: _tile(Icons.delete_outline, "Delete Account", isDestructive: true),
+                        child: _tile(Icons.delete_outline, "Delete Account",
+                            isDestructive: true),
                       ),
                     ],
                   ),
@@ -250,7 +255,8 @@ class ProfilePage extends ConsumerWidget {
 
       if (context.mounted) {
         // Navigate to login screen
-        Navigator.of(context).pushNamedAndRemoveUntil('Phone', (route) => false);
+        Navigator.of(context)
+            .pushNamedAndRemoveUntil('Phone', (route) => false);
       }
     } catch (e) {
       if (context.mounted) {
@@ -266,14 +272,16 @@ class ProfilePage extends ConsumerWidget {
       context: context,
       builder: (context) => ConfirmationDialog(
         title: 'Delete Account',
-        message: 'Are you sure you want to delete your account? This action cannot be undone.',
+        message:
+            'Are you sure you want to delete your account? This action cannot be undone.',
         confirmButtonText: 'Delete',
         onConfirm: () => _performDeleteAccount(context, ref),
       ),
     );
   }
 
-  Future<void> _performDeleteAccount(BuildContext context, WidgetRef ref) async {
+  Future<void> _performDeleteAccount(
+      BuildContext context, WidgetRef ref) async {
     try {
       final authLoginApi = ref.read(authLoginApiProvider);
       final authProvider = ref.read(authProviderProvider);
@@ -286,7 +294,8 @@ class ProfilePage extends ConsumerWidget {
 
       if (context.mounted) {
         // Navigate to login screen
-        Navigator.of(context).pushNamedAndRemoveUntil('Phone', (route) => false);
+        Navigator.of(context)
+            .pushNamedAndRemoveUntil('Phone', (route) => false);
       }
     } catch (e) {
       if (context.mounted) {
