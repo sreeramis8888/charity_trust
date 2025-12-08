@@ -27,6 +27,7 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
   final _formKey = GlobalKey<FormState>();
   final _scrollController = ScrollController();
   final FocusNode _unfocusNode = FocusNode();
+  final nameController = TextEditingController();
   final emailController = TextEditingController();
   final addressController = TextEditingController();
   final dobController = TextEditingController();
@@ -35,6 +36,7 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
   XFile? profileImage;
 
   final Map<String, GlobalKey> _fieldKeys = {
+    'name': GlobalKey(),
     'email': GlobalKey(),
     'address': GlobalKey(),
     'dob': GlobalKey(),
@@ -48,7 +50,9 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
         if (!mounted) return;
         String? firstErrorKey;
 
-        if (emailController.text.trim().isEmpty) {
+        if (nameController.text.trim().isEmpty) {
+          firstErrorKey = 'name';
+        } else if (emailController.text.trim().isEmpty) {
           firstErrorKey = 'email';
         } else if (addressController.text.trim().isEmpty) {
           firstErrorKey = 'address';
@@ -82,6 +86,7 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
     final userData = await ref.read(secureStorageServiceProvider).getUserData();
     if (userData != null && mounted) {
       setState(() {
+        nameController.text = userData.name ?? '';
         emailController.text = userData.email ?? '';
         addressController.text = userData.address ?? '';
         // Format DateTime to dd/MM/yyyy
@@ -98,6 +103,7 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
   void dispose() {
     _scrollController.dispose();
     _unfocusNode.dispose();
+    nameController.dispose();
     emailController.dispose();
     addressController.dispose();
     dobController.dispose();
@@ -131,6 +137,13 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
     try {
       ref.read(loadingProvider.notifier).startLoading();
 
+      // Get current user data to preserve all fields
+      final currentUser =
+          await ref.read(secureStorageServiceProvider).getUserData();
+      if (currentUser == null) {
+        throw Exception('User data not found');
+      }
+
       // Parse dob string (dd/MM/yyyy) to DateTime
       DateTime? parsedDob;
       final dobText = dobController.text.trim();
@@ -149,11 +162,40 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
         }
       }
 
-      final userData = <String, dynamic>{
-        'email': emailController.text.trim(),
-        'address': addressController.text.trim(),
-        'dob': parsedDob?.toIso8601String(),
-      };
+      // Build payload with only changed fields
+      final userData = <String, dynamic>{};
+
+      final newName = nameController.text.trim();
+      if (newName != (currentUser.name ?? '')) {
+        userData['name'] = newName;
+      }
+
+      final newEmail = emailController.text.trim();
+      if (newEmail != (currentUser.email ?? '')) {
+        userData['email'] = newEmail;
+      }
+
+      final newAddress = addressController.text.trim();
+      if (newAddress != (currentUser.address ?? '')) {
+        userData['address'] = newAddress;
+      }
+
+      if (parsedDob != currentUser.dob) {
+        if (parsedDob != null) {
+          userData['dob'] =
+              '${parsedDob.year}-${parsedDob.month.toString().padLeft(2, '0')}-${parsedDob.day.toString().padLeft(2, '0')}';
+        } else {
+          userData['dob'] = null;
+        }
+      }
+
+      // Update local storage with complete user data
+      final updatedUser = currentUser.copyWith(
+        name: newName,
+        email: newEmail,
+        address: newAddress,
+        dob: parsedDob,
+      );
 
       final result = await ref.read(updateUserProfileProvider(userData).future);
 
@@ -161,25 +203,18 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
 
       if (result != null) {
         log('Profile updated successfully', name: 'EditProfilePage');
-        
-        // Update local secure storage with new data
-        final currentUser = await ref.read(secureStorageServiceProvider).getUserData();
-        if (currentUser != null) {
-          final updatedUser = currentUser.copyWith(
-            email: emailController.text.trim(),
-            address: addressController.text.trim(),
-            dob: parsedDob,
-          );
-          await ref.read(secureStorageServiceProvider).saveUserData(updatedUser);
-        }
-        
+
+        // Update local secure storage with complete user data
+        await ref.read(secureStorageServiceProvider).saveUserData(updatedUser);
+
         SnackbarService().showSnackBar('Profile updated successfully');
 
         if (mounted) {
           Navigator.of(context).pop();
         }
       } else {
-        SnackbarService().showSnackBar('Failed to update profile');
+        SnackbarService()
+            .showSnackBar('Failed to update profile', type: SnackbarType.error);
       }
     } catch (e) {
       ref.read(loadingProvider.notifier).stopLoading();
@@ -267,13 +302,33 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
                       animationType: anim.AnimationType.fadeSlideInFromLeft,
                       duration: anim.AnimationDuration.normal,
                       delayMilliseconds: 100,
-                      child: Text("Email Address", style: kSmallTitleR),
+                      child: Text("Full Name", style: kSmallTitleR),
                     ),
                     const SizedBox(height: 6),
                     anim.AnimatedWidgetWrapper(
                       animationType: anim.AnimationType.fadeSlideInFromBottom,
                       duration: anim.AnimationDuration.normal,
                       delayMilliseconds: 150,
+                      child: InputField(
+                        key: _fieldKeys['name'],
+                        type: CustomFieldType.text,
+                        hint: "Enter full name",
+                        controller: nameController,
+                        validator: (v) => v!.isEmpty ? "Required" : null,
+                      ),
+                    ),
+                    const SizedBox(height: 18),
+                    anim.AnimatedWidgetWrapper(
+                      animationType: anim.AnimationType.fadeSlideInFromLeft,
+                      duration: anim.AnimationDuration.normal,
+                      delayMilliseconds: 200,
+                      child: Text("Email Address", style: kSmallTitleR),
+                    ),
+                    const SizedBox(height: 6),
+                    anim.AnimatedWidgetWrapper(
+                      animationType: anim.AnimationType.fadeSlideInFromBottom,
+                      duration: anim.AnimationDuration.normal,
+                      delayMilliseconds: 250,
                       child: InputField(
                         key: _fieldKeys['email'],
                         type: CustomFieldType.text,
@@ -286,14 +341,14 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
                     anim.AnimatedWidgetWrapper(
                       animationType: anim.AnimationType.fadeSlideInFromLeft,
                       duration: anim.AnimationDuration.normal,
-                      delayMilliseconds: 200,
+                      delayMilliseconds: 300,
                       child: Text("Address", style: kSmallTitleR),
                     ),
                     const SizedBox(height: 6),
                     anim.AnimatedWidgetWrapper(
                       animationType: anim.AnimationType.fadeSlideInFromBottom,
                       duration: anim.AnimationDuration.normal,
-                      delayMilliseconds: 250,
+                      delayMilliseconds: 350,
                       child: InputField(
                         key: _fieldKeys['address'],
                         type: CustomFieldType.text,
@@ -306,34 +361,35 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
                     anim.AnimatedWidgetWrapper(
                       animationType: anim.AnimationType.fadeSlideInFromLeft,
                       duration: anim.AnimationDuration.normal,
-                      delayMilliseconds: 300,
+                      delayMilliseconds: 400,
                       child: Text("Date of Birth", style: kSmallTitleR),
                     ),
                     const SizedBox(height: 6),
                     anim.AnimatedWidgetWrapper(
                       animationType: anim.AnimationType.fadeSlideInFromBottom,
                       duration: anim.AnimationDuration.normal,
-                      delayMilliseconds: 350,
+                      delayMilliseconds: 450,
                       child: InputField(
                         key: _fieldKeys['dob'],
                         type: CustomFieldType.date,
                         hint: "dd/mm/yyyy",
                         controller: dobController,
-                        validator: (v) => v?.isEmpty ?? true ? "Required" : null,
+                        validator: (v) =>
+                            v?.isEmpty ?? true ? "Required" : null,
                       ),
                     ),
                     const SizedBox(height: 18),
                     anim.AnimatedWidgetWrapper(
                       animationType: anim.AnimationType.fadeSlideInFromLeft,
                       duration: anim.AnimationDuration.normal,
-                      delayMilliseconds: 400,
+                      delayMilliseconds: 500,
                       child: Text("Recommended By", style: kSmallTitleR),
                     ),
                     const SizedBox(height: 6),
                     anim.AnimatedWidgetWrapper(
                       animationType: anim.AnimationType.fadeSlideInFromBottom,
                       duration: anim.AnimationDuration.normal,
-                      delayMilliseconds: 450,
+                      delayMilliseconds: 550,
                       child: InputField(
                         key: _fieldKeys['recommendedBy'],
                         type: CustomFieldType.text,
@@ -346,7 +402,7 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
                     anim.AnimatedWidgetWrapper(
                       animationType: anim.AnimationType.fadeScaleUp,
                       duration: anim.AnimationDuration.normal,
-                      delayMilliseconds: 500,
+                      delayMilliseconds: 600,
                       child: SizedBox(
                         height: 50,
                         width: double.infinity,

@@ -135,7 +135,6 @@ class ApiProvider {
       );
 
       final decoded = json.decode(response.body);
-
       if (response.statusCode == 200 || response.statusCode == 201) {
         return ApiResponse.success(decoded, response.statusCode);
       } else {

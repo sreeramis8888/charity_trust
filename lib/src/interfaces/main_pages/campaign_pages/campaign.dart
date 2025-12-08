@@ -10,7 +10,6 @@ import 'package:charity_trust/src/interfaces/animations/index.dart' as anim;
 import 'package:charity_trust/src/data/providers/campaigns_provider.dart'
     show
         generalCampaignsProvider,
-        myCampaignsProvider,
         participatedCampaignsProvider;
 import 'package:charity_trust/src/data/services/secure_storage_service.dart';
 import 'package:charity_trust/src/interfaces/main_pages/campaign_pages/add_campaign.dart';
@@ -39,14 +38,16 @@ class _CampaignPageState extends ConsumerState<CampaignPage>
     return Scaffold(
       backgroundColor: kBackgroundColor,
       appBar: AppBar(
-        leading: GestureDetector(
-          onTap: () => Navigator.pop(context),
-          child: const Icon(
-            Icons.arrow_back_ios,
-            color: kTextColor,
-            size: 20,
-          ),
-        ),
+        leading: Navigator.canPop(context)
+            ? GestureDetector(
+                onTap: () => Navigator.pop(context),
+                child: const Icon(
+                  Icons.arrow_back_ios,
+                  color: kTextColor,
+                  size: 20,
+                ),
+              )
+            : null,
         backgroundColor: kWhite,
         elevation: 0,
         title: Text("Campaign", style: kBodyTitleM),
@@ -261,7 +262,7 @@ class _CampaignPageState extends ConsumerState<CampaignPage>
                   // paymentMethod: donation.paymentMethod ?? '',
                   status: donation.status ?? '',
                   date: formatDate(donation.createdAt) ?? '',
-                  // receipt: donation.receipt,
+                  receipt: donation.receipt??'',
                 ),
               ),
             );

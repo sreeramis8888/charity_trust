@@ -14,25 +14,6 @@ class CampaignsApi {
 
   CampaignsApi({required ApiProvider apiProvider}) : _apiProvider = apiProvider;
 
-  Future<ApiResponse<Map<String, dynamic>>> getCampaignsForUser({
-    int pageNo = 1,
-    int limit = 10,
-    String? type,
-  }) async {
-    final queryParams = {
-      'page_no': pageNo,
-      'limit': limit,
-      if (type != null) 'type': type,
-    };
-
-    final queryString =
-        queryParams.entries.map((e) => '${e.key}=${e.value}').join('&');
-
-    return await _apiProvider.get(
-      '$_endpoint/user?$queryString',
-      requireAuth: true,
-    );
-  }
 
   Future<ApiResponse<Map<String, dynamic>>> getAllCampaigns({
     int pageNo = 1,
@@ -377,65 +358,3 @@ Future<CampaignPaginationState> categoryCampaigns(
   }
 }
 
-@riverpod
-class MyCampaignsNotifier extends _$MyCampaignsNotifier {
-  List<CampaignModel> _generateDummyCampaigns(int count) {
-    return List.generate(
-      count,
-      (index) => CampaignModel(
-        id: 'my_campaign_${index + 1}',
-        title: 'My Campaign ${index + 1}',
-        description: 'This is my campaign for helping communities in need.',
-        category: 'Funding Campaigns',
-        targetAmount: (150000.0 + (index * 50000)).toInt(),
-        collectedAmount: (75000.0 + (index * 25000)).toInt(),
-        targetDate: DateTime.now().add(Duration(days: 30 + (index * 10))),
-        coverImage: 'https://picsum.photos/id/${237 + index}/200/300',
-      ),
-    );
-  }
-
-  @override
-  Future<CampaignPaginationState> build() async {
-    final dummyCampaigns = _generateDummyCampaigns(10);
-
-    return CampaignPaginationState(
-      currentPage: 1,
-      limit: 10,
-      totalCount: 25,
-      campaigns: dummyCampaigns,
-    );
-  }
-
-  Future<void> loadNextPage() async {
-    if (!state.hasValue) return;
-
-    final currentState = state.value!;
-    if (!currentState.hasMore) return;
-
-    state = const AsyncValue.loading();
-    state = await AsyncValue.guard(() async {
-      final nextPage = currentState.currentPage + 1;
-      final startIndex = (nextPage - 1) * currentState.limit;
-      final dummyCampaigns = _generateDummyCampaigns(
-        currentState.limit,
-      ).asMap().entries.map((entry) {
-        final campaign = entry.value;
-        return campaign.copyWith(
-          id: 'my_campaign_${startIndex + entry.key + 1}',
-          title: 'My Campaign ${startIndex + entry.key + 1}',
-        );
-      }).toList();
-
-      return currentState.copyWith(
-        currentPage: nextPage,
-        campaigns: [...currentState.campaigns, ...dummyCampaigns],
-      );
-    });
-  }
-
-  Future<void> refresh() async {
-    state = const AsyncValue.loading();
-    state = await AsyncValue.guard(() => build());
-  }
-}

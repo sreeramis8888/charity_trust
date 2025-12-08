@@ -2,6 +2,7 @@ import 'package:charity_trust/src/data/constants/color_constants.dart';
 import 'package:charity_trust/src/data/constants/style_constants.dart';
 import 'package:charity_trust/src/interfaces/animations/index.dart' as anim;
 import 'package:charity_trust/src/interfaces/main_pages/profile_pages/my_participations.dart';
+import 'package:charity_trust/src/interfaces/components/confirmation_dialog.dart';
 import 'package:charity_trust/src/data/services/secure_storage_service.dart';
 import 'package:charity_trust/src/data/providers/auth_login_provider.dart';
 import 'package:charity_trust/src/data/providers/auth_provider.dart';
@@ -131,19 +132,14 @@ class ProfilePage extends ConsumerWidget {
                         child: _tile(Icons.volunteer_activism, "My Participations"),
                       ),
                       _divider(),
-                      _tile(Icons.headset_mic_rounded, "Help & Support"),
-                      _divider(),
-                      _tile(Icons.privacy_tip_outlined, "Privacy Policy"),
-                      _divider(),
-                      _tile(Icons.description_outlined, "Terms of Service"),
-                      _divider(),
-                      _tile(Icons.group_outlined, "About Us"),
-                      _divider(),
-                      _tile(Icons.calculate_outlined, "Zakat Calculator"),
-                      _divider(),
                       GestureDetector(
                         onTap: () => _handleLogout(context, ref),
                         child: _tile(Icons.logout, "Logout"),
+                      ),
+                      _divider(),
+                      GestureDetector(
+                        onTap: () => _handleDeleteAccount(context, ref),
+                        child: _tile(Icons.delete_outline, "Delete Account", isDestructive: true),
                       ),
                     ],
                   ),
@@ -175,38 +171,45 @@ class ProfilePage extends ConsumerWidget {
     );
   }
 
-  Widget _tile(IconData icon, String title) {
+  Widget _tile(IconData icon, String title, {bool isDestructive = false}) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
       child: Row(
         children: [
-          _iconCircle(icon),
+          _iconCircle(icon, isDestructive: isDestructive),
           const SizedBox(width: 16),
           Expanded(
-            child: Text(title, style: kSmallerTitleL),
+            child: Text(
+              title,
+              style: kSmallerTitleL.copyWith(
+                color: isDestructive ? kPrimaryColor : kTextColor,
+              ),
+            ),
           ),
-          const Icon(
+          Icon(
             Icons.arrow_forward_ios_rounded,
             size: 16,
-            color: kTextColor,
+            color: isDestructive ? kPrimaryColor : kTextColor,
           ),
         ],
       ),
     );
   }
 
-  Widget _iconCircle(IconData icon) {
+  Widget _iconCircle(IconData icon, {bool isDestructive = false}) {
     return Container(
       width: 32,
       height: 32,
       decoration: BoxDecoration(
-        color: const Color(0xFF0601B4).withOpacity(0.05),
+        color: isDestructive
+            ? kPrimaryColor.withOpacity(0.1)
+            : const Color(0xFF0601B4).withOpacity(0.05),
         shape: BoxShape.circle,
       ),
       child: Icon(
         icon,
         size: 15,
-        color: Colors.black54,
+        color: isDestructive ? kPrimaryColor : Colors.black54,
       ),
     );
   }
@@ -222,7 +225,19 @@ class ProfilePage extends ConsumerWidget {
     );
   }
 
-  Future<void> _handleLogout(BuildContext context, WidgetRef ref) async {
+  void _handleLogout(BuildContext context, WidgetRef ref) {
+    showDialog(
+      context: context,
+      builder: (context) => ConfirmationDialog(
+        title: 'Logout',
+        message: 'Are you sure you want to logout?',
+        confirmButtonText: 'Logout',
+        onConfirm: () => _performLogout(context, ref),
+      ),
+    );
+  }
+
+  Future<void> _performLogout(BuildContext context, WidgetRef ref) async {
     try {
       final authLoginApi = ref.read(authLoginApiProvider);
       final authProvider = ref.read(authProviderProvider);
@@ -241,6 +256,42 @@ class ProfilePage extends ConsumerWidget {
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Logout failed: $e')),
+        );
+      }
+    }
+  }
+
+  void _handleDeleteAccount(BuildContext context, WidgetRef ref) {
+    showDialog(
+      context: context,
+      builder: (context) => ConfirmationDialog(
+        title: 'Delete Account',
+        message: 'Are you sure you want to delete your account? This action cannot be undone.',
+        confirmButtonText: 'Delete',
+        onConfirm: () => _performDeleteAccount(context, ref),
+      ),
+    );
+  }
+
+  Future<void> _performDeleteAccount(BuildContext context, WidgetRef ref) async {
+    try {
+      final authLoginApi = ref.read(authLoginApiProvider);
+      final authProvider = ref.read(authProviderProvider);
+
+      // Call logout API (using same functionality for now)
+      final response = await authLoginApi.logout();
+
+      // Clear local storage regardless of API response
+      await authProvider.clearAllData();
+
+      if (context.mounted) {
+        // Navigate to login screen
+        Navigator.of(context).pushNamedAndRemoveUntil('Phone', (route) => false);
+      }
+    } catch (e) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Delete account failed: $e')),
         );
       }
     }
