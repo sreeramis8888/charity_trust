@@ -155,8 +155,7 @@ class _AddCampaignPageState extends ConsumerState<AddCampaignPage> {
           if (mounted) {
             ref.read(loadingProvider.notifier).stopLoading();
           }
-          SnackbarService().showSnackBar('Failed to upload cover image',
-              type: SnackbarType.error);
+          SnackbarService().showSnackBar('Failed to upload cover image');
           log('Error uploading cover image: $e', name: 'AddCampaignPage');
           return;
         }
@@ -206,17 +205,12 @@ class _AddCampaignPageState extends ConsumerState<AddCampaignPage> {
       backgroundColor: Colors.white,
       appBar: AppBar(
         backgroundColor: kWhite,
-        scrolledUnderElevation: 0,
         elevation: 0,
-        leading: GestureDetector(
-          onTap: () => Navigator.pop(context),
-          child: const Icon(
-            Icons.arrow_back_ios,
-            color: kTextColor,
-            size: 20,
-          ),
+        title: Text("New Campaign", style: kHeadTitleSB),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: kTextColor),
+          onPressed: () => Navigator.of(context).pop(),
         ),
-        title: Text('New Campaign', style: kBodyTitleM),
       ),
       body: GestureDetector(
         onTap: () {
@@ -370,8 +364,8 @@ class _AddCampaignPageState extends ConsumerState<AddCampaignPage> {
                             ),
                             if (field.hasError)
                               Padding(
-                                padding:
-                                    const EdgeInsets.only(top: 4.0, left: 4.0),
+                                padding: const EdgeInsets.only(
+                                    top: 4.0, left: 4.0),
                                 child: Text(
                                   field.errorText ?? '',
                                   style: const TextStyle(

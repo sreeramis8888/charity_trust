@@ -3,7 +3,7 @@ import 'dart:developer';
 import 'package:charity_trust/src/data/constants/color_constants.dart';
 import 'package:charity_trust/src/data/constants/style_constants.dart';
 import 'package:charity_trust/src/data/utils/media_picker.dart';
-import 'package:charity_trust/src/data/notifiers/loading_notifier.dart';
+import 'package:charity_trust/src/data/providers/loading_provider.dart';
 import 'package:charity_trust/src/data/services/snackbar_service.dart';
 import 'package:charity_trust/src/data/services/image_upload.dart';
 import 'package:charity_trust/src/data/providers/user_provider.dart';
