@@ -8,6 +8,7 @@ import 'package:charity_trust/src/interfaces/components/cards/video_card.dart';
 import 'package:charity_trust/src/interfaces/components/loading_indicator.dart';
 import 'package:charity_trust/src/interfaces/animations/index.dart';
 import 'package:charity_trust/src/interfaces/onboarding/create_user.dart';
+import 'package:charity_trust/src/interfaces/main_pages/campaign_pages/category_campaign_detail.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
@@ -25,6 +26,7 @@ class _HomePageState extends ConsumerState<HomePage> {
   late PageController _videoController;
   int _completedCampaignIndex = 0;
   int _videoIndex = 0;
+  bool _imagesPrecached = false;
 
   @override
   void initState() {
@@ -32,6 +34,41 @@ class _HomePageState extends ConsumerState<HomePage> {
     _completedCampaignController =
         PageController(initialPage: _completedCampaignIndex);
     _videoController = PageController(initialPage: _videoIndex);
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (!_imagesPrecached) {
+      _precacheImages();
+      _imagesPrecached = true;
+    }
+  }
+
+  void _precacheImages() {
+    final categoryImages = [
+      'assets/jpg/general_campaign.jpg',
+      'assets/jpg/general_funding.jpg',
+      'assets/jpg/zakat.jpg',
+      'assets/jpg/orphan.jpg',
+      'assets/jpg/widow.jpg',
+      'assets/png/ghusal_mayyt.png',
+    ];
+    for (var image in categoryImages) {
+      precacheImage(AssetImage(image), context);
+    }
+  }
+
+  void _handleCategoryTap(BuildContext context, String category) {
+    if (category == 'General Campaign') {
+      Navigator.of(context).pushNamed('Campaign');
+    } else {
+      Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (context) => CategoryCampaignDetailPage(category: category),
+        ),
+      );
+    }
   }
 
   @override
@@ -80,7 +117,7 @@ class _HomePageState extends ConsumerState<HomePage> {
       builder: (context, snapshot) {
         final userRole = snapshot.data ?? '';
 
-        if (userRole != 'trustee') {
+        if (userRole != 'trustee' || userRole != 'president') {
           return SizedBox.shrink();
         }
 
@@ -207,6 +244,127 @@ class _HomePageState extends ConsumerState<HomePage> {
                       ],
                     ),
                   ),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.only(top: 24, left: 0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    SizedBox(
+                      height: 120,
+                      child: CarouselSlider(
+                        options: CarouselOptions(
+                          height: 120,
+                          viewportFraction: 0.25,
+                          autoPlay: true,
+                          autoPlayInterval: const Duration(seconds: 3),
+                          autoPlayAnimationDuration:
+                              const Duration(milliseconds: 800),
+                          enableInfiniteScroll: false,
+                          initialPage: 0,
+                          padEnds: false,
+                        ),
+                        items: [
+                          {
+                            'title': 'General\nCampaign',
+                            'image': 'assets/jpg/general_campaign.jpg',
+                            'category': 'General Campaign'
+                          },
+                          {
+                            'title': 'General\nFunding',
+                            'image': 'assets/jpg/general_funding.jpg',
+                            'category': 'General Funding'
+                          },
+                          {
+                            'title': 'Zakat',
+                            'image': 'assets/jpg/zakat.jpg',
+                            'category': 'Zakat'
+                          },
+                          {
+                            'title': 'Orphan',
+                            'image': 'assets/jpg/orphan.jpg',
+                            'category': 'Orphan'
+                          },
+                          {
+                            'title': 'Widow',
+                            'image': 'assets/jpg/widow.jpg',
+                            'category': 'Widow'
+                          },
+                          {
+                            'title': 'Ghusl\nMayyit',
+                            'image': 'assets/png/ghusal_mayyt.png',
+                            'category': 'Ghusl Mayyit'
+                          },
+                        ].map((category) {
+                          return AnimatedWidgetWrapper(
+                            animationType: AnimationType.fadeScaleUp,
+                            duration: AnimationDuration.normal,
+                            curveType: AnimationCurveType.easeOut,
+                            child: Padding(
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 6),
+                              child: GestureDetector(
+                                onTap: () {
+                                  _handleCategoryTap(context, category['category'] as String);
+                                },
+                                child: Column(
+                                  children: [
+                                    Container(
+                                      width: 70,
+                                      height: 70,
+                                      decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(16),
+                                        boxShadow: [
+                                          BoxShadow(
+                                            color:
+                                                Colors.black.withOpacity(0.1),
+                                            blurRadius: 8,
+                                            offset: const Offset(0, 2),
+                                          )
+                                        ],
+                                      ),
+                                      child: ClipRRect(
+                                        borderRadius: BorderRadius.circular(16),
+                                        child: Image.asset(
+                                          category['image'] as String,
+                                          fit: BoxFit.cover,
+                                          cacheWidth: 140,
+                                          cacheHeight: 140,
+                                          errorBuilder:
+                                              (context, error, stackTrace) {
+                                            return Container(
+                                              color: Colors.grey[300],
+                                              child: const Icon(
+                                                  Icons.image_not_supported),
+                                            );
+                                          },
+                                        ),
+                                      ),
+                                    ),
+                                    const SizedBox(height: 8),
+                                    SizedBox(
+                                      width: 80,
+                                      child: Text(
+                                        category['title'] as String,
+                                        textAlign: TextAlign.center,
+                                        style: kSmallTitleR.copyWith(
+                                          fontSize: 10,
+                                          color: kTextColor,
+                                        ),
+                                        maxLines: 2,
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          );
+                        }).toList(),
+                      ),
+                    ),
+                  ],
                 ),
               ),
               if (homeData.endingCampaign != null)

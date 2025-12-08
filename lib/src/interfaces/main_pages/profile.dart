@@ -3,6 +3,8 @@ import 'package:charity_trust/src/data/constants/style_constants.dart';
 import 'package:charity_trust/src/interfaces/animations/index.dart' as anim;
 import 'package:charity_trust/src/interfaces/main_pages/profile_pages/my_participations.dart';
 import 'package:charity_trust/src/data/services/secure_storage_service.dart';
+import 'package:charity_trust/src/data/providers/auth_login_provider.dart';
+import 'package:charity_trust/src/data/providers/auth_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -139,7 +141,10 @@ class ProfilePage extends ConsumerWidget {
                       _divider(),
                       _tile(Icons.calculate_outlined, "Zakat Calculator"),
                       _divider(),
-                      _tile(Icons.logout, "Logout"),
+                      GestureDetector(
+                        onTap: () => _handleLogout(context, ref),
+                        child: _tile(Icons.logout, "Logout"),
+                      ),
                     ],
                   ),
                 )
@@ -215,5 +220,29 @@ class ProfilePage extends ConsumerWidget {
         height: 0,
       ),
     );
+  }
+
+  Future<void> _handleLogout(BuildContext context, WidgetRef ref) async {
+    try {
+      final authLoginApi = ref.read(authLoginApiProvider);
+      final authProvider = ref.read(authProviderProvider);
+
+      // Call logout API
+      final response = await authLoginApi.logout();
+
+      // Clear local storage regardless of API response
+      await authProvider.clearAllData();
+
+      if (context.mounted) {
+        // Navigate to login screen
+        Navigator.of(context).pushNamedAndRemoveUntil('Phone', (route) => false);
+      }
+    } catch (e) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Logout failed: $e')),
+        );
+      }
+    }
   }
 }

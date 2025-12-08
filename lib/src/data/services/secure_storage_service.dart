@@ -25,7 +25,6 @@ class SecureStorageService {
     return await _storage.read(key: _bearerTokenKey);
   }
 
-
   /// Save user ID for reference
   Future<void> saveUserId(String userId) async {
     await _storage.write(key: _userIdKey, value: userId);

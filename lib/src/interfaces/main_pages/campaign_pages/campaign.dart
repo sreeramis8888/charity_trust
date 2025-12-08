@@ -1,6 +1,7 @@
 import 'package:charity_trust/src/data/utils/date_formatter.dart';
 import 'package:charity_trust/src/interfaces/components/cards/campaing_card.dart';
 import 'package:charity_trust/src/interfaces/components/cards/transaction_card.dart';
+import 'package:charity_trust/src/interfaces/components/loading_indicator.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:charity_trust/src/data/constants/color_constants.dart';
@@ -38,15 +39,24 @@ class _CampaignPageState extends ConsumerState<CampaignPage>
     return Scaffold(
       backgroundColor: kBackgroundColor,
       appBar: AppBar(
+        leading: GestureDetector(
+          onTap: () => Navigator.pop(context),
+          child: const Icon(
+            Icons.arrow_back_ios,
+            color: kTextColor,
+            size: 20,
+          ),
+        ),
         backgroundColor: kWhite,
         elevation: 0,
-        title: Text("Campaign", style: kHeadTitleSB),
+        title: Text("Campaign", style: kBodyTitleM),
         actions: [
           Padding(
             padding: const EdgeInsets.only(right: 16),
             child: Center(
               child: FutureBuilder<String?>(
-                future: secureStorageAsync.getUserData().then((user) => user?.role),
+                future:
+                    secureStorageAsync.getUserData().then((user) => user?.role),
                 builder: (context, snapshot) {
                   final isPresident = snapshot.data == 'president';
                   if (!isPresident) {
@@ -60,17 +70,14 @@ class _CampaignPageState extends ConsumerState<CampaignPage>
                         ),
                       );
                     },
-                    child: Container(
-                      padding: const EdgeInsets.all(8),
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: kPrimaryColor.withOpacity(0.1),
-                      ),
-                      child: const Icon(
-                        Icons.add,
-                        color: kPrimaryColor,
-                        size: 24,
-                      ),
+                    child: Row(
+                      children: [
+                        const Icon(
+                          Icons.add,
+                          color: kPrimaryColor,
+                          size: 24,
+                        ),
+                      ],
                     ),
                   );
                 },
@@ -82,7 +89,7 @@ class _CampaignPageState extends ConsumerState<CampaignPage>
           preferredSize: Size.fromHeight(48),
           child: Container(
             decoration: BoxDecoration(
-              color: kWhite,
+              color: kBackgroundColor,
               boxShadow: [
                 BoxShadow(
                   color: Colors.black.withOpacity(0.08),
@@ -161,7 +168,8 @@ class _CampaignPageState extends ConsumerState<CampaignPage>
                 animationType: anim.AnimationType.fadeSlideInFromBottom,
                 duration: anim.AnimationDuration.normal,
                 delayMilliseconds: index * 50,
-                child: CampaignCard(id: campaign.id??'',
+                child: CampaignCard(
+                  id: campaign.id ?? '',
                   description: campaign.description ?? '',
                   title: campaign.title ?? '',
                   category: campaign.category ?? '',
@@ -191,7 +199,7 @@ class _CampaignPageState extends ConsumerState<CampaignPage>
           },
         );
       },
-      loading: () => const Center(child: CircularProgressIndicator()),
+      loading: () => const Center(child: LoadingAnimation()),
       error: (error, stackTrace) => Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -244,7 +252,9 @@ class _CampaignPageState extends ConsumerState<CampaignPage>
                 animationType: anim.AnimationType.fadeSlideInFromBottom,
                 duration: anim.AnimationDuration.normal,
                 delayMilliseconds: index * 50,
-                child: TransactionCard(id: donation.paymentId??'',type: donation.campaign?.category??'',
+                child: TransactionCard(
+                  id: donation.paymentId ?? '',
+                  type: donation.campaign?.category ?? '',
                   // campaignTitle: donation.campaign?.title ?? '',
                   amount: donation.amount?.toString() ?? '-',
                   // currency: donation.currency ?? 'INR',
@@ -258,7 +268,7 @@ class _CampaignPageState extends ConsumerState<CampaignPage>
           },
         );
       },
-      loading: () => const Center(child: CircularProgressIndicator()),
+      loading: () => const Center(child: LoadingAnimation()),
       error: (error, stackTrace) => Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -343,7 +353,7 @@ class _CampaignPageState extends ConsumerState<CampaignPage>
           },
         );
       },
-      loading: () => const Center(child: CircularProgressIndicator()),
+      loading: () => const Center(child: LoadingAnimation()),
       error: (error, stackTrace) => Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,

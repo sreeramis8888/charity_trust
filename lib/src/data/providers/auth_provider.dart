@@ -35,6 +35,10 @@ class AuthProvider {
     // If failed, clear tokens and return false
     return false;
   }
+
+  Future<void> clearAllData() async {
+    await _secureStorage.clearAll();
+  }
 }
 
 @riverpod

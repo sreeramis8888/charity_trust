@@ -7,6 +7,7 @@ import 'package:image/image.dart' as img;
 import 'package:http/http.dart' as http;
 import 'package:charity_trust/src/data/utils/globals.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:charity_trust/src/data/services/secure_storage_service.dart';
 
 Future<String> imageUpload(String imagePath) async {
   File imageFile = File(imagePath);
@@ -37,7 +38,12 @@ Future<String> imageUpload(String imagePath) async {
 
   request.headers['x-api-key'] = apiKey;
 
-  request.headers['Authorization'] = 'Bearer $token';
+  // Get token from secure storage
+  final secureStorage = SecureStorageService();
+  final bearerToken = await secureStorage.getBearerToken();
+  if (bearerToken != null) {
+    request.headers['Authorization'] = 'Bearer $bearerToken';
+  }
 
   request.files.add(await http.MultipartFile.fromPath('image', imageFile.path));
 

@@ -41,6 +41,28 @@ class CampaignsApi {
     final queryParams = {
       'page_no': pageNo,
       'limit': limit,
+      'status':'active'
+    };
+
+    final queryString =
+        queryParams.entries.map((e) => '${e.key}=${e.value}').join('&');
+
+    return await _apiProvider.get(
+      '$_endpoint?$queryString',
+      requireAuth: true,
+    );
+  }
+
+  Future<ApiResponse<Map<String, dynamic>>> getCampaignsByCategory({
+    required String category,
+    int pageNo = 1,
+    int limit = 10,
+  }) async {
+    final queryParams = {
+      'page_no': pageNo,
+      'limit': limit,
+      'category': category,
+      'status': 'active'
     };
 
     final queryString =
@@ -317,6 +339,41 @@ Future<CampaignModel?> createNewCampaign(
     return null;
   } catch (e) {
     throw Exception('Error creating campaign: $e');
+  }
+}
+
+@riverpod
+Future<CampaignPaginationState> categoryCampaigns(
+  Ref ref,
+  String category,
+) async {
+  final campaignsApi = ref.watch(campaignsApiProvider);
+  final response = await campaignsApi.getCampaignsByCategory(
+    category: category,
+    pageNo: 1,
+    limit: 10,
+  );
+
+  if (response.success && response.data != null) {
+    final campaignsList =
+        (response.data!['data'] as List<dynamic>?)
+                ?.map((item) =>
+                    CampaignModel.fromJson(item as Map<String, dynamic>))
+                .toList() ??
+            [];
+    final totalCountValue = response.data!['total_count'];
+    final totalCount = totalCountValue is int
+        ? totalCountValue
+        : int.tryParse(totalCountValue.toString()) ?? 0;
+
+    return CampaignPaginationState(
+      currentPage: 1,
+      limit: 10,
+      totalCount: totalCount,
+      campaigns: campaignsList,
+    );
+  } else {
+    throw Exception(response.message ?? 'Failed to fetch campaigns');
   }
 }
 

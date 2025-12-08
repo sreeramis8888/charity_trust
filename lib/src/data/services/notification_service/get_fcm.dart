@@ -27,10 +27,11 @@ Future<void> getFcmToken(BuildContext context, WidgetRef ref) async {
         print("APNs Token: $apnsToken");
       }
       String? token = await messaging.getToken();
-      fcmToken = token ?? '';
-      final secureStorage = ref.read(secureStorageServiceProvider);
-      await secureStorage.saveFcmToken(fcmToken);
-      print("FCM Token: $token");
+      if (token != null && token.isNotEmpty) {
+        final secureStorage = ref.read(secureStorageServiceProvider);
+        await secureStorage.saveFcmToken(token);
+        print("FCM Token: $token");
+      }
     } else {
       print('User declined or has not accepted permission');
     }

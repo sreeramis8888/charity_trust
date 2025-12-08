@@ -50,6 +50,14 @@ class AuthLoginApi {
 
     return response;
   }
+
+  Future<ApiResponse<Map<String, dynamic>>> logout() async {
+    return await _apiProvider.post(
+      '$_endpoint/logout',
+      {},
+      requireAuth: true,
+    );
+  }
 }
 
 @riverpod

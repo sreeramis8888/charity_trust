@@ -48,15 +48,12 @@ class DeepLinkService {
   Future<void> handleDeepLink(Uri uri) async {
     try {
       // First ensure token is loaded
-      if (token.isEmpty) {
-        final secureStorage = _ref.read(secureStorageServiceProvider);
-        String? savedToken = await secureStorage.getBearerToken();
-        String? savedId = await secureStorage.getUserId();
-        if (savedToken != null && savedToken.isNotEmpty && savedId != null) {
-          token = savedToken;
-          id = savedId;
-          LoggedIn = true;
-        }
+      final secureStorage = _ref.read(secureStorageServiceProvider);
+      String? savedToken = await secureStorage.getBearerToken();
+      String? savedId = await secureStorage.getUserId();
+      if (savedToken == null || savedToken.isEmpty || savedId == null) {
+        _showError('User not authenticated');
+        return;
       }
 
       final pathSegments = uri.pathSegments;

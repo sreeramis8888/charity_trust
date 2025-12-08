@@ -220,6 +220,85 @@ final class CreateNewCampaignFamily extends $Family
   String toString() => r'createNewCampaignProvider';
 }
 
+@ProviderFor(categoryCampaigns)
+const categoryCampaignsProvider = CategoryCampaignsFamily._();
+
+final class CategoryCampaignsProvider extends $FunctionalProvider<
+        AsyncValue<CampaignPaginationState>,
+        CampaignPaginationState,
+        FutureOr<CampaignPaginationState>>
+    with
+        $FutureModifier<CampaignPaginationState>,
+        $FutureProvider<CampaignPaginationState> {
+  const CategoryCampaignsProvider._(
+      {required CategoryCampaignsFamily super.from,
+      required String super.argument})
+      : super(
+          retry: null,
+          name: r'categoryCampaignsProvider',
+          isAutoDispose: true,
+          dependencies: null,
+          $allTransitiveDependencies: null,
+        );
+
+  @override
+  String debugGetCreateSourceHash() => _$categoryCampaignsHash();
+
+  @override
+  String toString() {
+    return r'categoryCampaignsProvider'
+        ''
+        '($argument)';
+  }
+
+  @$internal
+  @override
+  $FutureProviderElement<CampaignPaginationState> $createElement(
+          $ProviderPointer pointer) =>
+      $FutureProviderElement(pointer);
+
+  @override
+  FutureOr<CampaignPaginationState> create(Ref ref) {
+    final argument = this.argument as String;
+    return categoryCampaigns(
+      ref,
+      argument,
+    );
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other is CategoryCampaignsProvider && other.argument == argument;
+  }
+
+  @override
+  int get hashCode {
+    return argument.hashCode;
+  }
+}
+
+String _$categoryCampaignsHash() => r'6b510b04356b813eb548e174ba2d09f32902e887';
+
+final class CategoryCampaignsFamily extends $Family
+    with $FunctionalFamilyOverride<FutureOr<CampaignPaginationState>, String> {
+  const CategoryCampaignsFamily._()
+      : super(
+          retry: null,
+          name: r'categoryCampaignsProvider',
+          dependencies: null,
+          $allTransitiveDependencies: null,
+          isAutoDispose: true,
+        );
+
+  CategoryCampaignsProvider call(
+    String category,
+  ) =>
+      CategoryCampaignsProvider._(argument: category, from: this);
+
+  @override
+  String toString() => r'categoryCampaignsProvider';
+}
+
 @ProviderFor(MyCampaignsNotifier)
 const myCampaignsProvider = MyCampaignsNotifierProvider._();
 

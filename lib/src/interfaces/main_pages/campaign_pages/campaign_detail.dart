@@ -1,4 +1,5 @@
 import 'dart:developer';
+import 'package:charity_trust/src/interfaces/components/loading_indicator.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:razorpay_flutter/razorpay_flutter.dart';
@@ -14,25 +15,27 @@ import 'package:charity_trust/src/interfaces/components/additional_pages/payment
 import 'package:charity_trust/src/interfaces/components/additional_pages/payment_failed_page.dart';
 
 class CampaignDetailPage extends ConsumerStatefulWidget {
-  final String id;
-  final String title;
-  final String description;
-  final String category;
-  final String date;
+  final String? id;
+  final String? title;
+  final String? description;
+  final String? category;
+  final String? date;
   final String? image;
-  final int raised;
-  final int goal;
+  final int? raised;
+  final int? goal;
+  final bool isDirectCategory;
 
   const CampaignDetailPage({
     Key? key,
-    required this.id,
-    required this.title,
-    required this.description,
-    required this.category,
-    required this.date,
-    required this.raised,
-    required this.goal,
+    this.id,
+    this.title,
+    this.description,
+    this.category,
+    this.date,
     this.image,
+    this.raised,
+    this.goal,
+    this.isDirectCategory = false,
   }) : super(key: key);
 
   @override
@@ -42,6 +45,19 @@ class CampaignDetailPage extends ConsumerStatefulWidget {
 class _CampaignDetailPageState extends ConsumerState<CampaignDetailPage> {
   final TextEditingController _donationController = TextEditingController();
   bool _isProcessing = false;
+  late Future<void> _campaignLoadFuture;
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.isDirectCategory && widget.category != null) {
+      _campaignLoadFuture = _loadCategoryCampaign();
+    }
+  }
+
+  Future<void> _loadCategoryCampaign() async {
+    // This will be handled by the build method with FutureBuilder
+  }
 
   @override
   void dispose() {
@@ -73,7 +89,7 @@ class _CampaignDetailPageState extends ConsumerState<CampaignDetailPage> {
 
       // Step 1: Create donation and get order ID
       final response = await donationApi.createDonation(
-        campaignId: widget.id,
+        campaignId: widget.id ?? '',
         amount: amount,
       );
 
@@ -198,7 +214,44 @@ class _CampaignDetailPageState extends ConsumerState<CampaignDetailPage> {
 
   @override
   Widget build(BuildContext context) {
-    final progress = (widget.raised / widget.goal).clamp(0.0, 1.0);
+    if (widget.isDirectCategory && widget.category != null) {
+      return _buildCategoryDetailPage(context);
+    }
+    return _buildRegularDetailPage(context);
+  }
+
+  Widget _buildCategoryDetailPage(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        backgroundColor: kWhite,
+        scrolledUnderElevation: 0,
+        elevation: 0,
+        leading: GestureDetector(
+          onTap: () => Navigator.pop(context),
+          child: const Icon(
+            Icons.arrow_back_ios,
+            color: kTextColor,
+            size: 20,
+          ),
+        ),
+        title: Text('Campaign Details', style: kBodyTitleM),
+      ),
+      backgroundColor: kBackgroundColor,
+      body: FutureBuilder<void>(
+        future: _campaignLoadFuture,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: LoadingAnimation());
+          }
+          return _buildDetailContent(context);
+        },
+      ),
+    );
+  }
+
+  Widget _buildRegularDetailPage(BuildContext context) {
+    final progress =
+        ((widget.raised ?? 0) / (widget.goal ?? 1)).clamp(0.0, 1.0);
     final percentage = (progress * 100).toInt();
 
     return Scaffold(
@@ -219,184 +272,200 @@ class _CampaignDetailPageState extends ConsumerState<CampaignDetailPage> {
       backgroundColor: kBackgroundColor,
       body: SingleChildScrollView(
         padding: const EdgeInsets.symmetric(horizontal: 16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const SizedBox(height: 16),
-            anim.AnimatedWidgetWrapper(
-              animationType: anim.AnimationType.fadeSlideInFromLeft,
-              duration: anim.AnimationDuration.normal,
-              child: Text(
-                widget.title,
-                style: kHeadTitleSB,
-              ),
+        child: _buildDetailContent(context),
+      ),
+    );
+  }
+
+  Widget _buildDetailContent(BuildContext context) {
+    final progress =
+        ((widget.raised ?? 0) / (widget.goal ?? 1)).clamp(0.0, 1.0);
+    final percentage = (progress * 100).toInt();
+
+    return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+      const SizedBox(height: 16),
+      anim.AnimatedWidgetWrapper(
+        animationType: anim.AnimationType.fadeSlideInFromLeft,
+        duration: anim.AnimationDuration.normal,
+        child: Text(
+          widget.title ?? 'Campaign',
+          style: kHeadTitleSB,
+        ),
+      ),
+      const SizedBox(height: 16),
+      anim.AnimatedWidgetWrapper(
+        animationType: anim.AnimationType.fadeScaleUp,
+        duration: anim.AnimationDuration.normal,
+        delayMilliseconds: 100,
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(16),
+          child: AspectRatio(
+            aspectRatio: 16 / 9,
+            child: Image.network(
+              widget.image ?? 'https://placehold.co/400x225',
+              fit: BoxFit.cover,
             ),
-            const SizedBox(height: 16),
-            anim.AnimatedWidgetWrapper(
-              animationType: anim.AnimationType.fadeScaleUp,
-              duration: anim.AnimationDuration.normal,
-              delayMilliseconds: 100,
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(16),
-                child: AspectRatio(
-                  aspectRatio: 16 / 9,
-                  child: Image.network(
-                    widget.image ?? 'https://placehold.co/400x225',
-                    fit: BoxFit.cover,
-                  ),
+          ),
+        ),
+      ),
+      const SizedBox(height: 16),
+      if (widget.category == 'General Campaign' &&
+          widget.raised != null &&
+          widget.goal != null)
+        anim.AnimatedWidgetWrapper(
+          animationType: anim.AnimationType.fadeSlideInFromBottom,
+          duration: anim.AnimationDuration.normal,
+          delayMilliseconds: 150,
+          child: LinearProgressIndicator(
+            value: progress,
+            backgroundColor: const Color(0xFFCFCFCF),
+            color: const Color(0xFFFFD400),
+            minHeight: 8,
+            borderRadius: BorderRadius.circular(10),
+          ),
+        ),
+      if (widget.category == 'General Campaign' &&
+          widget.raised != null &&
+          widget.goal != null)
+        const SizedBox(height: 12),
+      if (widget.category == 'General Campaign' &&
+          widget.raised != null &&
+          widget.goal != null)
+        anim.AnimatedWidgetWrapper(
+          animationType: anim.AnimationType.fadeSlideInFromBottom,
+          duration: anim.AnimationDuration.normal,
+          delayMilliseconds: 200,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                '₹${widget.raised} raised of ₹${widget.goal} goal',
+                style: kBodyTitleM.copyWith(color: const Color(0xFF009000)),
+              ),
+              Text(
+                '$percentage%',
+                style: kSmallTitleR,
+              ),
+            ],
+          ),
+        ),
+      if (widget.category == 'General Campaign' && widget.date != null)
+        const SizedBox(height: 16),
+      if (widget.category == 'General Campaign' && widget.date != null)
+        anim.AnimatedWidgetWrapper(
+          animationType: anim.AnimationType.fadeSlideInFromRight,
+          duration: anim.AnimationDuration.normal,
+          delayMilliseconds: 250,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                'DUE DATE',
+                style: kSmallerTitleB.copyWith(
+                  color: kSecondaryTextColor,
+                  fontSize: 10,
                 ),
               ),
-            ),
-            const SizedBox(height: 16),
-            anim.AnimatedWidgetWrapper(
-              animationType: anim.AnimationType.fadeSlideInFromBottom,
-              duration: anim.AnimationDuration.normal,
-              delayMilliseconds: 150,
-              child: LinearProgressIndicator(
-                value: progress,
-                backgroundColor: const Color(0xFFCFCFCF),
-                color: const Color(0xFFFFD400),
-                minHeight: 8,
-                borderRadius: BorderRadius.circular(10),
-              ),
-            ),
-            const SizedBox(height: 12),
-            anim.AnimatedWidgetWrapper(
-              animationType: anim.AnimationType.fadeSlideInFromBottom,
-              duration: anim.AnimationDuration.normal,
-              delayMilliseconds: 200,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    '₹${widget.raised} raised of ₹${widget.goal} goal',
-                    style: kBodyTitleM.copyWith(color: const Color(0xFF009000)),
-                  ),
-                  Text(
-                    '$percentage%',
-                    style: kSmallTitleR,
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 16),
-            anim.AnimatedWidgetWrapper(
-              animationType: anim.AnimationType.fadeSlideInFromRight,
-              duration: anim.AnimationDuration.normal,
-              delayMilliseconds: 250,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    'DUE DATE',
-                    style: kSmallerTitleB.copyWith(
-                      color: kSecondaryTextColor,
-                      fontSize: 10,
+              Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF001F4D),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Row(
+                  children: [
+                    const Icon(Icons.calendar_month, color: kWhite, size: 14),
+                    const SizedBox(width: 6),
+                    Text(
+                      (widget.date ?? '').toUpperCase(),
+                      style: kSmallerTitleB.copyWith(color: kWhite),
                     ),
-                  ),
-                  Container(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFF001F4D),
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Row(
-                      children: [
-                        const Icon(Icons.calendar_month,
-                            color: kWhite, size: 14),
-                        const SizedBox(width: 6),
-                        Text(
-                          widget.date.toUpperCase(),
-                          style: kSmallerTitleB.copyWith(color: kWhite),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      const SizedBox(height: 20),
+      if (widget.description != null)
+        anim.AnimatedWidgetWrapper(
+          animationType: anim.AnimationType.fadeSlideInFromLeft,
+          duration: anim.AnimationDuration.normal,
+          delayMilliseconds: 300,
+          child: Text(
+            widget.description ?? '',
+            style: kSmallerTitleR.copyWith(color: kSecondaryTextColor),
+          ),
+        ),
+      const SizedBox(height: 20),
+      anim.AnimatedWidgetWrapper(
+        animationType: anim.AnimationType.fadeSlideInFromLeft,
+        duration: anim.AnimationDuration.normal,
+        delayMilliseconds: 350,
+        child: Text(
+          'Lorem ipsum dolor sit amet consectetur. Vestibulum arcu nec dolor gravida vel diam nulla. Diam nullam tincidunt interdum aliquet porta risus amet. Neque ipsum iaculis suspendisse lacus dictumst. Lectus mauris dapibus velit ultrices amet in at. Sit purus leo turpis ac malesuada in eu platea quam. Sagittis vestibulum placerat et vel vel. Diam id et nisl lectus elementum duis vel. U',
+          style: kSmallerTitleR.copyWith(color: kSecondaryTextColor),
+        ),
+      ),
+      const SizedBox(height: 28),
+      anim.AnimatedWidgetWrapper(
+        animationType: anim.AnimationType.fadeSlideInFromLeft,
+        duration: anim.AnimationDuration.normal,
+        delayMilliseconds: 400,
+        child: Text('Enter Donation Amount', style: kSmallTitleB),
+      ),
+      const SizedBox(height: 12),
+      anim.AnimatedWidgetWrapper(
+        animationType: anim.AnimationType.fadeSlideInFromBottom,
+        duration: anim.AnimationDuration.normal,
+        delayMilliseconds: 450,
+        child: InputField(
+          type: CustomFieldType.number,
+          hint: '₹ Enter amount',
+          controller: _donationController,
+          validator: (value) {
+            if (value == null || value.isEmpty) {
+              return 'Please enter an amount';
+            }
+            final amount = double.tryParse(value);
+            if (amount == null || amount <= 0) {
+              return 'Please enter a valid amount';
+            }
+            return null;
+          },
+        ),
+      ),
+      const SizedBox(height: 24),
+      anim.AnimatedWidgetWrapper(
+        animationType: anim.AnimationType.fadeSlideInFromBottom,
+        duration: anim.AnimationDuration.normal,
+        delayMilliseconds: 500,
+        child: Row(
+          children: [
+            // Expanded(
+            //   child: primaryButton(
+            //     label: "Share",
+            //     onPressed: () {
+            //       _showSnackBar("Share functionality coming soon", type: SnackbarType.info);
+            //     },
+            //     buttonColor: kWhite,
+            //     labelColor: kTextColor,
+            //     sideColor: kTertiary,
+            //   ),
+            // ),
+            // const SizedBox(width: 12),
+            Expanded(
+              child: primaryButton(
+                label: _isProcessing ? "Processing..." : "Donate Now",
+                onPressed: _isProcessing ? null : _handleDonation,
+                buttonColor: kPrimaryColor,
               ),
             ),
-            const SizedBox(height: 20),
-            anim.AnimatedWidgetWrapper(
-              animationType: anim.AnimationType.fadeSlideInFromLeft,
-              duration: anim.AnimationDuration.normal,
-              delayMilliseconds: 300,
-              child: Text(
-                widget.description,
-                style: kSmallerTitleR.copyWith(color: kSecondaryTextColor),
-              ),
-            ),
-            const SizedBox(height: 20),
-            anim.AnimatedWidgetWrapper(
-              animationType: anim.AnimationType.fadeSlideInFromLeft,
-              duration: anim.AnimationDuration.normal,
-              delayMilliseconds: 350,
-              child: Text(
-                'Lorem ipsum dolor sit amet consectetur. Vestibulum arcu nec dolor gravida vel diam nulla. Diam nullam tincidunt interdum aliquet porta risus amet. Neque ipsum iaculis suspendisse lacus dictumst. Lectus mauris dapibus velit ultrices amet in at. Sit purus leo turpis ac malesuada in eu platea quam. Sagittis vestibulum placerat et vel vel. Diam id et nisl lectus elementum duis vel. U',
-                style: kSmallerTitleR.copyWith(color: kSecondaryTextColor),
-              ),
-            ),
-            const SizedBox(height: 28),
-            anim.AnimatedWidgetWrapper(
-              animationType: anim.AnimationType.fadeSlideInFromLeft,
-              duration: anim.AnimationDuration.normal,
-              delayMilliseconds: 400,
-              child: Text('Enter Donation Amount', style: kSmallTitleB),
-            ),
-            const SizedBox(height: 12),
-            anim.AnimatedWidgetWrapper(
-              animationType: anim.AnimationType.fadeSlideInFromBottom,
-              duration: anim.AnimationDuration.normal,
-              delayMilliseconds: 450,
-              child: InputField(
-                type: CustomFieldType.number,
-                hint: '₹ Enter amount',
-                controller: _donationController,
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter an amount';
-                  }
-                  final amount = double.tryParse(value);
-                  if (amount == null || amount <= 0) {
-                    return 'Please enter a valid amount';
-                  }
-                  return null;
-                },
-              ),
-            ),
-            const SizedBox(height: 24),
-            anim.AnimatedWidgetWrapper(
-              animationType: anim.AnimationType.fadeSlideInFromBottom,
-              duration: anim.AnimationDuration.normal,
-              delayMilliseconds: 500,
-              child: Row(
-                children: [
-                  // Expanded(
-                  //   child: primaryButton(
-                  //     label: "Share",
-                  //     onPressed: () {
-                  //       _showSnackBar("Share functionality coming soon", type: SnackbarType.info);
-                  //     },
-                  //     buttonColor: kWhite,
-                  //     labelColor: kTextColor,
-                  //     sideColor: kTertiary,
-                  //   ),
-                  // ),
-                  // const SizedBox(width: 12),
-                  Expanded(
-                    child: primaryButton(
-                      label: _isProcessing ? "Processing..." : "Donate Now",
-                      onPressed: _isProcessing ? null : _handleDonation,
-                      buttonColor: kPrimaryColor,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 24),
           ],
         ),
       ),
-    );
+      const SizedBox(height: 24),
+    ]);
   }
 }
