@@ -1,6 +1,6 @@
 import 'package:charity_trust/src/data/constants/color_constants.dart';
 import 'package:charity_trust/src/interfaces/main_pages/home.dart';
-import 'package:charity_trust/src/interfaces/main_pages/campaign.dart';
+import 'package:charity_trust/src/interfaces/main_pages/campaign_pages/campaign.dart';
 import 'package:charity_trust/src/interfaces/main_pages/news_bookmark/news_list_page.dart';
 import 'package:charity_trust/src/interfaces/main_pages/profile.dart';
 import 'package:flutter/material.dart';

@@ -122,13 +122,13 @@ class _CampaignDetailPageState extends ConsumerState<CampaignDetailPage> {
             if (verifyResponse.success) {
               log("Payment verified successfully - navigating to success page");
               log("Payment verification data ${verifyResponse.data}");
-              
+
               // Extract receipt URL from verification response
               final receiptData = verifyResponse.data as Map<String, dynamic>?;
               final receipt = receiptData?['data']?['receipt'] as String?;
-              
+
               _donationController.clear();
-              
+
               if (mounted) {
                 Navigator.of(context).pushReplacement(
                   MaterialPageRoute(
@@ -143,7 +143,8 @@ class _CampaignDetailPageState extends ConsumerState<CampaignDetailPage> {
               }
             } else {
               log("Payment verification failed: ${verifyResponse.message}");
-              _showSnackBar('Payment verification failed', type: SnackbarType.error);
+              _showSnackBar('Payment verification failed',
+                  type: SnackbarType.error);
               if (mounted) {
                 setState(() => _isProcessing = false);
               }
@@ -158,7 +159,7 @@ class _CampaignDetailPageState extends ConsumerState<CampaignDetailPage> {
         },
         onError: (PaymentFailureResponse response) {
           log("ERROR CALLBACK: Payment error - code=${response.code}, message=${response.message}");
-          
+
           if (mounted) {
             Navigator.of(context).pushReplacement(
               MaterialPageRoute(builder: (_) => const PaymentFailurePage()),
@@ -348,7 +349,7 @@ class _CampaignDetailPageState extends ConsumerState<CampaignDetailPage> {
               duration: anim.AnimationDuration.normal,
               delayMilliseconds: 450,
               child: InputField(
-                type: CustomFieldType.text,
+                type: CustomFieldType.number,
                 hint: '₹ Enter amount',
                 controller: _donationController,
                 validator: (value) {
@@ -370,18 +371,18 @@ class _CampaignDetailPageState extends ConsumerState<CampaignDetailPage> {
               delayMilliseconds: 500,
               child: Row(
                 children: [
-                  Expanded(
-                    child: primaryButton(
-                      label: "Share",
-                      onPressed: () {
-                        _showSnackBar("Share functionality coming soon", type: SnackbarType.info);
-                      },
-                      buttonColor: kWhite,
-                      labelColor: kTextColor,
-                      sideColor: kTertiary,
-                    ),
-                  ),
-                  const SizedBox(width: 12),
+                  // Expanded(
+                  //   child: primaryButton(
+                  //     label: "Share",
+                  //     onPressed: () {
+                  //       _showSnackBar("Share functionality coming soon", type: SnackbarType.info);
+                  //     },
+                  //     buttonColor: kWhite,
+                  //     labelColor: kTextColor,
+                  //     sideColor: kTertiary,
+                  //   ),
+                  // ),
+                  // const SizedBox(width: 12),
                   Expanded(
                     child: primaryButton(
                       label: _isProcessing ? "Processing..." : "Donate Now",

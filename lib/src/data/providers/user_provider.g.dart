@@ -365,3 +365,77 @@ final class FetchCurrentUserStatusProvider extends $FunctionalProvider<
 
 String _$fetchCurrentUserStatusHash() =>
     r'716a193aeb5da5ed93e572d1c9f30dccbcd2a894';
+
+@ProviderFor(createNewUser)
+const createNewUserProvider = CreateNewUserFamily._();
+
+final class CreateNewUserProvider extends $FunctionalProvider<
+        AsyncValue<UserModel?>, UserModel?, FutureOr<UserModel?>>
+    with $FutureModifier<UserModel?>, $FutureProvider<UserModel?> {
+  const CreateNewUserProvider._(
+      {required CreateNewUserFamily super.from,
+      required Map<String, dynamic> super.argument})
+      : super(
+          retry: null,
+          name: r'createNewUserProvider',
+          isAutoDispose: true,
+          dependencies: null,
+          $allTransitiveDependencies: null,
+        );
+
+  @override
+  String debugGetCreateSourceHash() => _$createNewUserHash();
+
+  @override
+  String toString() {
+    return r'createNewUserProvider'
+        ''
+        '($argument)';
+  }
+
+  @$internal
+  @override
+  $FutureProviderElement<UserModel?> $createElement($ProviderPointer pointer) =>
+      $FutureProviderElement(pointer);
+
+  @override
+  FutureOr<UserModel?> create(Ref ref) {
+    final argument = this.argument as Map<String, dynamic>;
+    return createNewUser(
+      ref,
+      argument,
+    );
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other is CreateNewUserProvider && other.argument == argument;
+  }
+
+  @override
+  int get hashCode {
+    return argument.hashCode;
+  }
+}
+
+String _$createNewUserHash() => r'dfe04814d1417d719a7632621b85b25c7409d663';
+
+final class CreateNewUserFamily extends $Family
+    with $FunctionalFamilyOverride<FutureOr<UserModel?>, Map<String, dynamic>> {
+  const CreateNewUserFamily._()
+      : super(
+          retry: null,
+          name: r'createNewUserProvider',
+          dependencies: null,
+          $allTransitiveDependencies: null,
+          isAutoDispose: true,
+        );
+
+  CreateNewUserProvider call(
+    Map<String, dynamic> userData,
+  ) =>
+      CreateNewUserProvider._(argument: userData, from: this);
+
+  @override
+  String toString() => r'createNewUserProvider';
+}

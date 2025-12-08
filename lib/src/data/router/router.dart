@@ -1,5 +1,5 @@
-import 'package:charity_trust/src/interfaces/main_pages/campaign.dart';
-import 'package:charity_trust/src/interfaces/main_pages/campaign_detail.dart';
+import 'package:charity_trust/src/interfaces/main_pages/campaign_pages/campaign.dart';
+import 'package:charity_trust/src/interfaces/main_pages/campaign_pages/campaign_detail.dart';
 import 'package:charity_trust/src/interfaces/main_pages/home.dart';
 import 'package:charity_trust/src/interfaces/main_pages/news_bookmark/news_list_page.dart';
 import 'package:charity_trust/src/interfaces/main_pages/profile.dart';
@@ -8,6 +8,7 @@ import 'package:charity_trust/src/interfaces/main_pages/profile_pages/my_partici
 import 'package:charity_trust/src/interfaces/main_pages/navbar.dart';
 import 'package:charity_trust/src/interfaces/onboarding/login.dart';
 import 'package:charity_trust/src/interfaces/onboarding/registration.dart';
+import 'package:charity_trust/src/interfaces/onboarding/create_user.dart';
 import 'package:charity_trust/src/interfaces/onboarding/charity_member_otp_verification.dart';
 import 'package:charity_trust/src/interfaces/onboarding/request_rejected_state.dart';
 import 'package:charity_trust/src/interfaces/onboarding/request_sent_state.dart';
@@ -118,6 +119,11 @@ Route<dynamic> generateRoute(RouteSettings? settings) {
       page = RegistrationPage();
       transitionToUse = TransitionType.fade;
       transitionDuration = const Duration(milliseconds: 500);
+      break;
+    case 'CreateUser':
+      page = CreateUserPage();
+      transitionToUse = TransitionType.slideFromBottom;
+      transitionDuration = const Duration(milliseconds: 300);
       break;
     case 'charityMemberOtpVerification':
       if (settings?.arguments is Map) {

@@ -143,6 +143,83 @@ abstract class _$ParticipatedCampaignsNotifier
   }
 }
 
+@ProviderFor(createNewCampaign)
+const createNewCampaignProvider = CreateNewCampaignFamily._();
+
+final class CreateNewCampaignProvider extends $FunctionalProvider<
+        AsyncValue<CampaignModel?>, CampaignModel?, FutureOr<CampaignModel?>>
+    with $FutureModifier<CampaignModel?>, $FutureProvider<CampaignModel?> {
+  const CreateNewCampaignProvider._(
+      {required CreateNewCampaignFamily super.from,
+      required Map<String, dynamic> super.argument})
+      : super(
+          retry: null,
+          name: r'createNewCampaignProvider',
+          isAutoDispose: true,
+          dependencies: null,
+          $allTransitiveDependencies: null,
+        );
+
+  @override
+  String debugGetCreateSourceHash() => _$createNewCampaignHash();
+
+  @override
+  String toString() {
+    return r'createNewCampaignProvider'
+        ''
+        '($argument)';
+  }
+
+  @$internal
+  @override
+  $FutureProviderElement<CampaignModel?> $createElement(
+          $ProviderPointer pointer) =>
+      $FutureProviderElement(pointer);
+
+  @override
+  FutureOr<CampaignModel?> create(Ref ref) {
+    final argument = this.argument as Map<String, dynamic>;
+    return createNewCampaign(
+      ref,
+      argument,
+    );
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other is CreateNewCampaignProvider && other.argument == argument;
+  }
+
+  @override
+  int get hashCode {
+    return argument.hashCode;
+  }
+}
+
+String _$createNewCampaignHash() => r'466df620eddedc8835ffbe0d2b64baf6e3ab7043';
+
+final class CreateNewCampaignFamily extends $Family
+    with
+        $FunctionalFamilyOverride<FutureOr<CampaignModel?>,
+            Map<String, dynamic>> {
+  const CreateNewCampaignFamily._()
+      : super(
+          retry: null,
+          name: r'createNewCampaignProvider',
+          dependencies: null,
+          $allTransitiveDependencies: null,
+          isAutoDispose: true,
+        );
+
+  CreateNewCampaignProvider call(
+    Map<String, dynamic> campaignData,
+  ) =>
+      CreateNewCampaignProvider._(argument: campaignData, from: this);
+
+  @override
+  String toString() => r'createNewCampaignProvider';
+}
+
 @ProviderFor(MyCampaignsNotifier)
 const myCampaignsProvider = MyCampaignsNotifierProvider._();
 

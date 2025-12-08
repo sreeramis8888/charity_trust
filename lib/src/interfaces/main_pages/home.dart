@@ -7,6 +7,7 @@ import 'package:charity_trust/src/data/services/secure_storage_service.dart';
 import 'package:charity_trust/src/interfaces/components/cards/video_card.dart';
 import 'package:charity_trust/src/interfaces/components/loading_indicator.dart';
 import 'package:charity_trust/src/interfaces/animations/index.dart';
+import 'package:charity_trust/src/interfaces/onboarding/create_user.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
@@ -67,6 +68,45 @@ class _HomePageState extends ConsumerState<HomePage> {
           ),
         ),
       ),
+      floatingActionButton: _buildFloatingActionButton(context, ref),
+    );
+  }
+
+  Widget? _buildFloatingActionButton(BuildContext context, WidgetRef ref) {
+    return FutureBuilder<String?>(
+      future: ref.read(secureStorageServiceProvider).getUserData().then(
+            (userData) => userData?.role,
+          ),
+      builder: (context, snapshot) {
+        final userRole = snapshot.data ?? '';
+
+        if (userRole != 'trustee') {
+          return SizedBox.shrink();
+        }
+
+        return Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [Color(0xFFED3C5F), Color(0xFFED3C5F)],
+              begin: Alignment.bottomRight,
+              end: Alignment.topLeft,
+            ),
+            shape: BoxShape.circle,
+          ),
+          child: FloatingActionButton(
+            onPressed: () {
+              Navigator.of(context).pushNamed('CreateUser');
+            },
+            backgroundColor: Colors.transparent,
+            elevation: 0,
+            child: const Icon(
+              Icons.add,
+              size: 40,
+              color: kWhite,
+            ),
+          ),
+        );
+      },
     );
   }
 
@@ -150,8 +190,8 @@ class _HomePageState extends ConsumerState<HomePage> {
                           end: AlignmentGeometry.centerRight),
                       borderRadius: BorderRadius.circular(16),
                     ),
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 16, vertical: 25),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 16, vertical: 25),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -213,12 +253,23 @@ class _HomePageState extends ConsumerState<HomePage> {
                               arguments: {
                                 '_id': homeData.endingCampaign!.id ?? '',
                                 'title': homeData.endingCampaign!.title ?? '',
-                                'description': homeData.endingCampaign!.description ?? '',
-                                'category': homeData.endingCampaign!.category ?? '',
-                                'date': homeData.endingCampaign!.targetDate?.toString().split(' ')[0] ?? '',
-                                'image': homeData.endingCampaign!.coverImage ?? '',
-                                'raised': homeData.endingCampaign!.collectedAmount?.toInt() ?? 0,
-                                'goal': homeData.endingCampaign!.targetAmount?.toInt() ?? 0,
+                                'description':
+                                    homeData.endingCampaign!.description ?? '',
+                                'category':
+                                    homeData.endingCampaign!.category ?? '',
+                                'date': homeData.endingCampaign!.targetDate
+                                        ?.toString()
+                                        .split(' ')[0] ??
+                                    '',
+                                'image':
+                                    homeData.endingCampaign!.coverImage ?? '',
+                                'raised': homeData
+                                        .endingCampaign!.collectedAmount
+                                        ?.toInt() ??
+                                    0,
+                                'goal': homeData.endingCampaign!.targetAmount
+                                        ?.toInt() ??
+                                    0,
                               },
                             );
                           },

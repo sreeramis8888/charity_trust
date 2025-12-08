@@ -69,6 +69,16 @@ class CampaignsApi {
       requireAuth: true,
     );
   }
+
+  Future<ApiResponse<Map<String, dynamic>>> createCampaign(
+    Map<String, dynamic> campaignData,
+  ) async {
+    return await _apiProvider.post(
+      _endpoint,
+      campaignData,
+      requireAuth: true,
+    );
+  }
 }
 
 @riverpod
@@ -286,6 +296,27 @@ class ParticipatedCampaignsNotifier extends _$ParticipatedCampaignsNotifier {
   Future<void> refresh() async {
     state = const AsyncValue.loading();
     state = await AsyncValue.guard(() => build());
+  }
+}
+
+@riverpod
+Future<CampaignModel?> createNewCampaign(
+  Ref ref,
+  Map<String, dynamic> campaignData,
+) async {
+  try {
+    final campaignsApi = ref.watch(campaignsApiProvider);
+    final response = await campaignsApi.createCampaign(campaignData);
+
+    if (response.success && response.data != null) {
+      final data = response.data!['data'] as Map<String, dynamic>?;
+      if (data != null) {
+        return CampaignModel.fromJson(data);
+      }
+    }
+    return null;
+  } catch (e) {
+    throw Exception('Error creating campaign: $e');
   }
 }
 

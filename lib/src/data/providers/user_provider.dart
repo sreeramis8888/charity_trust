@@ -222,3 +222,37 @@ Future<UserModel?> fetchCurrentUserStatus(Ref ref) async {
     return null;
   }
 }
+
+
+@riverpod
+Future<UserModel?> createNewUser(
+  Ref ref,
+  Map<String, dynamic> userData,
+) async {
+  try {
+    final cleanedData = Map<String, dynamic>.from(userData)
+      ..removeWhere((key, value) => value == "" || value == null);
+
+    log("Creating new user with data: $cleanedData");
+
+    final apiProvider = ref.watch(apiProviderProvider);
+    final response = await apiProvider.post(
+      '/user/create',
+      cleanedData,
+      requireAuth: true,
+    );
+    
+    if (response.success && response.data != null) {
+      final data = response.data!['data'] as Map<String, dynamic>?;
+      if (data != null) {
+        final user = UserModel.fromJson(data);
+        return user;
+      }
+    }
+
+    return null;
+  } catch (e) {
+    log('Error creating new user: $e', name: 'createNewUser');
+    return null;
+  }
+}

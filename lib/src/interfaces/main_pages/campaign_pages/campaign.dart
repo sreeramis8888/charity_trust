@@ -11,6 +11,8 @@ import 'package:charity_trust/src/data/providers/campaigns_provider.dart'
         generalCampaignsProvider,
         myCampaignsProvider,
         participatedCampaignsProvider;
+import 'package:charity_trust/src/data/services/secure_storage_service.dart';
+import 'package:charity_trust/src/interfaces/main_pages/campaign_pages/add_campaign.dart';
 
 class CampaignPage extends ConsumerStatefulWidget {
   const CampaignPage({super.key});
@@ -31,12 +33,51 @@ class _CampaignPageState extends ConsumerState<CampaignPage>
 
   @override
   Widget build(BuildContext context) {
+    final secureStorageAsync = ref.watch(secureStorageServiceProvider);
+
     return Scaffold(
       backgroundColor: kBackgroundColor,
       appBar: AppBar(
         backgroundColor: kWhite,
         elevation: 0,
         title: Text("Campaign", style: kHeadTitleSB),
+        actions: [
+          Padding(
+            padding: const EdgeInsets.only(right: 16),
+            child: Center(
+              child: FutureBuilder<String?>(
+                future: secureStorageAsync.getUserData().then((user) => user?.role),
+                builder: (context, snapshot) {
+                  final isPresident = snapshot.data == 'president';
+                  if (!isPresident) {
+                    return const SizedBox.shrink();
+                  }
+                  return GestureDetector(
+                    onTap: () {
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (context) => const AddCampaignPage(),
+                        ),
+                      );
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: kPrimaryColor.withOpacity(0.1),
+                      ),
+                      child: const Icon(
+                        Icons.add,
+                        color: kPrimaryColor,
+                        size: 24,
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ),
+          ),
+        ],
         bottom: PreferredSize(
           preferredSize: Size.fromHeight(48),
           child: Container(
