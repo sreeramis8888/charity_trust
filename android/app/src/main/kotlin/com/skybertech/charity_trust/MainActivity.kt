@@ -1,4 +1,4 @@
-package com.skybertech.charity_trust
+package com.annujoomconnect
 
 import io.flutter.embedding.android.FlutterActivity
 
