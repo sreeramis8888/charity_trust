@@ -1,6 +1,6 @@
-import 'package:charity_trust/src/interfaces/components/loading_indicator.dart';
+import 'package:Annujoom/src/interfaces/components/loading_indicator.dart';
 import 'package:flutter/material.dart';
-import 'package:charity_trust/src/data/constants/color_constants.dart';
+import 'package:Annujoom/src/data/constants/color_constants.dart';
 
 Widget primaryButton({
   required String label,
@@ -35,7 +35,9 @@ Widget primaryButton({
                 ? const SizedBox(
                     height: 20,
                     width: 20,
-                    child: LoadingAnimation(loadingColor: kWhite,),
+                    child: LoadingAnimation(
+                      loadingColor: kWhite,
+                    ),
                   )
                 : Row(
                     mainAxisSize: MainAxisSize.min,

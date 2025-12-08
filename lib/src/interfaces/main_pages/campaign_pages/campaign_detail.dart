@@ -1,18 +1,18 @@
 import 'dart:developer';
-import 'package:charity_trust/src/interfaces/components/loading_indicator.dart';
+import 'package:Annujoom/src/interfaces/components/loading_indicator.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:razorpay_flutter/razorpay_flutter.dart';
-import 'package:charity_trust/src/data/constants/color_constants.dart';
-import 'package:charity_trust/src/data/constants/style_constants.dart';
-import 'package:charity_trust/src/interfaces/components/primaryButton.dart';
-import 'package:charity_trust/src/interfaces/components/input_field.dart';
-import 'package:charity_trust/src/interfaces/animations/index.dart' as anim;
-import 'package:charity_trust/src/data/providers/donation_provider.dart';
-import 'package:charity_trust/src/data/providers/razorpay_provider.dart';
-import 'package:charity_trust/src/data/services/snackbar_service.dart';
-import 'package:charity_trust/src/interfaces/components/additional_pages/payment_success_page.dart';
-import 'package:charity_trust/src/interfaces/components/additional_pages/payment_failed_page.dart';
+import 'package:Annujoom/src/data/constants/color_constants.dart';
+import 'package:Annujoom/src/data/constants/style_constants.dart';
+import 'package:Annujoom/src/interfaces/components/primaryButton.dart';
+import 'package:Annujoom/src/interfaces/components/input_field.dart';
+import 'package:Annujoom/src/interfaces/animations/index.dart' as anim;
+import 'package:Annujoom/src/data/providers/donation_provider.dart';
+import 'package:Annujoom/src/data/providers/razorpay_provider.dart';
+import 'package:Annujoom/src/data/services/snackbar_service.dart';
+import 'package:Annujoom/src/interfaces/components/additional_pages/payment_success_page.dart';
+import 'package:Annujoom/src/interfaces/components/additional_pages/payment_failed_page.dart';
 
 class CampaignDetailPage extends ConsumerStatefulWidget {
   final String? id;

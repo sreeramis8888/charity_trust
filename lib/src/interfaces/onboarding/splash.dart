@@ -1,6 +1,6 @@
 import 'dart:async';
 import 'dart:developer';
-import 'package:charity_trust/src/data/models/user_model.dart';
+import 'package:Annujoom/src/data/models/user_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:url_launcher/url_launcher.dart';

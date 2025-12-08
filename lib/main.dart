@@ -1,17 +1,17 @@
 import 'dart:ui';
 
-import 'package:charity_trust/firebase_options.dart';
-import 'package:charity_trust/src/data/services/crashlytics_service.dart';
+import 'package:Annujoom/firebase_options.dart';
+import 'package:Annujoom/src/data/services/crashlytics_service.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:charity_trust/src/data/services/navigation_service.dart';
-import 'package:charity_trust/src/data/services/notification_service/notification_service.dart';
-import 'package:charity_trust/src/data/utils/install_checker.dart';
-import 'package:charity_trust/src/data/services/snackbar_service.dart';
-import 'package:charity_trust/src/data/router/router.dart' as router;
+import 'package:Annujoom/src/data/services/navigation_service.dart';
+import 'package:Annujoom/src/data/services/notification_service/notification_service.dart';
+import 'package:Annujoom/src/data/utils/install_checker.dart';
+import 'package:Annujoom/src/data/services/snackbar_service.dart';
+import 'package:Annujoom/src/data/router/router.dart' as router;
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();

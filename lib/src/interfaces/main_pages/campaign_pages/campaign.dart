@@ -1,18 +1,16 @@
-import 'package:charity_trust/src/data/utils/date_formatter.dart';
-import 'package:charity_trust/src/interfaces/components/cards/campaing_card.dart';
-import 'package:charity_trust/src/interfaces/components/cards/transaction_card.dart';
-import 'package:charity_trust/src/interfaces/components/loading_indicator.dart';
+import 'package:Annujoom/src/data/utils/date_formatter.dart';
+import 'package:Annujoom/src/interfaces/components/cards/campaing_card.dart';
+import 'package:Annujoom/src/interfaces/components/cards/transaction_card.dart';
+import 'package:Annujoom/src/interfaces/components/loading_indicator.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:charity_trust/src/data/constants/color_constants.dart';
-import 'package:charity_trust/src/data/constants/style_constants.dart';
-import 'package:charity_trust/src/interfaces/animations/index.dart' as anim;
-import 'package:charity_trust/src/data/providers/campaigns_provider.dart'
-    show
-        generalCampaignsProvider,
-        participatedCampaignsProvider;
-import 'package:charity_trust/src/data/services/secure_storage_service.dart';
-import 'package:charity_trust/src/interfaces/main_pages/campaign_pages/add_campaign.dart';
+import 'package:Annujoom/src/data/constants/color_constants.dart';
+import 'package:Annujoom/src/data/constants/style_constants.dart';
+import 'package:Annujoom/src/interfaces/animations/index.dart' as anim;
+import 'package:Annujoom/src/data/providers/campaigns_provider.dart'
+    show generalCampaignsProvider, participatedCampaignsProvider;
+import 'package:Annujoom/src/data/services/secure_storage_service.dart';
+import 'package:Annujoom/src/interfaces/main_pages/campaign_pages/add_campaign.dart';
 
 class CampaignPage extends ConsumerStatefulWidget {
   const CampaignPage({super.key});
@@ -262,7 +260,7 @@ class _CampaignPageState extends ConsumerState<CampaignPage>
                   // paymentMethod: donation.paymentMethod ?? '',
                   status: donation.status ?? '',
                   date: formatDate(donation.createdAt) ?? '',
-                  receipt: donation.receipt??'',
+                  receipt: donation.receipt ?? '',
                 ),
               ),
             );

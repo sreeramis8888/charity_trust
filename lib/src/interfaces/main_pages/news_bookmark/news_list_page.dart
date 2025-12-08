@@ -1,13 +1,13 @@
-import 'package:charity_trust/src/data/providers/news_provider.dart';
-import 'package:charity_trust/src/interfaces/components/cards/news_card.dart';
-import 'package:charity_trust/src/interfaces/components/loading_indicator.dart';
-import 'package:charity_trust/src/interfaces/animations/index.dart' as anim;
+import 'package:Annujoom/src/data/providers/news_provider.dart';
+import 'package:Annujoom/src/interfaces/components/cards/news_card.dart';
+import 'package:Annujoom/src/interfaces/components/loading_indicator.dart';
+import 'package:Annujoom/src/interfaces/animations/index.dart' as anim;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import 'package:charity_trust/src/data/constants/color_constants.dart';
-import 'package:charity_trust/src/data/constants/style_constants.dart';
-import 'package:charity_trust/src/data/utils/get_time_ago.dart';
+import 'package:Annujoom/src/data/constants/color_constants.dart';
+import 'package:Annujoom/src/data/constants/style_constants.dart';
+import 'package:Annujoom/src/data/utils/get_time_ago.dart';
 import '../../../data/models/news_model.dart';
 import 'news_page.dart';
 import 'bookmark_page.dart';

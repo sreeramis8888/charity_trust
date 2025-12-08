@@ -1,7 +1,7 @@
-import 'package:charity_trust/src/data/constants/color_constants.dart';
-import 'package:charity_trust/src/data/constants/style_constants.dart';
-import 'package:charity_trust/src/interfaces/animations/index.dart';
-import 'package:charity_trust/src/interfaces/main_pages/campaign_pages/category_campaign_detail.dart';
+import 'package:Annujoom/src/data/constants/color_constants.dart';
+import 'package:Annujoom/src/data/constants/style_constants.dart';
+import 'package:Annujoom/src/interfaces/animations/index.dart';
+import 'package:Annujoom/src/interfaces/main_pages/campaign_pages/category_campaign_detail.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 
@@ -64,19 +64,20 @@ class DonationCategoriesPage extends StatelessWidget {
     return Scaffold(
       backgroundColor: Color(0xFFF2F2F2),
       appBar: AppBar(
+        scrolledUnderElevation: 0,
         backgroundColor: Colors.white,
         elevation: 0,
         leading: IconButton(
-          icon: SvgPicture.asset(
-            'assets/svg/back_arrow.svg',
-            height: 24,
-            width: 24,
+          icon: const Icon(
+            Icons.arrow_back_ios,
+            color: kTextColor,
+            size: 20,
           ),
           onPressed: () => Navigator.of(context).pop(),
         ),
         title: Text(
-          'Donate Amount',
-          style: kHeadTitleSB.copyWith(fontSize: 18),
+          'Donations',
+          style: kBodyTitleM,
         ),
         centerTitle: false,
       ),
@@ -91,12 +92,12 @@ class DonationCategoriesPage extends StatelessWidget {
                 children: [
                   Text(
                     'Donate & Support Our Community',
-                    style: kHeadTitleSB.copyWith(fontSize: 18),
+                    style: kSubHeadingM.copyWith(fontSize: 18),
                   ),
                   const SizedBox(height: 4),
                   Text(
                     'Your contribution can change someone\'s life today.',
-                    style: kSmallTitleL.copyWith(color: kThirdTextColor),
+                    style: kSmallTitleL,
                   ),
                 ],
               ),
@@ -141,27 +142,25 @@ class DonationCategoriesPage extends StatelessWidget {
                             Container(
                               height: 100,
                               decoration: BoxDecoration(
-                                borderRadius: BorderRadius.only(
-                                  topLeft: Radius.circular(16),
-                                  topRight: Radius.circular(16),
-                                ),
-                              ),
-                              child: ClipRRect(
-                                borderRadius: BorderRadius.only(
-                                  topLeft: Radius.circular(16),
-                                  topRight: Radius.circular(16),
-                                ),
-                                child: Image.asset(
-                                  category['image']!,
-                                  fit: BoxFit.cover,
-                                  cacheWidth: 200,
-                                  cacheHeight: 200,
-                                  errorBuilder: (context, error, stackTrace) {
-                                    return Container(
-                                      color: Colors.grey[300],
-                                      child: const Icon(Icons.image_not_supported),
-                                    );
-                                  },
+                                  borderRadius: BorderRadius.circular(16)),
+                              child: Padding(
+                                padding:
+                                    const EdgeInsets.only(top: 8.0, left: 8),
+                                child: ClipRRect(
+                                  borderRadius: BorderRadius.circular(16),
+                                  child: Image.asset(
+                                    category['image'] ?? '',
+                                    fit: BoxFit.cover,
+                                    cacheWidth: 200,
+                                    cacheHeight: 200,
+                                    errorBuilder: (context, error, stackTrace) {
+                                      return Container(
+                                        color: Colors.grey[300],
+                                        child: const Icon(
+                                            Icons.image_not_supported),
+                                      );
+                                    },
+                                  ),
                                 ),
                               ),
                             ),
@@ -171,18 +170,15 @@ class DonationCategoriesPage extends StatelessWidget {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
-                                    category['title']!,
-                                    style: kSmallTitleSB.copyWith(fontSize: 13),
+                                    category['title'] ?? '',
+                                    style: kBodyTitleM.copyWith(fontSize: 13),
                                     maxLines: 1,
                                     overflow: TextOverflow.ellipsis,
                                   ),
                                   const SizedBox(height: 4),
                                   Text(
-                                    category['subtitle']!,
-                                    style: kSmallTitleR.copyWith(
-                                      fontSize: 11,
-                                      color: kThirdTextColor,
-                                    ),
+                                    category['subtitle'] ?? '',
+                                    style: kSmallerTitleL,
                                     maxLines: 2,
                                     overflow: TextOverflow.ellipsis,
                                   ),

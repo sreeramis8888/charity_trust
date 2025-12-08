@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:charity_trust/src/data/feature_tours/feature_tour_model.dart';
+import 'package:Annujoom/src/data/feature_tours/feature_tour_model.dart';
 
 class NewsSwipeTour {
   static const String tourId = 'news_swipe_tour';

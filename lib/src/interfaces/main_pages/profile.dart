@@ -1,11 +1,11 @@
-import 'package:charity_trust/src/data/constants/color_constants.dart';
-import 'package:charity_trust/src/data/constants/style_constants.dart';
-import 'package:charity_trust/src/interfaces/animations/index.dart' as anim;
-import 'package:charity_trust/src/interfaces/main_pages/profile_pages/my_participations.dart';
-import 'package:charity_trust/src/interfaces/components/confirmation_dialog.dart';
-import 'package:charity_trust/src/data/services/secure_storage_service.dart';
-import 'package:charity_trust/src/data/providers/auth_login_provider.dart';
-import 'package:charity_trust/src/data/providers/auth_provider.dart';
+import 'package:Annujoom/src/data/constants/color_constants.dart';
+import 'package:Annujoom/src/data/constants/style_constants.dart';
+import 'package:Annujoom/src/interfaces/animations/index.dart' as anim;
+import 'package:Annujoom/src/interfaces/main_pages/profile_pages/my_participations.dart';
+import 'package:Annujoom/src/interfaces/components/confirmation_dialog.dart';
+import 'package:Annujoom/src/data/services/secure_storage_service.dart';
+import 'package:Annujoom/src/data/providers/auth_login_provider.dart';
+import 'package:Annujoom/src/data/providers/auth_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 

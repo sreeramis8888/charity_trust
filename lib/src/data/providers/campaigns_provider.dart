@@ -1,8 +1,8 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-import 'package:charity_trust/src/data/providers/api_provider.dart';
-import 'package:charity_trust/src/data/models/campaign_model.dart';
-import 'package:charity_trust/src/data/models/donation_model.dart';
+import 'package:Annujoom/src/data/providers/api_provider.dart';
+import 'package:Annujoom/src/data/models/campaign_model.dart';
+import 'package:Annujoom/src/data/models/donation_model.dart';
 
 part 'campaigns_provider.g.dart';
 
@@ -14,16 +14,11 @@ class CampaignsApi {
 
   CampaignsApi({required ApiProvider apiProvider}) : _apiProvider = apiProvider;
 
-
   Future<ApiResponse<Map<String, dynamic>>> getAllCampaigns({
     int pageNo = 1,
     int limit = 10,
   }) async {
-    final queryParams = {
-      'page_no': pageNo,
-      'limit': limit,
-      'status':'active'
-    };
+    final queryParams = {'page_no': pageNo, 'limit': limit, 'status': 'active'};
 
     final queryString =
         queryParams.entries.map((e) => '${e.key}=${e.value}').join('&');
@@ -130,12 +125,11 @@ class GeneralCampaignsNotifier extends _$GeneralCampaignsNotifier {
     );
 
     if (response.success && response.data != null) {
-      final campaignsList =
-          (response.data!['data'] as List<dynamic>?)
-                  ?.map((item) =>
-                      CampaignModel.fromJson(item as Map<String, dynamic>))
-                  .toList() ??
-              [];
+      final campaignsList = (response.data!['data'] as List<dynamic>?)
+              ?.map((item) =>
+                  CampaignModel.fromJson(item as Map<String, dynamic>))
+              .toList() ??
+          [];
       final totalCountValue = response.data!['total_count'];
       final totalCount = totalCountValue is int
           ? totalCountValue
@@ -168,12 +162,11 @@ class GeneralCampaignsNotifier extends _$GeneralCampaignsNotifier {
       );
 
       if (response.success && response.data != null) {
-        final campaignsList =
-            (response.data!['data'] as List<dynamic>?)
-                    ?.map((item) =>
-                        CampaignModel.fromJson(item as Map<String, dynamic>))
-                    .toList() ??
-                [];
+        final campaignsList = (response.data!['data'] as List<dynamic>?)
+                ?.map((item) =>
+                    CampaignModel.fromJson(item as Map<String, dynamic>))
+                .toList() ??
+            [];
         final totalCountValue = response.data!['total_count'];
         final totalCount = totalCountValue is int
             ? totalCountValue
@@ -236,12 +229,11 @@ class ParticipatedCampaignsNotifier extends _$ParticipatedCampaignsNotifier {
     );
 
     if (response.success && response.data != null) {
-      final donationsList =
-          (response.data!['data'] as List<dynamic>?)
-                  ?.map((item) =>
-                      DonationModel.fromJson(item as Map<String, dynamic>))
-                  .toList() ??
-              [];
+      final donationsList = (response.data!['data'] as List<dynamic>?)
+              ?.map((item) =>
+                  DonationModel.fromJson(item as Map<String, dynamic>))
+              .toList() ??
+          [];
       final totalCountValue = response.data!['total_count'];
       final totalCount = totalCountValue is int
           ? totalCountValue
@@ -254,7 +246,8 @@ class ParticipatedCampaignsNotifier extends _$ParticipatedCampaignsNotifier {
         donations: donationsList,
       );
     } else {
-      throw Exception(response.message ?? 'Failed to fetch participated campaigns');
+      throw Exception(
+          response.message ?? 'Failed to fetch participated campaigns');
     }
   }
 
@@ -274,12 +267,11 @@ class ParticipatedCampaignsNotifier extends _$ParticipatedCampaignsNotifier {
       );
 
       if (response.success && response.data != null) {
-        final donationsList =
-            (response.data!['data'] as List<dynamic>?)
-                    ?.map((item) =>
-                        DonationModel.fromJson(item as Map<String, dynamic>))
-                    .toList() ??
-                [];
+        final donationsList = (response.data!['data'] as List<dynamic>?)
+                ?.map((item) =>
+                    DonationModel.fromJson(item as Map<String, dynamic>))
+                .toList() ??
+            [];
         final totalCountValue = response.data!['total_count'];
         final totalCount = totalCountValue is int
             ? totalCountValue
@@ -336,12 +328,11 @@ Future<CampaignPaginationState> categoryCampaigns(
   );
 
   if (response.success && response.data != null) {
-    final campaignsList =
-        (response.data!['data'] as List<dynamic>?)
-                ?.map((item) =>
-                    CampaignModel.fromJson(item as Map<String, dynamic>))
-                .toList() ??
-            [];
+    final campaignsList = (response.data!['data'] as List<dynamic>?)
+            ?.map(
+                (item) => CampaignModel.fromJson(item as Map<String, dynamic>))
+            .toList() ??
+        [];
     final totalCountValue = response.data!['total_count'];
     final totalCount = totalCountValue is int
         ? totalCountValue
@@ -357,4 +348,3 @@ Future<CampaignPaginationState> categoryCampaigns(
     throw Exception(response.message ?? 'Failed to fetch campaigns');
   }
 }
-

@@ -1,14 +1,14 @@
 import 'package:carousel_slider/carousel_slider.dart';
-import 'package:charity_trust/src/data/constants/color_constants.dart';
-import 'package:charity_trust/src/data/constants/style_constants.dart';
-import 'package:charity_trust/src/interfaces/components/cards/index.dart';
-import 'package:charity_trust/src/data/providers/home_provider.dart';
-import 'package:charity_trust/src/data/services/secure_storage_service.dart';
-import 'package:charity_trust/src/interfaces/components/cards/video_card.dart';
-import 'package:charity_trust/src/interfaces/components/loading_indicator.dart';
-import 'package:charity_trust/src/interfaces/animations/index.dart';
-import 'package:charity_trust/src/interfaces/onboarding/create_user.dart';
-import 'package:charity_trust/src/interfaces/main_pages/campaign_pages/category_campaign_detail.dart';
+import 'package:Annujoom/src/data/constants/color_constants.dart';
+import 'package:Annujoom/src/data/constants/style_constants.dart';
+import 'package:Annujoom/src/interfaces/components/cards/index.dart';
+import 'package:Annujoom/src/data/providers/home_provider.dart';
+import 'package:Annujoom/src/data/services/secure_storage_service.dart';
+import 'package:Annujoom/src/interfaces/components/cards/video_card.dart';
+import 'package:Annujoom/src/interfaces/components/loading_indicator.dart';
+import 'package:Annujoom/src/interfaces/animations/index.dart';
+import 'package:Annujoom/src/interfaces/onboarding/create_user.dart';
+import 'package:Annujoom/src/interfaces/main_pages/campaign_pages/category_campaign_detail.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
@@ -161,6 +161,7 @@ class _HomePageState extends ConsumerState<HomePage> {
                 shape: BoxShape.circle,
               ),
               child: FloatingActionButton(
+                heroTag: 'donateButton',
                 onPressed: () {
                   Navigator.of(context).pushNamed('DonationCategories');
                 },

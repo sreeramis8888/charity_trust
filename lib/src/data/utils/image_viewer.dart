@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:charity_trust/src/data/constants/color_constants.dart';
-import 'package:charity_trust/src/data/utils/download_image.dart';
+import 'package:Annujoom/src/data/constants/color_constants.dart';
+import 'package:Annujoom/src/data/utils/download_image.dart';
 
 void showImageViewer(String file, BuildContext context) {
   showDialog(

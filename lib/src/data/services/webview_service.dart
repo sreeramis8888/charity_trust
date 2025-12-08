@@ -1,6 +1,6 @@
-import 'package:charity_trust/src/interfaces/components/loading_indicator.dart';
+import 'package:Annujoom/src/interfaces/components/loading_indicator.dart';
 import 'package:flutter/material.dart';
-import 'package:charity_trust/src/data/constants/color_constants.dart';
+import 'package:Annujoom/src/data/constants/color_constants.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
 

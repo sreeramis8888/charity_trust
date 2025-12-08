@@ -89,14 +89,15 @@ BEGIN
     BEGIN
         BLOCK "040904e4"
         BEGIN
-            VALUE "CompanyName", "com.skybertech" "\0"
-            VALUE "FileDescription", "charity_trust" "\0"
+            VALUE "CompanyName", "" "\0"
+            VALUE "FileDescription", "Annujoom" "\0"
             VALUE "FileVersion", VERSION_AS_STRING "\0"
-            VALUE "InternalName", "charity_trust" "\0"
-            VALUE "LegalCopyright", "Copyright (C) 2025 com.skybertech. All rights reserved." "\0"
-            VALUE "OriginalFilename", "charity_trust.exe" "\0"
-            VALUE "ProductName", "charity_trust" "\0"
+            VALUE "InternalName", "Annujoom" "\0"
+            VALUE "LegalCopyright", "Copyright (C) 2025 com.annujoom. All rights reserved." "\0"
+            VALUE "OriginalFilename", "Annujoom.exe" "\0"
+            VALUE "ProductName", "Annujoom" "\0"
             VALUE "ProductVersion", VERSION_AS_STRING "\0"
+
         END
     END
     BLOCK "VarFileInfo"

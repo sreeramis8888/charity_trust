@@ -1,20 +1,20 @@
-import 'package:charity_trust/src/interfaces/main_pages/campaign_pages/campaign.dart';
-import 'package:charity_trust/src/interfaces/main_pages/campaign_pages/campaign_detail.dart';
-import 'package:charity_trust/src/interfaces/main_pages/home.dart';
-import 'package:charity_trust/src/interfaces/main_pages/donation_categories.dart';
-import 'package:charity_trust/src/interfaces/main_pages/news_bookmark/news_list_page.dart';
-import 'package:charity_trust/src/interfaces/main_pages/profile.dart';
-import 'package:charity_trust/src/interfaces/main_pages/profile_pages/edit_profile.dart';
-import 'package:charity_trust/src/interfaces/main_pages/profile_pages/my_participations.dart';
-import 'package:charity_trust/src/interfaces/main_pages/navbar.dart';
-import 'package:charity_trust/src/interfaces/onboarding/login.dart';
-import 'package:charity_trust/src/interfaces/onboarding/registration.dart';
-import 'package:charity_trust/src/interfaces/onboarding/create_user.dart';
-import 'package:charity_trust/src/interfaces/onboarding/charity_member_otp_verification.dart';
-import 'package:charity_trust/src/interfaces/onboarding/request_rejected_state.dart';
-import 'package:charity_trust/src/interfaces/onboarding/request_sent_state.dart';
-import 'package:charity_trust/src/interfaces/onboarding/account_suspended_state.dart';
-import 'package:charity_trust/src/interfaces/onboarding/splash.dart';
+import 'package:Annujoom/src/interfaces/main_pages/campaign_pages/campaign.dart';
+import 'package:Annujoom/src/interfaces/main_pages/campaign_pages/campaign_detail.dart';
+import 'package:Annujoom/src/interfaces/main_pages/home.dart';
+import 'package:Annujoom/src/interfaces/main_pages/donation_categories.dart';
+import 'package:Annujoom/src/interfaces/main_pages/news_bookmark/news_list_page.dart';
+import 'package:Annujoom/src/interfaces/main_pages/profile.dart';
+import 'package:Annujoom/src/interfaces/main_pages/profile_pages/edit_profile.dart';
+import 'package:Annujoom/src/interfaces/main_pages/profile_pages/my_participations.dart';
+import 'package:Annujoom/src/interfaces/main_pages/navbar.dart';
+import 'package:Annujoom/src/interfaces/onboarding/login.dart';
+import 'package:Annujoom/src/interfaces/onboarding/registration.dart';
+import 'package:Annujoom/src/interfaces/onboarding/create_user.dart';
+import 'package:Annujoom/src/interfaces/onboarding/charity_member_otp_verification.dart';
+import 'package:Annujoom/src/interfaces/onboarding/request_rejected_state.dart';
+import 'package:Annujoom/src/interfaces/onboarding/request_sent_state.dart';
+import 'package:Annujoom/src/interfaces/onboarding/account_suspended_state.dart';
+import 'package:Annujoom/src/interfaces/onboarding/splash.dart';
 import 'package:flutter/material.dart';
 
 /// Usage:
@@ -30,8 +30,9 @@ enum TransitionType {
   slideFromBottom,
   slideFromRight,
   fade,
-  fadeScale, 
+  fadeScale,
 }
+
 PageRouteBuilder<T> createRoute<T>(
   Widget page, {
   TransitionType? transition,
@@ -50,25 +51,31 @@ RouteTransitionsBuilder _transitionsBuilderFor(TransitionType? type) {
     case TransitionType.slideFromRight:
       return (context, animation, secondaryAnimation, child) {
         // Professional smooth right-to-left slide
-        final curved = CurvedAnimation(parent: animation, curve: Curves.easeOutCubic);
-        final tween = Tween(begin: const Offset(1.0, 0.0), end: Offset.zero).chain(CurveTween(curve: Curves.easeOutCubic));
+        final curved =
+            CurvedAnimation(parent: animation, curve: Curves.easeOutCubic);
+        final tween = Tween(begin: const Offset(1.0, 0.0), end: Offset.zero)
+            .chain(CurveTween(curve: Curves.easeOutCubic));
         return SlideTransition(position: curved.drive(tween), child: child);
       };
 
     case TransitionType.fade:
       return (context, animation, secondaryAnimation, child) {
-        final curved = CurvedAnimation(parent: animation, curve: Curves.easeInOut);
+        final curved =
+            CurvedAnimation(parent: animation, curve: Curves.easeInOut);
         return FadeTransition(opacity: curved, child: child);
       };
 
     case TransitionType.fadeScale:
       return (context, animation, secondaryAnimation, child) {
         // subtle scale + fade for a polished material-like entrance
-        final fadeAnim = CurvedAnimation(parent: animation, curve: Curves.easeOut);
-        final scaleTween = Tween<double>(begin: 0.98, end: 1.0).chain(CurveTween(curve: Curves.easeOut));
+        final fadeAnim =
+            CurvedAnimation(parent: animation, curve: Curves.easeOut);
+        final scaleTween = Tween<double>(begin: 0.98, end: 1.0)
+            .chain(CurveTween(curve: Curves.easeOut));
         return FadeTransition(
           opacity: fadeAnim,
-          child: ScaleTransition(scale: animation.drive(scaleTween), child: child),
+          child:
+              ScaleTransition(scale: animation.drive(scaleTween), child: child),
         );
       };
 
@@ -76,8 +83,10 @@ RouteTransitionsBuilder _transitionsBuilderFor(TransitionType? type) {
     default:
       return (context, animation, secondaryAnimation, child) {
         // Standard bottom-up slide (good for modal-ish pages)
-        final curved = CurvedAnimation(parent: animation, curve: Curves.easeOutCubic);
-        final tween = Tween(begin: const Offset(0.0, 1.0), end: Offset.zero).chain(CurveTween(curve: Curves.easeOutCubic));
+        final curved =
+            CurvedAnimation(parent: animation, curve: Curves.easeOutCubic);
+        final tween = Tween(begin: const Offset(0.0, 1.0), end: Offset.zero)
+            .chain(CurveTween(curve: Curves.easeOutCubic));
         return SlideTransition(position: curved.drive(tween), child: child);
       };
   }
@@ -115,7 +124,7 @@ Route<dynamic> generateRoute(RouteSettings? settings) {
       transitionToUse = TransitionType.fade;
       transitionDuration = const Duration(milliseconds: 500);
       break;
-      
+
     case 'registration':
       page = RegistrationPage();
       transitionToUse = TransitionType.fade;
@@ -142,7 +151,7 @@ Route<dynamic> generateRoute(RouteSettings? settings) {
       transitionToUse = TransitionType.fade;
       transitionDuration = const Duration(milliseconds: 500);
       break;
-      
+
     case 'requestSent':
       page = RequestSentState();
       transitionToUse = TransitionType.fade;
@@ -154,7 +163,7 @@ Route<dynamic> generateRoute(RouteSettings? settings) {
       transitionToUse = TransitionType.fade;
       transitionDuration = const Duration(milliseconds: 500);
       break;
-      
+
     case 'Profile':
       page = ProfilePage();
       break;
@@ -188,7 +197,7 @@ Route<dynamic> generateRoute(RouteSettings? settings) {
         );
       }
       break;
-      
+
     case 'navbar':
       page = NavBar();
       transitionToUse = TransitionType.fade;
@@ -206,11 +215,15 @@ Route<dynamic> generateRoute(RouteSettings? settings) {
   if (transitionToUse == null) {
     return MaterialPageRoute(builder: (_) => page!);
   }
-  return createRoute(page!, transition: transitionToUse, duration: transitionDuration);
+  return createRoute(page!,
+      transition: transitionToUse, duration: transitionDuration);
 }
 
 extension NavigatorTransitionHelpers on NavigatorState {
-  Future<T?> pushWithTransition<T>(Widget page, {TransitionType transition = TransitionType.slideFromBottom, Duration duration = const Duration(milliseconds: 300)}) {
-    return push<T>(createRoute(page, transition: transition, duration: duration));
+  Future<T?> pushWithTransition<T>(Widget page,
+      {TransitionType transition = TransitionType.slideFromBottom,
+      Duration duration = const Duration(milliseconds: 300)}) {
+    return push<T>(
+        createRoute(page, transition: transition, duration: duration));
   }
 }

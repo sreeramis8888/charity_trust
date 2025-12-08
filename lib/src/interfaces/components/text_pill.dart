@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:charity_trust/src/data/constants/style_constants.dart';
+import 'package:Annujoom/src/data/constants/style_constants.dart';
 
 class TextPill extends StatelessWidget {
   final String text;

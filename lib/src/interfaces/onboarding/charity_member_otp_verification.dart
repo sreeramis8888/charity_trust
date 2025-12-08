@@ -1,12 +1,12 @@
 import 'dart:async';
 import 'dart:developer';
-import 'package:charity_trust/src/data/constants/color_constants.dart';
-import 'package:charity_trust/src/data/constants/style_constants.dart';
-import 'package:charity_trust/src/data/providers/loading_provider.dart';
-import 'package:charity_trust/src/data/services/snackbar_service.dart';
-import 'package:charity_trust/src/data/providers/user_provider.dart';
-import 'package:charity_trust/src/interfaces/components/primaryButton.dart';
-import 'package:charity_trust/src/interfaces/animations/index.dart' as anim;
+import 'package:Annujoom/src/data/constants/color_constants.dart';
+import 'package:Annujoom/src/data/constants/style_constants.dart';
+import 'package:Annujoom/src/data/providers/loading_provider.dart';
+import 'package:Annujoom/src/data/services/snackbar_service.dart';
+import 'package:Annujoom/src/data/providers/user_provider.dart';
+import 'package:Annujoom/src/interfaces/components/primaryButton.dart';
+import 'package:Annujoom/src/interfaces/animations/index.dart' as anim;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
@@ -194,7 +194,8 @@ class _CharityMemberOtpVerificationScreenState
                                 label: 'Verify',
                                 onPressed: isLoading
                                     ? null
-                                    : () => _handleOtpVerification(context, ref),
+                                    : () =>
+                                        _handleOtpVerification(context, ref),
                                 isLoading: isLoading,
                               ),
                             ),
@@ -233,7 +234,8 @@ class _CharityMemberOtpVerificationScreenState
       ref.read(loadingProvider.notifier).stopLoading();
 
       if (result != null) {
-        log('OTP verified for charity member', name: 'CharityMemberOtpVerification');
+        log('OTP verified for charity member',
+            name: 'CharityMemberOtpVerification');
         SnackbarService().showSnackBar('Verification successful');
 
         if (context.mounted) {

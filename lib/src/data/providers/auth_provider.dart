@@ -1,6 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-import 'package:charity_trust/src/data/services/secure_storage_service.dart';
+import 'package:Annujoom/src/data/services/secure_storage_service.dart';
 
 part 'auth_provider.g.dart';
 
@@ -18,7 +18,8 @@ class AuthProvider {
     return await _secureStorage.hasBearerToken();
   }
 
-  Future<void> login(String token, {String? refreshToken, String? userId}) async {
+  Future<void> login(String token,
+      {String? refreshToken, String? userId}) async {
     await _secureStorage.saveBearerToken(token);
     if (userId != null) {
       await _secureStorage.saveUserId(userId);

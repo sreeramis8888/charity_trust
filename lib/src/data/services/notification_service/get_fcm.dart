@@ -1,7 +1,7 @@
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
-import 'package:charity_trust/src/data/utils/globals.dart';
-import 'package:charity_trust/src/data/services/secure_storage_service.dart';
+import 'package:Annujoom/src/data/utils/globals.dart';
+import 'package:Annujoom/src/data/services/secure_storage_service.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:permission_handler/permission_handler.dart';
 

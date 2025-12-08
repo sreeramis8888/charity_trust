@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-import 'package:charity_trust/src/data/models/user_model.dart';
+import 'package:Annujoom/src/data/models/user_model.dart';
 
 part 'secure_storage_service.g.dart';
 

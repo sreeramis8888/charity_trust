@@ -1,8 +1,8 @@
-import 'package:charity_trust/src/data/constants/color_constants.dart';
-import 'package:charity_trust/src/data/constants/style_constants.dart';
-import 'package:charity_trust/src/data/utils/currency_formatter.dart';
-import 'package:charity_trust/src/interfaces/components/primaryButton.dart';
-import 'package:charity_trust/src/interfaces/components/text_pill.dart';
+import 'package:Annujoom/src/data/constants/color_constants.dart';
+import 'package:Annujoom/src/data/constants/style_constants.dart';
+import 'package:Annujoom/src/data/utils/currency_formatter.dart';
+import 'package:Annujoom/src/interfaces/components/primaryButton.dart';
+import 'package:Annujoom/src/interfaces/components/text_pill.dart';
 import 'package:flutter/material.dart';
 
 class HomeCampaignCard extends StatelessWidget {

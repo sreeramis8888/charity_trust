@@ -1,7 +1,7 @@
 import 'dart:typed_data';
 import 'package:dio/dio.dart';
 import 'package:image_gallery_saver_plus/image_gallery_saver_plus.dart';
-import 'package:charity_trust/src/data/services/snackbar_service.dart';
+import 'package:Annujoom/src/data/services/snackbar_service.dart';
 
 Future<void> downloadImage(String imageUrl) async {
   try {

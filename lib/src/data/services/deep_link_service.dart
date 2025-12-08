@@ -1,12 +1,10 @@
 import 'package:app_links/app_links.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:charity_trust/src/data/router/nav_router.dart';
-import 'package:charity_trust/src/data/services/navigation_service.dart';
-import 'package:charity_trust/src/data/services/secure_storage_service.dart';
-import 'package:charity_trust/src/data/utils/globals.dart';
-
-
+import 'package:Annujoom/src/data/router/nav_router.dart';
+import 'package:Annujoom/src/data/services/navigation_service.dart';
+import 'package:Annujoom/src/data/services/secure_storage_service.dart';
+import 'package:Annujoom/src/data/utils/globals.dart';
 
 // Create a provider for DeepLinkService
 final deepLinkServiceProvider = Provider<DeepLinkService>((ref) {
@@ -264,41 +262,39 @@ class DeepLinkService {
   String? getDeepLinkPath(String screen, {String? id}) {
     switch (screen) {
       case 'chat':
-        return id != null
-            ? 'charity_trust://app/chat/$id'
-            : 'charity_trust://app/chat';
+        return id != null ? 'Annujoom://app/chat/$id' : 'Annujoom://app/chat';
       case 'events':
         return id != null
-            ? 'charity_trust://app/events/$id'
-            : 'charity_trust://app/events';
+            ? 'Annujoom://app/events/$id'
+            : 'Annujoom://app/events';
       case 'my_products':
-        return 'charity_trust://app/my_products';
+        return 'Annujoom://app/my_products';
       case 'my_requirements':
-        return 'charity_trust://app/my_requirements';
+        return 'Annujoom://app/my_requirements';
       case 'analytics':
-        return 'charity_trust://app/analytics';
+        return 'Annujoom://app/analytics';
       case 'in-app':
-        return 'charity_trust://app/notification';
+        return 'Annujoom://app/notification';
       // case 'products':
       //   return id != null
-      //       ? 'charity_trust://app/products/$id'
-      //       : 'charity_trust://app/products';
+      //       ? 'Annujoom://app/products/$id'
+      //       : 'Annujoom://app/products';
       case 'news':
-        return 'charity_trust://app/news';
+        return 'Annujoom://app/news';
       case 'my_events':
-        return 'charity_trust://app/my_events';
+        return 'Annujoom://app/my_events';
       case 'requirements':
-        return 'charity_trust://app/requirements';
+        return 'Annujoom://app/requirements';
       case 'my_enquiries':
-        return 'charity_trust://app/my_enquiries';
+        return 'Annujoom://app/my_enquiries';
       case 'my_reviews':
-        return 'charity_trust://app/my_reviews';
+        return 'Annujoom://app/my_reviews';
       case 'mainpage':
-        return 'charity_trust://app/mainpage';
+        return 'Annujoom://app/mainpage';
       case 'products':
-        return 'charity_trust://app/products';
+        return 'Annujoom://app/products';
       default:
-        return 'charity_trust://app/general';
+        return 'Annujoom://app/general';
     }
   }
 }

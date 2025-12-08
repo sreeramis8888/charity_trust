@@ -1,9 +1,9 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-import 'package:charity_trust/src/data/providers/api_provider.dart';
-import 'package:charity_trust/src/data/models/campaign_model.dart';
-import 'package:charity_trust/src/data/models/promotions_model.dart';
-import 'package:charity_trust/src/data/models/news_model.dart';
+import 'package:Annujoom/src/data/providers/api_provider.dart';
+import 'package:Annujoom/src/data/models/campaign_model.dart';
+import 'package:Annujoom/src/data/models/promotions_model.dart';
+import 'package:Annujoom/src/data/models/news_model.dart';
 
 part 'home_provider.g.dart';
 
@@ -65,7 +65,8 @@ Future<HomePageData> homePageData(Ref ref) async {
     final data = response.data!['data'] as Map<String, dynamic>?;
 
     final endingCampaign = data?['ending_campaign'] != null
-        ? CampaignModel.fromJson(data!['ending_campaign'] as Map<String, dynamic>)
+        ? CampaignModel.fromJson(
+            data!['ending_campaign'] as Map<String, dynamic>)
         : null;
 
     final latestNews = (data?['latest_news'] as List<dynamic>?)
@@ -105,7 +106,8 @@ class HomePageNotifier extends _$HomePageNotifier {
       final data = response.data!['data'] as Map<String, dynamic>?;
 
       final endingCampaign = data?['ending_campaign'] != null
-          ? CampaignModel.fromJson(data!['ending_campaign'] as Map<String, dynamic>)
+          ? CampaignModel.fromJson(
+              data!['ending_campaign'] as Map<String, dynamic>)
           : null;
 
       final latestNews = (data?['latest_news'] as List<dynamic>?)

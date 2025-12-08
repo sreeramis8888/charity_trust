@@ -1,6 +1,6 @@
 import 'dart:developer';
 import 'package:flutter/material.dart';
-import 'package:charity_trust/src/data/constants/color_constants.dart';
+import 'package:Annujoom/src/data/constants/color_constants.dart';
 
 enum SnackbarType { success, error, warning, info }
 

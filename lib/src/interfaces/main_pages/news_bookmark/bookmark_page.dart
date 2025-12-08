@@ -1,13 +1,13 @@
-import 'package:charity_trust/src/interfaces/components/cards/news_card.dart';
+import 'package:Annujoom/src/interfaces/components/cards/news_card.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
-import 'package:charity_trust/src/data/constants/color_constants.dart';
-import 'package:charity_trust/src/data/constants/style_constants.dart';
-import 'package:charity_trust/src/data/models/news_model.dart';
-import 'package:charity_trust/src/data/providers/news_provider.dart';
-import 'package:charity_trust/src/interfaces/components/loading_indicator.dart';
-import 'package:charity_trust/src/interfaces/animations/index.dart' as anim;
+import 'package:Annujoom/src/data/constants/color_constants.dart';
+import 'package:Annujoom/src/data/constants/style_constants.dart';
+import 'package:Annujoom/src/data/models/news_model.dart';
+import 'package:Annujoom/src/data/providers/news_provider.dart';
+import 'package:Annujoom/src/interfaces/components/loading_indicator.dart';
+import 'package:Annujoom/src/interfaces/animations/index.dart' as anim;
 import 'package:shimmer/shimmer.dart';
 import 'news_page.dart';
 
@@ -119,9 +119,9 @@ class _BookmarkPageState extends ConsumerState<BookmarkPage> {
                       );
                     }
                   },
-                  child: NewsCard(allNews: paginationState.news,
+                  child: NewsCard(
+                    allNews: paginationState.news,
                     news: newsItem,
-                   
                   ),
                 );
               },
@@ -155,4 +155,3 @@ class _BookmarkPageState extends ConsumerState<BookmarkPage> {
     );
   }
 }
-

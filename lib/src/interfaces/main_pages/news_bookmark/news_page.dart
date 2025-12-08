@@ -3,14 +3,14 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
 
 import 'package:intl/intl.dart';
-import 'package:charity_trust/src/data/constants/color_constants.dart';
-import 'package:charity_trust/src/data/constants/style_constants.dart';
-import 'package:charity_trust/src/data/models/news_model.dart';
-import 'package:charity_trust/src/data/providers/news_provider.dart';
-import 'package:charity_trust/src/data/feature_tours/news_swipe_tour.dart';
-import 'package:charity_trust/src/data/feature_tours/feature_tour_provider.dart';
-import 'package:charity_trust/src/interfaces/animations/index.dart' as anim;
-import 'package:charity_trust/src/interfaces/components/feature_tour_overlay.dart';
+import 'package:Annujoom/src/data/constants/color_constants.dart';
+import 'package:Annujoom/src/data/constants/style_constants.dart';
+import 'package:Annujoom/src/data/models/news_model.dart';
+import 'package:Annujoom/src/data/providers/news_provider.dart';
+import 'package:Annujoom/src/data/feature_tours/news_swipe_tour.dart';
+import 'package:Annujoom/src/data/feature_tours/feature_tour_provider.dart';
+import 'package:Annujoom/src/interfaces/animations/index.dart' as anim;
+import 'package:Annujoom/src/interfaces/components/feature_tour_overlay.dart';
 import 'package:shimmer/shimmer.dart';
 
 final currentNewsIndexProvider = StateProvider<int>((ref) => 0);
@@ -127,7 +127,7 @@ class _NewsModelDetailContentViewState
 
     Future.delayed(Duration(milliseconds: 500), () {
       if (!mounted) return;
-      
+
       final completedTours = ref.read(completedFeatureToursProvider);
       if (!completedTours.contains(NewsSwipeTour.tourId)) {
         showDialog(
@@ -261,12 +261,12 @@ class NewsContent extends ConsumerWidget {
                       height: 10,
                     ),
                     Text(newsItem.subTitle ?? '',
-                        style: kSmallTitleL.copyWith(
-                            color: kSecondaryTextColor)),
+                        style:
+                            kSmallTitleL.copyWith(color: kSecondaryTextColor)),
                     const SizedBox(height: 16),
                     Text(newsItem.content ?? '',
-                        style: kSmallTitleR.copyWith(
-                            color: kSecondaryTextColor)),
+                        style:
+                            kSmallTitleR.copyWith(color: kSecondaryTextColor)),
                   ],
                 ),
               ),

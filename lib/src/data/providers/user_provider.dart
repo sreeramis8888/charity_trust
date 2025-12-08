@@ -1,8 +1,8 @@
 import 'dart:developer';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-import 'package:charity_trust/src/data/models/user_model.dart';
-import 'package:charity_trust/src/data/providers/api_provider.dart';
-import 'package:charity_trust/src/data/services/secure_storage_service.dart';
+import 'package:Annujoom/src/data/models/user_model.dart';
+import 'package:Annujoom/src/data/providers/api_provider.dart';
+import 'package:Annujoom/src/data/services/secure_storage_service.dart';
 
 part 'user_provider.g.dart';
 
@@ -88,7 +88,7 @@ Future<UserModel?> updateUserProfile(
       cleanedData,
       requireAuth: true,
     );
-    
+
     if (response.success) {
       final user = UserModel.fromJson(cleanedData);
       // Check if ref is still valid before using it
@@ -193,22 +193,23 @@ Future<UserModel?> fetchCurrentUserStatus(Ref ref) async {
   try {
     final apiProvider = ref.watch(apiProviderProvider);
     final secureStorage = ref.watch(secureStorageServiceProvider);
-    
-    final response = await apiProvider.get('/user/current-status', requireAuth: true);
+
+    final response =
+        await apiProvider.get('/user/current-status', requireAuth: true);
 
     if (response.success && response.data != null) {
       final statusData = response.data!['data'];
-      
+
       if (statusData != null) {
         // Get existing user from local storage to preserve other fields
         var existingUser = await secureStorage.getUserData();
-        
+
         // Create updated user with current status, preserving existing data
         final updatedUser = (existingUser ?? UserModel()).copyWith(
           id: statusData['_id'] ?? existingUser?.id,
           status: statusData['status'] ?? existingUser?.status,
         );
-        
+
         // Only update provider if ref is still mounted
         if (ref.mounted) {
           ref.read(userProvider.notifier).setUser(updatedUser);
@@ -218,11 +219,11 @@ Future<UserModel?> fetchCurrentUserStatus(Ref ref) async {
     }
     return null;
   } catch (e) {
-    log('Error fetching current user status: $e', name: 'fetchCurrentUserStatus');
+    log('Error fetching current user status: $e',
+        name: 'fetchCurrentUserStatus');
     return null;
   }
 }
-
 
 @riverpod
 Future<UserModel?> createNewUser(
@@ -241,7 +242,7 @@ Future<UserModel?> createNewUser(
       cleanedData,
       requireAuth: true,
     );
-    
+
     if (response.success && response.data != null) {
       final data = response.data!['data'] as Map<String, dynamic>?;
       if (data != null) {

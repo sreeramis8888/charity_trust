@@ -1,7 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-import 'package:charity_trust/src/data/providers/api_provider.dart';
-import 'package:charity_trust/src/data/providers/auth_provider.dart';
+import 'package:Annujoom/src/data/providers/api_provider.dart';
+import 'package:Annujoom/src/data/providers/auth_provider.dart';
 import 'dart:developer';
 
 part 'auth_login_provider.g.dart';
@@ -43,7 +43,8 @@ class AuthLoginApi {
         final token = data['token'] as String?;
         if (token != null && token.isNotEmpty) {
           await _authProvider.login(token);
-          log('Bearer token saved securely via AuthProvider', name: 'AuthLoginApi');
+          log('Bearer token saved securely via AuthProvider',
+              name: 'AuthLoginApi');
         }
       }
     }

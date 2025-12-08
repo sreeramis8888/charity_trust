@@ -1,7 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-import 'package:charity_trust/src/data/providers/api_provider.dart';
-import 'package:charity_trust/src/data/models/news_model.dart';
+import 'package:Annujoom/src/data/providers/api_provider.dart';
+import 'package:Annujoom/src/data/models/news_model.dart';
 
 part 'news_provider.g.dart';
 
@@ -23,9 +23,8 @@ class NewsApi {
       if (bookmarked) 'bookmarked': true,
     };
 
-    final queryString = queryParams.entries
-        .map((e) => '${e.key}=${e.value}')
-        .join('&');
+    final queryString =
+        queryParams.entries.map((e) => '${e.key}=${e.value}').join('&');
 
     return await _apiProvider.get(
       '$_endpoint/user?$queryString',
@@ -33,7 +32,8 @@ class NewsApi {
     );
   }
 
-  Future<ApiResponse<Map<String, dynamic>>> toggleBookmark(String newsId) async {
+  Future<ApiResponse<Map<String, dynamic>>> toggleBookmark(
+      String newsId) async {
     return await _apiProvider.patch(
       '$_endpoint/add-to-bookmark/$newsId',
       null,
@@ -110,7 +110,8 @@ Future<PaginationState> news(
             ?.map((item) => NewsModel.fromJson(item as Map<String, dynamic>))
             .toList() ??
         [];
-    final statistics = (response.data!['data']?['statistics'] as List<dynamic>?) ?? [];
+    final statistics =
+        (response.data!['data']?['statistics'] as List<dynamic>?) ?? [];
     final totalCount = response.data!['total_count'] as int? ?? 0;
 
     return PaginationState(
@@ -157,7 +158,8 @@ Future<PaginationState> bookmarkedNews(
       );
     },
     loading: () => throw Exception('Loading news...'),
-    error: (error, stackTrace) => throw Exception('Failed to fetch bookmarked news'),
+    error: (error, stackTrace) =>
+        throw Exception('Failed to fetch bookmarked news'),
   );
 }
 
@@ -177,7 +179,8 @@ class NewsListNotifier extends _$NewsListNotifier {
               ?.map((item) => NewsModel.fromJson(item as Map<String, dynamic>))
               .toList() ??
           [];
-      final statistics = (response.data!['data']?['statistics'] as List<dynamic>?) ?? [];
+      final statistics =
+          (response.data!['data']?['statistics'] as List<dynamic>?) ?? [];
       final totalCount = response.data!['total_count'] as int? ?? 0;
 
       return PaginationState(
@@ -210,10 +213,12 @@ class NewsListNotifier extends _$NewsListNotifier {
 
       if (response.success && response.data != null) {
         final newsList = (response.data!['data']?['news'] as List<dynamic>?)
-                ?.map((item) => NewsModel.fromJson(item as Map<String, dynamic>))
+                ?.map(
+                    (item) => NewsModel.fromJson(item as Map<String, dynamic>))
                 .toList() ??
             [];
-        final statistics = (response.data!['data']?['statistics'] as List<dynamic>?) ?? [];
+        final statistics =
+            (response.data!['data']?['statistics'] as List<dynamic>?) ?? [];
         final totalCount = response.data!['total_count'] as int? ?? 0;
 
         return currentState.copyWith(
@@ -285,7 +290,8 @@ class BookmarkedNewsListNotifier extends _$BookmarkedNewsListNotifier {
         );
       },
       loading: () => throw Exception('Loading news...'),
-      error: (error, stackTrace) => throw Exception('Failed to fetch bookmarked news'),
+      error: (error, stackTrace) =>
+          throw Exception('Failed to fetch bookmarked news'),
     );
   }
 
@@ -323,7 +329,8 @@ class BookmarkedNewsListNotifier extends _$BookmarkedNewsListNotifier {
           );
         },
         loading: () => throw Exception('Loading news...'),
-        error: (error, stackTrace) => throw Exception('Failed to load more bookmarked news'),
+        error: (error, stackTrace) =>
+            throw Exception('Failed to load more bookmarked news'),
       );
     });
   }
@@ -342,9 +349,8 @@ class BookmarkedNewsListNotifier extends _$BookmarkedNewsListNotifier {
 
       if (response.success) {
         final currentState = state.value!;
-        final updatedNews = currentState.news
-            .where((news) => news.id != newsId)
-            .toList();
+        final updatedNews =
+            currentState.news.where((news) => news.id != newsId).toList();
 
         state = AsyncValue.data(
           currentState.copyWith(

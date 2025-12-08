@@ -1,10 +1,10 @@
-import 'package:charity_trust/src/interfaces/components/loading_indicator.dart';
+import 'package:Annujoom/src/interfaces/components/loading_indicator.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:charity_trust/src/data/constants/color_constants.dart';
-import 'package:charity_trust/src/data/constants/style_constants.dart';
-import 'package:charity_trust/src/data/providers/campaigns_provider.dart';
-import 'package:charity_trust/src/interfaces/main_pages/campaign_pages/campaign_detail.dart';
+import 'package:Annujoom/src/data/constants/color_constants.dart';
+import 'package:Annujoom/src/data/constants/style_constants.dart';
+import 'package:Annujoom/src/data/providers/campaigns_provider.dart';
+import 'package:Annujoom/src/interfaces/main_pages/campaign_pages/campaign_detail.dart';
 
 class CategoryCampaignDetailPage extends ConsumerWidget {
   final String category;

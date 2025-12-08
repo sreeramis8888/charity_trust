@@ -1,9 +1,9 @@
-import 'package:charity_trust/src/data/constants/color_constants.dart';
-import 'package:charity_trust/src/data/constants/style_constants.dart';
-import 'package:charity_trust/src/data/models/news_model.dart';
-import 'package:charity_trust/src/data/utils/get_time_ago.dart';
-import 'package:charity_trust/src/interfaces/components/text_pill.dart';
-import 'package:charity_trust/src/interfaces/main_pages/news_bookmark/news_page.dart';
+import 'package:Annujoom/src/data/constants/color_constants.dart';
+import 'package:Annujoom/src/data/constants/style_constants.dart';
+import 'package:Annujoom/src/data/models/news_model.dart';
+import 'package:Annujoom/src/data/utils/get_time_ago.dart';
+import 'package:Annujoom/src/interfaces/components/text_pill.dart';
+import 'package:Annujoom/src/interfaces/main_pages/news_bookmark/news_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 

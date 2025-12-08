@@ -2,9 +2,9 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:charity_trust/src/data/constants/color_constants.dart';
-import 'package:charity_trust/src/data/feature_tours/feature_tour_model.dart';
-import 'package:charity_trust/src/data/feature_tours/feature_tour_provider.dart';
+import 'package:Annujoom/src/data/constants/color_constants.dart';
+import 'package:Annujoom/src/data/feature_tours/feature_tour_model.dart';
+import 'package:Annujoom/src/data/feature_tours/feature_tour_provider.dart';
 
 part 'gesture_painters/swipe_gesture_painter.dart';
 part 'gesture_painters/tap_gesture_painter.dart';
