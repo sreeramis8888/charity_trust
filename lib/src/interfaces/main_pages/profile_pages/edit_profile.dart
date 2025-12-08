@@ -5,6 +5,7 @@ import 'package:charity_trust/src/data/constants/style_constants.dart';
 import 'package:charity_trust/src/data/utils/media_picker.dart';
 import 'package:charity_trust/src/data/notifiers/loading_notifier.dart';
 import 'package:charity_trust/src/data/services/snackbar_service.dart';
+import 'package:charity_trust/src/data/services/secure_storage_service.dart';
 import 'package:charity_trust/src/data/providers/user_provider.dart';
 import 'package:charity_trust/src/interfaces/components/input_field.dart';
 import 'package:charity_trust/src/interfaces/components/loading_indicator.dart';
@@ -72,6 +73,28 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
   }
 
   @override
+  void initState() {
+    super.initState();
+    _loadUserData();
+  }
+
+  Future<void> _loadUserData() async {
+    final userData = await ref.read(secureStorageServiceProvider).getUserData();
+    if (userData != null && mounted) {
+      setState(() {
+        emailController.text = userData.email ?? '';
+        addressController.text = userData.address ?? '';
+        // Format DateTime to dd/MM/yyyy
+        if (userData.dob != null) {
+          dobController.text =
+              '${userData.dob!.day.toString().padLeft(2, '0')}/${userData.dob!.month.toString().padLeft(2, '0')}/${userData.dob!.year}';
+        }
+        recommendedByController.text = userData.recommendedBy ?? '';
+      });
+    }
+  }
+
+  @override
   void dispose() {
     _scrollController.dispose();
     _unfocusNode.dispose();
@@ -108,10 +131,28 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
     try {
       ref.read(loadingProvider.notifier).startLoading();
 
+      // Parse dob string (dd/MM/yyyy) to DateTime
+      DateTime? parsedDob;
+      final dobText = dobController.text.trim();
+      if (dobText.isNotEmpty) {
+        try {
+          final parts = dobText.split('/');
+          if (parts.length == 3) {
+            parsedDob = DateTime(
+              int.parse(parts[2]),
+              int.parse(parts[1]),
+              int.parse(parts[0]),
+            );
+          }
+        } catch (e) {
+          log('Error parsing dob: $e', name: 'EditProfilePage');
+        }
+      }
+
       final userData = <String, dynamic>{
         'email': emailController.text.trim(),
         'address': addressController.text.trim(),
-        'dob': dobController.text.trim(),
+        'dob': parsedDob?.toIso8601String(),
       };
 
       final result = await ref.read(updateUserProfileProvider(userData).future);
@@ -120,6 +161,18 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
 
       if (result != null) {
         log('Profile updated successfully', name: 'EditProfilePage');
+        
+        // Update local secure storage with new data
+        final currentUser = await ref.read(secureStorageServiceProvider).getUserData();
+        if (currentUser != null) {
+          final updatedUser = currentUser.copyWith(
+            email: emailController.text.trim(),
+            address: addressController.text.trim(),
+            dob: parsedDob,
+          );
+          await ref.read(secureStorageServiceProvider).saveUserData(updatedUser);
+        }
+        
         SnackbarService().showSnackBar('Profile updated successfully');
 
         if (mounted) {
@@ -266,7 +319,7 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
                         type: CustomFieldType.date,
                         hint: "dd/mm/yyyy",
                         controller: dobController,
-                        validator: (v) => v!.isEmpty ? "Required" : null,
+                        validator: (v) => v?.isEmpty ?? true ? "Required" : null,
                       ),
                     ),
                     const SizedBox(height: 18),

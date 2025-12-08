@@ -180,7 +180,9 @@ class _HomePageState extends ConsumerState<HomePage> {
                         children: [
                           Text('Funding Campaigns', style: kBodyTitleM),
                           GestureDetector(
-                            onTap: () {},
+                            onTap: () {
+                              Navigator.of(context).pushNamed('Campaign');
+                            },
                             child: Text('See All >',
                                 style: kSmallTitleM.copyWith(
                                     color: kThirdTextColor)),
@@ -205,7 +207,21 @@ class _HomePageState extends ConsumerState<HomePage> {
                                   ?.toString()
                                   .split(' ')[0] ??
                               '',
-                          onViewDetails: () {},
+                          onViewDetails: () {
+                            Navigator.of(context).pushNamed(
+                              'CampaignDetail',
+                              arguments: {
+                                '_id': homeData.endingCampaign!.id ?? '',
+                                'title': homeData.endingCampaign!.title ?? '',
+                                'description': homeData.endingCampaign!.description ?? '',
+                                'category': homeData.endingCampaign!.category ?? '',
+                                'date': homeData.endingCampaign!.targetDate?.toString().split(' ')[0] ?? '',
+                                'image': homeData.endingCampaign!.coverImage ?? '',
+                                'raised': homeData.endingCampaign!.collectedAmount?.toInt() ?? 0,
+                                'goal': homeData.endingCampaign!.targetAmount?.toInt() ?? 0,
+                              },
+                            );
+                          },
                           onDonate: () {},
                         ),
                       ),
@@ -311,7 +327,9 @@ class _HomePageState extends ConsumerState<HomePage> {
                           Text('Latest News',
                               style: kHeadTitleM.copyWith(fontSize: 18)),
                           GestureDetector(
-                            onTap: () {},
+                            onTap: () {
+                              Navigator.of(context).pushNamed('News');
+                            },
                             child: Text('See All >',
                                 style: kSmallTitleM.copyWith(
                                     color: kThirdTextColor)),

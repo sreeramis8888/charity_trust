@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:typed_data';
 import 'package:dio/dio.dart';
 import 'package:file_saver/file_saver.dart';
 import 'package:share_plus/share_plus.dart';
@@ -36,8 +37,8 @@ class ReceiptService {
       // Save using file_saver
       final path = await FileSaver.instance.saveFile(
         name: fileName,
-        bytes: response.data!,
-        ext: 'pdf',
+        bytes: Uint8List.fromList(response.data!),
+        fileExtension: 'pdf',
         mimeType: MimeType.pdf,
       );
 

@@ -4,12 +4,12 @@ class UserModel {
   final String? email;
   final String? image;
   final String? phone;
+  final String? whatsappNo;
   final String? fcm;
   final String? otp;
   final String? gender;
-  final String? bloodGroup;
-  final int? aadharNumber;
-  final String? aadharCopy;
+  final int? panNumber;
+  final String? panCopy;
   final String? address;
   final String? area;
   final String? district;
@@ -38,12 +38,12 @@ class UserModel {
     this.email,
     this.image,
     this.phone,
+    this.whatsappNo,
     this.fcm,
     this.otp,
     this.gender,
-    this.bloodGroup,
-    this.aadharNumber,
-    this.aadharCopy,
+    this.panNumber,
+    this.panCopy,
     this.address,
     this.area,
     this.district,
@@ -67,22 +67,22 @@ class UserModel {
     this.updatedAt,
   });
 
-  // -----------------------------
-  // FROM JSON
-  // -----------------------------
+  // -------------------------
+  //          FROM JSON
+  // -------------------------
   factory UserModel.fromJson(Map<String, dynamic> json) {
     return UserModel(
-      id: json["_id"],
+      id: json["_id"]?.toString(),
       name: json["name"],
       email: json["email"],
       image: json["image"],
       phone: json["phone"],
+      whatsappNo: json["whatsapp_no"],
       fcm: json["fcm"],
       otp: json["otp"],
       gender: json["gender"],
-      bloodGroup: json["blood_group"],
-      aadharNumber: json["aadhar_number"],
-      aadharCopy: json["aadhar_copy"],
+      panNumber: json["pan_number"],
+      panCopy: json["pan_copy"],
       address: json["address"],
       area: json["area"],
       district: json["district"],
@@ -92,7 +92,7 @@ class UserModel {
       password: json["password"],
       status: json["status"],
       isAdmin: json["is_admin"],
-      adminRole: json["admin_role"],
+      adminRole: json["admin_role"]?.toString(),
       role: json["role"],
       lastSeen: json["last_seen"] != null
           ? DateTime.tryParse(json["last_seen"])
@@ -101,8 +101,8 @@ class UserModel {
       dob: json["dob"] != null ? DateTime.tryParse(json["dob"]) : null,
       isInstalled: json["is_installed"],
       recommendedBy: json["recommended_by"],
-      underTrustee: json["under_trustee"],
-      underCharityMember: json["under_charity_member"],
+      underTrustee: json["under_trustee"]?.toString(),
+      underCharityMember: json["under_charity_member"]?.toString(),
       rejectReason: json["reject_reason"],
       createdAt: json["createdAt"] != null
           ? DateTime.tryParse(json["createdAt"])
@@ -113,9 +113,9 @@ class UserModel {
     );
   }
 
-  // -----------------------------
-  // TO JSON
-  // -----------------------------
+  // -------------------------
+  //            TO JSON
+  // -------------------------
   Map<String, dynamic> toJson() {
     return {
       "_id": id,
@@ -123,12 +123,12 @@ class UserModel {
       "email": email,
       "image": image,
       "phone": phone,
+      "whatsapp_no": whatsappNo,
       "fcm": fcm,
       "otp": otp,
       "gender": gender,
-      "blood_group": bloodGroup,
-      "aadhar_number": aadharNumber,
-      "aadhar_copy": aadharCopy,
+      "pan_number": panNumber,
+      "pan_copy": panCopy,
       "address": address,
       "area": area,
       "district": district,
@@ -153,21 +153,21 @@ class UserModel {
     };
   }
 
-  // -----------------------------
-  // COPY WITH
-  // -----------------------------
+  // -------------------------
+  //         COPYWITH
+  // -------------------------
   UserModel copyWith({
     String? id,
     String? name,
     String? email,
     String? image,
     String? phone,
+    String? whatsappNo,
     String? fcm,
     String? otp,
     String? gender,
-    String? bloodGroup,
-    int? aadharNumber,
-    String? aadharCopy,
+    int? panNumber,
+    String? panCopy,
     String? address,
     String? area,
     String? district,
@@ -196,12 +196,12 @@ class UserModel {
       email: email ?? this.email,
       image: image ?? this.image,
       phone: phone ?? this.phone,
+      whatsappNo: whatsappNo ?? this.whatsappNo,
       fcm: fcm ?? this.fcm,
       otp: otp ?? this.otp,
       gender: gender ?? this.gender,
-      bloodGroup: bloodGroup ?? this.bloodGroup,
-      aadharNumber: aadharNumber ?? this.aadharNumber,
-      aadharCopy: aadharCopy ?? this.aadharCopy,
+      panNumber: panNumber ?? this.panNumber,
+      panCopy: panCopy ?? this.panCopy,
       address: address ?? this.address,
       area: area ?? this.area,
       district: district ?? this.district,

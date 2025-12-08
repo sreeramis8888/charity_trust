@@ -5,6 +5,7 @@ import 'package:charity_trust/src/data/constants/style_constants.dart';
 import 'package:charity_trust/src/data/utils/media_picker.dart';
 import 'package:charity_trust/src/data/notifiers/loading_notifier.dart';
 import 'package:charity_trust/src/data/services/snackbar_service.dart';
+import 'package:charity_trust/src/data/services/image_upload.dart';
 import 'package:charity_trust/src/data/providers/user_provider.dart';
 import 'package:charity_trust/src/data/providers/location_provider.dart';
 import 'package:charity_trust/src/data/models/user_model.dart';
@@ -14,7 +15,6 @@ import 'package:charity_trust/src/interfaces/components/loading_indicator.dart';
 import 'package:charity_trust/src/interfaces/components/searchable_dropdown.dart';
 import 'package:charity_trust/src/interfaces/components/primaryButton.dart';
 import 'package:charity_trust/src/interfaces/animations/index.dart' as anim;
-import 'package:charity_trust/src/interfaces/onboarding/charity_member_otp_verification.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_cropper/image_cropper.dart';
@@ -38,17 +38,21 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
   final addressController = TextEditingController();
   final areaController = TextEditingController();
   final pincodeController = TextEditingController();
+  final panNumberController = TextEditingController();
   final dobController = TextEditingController();
-  final documentController = TextEditingController();
   final recommendedByController = TextEditingController();
 
   String? selectedCountryCode;
   String? selectedStateCode;
   String? selectedDistrictCode;
+  String? selectedGender;
   XFile? profileImage;
-  XFile? aadhaarImage;
+  XFile? panCardImage;
   String? recommendedByType = 'trustee';
   UserModel? selectedRecommendedBy;
+  bool isSameAsPhone = true;
+  String? whatsappCountryCode;
+  final whatsappController = TextEditingController();
 
   final Map<String, GlobalKey> _fieldKeys = {
     'name': GlobalKey(),
@@ -60,8 +64,11 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
     'state': GlobalKey(),
     'district': GlobalKey(),
     'pincode': GlobalKey(),
-    'aadhaar': GlobalKey(),
+    'panNumber': GlobalKey(),
+    'panCard': GlobalKey(),
     'dob': GlobalKey(),
+    'gender': GlobalKey(),
+    'whatsapp': GlobalKey(),
     'recommendedBy': GlobalKey(),
   };
 
@@ -78,6 +85,8 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
           firstErrorKey = 'mobile';
         } else if (dobController.text.trim().isEmpty) {
           firstErrorKey = 'dob';
+        } else if (selectedGender == null || selectedGender!.isEmpty) {
+          firstErrorKey = 'gender';
         } else if (selectedCountryCode == null ||
             selectedCountryCode!.isEmpty) {
           firstErrorKey = 'country';
@@ -86,8 +95,12 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
         } else if (selectedDistrictCode == null ||
             selectedDistrictCode!.isEmpty) {
           firstErrorKey = 'district';
-        } else if (aadhaarImage == null) {
-          firstErrorKey = 'aadhaar';
+        } else if (panNumberController.text.trim().isEmpty) {
+          firstErrorKey = 'panNumber';
+        } else if (panCardImage == null) {
+          firstErrorKey = 'panCard';
+        } else if (!isSameAsPhone && whatsappController.text.trim().isEmpty) {
+          firstErrorKey = 'whatsapp';
         } else if (selectedRecommendedBy == null) {
           firstErrorKey = 'recommendedBy';
         }
@@ -118,8 +131,9 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
     addressController.dispose();
     areaController.dispose();
     pincodeController.dispose();
+    panNumberController.dispose();
     dobController.dispose();
-    documentController.dispose();
+    whatsappController.dispose();
     recommendedByController.dispose();
     super.dispose();
   }
@@ -146,7 +160,7 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
     }
   }
 
-  Future<void> _pickAadhaarCard() async {
+  Future<void> _pickPanCard() async {
     FocusScope.of(context).requestFocus(_unfocusNode);
     final result = await pickMedia(
       context: context,
@@ -157,8 +171,7 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
 
     if (result != null && result is XFile) {
       setState(() {
-        aadhaarImage = result;
-        documentController.text = result.name;
+        panCardImage = result;
       });
     }
     if (mounted) {
@@ -169,6 +182,39 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
   Future<void> _handleRegistration() async {
     try {
       ref.read(loadingProvider.notifier).startLoading();
+
+      // Upload profile picture if available
+      String? profilePictureUrl;
+      if (profileImage != null) {
+        try {
+          profilePictureUrl = await imageUpload(profileImage!.path);
+          log('Profile picture uploaded: $profilePictureUrl',
+              name: 'RegistrationPage');
+        } catch (e) {
+          if (mounted) {
+            ref.read(loadingProvider.notifier).stopLoading();
+          }
+          SnackbarService().showSnackBar('Failed to upload profile picture');
+          log('Error uploading profile picture: $e', name: 'RegistrationPage');
+          return;
+        }
+      }
+
+      // Upload PAN card if available
+      String? panCardUrl;
+      if (panCardImage != null) {
+        try {
+          panCardUrl = await imageUpload(panCardImage!.path);
+          log('PAN card uploaded: $panCardUrl', name: 'RegistrationPage');
+        } catch (e) {
+          if (mounted) {
+            ref.read(loadingProvider.notifier).stopLoading();
+          }
+          SnackbarService().showSnackBar('Failed to upload PAN card');
+          log('Error uploading PAN card: $e', name: 'RegistrationPage');
+          return;
+        }
+      }
 
       // Convert date from dd/mm/yyyy to yyyy-mm-dd format
       String formattedDob = dobController.text.trim();
@@ -183,6 +229,10 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
         }
       }
 
+      final whatsappNumber = isSameAsPhone
+          ? mobileController.text.trim()
+          : whatsappController.text.trim();
+
       final userData = <String, dynamic>{
         'name': nameController.text.trim(),
         'email': emailController.text.trim(),
@@ -192,6 +242,11 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
         'state': selectedStateCode,
         'district': selectedDistrictCode,
         'pincode': pincodeController.text.trim(),
+        'pan_number': panNumberController.text.trim(),
+        'pan_copy': panCardUrl,
+        'profile_picture': profilePictureUrl,
+        'gender': selectedGender,
+        'whatsapp_number': whatsappNumber,
         'dob': formattedDob,
         'recommended_by': recommendedByType == 'trustee' ? 'trustee' : 'charity-member',
         if (recommendedByType == 'trustee')
@@ -648,13 +703,33 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
                         animationType: anim.AnimationType.fadeSlideInFromLeft,
                         duration: anim.AnimationDuration.normal,
                         delayMilliseconds: 1000,
-                        child: Text("Upload Aadhar Card", style: kSmallTitleR),
+                        child: Text("PAN Number *", style: kSmallTitleR),
+                      ),
+                      const SizedBox(height: 6),
+                      anim.AnimatedWidgetWrapper(
+                        animationType: anim.AnimationType.fadeSlideInFromBottom,
+                        duration: anim.AnimationDuration.normal,
+                        delayMilliseconds: 1050,
+                        child: InputField(
+                          key: _fieldKeys['panNumber'],
+                          type: CustomFieldType.text,
+                          hint: "Enter PAN number",
+                          controller: panNumberController,
+                          validator: (v) => v!.isEmpty ? "Required" : null,
+                        ),
+                      ),
+                      const SizedBox(height: 20),
+                      anim.AnimatedWidgetWrapper(
+                        animationType: anim.AnimationType.fadeSlideInFromLeft,
+                        duration: anim.AnimationDuration.normal,
+                        delayMilliseconds: 1100,
+                        child: Text("Upload PAN Card", style: kSmallTitleR),
                       ),
                       const SizedBox(height: 4),
                       anim.AnimatedWidgetWrapper(
                         animationType: anim.AnimationType.fadeSlideInFromLeft,
                         duration: anim.AnimationDuration.normal,
-                        delayMilliseconds: 1050,
+                        delayMilliseconds: 1150,
                         child: Text(
                           "Image (JPG/PNG) - Recommended size: 400x400",
                           style: kSmallerTitleR.copyWith(color: Colors.grey),
@@ -664,12 +739,11 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
                       anim.AnimatedWidgetWrapper(
                         animationType: anim.AnimationType.fadeSlideInFromBottom,
                         duration: anim.AnimationDuration.normal,
-                        delayMilliseconds: 1100,
+                        delayMilliseconds: 1200,
                         child: FormField<void>(
-                          key: _fieldKeys['aadhaar'],
+                          key: _fieldKeys['panCard'],
                           validator: (_) {
-                            // Example: make Aadhaar required; adjust if optional
-                            if (aadhaarImage == null) {
+                            if (panCardImage == null) {
                               return 'Required';
                             }
                             return null;
@@ -678,7 +752,7 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               GestureDetector(
-                                onTap: _pickAadhaarCard,
+                                onTap: _pickPanCard,
                                 child: Container(
                                   padding: const EdgeInsets.symmetric(
                                       vertical: 16, horizontal: 12),
@@ -697,12 +771,12 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
                                       const SizedBox(width: 12),
                                       Expanded(
                                         child: Text(
-                                          aadhaarImage != null
-                                              ? aadhaarImage!.name
+                                          panCardImage != null
+                                              ? panCardImage!.name
                                               : "Upload",
                                           style: TextStyle(
                                             fontSize: 14,
-                                            color: aadhaarImage != null
+                                            color: panCardImage != null
                                                 ? kTextColor
                                                 : kSecondaryTextColor,
                                           ),
@@ -732,14 +806,14 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
                       anim.AnimatedWidgetWrapper(
                         animationType: anim.AnimationType.fadeSlideInFromLeft,
                         duration: anim.AnimationDuration.normal,
-                        delayMilliseconds: 1150,
+                        delayMilliseconds: 1250,
                         child: Text("Date of Birth *", style: kSmallTitleR),
                       ),
                       const SizedBox(height: 6),
                       anim.AnimatedWidgetWrapper(
                         animationType: anim.AnimationType.fadeSlideInFromBottom,
                         duration: anim.AnimationDuration.normal,
-                        delayMilliseconds: 1200,
+                        delayMilliseconds: 1300,
                         child: InputField(
                           key: _fieldKeys['dob'],
                           type: CustomFieldType.date,
@@ -752,14 +826,151 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
                       anim.AnimatedWidgetWrapper(
                         animationType: anim.AnimationType.fadeSlideInFromLeft,
                         duration: anim.AnimationDuration.normal,
-                        delayMilliseconds: 1250,
+                        delayMilliseconds: 1350,
+                        child: Text("Gender *", style: kSmallTitleR),
+                      ),
+                      const SizedBox(height: 6),
+                      anim.AnimatedWidgetWrapper(
+                        animationType: anim.AnimationType.fadeSlideInFromBottom,
+                        duration: anim.AnimationDuration.normal,
+                        delayMilliseconds: 1400,
+                        child: AnimatedDropdown<String>(
+                          key: _fieldKeys['gender'],
+                          hint: "Select gender",
+                          value: selectedGender,
+                          items: const ['Male', 'Female', 'Other'],
+                          itemLabel: (value) => value,
+                          onChanged: (v) {
+                            setState(() {
+                              selectedGender = v;
+                            });
+                          },
+                        ),
+                      ),
+                      const SizedBox(height: 20),
+                      anim.AnimatedWidgetWrapper(
+                        animationType: anim.AnimationType.fadeSlideInFromLeft,
+                        duration: anim.AnimationDuration.normal,
+                        delayMilliseconds: 1450,
+                        child: Text("WhatsApp Number *", style: kSmallTitleR),
+                      ),
+                      const SizedBox(height: 12),
+                      anim.AnimatedWidgetWrapper(
+                        animationType: anim.AnimationType.fadeSlideInFromBottom,
+                        duration: anim.AnimationDuration.normal,
+                        delayMilliseconds: 1500,
+                        child: Row(
+                          children: [
+                            Checkbox(
+                              value: isSameAsPhone,
+                              onChanged: (value) {
+                                setState(() {
+                                  isSameAsPhone = value ?? true;
+                                  if (isSameAsPhone) {
+                                    whatsappController.clear();
+                                  }
+                                });
+                              },
+                            ),
+                            const Expanded(
+                              child: Text(
+                                "Same as phone number",
+                                style: TextStyle(fontSize: 14),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      if (!isSameAsPhone)
+                        const SizedBox(height: 12),
+                      if (!isSameAsPhone)
+                        anim.AnimatedWidgetWrapper(
+                          animationType:
+                              anim.AnimationType.fadeSlideInFromBottom,
+                          duration: anim.AnimationDuration.normal,
+                          delayMilliseconds: 1550,
+                          child: IntlPhoneField(
+                            key: _fieldKeys['whatsapp'],
+                            validator: (phone) {
+                              if (!isSameAsPhone) {
+                                if (phone == null ||
+                                    phone.number.isEmpty ||
+                                    phone.number.length < 9) {
+                                  return 'Please enter a valid phone number';
+                                }
+                                if (phone.number.length > 10) {
+                                  return 'Phone number cannot exceed 10 digits';
+                                }
+                              }
+                              return null;
+                            },
+                            style: const TextStyle(
+                              color: kTextColor,
+                              letterSpacing: 3,
+                              fontSize: 14,
+                              fontWeight: FontWeight.w400,
+                            ),
+                            controller: whatsappController,
+                            disableLengthCheck: true,
+                            showCountryFlag: true,
+                            cursorColor: kBlack,
+                            decoration: InputDecoration(
+                              fillColor: kWhite,
+                              hintText: 'Enter WhatsApp number',
+                              hintStyle: TextStyle(
+                                fontSize: 14,
+                                letterSpacing: .2,
+                                fontWeight: FontWeight.w200,
+                                color: kTextColor,
+                              ),
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(8.0),
+                                borderSide: BorderSide(color: kBorder),
+                              ),
+                              enabledBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(8.0),
+                                borderSide: BorderSide(color: kBorder),
+                              ),
+                              focusedBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(8.0),
+                                borderSide: const BorderSide(color: kBorder),
+                              ),
+                              contentPadding: const EdgeInsets.symmetric(
+                                vertical: 16.0,
+                                horizontal: 10.0,
+                              ),
+                            ),
+                            onCountryChanged: (value) {
+                              whatsappCountryCode = value.dialCode;
+                            },
+                            initialCountryCode: 'IN',
+                            flagsButtonPadding:
+                                const EdgeInsets.only(left: 10, right: 10.0),
+                            showDropdownIcon: true,
+                            dropdownIcon: const Icon(
+                              Icons.arrow_drop_down_outlined,
+                              color: kTextColor,
+                            ),
+                            dropdownIconPosition: IconPosition.trailing,
+                            dropdownTextStyle: const TextStyle(
+                              color: kTextColor,
+                              fontSize: 15,
+                              fontWeight: FontWeight.w400,
+                            ),
+                          ),
+                        ),
+                      const SizedBox(height: 20),
+                      anim.AnimatedWidgetWrapper(
+                        animationType: anim.AnimationType.fadeSlideInFromLeft,
+                        duration: anim.AnimationDuration.normal,
+                        delayMilliseconds: 1600,
                         child: Text("Recommended By *", style: kSmallTitleR),
                       ),
                       const SizedBox(height: 12),
                       anim.AnimatedWidgetWrapper(
                         animationType: anim.AnimationType.fadeSlideInFromBottom,
                         duration: anim.AnimationDuration.normal,
-                        delayMilliseconds: 1300,
+                        delayMilliseconds: 1650,
                         child: Row(
                           children: [
                             Row(
@@ -799,7 +1010,7 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
                       anim.AnimatedWidgetWrapper(
                         animationType: anim.AnimationType.fadeSlideInFromBottom,
                         duration: anim.AnimationDuration.normal,
-                        delayMilliseconds: 1350,
+                        delayMilliseconds: 1700,
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
@@ -842,7 +1053,7 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
                       anim.AnimatedWidgetWrapper(
                         animationType: anim.AnimationType.fadeScaleUp,
                         duration: anim.AnimationDuration.normal,
-                        delayMilliseconds: 1400,
+                        delayMilliseconds: 1750,
                         child: SizedBox(
                           height: 50,
                           width: double.infinity,

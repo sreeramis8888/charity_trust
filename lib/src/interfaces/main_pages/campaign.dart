@@ -6,7 +6,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:charity_trust/src/data/constants/color_constants.dart';
 import 'package:charity_trust/src/data/constants/style_constants.dart';
 import 'package:charity_trust/src/interfaces/animations/index.dart' as anim;
-import 'package:charity_trust/src/data/providers/campaigns_provider.dart';
+import 'package:charity_trust/src/data/providers/campaigns_provider.dart'
+    show
+        generalCampaignsProvider,
+        myCampaignsProvider,
+        participatedCampaignsProvider;
 
 class CampaignPage extends ConsumerStatefulWidget {
   const CampaignPage({super.key});
@@ -124,7 +128,21 @@ class _CampaignPageState extends ConsumerState<CampaignPage>
                   image: campaign.coverImage ?? '',
                   raised: campaign.collectedAmount?.toInt() ?? 0,
                   goal: campaign.targetAmount?.toInt() ?? 0,
-                  onDetails: () {},
+                  onDetails: () {
+                    Navigator.of(context).pushNamed(
+                      'CampaignDetail',
+                      arguments: {
+                        '_id': campaign.id ?? '',
+                        'title': campaign.title ?? '',
+                        'description': campaign.description ?? '',
+                        'category': campaign.category ?? '',
+                        'date': formatDate(campaign.targetDate) ?? '',
+                        'image': campaign.coverImage ?? '',
+                        'raised': campaign.collectedAmount?.toInt() ?? 0,
+                        'goal': campaign.targetAmount?.toInt() ?? 0,
+                      },
+                    );
+                  },
                   onDonate: () {},
                 ),
               ),
@@ -153,39 +171,24 @@ class _CampaignPageState extends ConsumerState<CampaignPage>
 
   // ---------------- TAB 2 ---------------- //
   Widget _yourTransactionsTab() {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          const Text('Transactions feature coming soon'),
-          const SizedBox(height: 16),
-          ElevatedButton(
-            onPressed: () {},
-            child: const Text('View Transactions'),
-          ),
-        ],
-      ),
-    );
-  }
+    final participatedState = ref.watch(participatedCampaignsProvider);
 
-  // ---------------- TAB 3 ---------------- //
-  Widget _myCampaignsTab() {
-    final myCampaignsState = ref.watch(myCampaignsProvider);
-
-    return myCampaignsState.when(
+    return participatedState.when(
       data: (paginationState) {
         return ListView.builder(
           padding: const EdgeInsets.all(16),
-          itemCount: paginationState.campaigns.length +
+          itemCount: paginationState.donations.length +
               (paginationState.hasMore ? 1 : 0),
           itemBuilder: (context, index) {
-            if (index == paginationState.campaigns.length) {
+            if (index == paginationState.donations.length) {
               return Padding(
                 padding: const EdgeInsets.symmetric(vertical: 16),
                 child: Center(
                   child: ElevatedButton(
                     onPressed: () {
-                      ref.read(myCampaignsProvider.notifier).loadNextPage();
+                      ref
+                          .read(participatedCampaignsProvider.notifier)
+                          .loadNextPage();
                     },
                     child: const Text('Load More'),
                   ),
@@ -193,22 +196,105 @@ class _CampaignPageState extends ConsumerState<CampaignPage>
               );
             }
 
-            final campaign = paginationState.campaigns[index];
+            final donation = paginationState.donations[index];
             return Padding(
               padding: const EdgeInsets.only(bottom: 16),
               child: anim.AnimatedWidgetWrapper(
                 animationType: anim.AnimationType.fadeSlideInFromBottom,
                 duration: anim.AnimationDuration.normal,
                 delayMilliseconds: index * 50,
-                child: CampaignCard(id: campaign.id??'',
-                  description: campaign.description ?? '',
-                  title: campaign.title ?? '',
-                  category: campaign.category ?? '',
-                  date: formatDate(campaign.targetDate) ?? '',
-                  image: campaign.coverImage ?? '',
-                  raised: campaign.collectedAmount?.toInt() ?? 0,
-                  goal: campaign.targetAmount?.toInt() ?? 0,
-                  onDetails: () {},
+                child: TransactionCard(id: donation.paymentId??'',type: donation.campaign?.category??'',
+                  // campaignTitle: donation.campaign?.title ?? '',
+                  amount: donation.amount?.toString() ?? '-',
+                  // currency: donation.currency ?? 'INR',
+                  // paymentMethod: donation.paymentMethod ?? '',
+                  status: donation.status ?? '',
+                  date: formatDate(donation.createdAt) ?? '',
+                  // receipt: donation.receipt,
+                ),
+              ),
+            );
+          },
+        );
+      },
+      loading: () => const Center(child: CircularProgressIndicator()),
+      error: (error, stackTrace) => Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text('Error: $error'),
+            const SizedBox(height: 16),
+            ElevatedButton(
+              onPressed: () {
+                ref.read(participatedCampaignsProvider.notifier).refresh();
+              },
+              child: const Text('Retry'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // ---------------- TAB 3 ---------------- //
+  Widget _myCampaignsTab() {
+    final participatedState = ref.watch(participatedCampaignsProvider);
+
+    return participatedState.when(
+      data: (paginationState) {
+        return ListView.builder(
+          padding: const EdgeInsets.all(16),
+          itemCount: paginationState.donations.length +
+              (paginationState.hasMore ? 1 : 0),
+          itemBuilder: (context, index) {
+            if (index == paginationState.donations.length) {
+              return Padding(
+                padding: const EdgeInsets.symmetric(vertical: 16),
+                child: Center(
+                  child: ElevatedButton(
+                    onPressed: () {
+                      ref
+                          .read(participatedCampaignsProvider.notifier)
+                          .loadNextPage();
+                    },
+                    child: const Text('Load More'),
+                  ),
+                ),
+              );
+            }
+
+            final donation = paginationState.donations[index];
+            final campaign = donation.campaign;
+            return Padding(
+              padding: const EdgeInsets.only(bottom: 16),
+              child: anim.AnimatedWidgetWrapper(
+                animationType: anim.AnimationType.fadeSlideInFromBottom,
+                duration: anim.AnimationDuration.normal,
+                delayMilliseconds: index * 50,
+                child: CampaignCard(
+                  id: campaign?.id ?? '',
+                  description: campaign?.description ?? '',
+                  title: campaign?.title ?? '',
+                  category: campaign?.category ?? '',
+                  date: formatDate(campaign?.targetDate) ?? '',
+                  image: campaign?.coverImage ?? '',
+                  raised: campaign?.collectedAmount?.toInt() ?? 0,
+                  goal: campaign?.targetAmount?.toInt() ?? 0,
+                  onDetails: () {
+                    Navigator.of(context).pushNamed(
+                      'CampaignDetail',
+                      arguments: {
+                        '_id': campaign?.id ?? '',
+                        'title': campaign?.title ?? '',
+                        'description': campaign?.description ?? '',
+                        'category': campaign?.category ?? '',
+                        'date': formatDate(campaign?.targetDate) ?? '',
+                        'image': campaign?.coverImage ?? '',
+                        'raised': campaign?.collectedAmount?.toInt() ?? 0,
+                        'goal': campaign?.targetAmount?.toInt() ?? 0,
+                      },
+                    );
+                  },
                   isMyCampaign: true,
                 ),
               ),
@@ -225,7 +311,7 @@ class _CampaignPageState extends ConsumerState<CampaignPage>
             const SizedBox(height: 16),
             ElevatedButton(
               onPressed: () {
-                ref.read(myCampaignsProvider.notifier).refresh();
+                ref.read(participatedCampaignsProvider.notifier).refresh();
               },
               child: const Text('Retry'),
             ),

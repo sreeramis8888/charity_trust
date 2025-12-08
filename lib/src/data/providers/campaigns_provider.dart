@@ -2,11 +2,13 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:charity_trust/src/data/providers/api_provider.dart';
 import 'package:charity_trust/src/data/models/campaign_model.dart';
+import 'package:charity_trust/src/data/models/donation_model.dart';
 
 part 'campaigns_provider.g.dart';
 
 class CampaignsApi {
   static const String _endpoint = '/campaign';
+  static const String _donationEndpoint = '/donation';
 
   final ApiProvider _apiProvider;
 
@@ -46,6 +48,24 @@ class CampaignsApi {
 
     return await _apiProvider.get(
       '$_endpoint?$queryString',
+      requireAuth: true,
+    );
+  }
+
+  Future<ApiResponse<Map<String, dynamic>>> getParticipatedCampaigns({
+    int pageNo = 1,
+    int limit = 10,
+  }) async {
+    final queryParams = {
+      'page_no': pageNo,
+      'limit': limit,
+    };
+
+    final queryString =
+        queryParams.entries.map((e) => '${e.key}=${e.value}').join('&');
+
+    return await _apiProvider.get(
+      '$_donationEndpoint/participated-campaigns?$queryString',
       requireAuth: true,
     );
   }
@@ -153,6 +173,112 @@ class GeneralCampaignsNotifier extends _$GeneralCampaignsNotifier {
         );
       } else {
         throw Exception(response.message ?? 'Failed to load more campaigns');
+      }
+    });
+  }
+
+  Future<void> refresh() async {
+    state = const AsyncValue.loading();
+    state = await AsyncValue.guard(() => build());
+  }
+}
+
+class DonationPaginationState {
+  final int currentPage;
+  final int limit;
+  final int totalCount;
+  final List<DonationModel> donations;
+  final bool hasMore;
+
+  DonationPaginationState({
+    required this.currentPage,
+    required this.limit,
+    required this.totalCount,
+    required this.donations,
+  }) : hasMore = (currentPage * limit) < totalCount;
+
+  DonationPaginationState copyWith({
+    int? currentPage,
+    int? limit,
+    int? totalCount,
+    List<DonationModel>? donations,
+  }) {
+    return DonationPaginationState(
+      currentPage: currentPage ?? this.currentPage,
+      limit: limit ?? this.limit,
+      totalCount: totalCount ?? this.totalCount,
+      donations: donations ?? this.donations,
+    );
+  }
+}
+
+@riverpod
+class ParticipatedCampaignsNotifier extends _$ParticipatedCampaignsNotifier {
+  @override
+  Future<DonationPaginationState> build() async {
+    final campaignsApi = ref.watch(campaignsApiProvider);
+    final response = await campaignsApi.getParticipatedCampaigns(
+      pageNo: 1,
+      limit: 10,
+    );
+
+    if (response.success && response.data != null) {
+      final donationsList =
+          (response.data!['data'] as List<dynamic>?)
+                  ?.map((item) =>
+                      DonationModel.fromJson(item as Map<String, dynamic>))
+                  .toList() ??
+              [];
+      final totalCountValue = response.data!['total_count'];
+      final totalCount = totalCountValue is int
+          ? totalCountValue
+          : int.tryParse(totalCountValue.toString()) ?? 0;
+
+      return DonationPaginationState(
+        currentPage: 1,
+        limit: 10,
+        totalCount: totalCount,
+        donations: donationsList,
+      );
+    } else {
+      throw Exception(response.message ?? 'Failed to fetch participated campaigns');
+    }
+  }
+
+  Future<void> loadNextPage() async {
+    if (!state.hasValue) return;
+
+    final currentState = state.value!;
+    if (!currentState.hasMore) return;
+
+    state = const AsyncValue.loading();
+    state = await AsyncValue.guard(() async {
+      final campaignsApi = ref.watch(campaignsApiProvider);
+      final nextPage = currentState.currentPage + 1;
+      final response = await campaignsApi.getParticipatedCampaigns(
+        pageNo: nextPage,
+        limit: currentState.limit,
+      );
+
+      if (response.success && response.data != null) {
+        final donationsList =
+            (response.data!['data'] as List<dynamic>?)
+                    ?.map((item) =>
+                        DonationModel.fromJson(item as Map<String, dynamic>))
+                    .toList() ??
+                [];
+        final totalCountValue = response.data!['total_count'];
+        final totalCount = totalCountValue is int
+            ? totalCountValue
+            : int.tryParse(totalCountValue.toString()) ?? 0;
+
+        return currentState.copyWith(
+          currentPage: nextPage,
+          totalCount: totalCount,
+          donations: [...currentState.donations, ...donationsList],
+        );
+      } else {
+        throw Exception(response.message ?? 'Failed to load more donations');
       }
     });
   }
