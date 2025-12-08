@@ -1,6 +1,7 @@
 import 'package:charity_trust/src/interfaces/main_pages/campaign_pages/campaign.dart';
 import 'package:charity_trust/src/interfaces/main_pages/campaign_pages/campaign_detail.dart';
 import 'package:charity_trust/src/interfaces/main_pages/home.dart';
+import 'package:charity_trust/src/interfaces/main_pages/donation_categories.dart';
 import 'package:charity_trust/src/interfaces/main_pages/news_bookmark/news_list_page.dart';
 import 'package:charity_trust/src/interfaces/main_pages/profile.dart';
 import 'package:charity_trust/src/interfaces/main_pages/profile_pages/edit_profile.dart';
@@ -168,6 +169,9 @@ Route<dynamic> generateRoute(RouteSettings? settings) {
       break;
     case 'Campaign':
       page = CampaignPage();
+      break;
+    case 'DonationCategories':
+      page = DonationCategoriesPage();
       break;
     case 'CampaignDetail':
       if (settings?.arguments is Map) {

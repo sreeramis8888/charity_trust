@@ -116,32 +116,65 @@ class _HomePageState extends ConsumerState<HomePage> {
           ),
       builder: (context, snapshot) {
         final userRole = snapshot.data ?? '';
+        final isAdmin = userRole == 'trustee' || userRole == 'president';
 
-        if (userRole != 'trustee' || userRole != 'president') {
-          return SizedBox.shrink();
-        }
-
-        return Container(
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              colors: [Color(0xFFED3C5F), Color(0xFFED3C5F)],
-              begin: Alignment.bottomRight,
-              end: Alignment.topLeft,
+        return Column(
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: [
+            if (isAdmin)
+              Container(
+                height: 45,
+                width: 45,
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [Color(0xFFED3C5F), Color(0xFFED3C5F)],
+                    begin: Alignment.bottomRight,
+                    end: Alignment.topLeft,
+                  ),
+                  shape: BoxShape.circle,
+                ),
+                child: FloatingActionButton(
+                  heroTag: 'addUserButton',
+                  onPressed: () {
+                    Navigator.of(context).pushNamed('CreateUser');
+                  },
+                  backgroundColor: Colors.transparent,
+                  elevation: 0,
+                  child: SvgPicture.asset(
+                    'assets/svg/add.svg',
+                    height: 24,
+                    width: 24,
+                    colorFilter: ColorFilter.mode(kWhite, BlendMode.srcIn),
+                  ),
+                ),
+              ),
+            if (isAdmin) const SizedBox(height: 16),
+            Container(
+              height: 45,
+              width: 45,
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [Color(0xFFED3C5F), Color(0xFFED3C5F)],
+                  begin: Alignment.bottomRight,
+                  end: Alignment.topLeft,
+                ),
+                shape: BoxShape.circle,
+              ),
+              child: FloatingActionButton(
+                onPressed: () {
+                  Navigator.of(context).pushNamed('DonationCategories');
+                },
+                backgroundColor: Colors.transparent,
+                elevation: 0,
+                child: SvgPicture.asset(
+                  'assets/svg/donation.svg',
+                  height: 24,
+                  width: 24,
+                  colorFilter: ColorFilter.mode(kWhite, BlendMode.srcIn),
+                ),
+              ),
             ),
-            shape: BoxShape.circle,
-          ),
-          child: FloatingActionButton(
-            onPressed: () {
-              Navigator.of(context).pushNamed('CreateUser');
-            },
-            backgroundColor: Colors.transparent,
-            elevation: 0,
-            child: const Icon(
-              Icons.add,
-              size: 40,
-              color: kWhite,
-            ),
-          ),
+          ],
         );
       },
     );
@@ -306,7 +339,8 @@ class _HomePageState extends ConsumerState<HomePage> {
                                   const EdgeInsets.symmetric(horizontal: 6),
                               child: GestureDetector(
                                 onTap: () {
-                                  _handleCategoryTap(context, category['category'] as String);
+                                  _handleCategoryTap(
+                                      context, category['category'] as String);
                                 },
                                 child: Column(
                                   children: [
