@@ -5,7 +5,9 @@ import 'package:Annujoom/src/data/constants/style_constants.dart';
 import 'package:Annujoom/src/data/providers/loading_provider.dart';
 import 'package:Annujoom/src/data/services/secure_storage_service.dart';
 import 'package:Annujoom/src/data/services/snackbar_service.dart';
+import 'package:Annujoom/src/data/services/firebase_auth_service.dart';
 import 'package:Annujoom/src/data/providers/auth_login_provider.dart';
+import 'package:Annujoom/src/data/providers/firebase_auth_provider.dart';
 import 'package:Annujoom/src/data/providers/user_provider.dart';
 import 'package:Annujoom/src/data/models/user_model.dart';
 import 'package:Annujoom/src/interfaces/components/primaryButton.dart';
@@ -205,42 +207,39 @@ class _PhoneNumberScreenState extends ConsumerState<PhoneNumberScreen> {
     final phoneNumber = _mobileController.text;
 
     if (phoneNumber.isEmpty) {
-      SnackbarService snackbarService = SnackbarService();
-      snackbarService.showSnackBar('Please enter a phone number');
+      SnackbarService().showSnackBar('Please enter a phone number');
       return;
     }
 
     try {
-      // Show loading
       ref.read(loadingProvider.notifier).startLoading();
 
-      final authLoginApi = ref.read(authLoginApiProvider);
-      final response = await authLoginApi.sendOtp("+$countryCode$phoneNumber");
+      final firebaseAuthService = ref.read(firebaseAuthServiceProvider);
+      final fullPhone = "+$countryCode$phoneNumber";
+
+      final result = await firebaseAuthService.sendOtp(fullPhone);
+      final verificationId = result['verificationId'] ?? '';
+      final resendToken = result['resendToken'] ?? '';
 
       ref.read(loadingProvider.notifier).stopLoading();
 
-      if (response.success && response.data != null) {
-        final otp = response.data!['data'] as String?;
-        if (otp != null) {
-          log('OTP: $otp', name: 'PhoneNumberScreen');
-          SnackbarService().showSnackBar('OTP sent successfully');
+      if (verificationId.isEmpty) {
+        SnackbarService().showSnackBar('Failed to send OTP. Please try again.');
+        return;
+      }
 
-          if (context.mounted) {
-            Navigator.of(context).push(
-              MaterialPageRoute(
-                builder: (context) => OTPScreen(
-                  fullPhone: "+$countryCode$phoneNumber",
-                  resendToken: '',
-                  countryCode: countryCode ?? '91',
-                  verificationId: '',
-                ),
-              ),
-            );
-          }
-        }
-      } else {
-        SnackbarService().showSnackBar(
-          response.message ?? 'Failed to send OTP',
+      SnackbarService().showSnackBar('OTP sent successfully');
+
+      if (context.mounted) {
+        Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (context) => OTPScreen(
+              fullPhone: fullPhone,
+              countryCode: countryCode ?? '91',
+              verificationId: verificationId,
+              resendToken: resendToken,
+            ),
+          ),
         );
       }
     } catch (e) {
@@ -252,16 +251,17 @@ class _PhoneNumberScreenState extends ConsumerState<PhoneNumberScreen> {
 }
 
 class OTPScreen extends ConsumerStatefulWidget {
-  final String verificationId;
-  final String resendToken;
   final String fullPhone;
   final String countryCode;
+  final String verificationId;
+  final String resendToken;
+
   const OTPScreen({
     required this.fullPhone,
-    required this.resendToken,
     required this.countryCode,
-    super.key,
     required this.verificationId,
+    required this.resendToken,
+    super.key,
   });
 
   @override
@@ -276,11 +276,15 @@ class _OTPScreenState extends ConsumerState<OTPScreen> {
   bool _isButtonDisabled = true;
 
   late TextEditingController _otpController;
+  late String _currentVerificationId;
+  late String _currentResendToken;
 
   @override
   void initState() {
     super.initState();
     _otpController = TextEditingController();
+    _currentVerificationId = widget.verificationId;
+    _currentResendToken = widget.resendToken;
     startTimer();
   }
 
@@ -315,20 +319,19 @@ class _OTPScreenState extends ConsumerState<OTPScreen> {
 
   Future<void> _resendOtp() async {
     try {
-      final authLoginApi = ref.read(authLoginApiProvider);
-      final response = await authLoginApi.sendOtp(widget.fullPhone);
+      final firebaseAuthService = ref.read(firebaseAuthServiceProvider);
+      final result = await firebaseAuthService.resendOtp(
+        widget.fullPhone,
+        _currentResendToken,
+      );
 
-      if (response.success && response.data != null) {
-        final otp = response.data!['data'] as String?;
-        if (otp != null) {
-          log('OTP (Resend): $otp', name: 'OTPScreen');
-          SnackbarService().showSnackBar('OTP resent successfully');
-        }
-      } else {
-        SnackbarService().showSnackBar(
-          response.message ?? 'Failed to resend OTP',
-        );
-      }
+      setState(() {
+        _currentVerificationId = result['verificationId'] ?? '';
+        _currentResendToken = result['resendToken'] ?? '';
+      });
+
+      SnackbarService().showSnackBar('OTP resent successfully');
+      log('OTP resent successfully', name: 'OTPScreen');
     } catch (e) {
       SnackbarService().showSnackBar('Error: $e');
       log('Error resending OTP: $e', name: 'OTPScreen');
@@ -488,28 +491,36 @@ class _OTPScreenState extends ConsumerState<OTPScreen> {
 
     try {
       ref.read(loadingProvider.notifier).startLoading();
-      SecureStorageService secureStorage = SecureStorageService();
-      // Get FCM token
+
+      // Step 1: Verify OTP with Firebase and get ID token
+      final firebaseAuthService = ref.read(firebaseAuthServiceProvider);
+      final clientToken = await firebaseAuthService.verifyOtp(
+        verificationId: _currentVerificationId,
+        smsCode: otp,
+      );
+
+      // Step 2: Get FCM token
+      final secureStorage = SecureStorageService();
       final fcmToken = await secureStorage.getFcmToken();
 
+      // Step 3: Call backend firebase-login endpoint
       final authLoginApi = ref.read(authLoginApiProvider);
-      final response =
-          await authLoginApi.verifyOtp(widget.fullPhone, otp, fcmToken ?? '');
+      final response = await authLoginApi.firebaseLogin(clientToken, fcmToken ?? '');
 
       ref.read(loadingProvider.notifier).stopLoading();
 
       if (response.success && response.data != null) {
         final data = response.data!['data'] as Map<String, dynamic>?;
         if (data != null) {
-          final userData = data['user'] as Map<String, dynamic>?;
+          final userData = data['user'] ?? data['new_user'] as Map<String, dynamic>?;
           if (userData != null) {
             final user = UserModel.fromJson(userData);
 
-            // Store user in provider and secure storage
+            // Store user in provider
             ref.read(userProvider.notifier).setUser(user);
 
-            log('OTP verified successfully', name: 'OTPScreen');
-            SnackbarService().showSnackBar('Login successful');
+            log('OTP verified and login successful', name: 'OTPScreen');
+            // SnackbarService().showSnackBar('Login successful');
 
             if (context.mounted) {
               // Navigate based on user status
