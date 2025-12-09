@@ -512,15 +512,23 @@ class _OTPScreenState extends ConsumerState<OTPScreen> {
       if (response.success && response.data != null) {
         final data = response.data!['data'] as Map<String, dynamic>?;
         if (data != null) {
+          final token = data['token'] as String?;
           final userData = data['user'] ?? data['new_user'] as Map<String, dynamic>?;
-          if (userData != null) {
+          
+          if (token != null && userData != null) {
             final user = UserModel.fromJson(userData);
+            final secureStorage = SecureStorageService();
+
+            // Save bearer token to secure storage
+            await secureStorage.saveBearerToken(token);
+            if (user.id != null) {
+              await secureStorage.saveUserId(user.id!);
+            }
 
             // Store user in provider
             ref.read(userProvider.notifier).setUser(user);
 
             log('OTP verified and login successful', name: 'OTPScreen');
-            // SnackbarService().showSnackBar('Login successful');
 
             if (context.mounted) {
               // Navigate based on user status
@@ -545,6 +553,8 @@ class _OTPScreenState extends ConsumerState<OTPScreen> {
                   Navigator.of(context).pushReplacementNamed('navbar');
               }
             }
+          } else {
+            SnackbarService().showSnackBar('Invalid response data');
           }
         }
       } else {

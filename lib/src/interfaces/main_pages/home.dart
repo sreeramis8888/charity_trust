@@ -116,7 +116,7 @@ class _HomePageState extends ConsumerState<HomePage> {
           ),
       builder: (context, snapshot) {
         final userRole = snapshot.data ?? '';
-        final isAdmin = userRole == 'trustee' || userRole == 'president';
+        final isAdmin = userRole == 'trustee' || userRole == 'president' || userRole == 'secretary';
 
         return Column(
           mainAxisAlignment: MainAxisAlignment.end,

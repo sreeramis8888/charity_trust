@@ -93,7 +93,7 @@ class ApiProvider {
   Future<ApiResponse<Map<String, dynamic>>> post(
     String endpoint,
     Map<String, dynamic> data, {
-    bool requireAuth = false,
+    bool requireAuth = true,
   }) async {
     try {
       final headers = await _buildHeaders(requireAuth: requireAuth);
@@ -104,7 +104,8 @@ class ApiProvider {
       );
       log(name: 'API POST', '$baseUrl$endpoint');
       final decoded = json.decode(response.body);
-
+      log(name: 'API POST data ', '${decoded['data']}');
+      log(name: 'API POST message', '${decoded['message']}');
       if (response.statusCode == 200 || response.statusCode == 201) {
         return ApiResponse.success(decoded, response.statusCode);
       } else {
