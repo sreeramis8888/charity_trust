@@ -8,8 +8,7 @@ class UserModel {
   final String? fcm;
   final String? otp;
   final String? gender;
-  final int? panNumber;
-  final String? panCopy;
+  final String? aadharNumber;
   final String? address;
   final String? area;
   final String? district;
@@ -42,8 +41,7 @@ class UserModel {
     this.fcm,
     this.otp,
     this.gender,
-    this.panNumber,
-    this.panCopy,
+    this.aadharNumber,
     this.address,
     this.area,
     this.district,
@@ -81,8 +79,7 @@ class UserModel {
       fcm: json["fcm"],
       otp: json["otp"],
       gender: json["gender"],
-      panNumber: json["pan_number"],
-      panCopy: json["pan_copy"],
+      aadharNumber: json["aadhar_number"],
       address: json["address"],
       area: json["area"],
       district: json["district"],
@@ -127,8 +124,7 @@ class UserModel {
       "fcm": fcm,
       "otp": otp,
       "gender": gender,
-      "pan_number": panNumber,
-      "pan_copy": panCopy,
+      "aadhar_number": aadharNumber,
       "address": address,
       "area": area,
       "district": district,
@@ -166,8 +162,7 @@ class UserModel {
     String? fcm,
     String? otp,
     String? gender,
-    int? panNumber,
-    String? panCopy,
+    String? aadharNumber,
     String? address,
     String? area,
     String? district,
@@ -200,8 +195,7 @@ class UserModel {
       fcm: fcm ?? this.fcm,
       otp: otp ?? this.otp,
       gender: gender ?? this.gender,
-      panNumber: panNumber ?? this.panNumber,
-      panCopy: panCopy ?? this.panCopy,
+      aadharNumber: aadharNumber ?? this.aadharNumber,
       address: address ?? this.address,
       area: area ?? this.area,
       district: district ?? this.district,

@@ -221,26 +221,26 @@ class _HomePageState extends ConsumerState<HomePage> {
                         fit: BoxFit.contain,
                       ),
                     ),
-                    Row(
-                      children: [
-                        IconButton(
-                          onPressed: () {},
-                          icon: SvgPicture.asset(
-                            'assets/svg/bell.svg',
-                            height: 20,
-                            width: 20,
-                          ),
-                        ),
-                        IconButton(
-                          onPressed: () {},
-                          icon: SvgPicture.asset(
-                            'assets/svg/call.svg',
-                            height: 20,
-                            width: 20,
-                          ),
-                        ),
-                      ],
-                    )
+                    // Row(
+                    //   children: [
+                    //     IconButton(
+                    //       onPressed: () {},
+                    //       icon: SvgPicture.asset(
+                    //         'assets/svg/bell.svg',
+                    //         height: 20,
+                    //         width: 20,
+                    //       ),
+                    //     ),
+                    //     IconButton(
+                    //       onPressed: () {},
+                    //       icon: SvgPicture.asset(
+                    //         'assets/svg/call.svg',
+                    //         height: 20,
+                    //         width: 20,
+                    //       ),
+                    //     ),
+                    //   ],
+                    // )
                   ],
                 ),
               ),

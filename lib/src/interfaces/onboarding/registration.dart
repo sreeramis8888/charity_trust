@@ -38,7 +38,7 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
   final addressController = TextEditingController();
   final areaController = TextEditingController();
   final pincodeController = TextEditingController();
-  final panNumberController = TextEditingController();
+  final aadharNumberController = TextEditingController();
   final dobController = TextEditingController();
   final recommendedByController = TextEditingController();
 
@@ -47,7 +47,6 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
   String? selectedDistrictCode;
   String? selectedGender;
   XFile? profileImage;
-  XFile? panCardImage;
   String? recommendedByType = 'trustee';
   UserModel? selectedRecommendedBy;
   bool isSameAsPhone = true;
@@ -64,8 +63,7 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
     'state': GlobalKey(),
     'district': GlobalKey(),
     'pincode': GlobalKey(),
-    'panNumber': GlobalKey(),
-    'panCard': GlobalKey(),
+    'aadharNumber': GlobalKey(),
     'dob': GlobalKey(),
     'gender': GlobalKey(),
     'whatsapp': GlobalKey(),
@@ -95,10 +93,8 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
         } else if (selectedDistrictCode == null ||
             selectedDistrictCode!.isEmpty) {
           firstErrorKey = 'district';
-        } else if (panNumberController.text.trim().isEmpty) {
-          firstErrorKey = 'panNumber';
-        } else if (panCardImage == null) {
-          firstErrorKey = 'panCard';
+        } else if (aadharNumberController.text.trim().isEmpty) {
+          firstErrorKey = 'aadharNumber';
         } else if (!isSameAsPhone && whatsappController.text.trim().isEmpty) {
           firstErrorKey = 'whatsapp';
         } else if (selectedRecommendedBy == null) {
@@ -131,7 +127,7 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
     addressController.dispose();
     areaController.dispose();
     pincodeController.dispose();
-    panNumberController.dispose();
+    aadharNumberController.dispose();
     dobController.dispose();
     whatsappController.dispose();
     recommendedByController.dispose();
@@ -160,24 +156,7 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
     }
   }
 
-  Future<void> _pickPanCard() async {
-    FocusScope.of(context).requestFocus(_unfocusNode);
-    final result = await pickMedia(
-      context: context,
-      enableCrop: false,
-    );
 
-    if (!mounted) return;
-
-    if (result != null && result is XFile) {
-      setState(() {
-        panCardImage = result;
-      });
-    }
-    if (mounted) {
-      FocusScope.of(context).requestFocus(_unfocusNode);
-    }
-  }
 
   Future<void> _handleRegistration() async {
     try {
@@ -200,21 +179,7 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
         }
       }
 
-      // Upload PAN card if available
-      String? panCardUrl;
-      if (panCardImage != null) {
-        try {
-          panCardUrl = await imageUpload(panCardImage!.path);
-          log('PAN card uploaded: $panCardUrl', name: 'RegistrationPage');
-        } catch (e) {
-          if (mounted) {
-            ref.read(loadingProvider.notifier).stopLoading();
-          }
-          SnackbarService().showSnackBar('Failed to upload PAN card');
-          log('Error uploading PAN card: $e', name: 'RegistrationPage');
-          return;
-        }
-      }
+
 
       // Convert date from dd/mm/yyyy to yyyy-mm-dd format
       String formattedDob = dobController.text.trim();
@@ -242,8 +207,7 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
         'state': selectedStateCode,
         'district': selectedDistrictCode,
         'pincode': pincodeController.text.trim(),
-        'pan_number': panNumberController.text.trim(),
-        'pan_copy': panCardUrl,
+        'aadhar_number': aadharNumberController.text.trim(),
         'profile_picture': profilePictureUrl,
         'gender': selectedGender,
         'whatsapp_number': whatsappNumber,
@@ -704,7 +668,7 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
                         animationType: anim.AnimationType.fadeSlideInFromLeft,
                         duration: anim.AnimationDuration.normal,
                         delayMilliseconds: 1000,
-                        child: Text("PAN Number *", style: kSmallTitleR),
+                        child: Text("Aadhar Number *", style: kSmallTitleR),
                       ),
                       const SizedBox(height: 6),
                       anim.AnimatedWidgetWrapper(
@@ -712,95 +676,11 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
                         duration: anim.AnimationDuration.normal,
                         delayMilliseconds: 1050,
                         child: InputField(
-                          key: _fieldKeys['panNumber'],
+                          key: _fieldKeys['aadharNumber'],
                           type: CustomFieldType.text,
-                          hint: "Enter PAN number",
-                          controller: panNumberController,
+                          hint: "Enter Aadhar number",
+                          controller: aadharNumberController,
                           validator: (v) => v!.isEmpty ? "Required" : null,
-                        ),
-                      ),
-                      const SizedBox(height: 20),
-                      anim.AnimatedWidgetWrapper(
-                        animationType: anim.AnimationType.fadeSlideInFromLeft,
-                        duration: anim.AnimationDuration.normal,
-                        delayMilliseconds: 1100,
-                        child: Text("Upload PAN Card", style: kSmallTitleR),
-                      ),
-                      const SizedBox(height: 4),
-                      anim.AnimatedWidgetWrapper(
-                        animationType: anim.AnimationType.fadeSlideInFromLeft,
-                        duration: anim.AnimationDuration.normal,
-                        delayMilliseconds: 1150,
-                        child: Text(
-                          "Image (JPG/PNG) - Recommended size: 400x400",
-                          style: kSmallerTitleR.copyWith(color: Colors.grey),
-                        ),
-                      ),
-                      const SizedBox(height: 6),
-                      anim.AnimatedWidgetWrapper(
-                        animationType: anim.AnimationType.fadeSlideInFromBottom,
-                        duration: anim.AnimationDuration.normal,
-                        delayMilliseconds: 1200,
-                        child: FormField<void>(
-                          key: _fieldKeys['panCard'],
-                          validator: (_) {
-                            if (panCardImage == null) {
-                              return 'Required';
-                            }
-                            return null;
-                          },
-                          builder: (field) => Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              GestureDetector(
-                                onTap: _pickPanCard,
-                                child: Container(
-                                  padding: const EdgeInsets.symmetric(
-                                      vertical: 16, horizontal: 12),
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(8),
-                                    border: Border.all(
-                                        color: field.hasError
-                                            ? Colors.red
-                                            : kBorder),
-                                    color: kWhite,
-                                  ),
-                                  child: Row(
-                                    children: [
-                                      const Icon(Icons.cloud_upload_outlined,
-                                          color: kTextColor),
-                                      const SizedBox(width: 12),
-                                      Expanded(
-                                        child: Text(
-                                          panCardImage != null
-                                              ? panCardImage!.name
-                                              : "Upload",
-                                          style: TextStyle(
-                                            fontSize: 14,
-                                            color: panCardImage != null
-                                                ? kTextColor
-                                                : kSecondaryTextColor,
-                                          ),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                              if (field.hasError)
-                                Padding(
-                                  padding: const EdgeInsets.only(
-                                      top: 4.0, left: 4.0),
-                                  child: Text(
-                                    field.errorText ?? '',
-                                    style: const TextStyle(
-                                      fontSize: 12,
-                                      color: Colors.red,
-                                    ),
-                                  ),
-                                ),
-                            ],
-                          ),
                         ),
                       ),
                       const SizedBox(height: 20),
