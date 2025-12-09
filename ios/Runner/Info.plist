@@ -34,10 +34,10 @@
 		</dict>
 		<dict>
 			<key>CFBundleURLName</key>
-			<string>com.skybertech.ipaconnect</string>
+			<string>com.annujoom</string>
 			<key>CFBundleURLSchemes</key>
 			<array>
-				<string>ipaconnect</string>
+				<string>Annuojoom</string>
 			</array>
 		</dict>
 	</array>
