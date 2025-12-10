@@ -3,6 +3,7 @@ import 'package:Annujoom/src/interfaces/components/loading_indicator.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:razorpay_flutter/razorpay_flutter.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:Annujoom/src/data/constants/color_constants.dart';
 import 'package:Annujoom/src/data/constants/style_constants.dart';
 import 'package:Annujoom/src/interfaces/components/primaryButton.dart';
@@ -11,6 +12,7 @@ import 'package:Annujoom/src/interfaces/animations/index.dart' as anim;
 import 'package:Annujoom/src/data/providers/donation_provider.dart';
 import 'package:Annujoom/src/data/providers/razorpay_provider.dart';
 import 'package:Annujoom/src/data/services/snackbar_service.dart';
+import 'package:Annujoom/src/data/services/secure_storage_service.dart';
 import 'package:Annujoom/src/interfaces/components/additional_pages/payment_success_page.dart';
 import 'package:Annujoom/src/interfaces/components/additional_pages/payment_failed_page.dart';
 
@@ -45,13 +47,25 @@ class CampaignDetailPage extends ConsumerStatefulWidget {
 class _CampaignDetailPageState extends ConsumerState<CampaignDetailPage> {
   final TextEditingController _donationController = TextEditingController();
   bool _isProcessing = false;
+  bool _isDemoAccount = false;
   late Future<void> _campaignLoadFuture;
 
   @override
   void initState() {
     super.initState();
+    _checkDemoAccount();
     if (widget.isDirectCategory && widget.category != null) {
       _campaignLoadFuture = _loadCategoryCampaign();
+    }
+  }
+
+  Future<void> _checkDemoAccount() async {
+    final secureStorage = ref.read(secureStorageServiceProvider);
+    final isDemoAccount = await secureStorage.isDemoAccount();
+    if (mounted) {
+      setState(() {
+        _isDemoAccount = isDemoAccount;
+      });
     }
   }
 
@@ -214,6 +228,9 @@ class _CampaignDetailPageState extends ConsumerState<CampaignDetailPage> {
 
   @override
   Widget build(BuildContext context) {
+    if (_isDemoAccount) {
+      return _buildDemoAccountPage(context);
+    }
     if (widget.isDirectCategory && widget.category != null) {
       return _buildCategoryDetailPage(context);
     }
@@ -470,5 +487,66 @@ class _CampaignDetailPageState extends ConsumerState<CampaignDetailPage> {
       ),
       const SizedBox(height: 24),
     ]);
+  }
+
+  Widget _buildDemoAccountPage(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        backgroundColor: kWhite,
+        scrolledUnderElevation: 0,
+        elevation: 0,
+        leading: IconButton(
+          icon: const Icon(
+            Icons.arrow_back_ios,
+            color: kTextColor,
+            size: 20,
+          ),
+          onPressed: () => Navigator.pop(context),
+        ),
+        title: Text('Campaign Details', style: kBodyTitleM),
+      ),
+      backgroundColor: kBackgroundColor,
+      body: Center(
+        child: Padding(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                Icons.info_outline,
+                size: 64,
+                color: kPrimaryColor,
+              ),
+              const SizedBox(height: 24),
+              Text(
+                'Donations via App',
+                style: kHeadTitleR,
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 12),
+              Text(
+                'To support our campaigns and make a donation, please visit our website.',
+                style: kBodyTitleR.copyWith(color: kSecondaryTextColor),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 32),
+              primaryButton(
+                label: 'Donate on Website',
+                onPressed: () async {
+                  const url = 'https://annujoomcharitabletrust.com/';
+                  if (await canLaunchUrl(Uri.parse(url))) {
+                    await launchUrl(
+                      Uri.parse(url),
+                      mode: LaunchMode.externalApplication,
+                    );
+                  }
+                },
+                buttonHeight: 48,
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 }

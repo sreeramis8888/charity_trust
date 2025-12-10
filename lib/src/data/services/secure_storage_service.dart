@@ -1,6 +1,5 @@
 import 'dart:convert';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:Annujoom/src/data/models/user_model.dart';
 
@@ -75,6 +74,12 @@ class SecureStorageService {
   /// Retrieve FCM token
   Future<String?> getFcmToken() async {
     return await _storage.read(key: _fcmTokenKey);
+  }
+
+  /// Check if current user is the demo account for App Store Connect
+  Future<bool> isDemoAccount() async {
+    final user = await getUserData();
+    return user?.phone == '+919645398555';
   }
 }
 
