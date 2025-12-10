@@ -10,6 +10,7 @@ class CampaignCard extends StatelessWidget {
   final String description;
   final String category;
   final String date;
+  final String? startDate;
   final String? image;
   final int raised;
   final int goal;
@@ -27,6 +28,7 @@ class CampaignCard extends StatelessWidget {
     required this.description,
     required this.category,
     required this.date,
+    this.startDate,
     required this.raised,
     required this.goal,
     this.image,
@@ -55,14 +57,27 @@ class CampaignCard extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              TextPill(
-                text: category,
-                color: const Color(0xFFFF6900),
-                textStyle: kSmallerTitleR.copyWith(fontSize: 10, color: kWhite),
-              ),
-              if (isGeneralCampaign)
+              if (!isApprovalCard)
+                TextPill(
+                  text: category,
+                  color: const Color(0xFFFF6900),
+                  textStyle: kSmallerTitleR.copyWith(fontSize: 10, color: kWhite),
+                ),
+              if (isApprovalCard && startDate != null)
+                TextPill(
+                  text: "START: $startDate",
+                  color: const Color(0xFFDBDBDB),
+                  textStyle: kSmallerTitleR.copyWith(fontSize: 10),
+                ),
+              if (isGeneralCampaign && !isApprovalCard)
                 TextPill(
                   text: "DUE DATE:  $date",
+                  color: const Color(0xFFDBDBDB),
+                  textStyle: kSmallerTitleR.copyWith(fontSize: 10),
+                ),
+              if (isApprovalCard)
+                TextPill(
+                  text: "DUE DATE: $date",
                   color: const Color(0xFFDBDBDB),
                   textStyle: kSmallerTitleR.copyWith(fontSize: 10),
                 ),
@@ -102,7 +117,7 @@ class CampaignCard extends StatelessWidget {
               ),
             ],
           ),
-          if (isGeneralCampaign) ...[
+          if (isGeneralCampaign && !isApprovalCard) ...[
             const SizedBox(height: 16),
             LinearProgressIndicator(
               color: Color(0xFFFFD400),
@@ -154,7 +169,7 @@ class CampaignCard extends StatelessWidget {
                   child: primaryButton(
                     label: "Reject",
                     onPressed: onReject,
-                    buttonColor: const Color(0xFFFFEBEE),
+                    buttonColor: kCardBackgroundColor,
                     labelColor: const Color(0xFFC62828),
                     sideColor: const Color(0xFFC62828),
                   ),
@@ -164,7 +179,7 @@ class CampaignCard extends StatelessWidget {
                   child: primaryButton(
                     label: "Accept",
                     onPressed: onApprove,
-                    buttonColor: const Color(0xFF2E7D32),
+                    buttonColor: const Color(0xFF009B0A),
                     labelColor: kWhite,
                   ),
                 ),

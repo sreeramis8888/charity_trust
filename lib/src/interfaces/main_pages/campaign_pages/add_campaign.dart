@@ -7,7 +7,7 @@ import 'package:Annujoom/src/data/providers/loading_provider.dart';
 import 'package:Annujoom/src/data/services/snackbar_service.dart';
 import 'package:Annujoom/src/data/services/image_upload.dart';
 import 'package:Annujoom/src/data/providers/campaigns_provider.dart';
-import 'package:Annujoom/src/data/providers/user_provider.dart';
+import 'package:Annujoom/src/data/services/secure_storage_service.dart';
 import 'package:Annujoom/src/interfaces/components/input_field.dart';
 import 'package:Annujoom/src/interfaces/components/dropdown.dart';
 import 'package:Annujoom/src/interfaces/components/loading_indicator.dart';
@@ -163,7 +163,9 @@ class _AddCampaignPageState extends ConsumerState<AddCampaignPage> {
         }
       }
 
-      final userRole = ref.read(userProvider)?.role ?? '';
+      final secureStorage = ref.read(secureStorageServiceProvider);
+      final user = await secureStorage.getUserData();
+      final userRole = user?.role ?? '';
       final approvalStatus = userRole == 'president' ? 'approved' : 'pending';
 
       final campaignData = <String, dynamic>{

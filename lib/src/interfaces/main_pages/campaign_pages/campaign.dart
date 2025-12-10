@@ -12,9 +12,9 @@ import 'package:Annujoom/src/data/providers/campaigns_provider.dart'
         generalCampaignsProvider,
         participatedCampaignsProvider,
         pendingApprovalCampaignsProvider;
-import 'package:Annujoom/src/data/providers/user_provider.dart'
-    show userProvider;
 import 'package:Annujoom/src/data/services/secure_storage_service.dart';
+import 'package:Annujoom/src/data/services/snackbar_service.dart';
+import 'package:Annujoom/src/interfaces/components/confirmation_dialog.dart';
 import 'package:Annujoom/src/interfaces/main_pages/campaign_pages/add_campaign.dart';
 
 class CampaignPage extends ConsumerStatefulWidget {
@@ -25,23 +25,41 @@ class CampaignPage extends ConsumerStatefulWidget {
 }
 
 class _CampaignPageState extends ConsumerState<CampaignPage>
-    with SingleTickerProviderStateMixin {
+    with TickerProviderStateMixin {
   late TabController _controller;
+  bool _isPresident = false;
 
   @override
   void initState() {
     super.initState();
+    _controller = TabController(length: 3, vsync: this);
+    _loadUserRole();
+  }
+
+  Future<void> _loadUserRole() async {
+    final secureStorage = ref.read(secureStorageServiceProvider);
+    final user = await secureStorage.getUserData();
+    if (mounted) {
+      setState(() {
+        _isPresident = user?.role == 'president';
+        final tabCount = _isPresident ? 4 : 3;
+        if (_controller.length != tabCount) {
+          _controller.dispose();
+          _controller = TabController(length: tabCount, vsync: this);
+        }
+      });
+    }
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    final user = ref.watch(userProvider);
-    final isPresident = user?.role == 'president';
-    final tabCount = isPresident ? 4 : 3;
-
-    _controller = TabController(length: tabCount, vsync: this);
-
-    final secureStorageAsync = ref.watch(secureStorageServiceProvider);
+    final secureStorage = ref.watch(secureStorageServiceProvider);
 
     return Scaffold(
       backgroundColor: kBackgroundColor,
@@ -64,8 +82,7 @@ class _CampaignPageState extends ConsumerState<CampaignPage>
             padding: const EdgeInsets.only(right: 16),
             child: Center(
               child: FutureBuilder<String?>(
-                future:
-                    secureStorageAsync.getUserData().then((user) => user?.role),
+                future: secureStorage.getUserData().then((user) => user?.role),
                 builder: (context, snapshot) {
                   final isAdmin = snapshot.data != 'member';
                   if (!isAdmin) {
@@ -123,11 +140,11 @@ class _CampaignPageState extends ConsumerState<CampaignPage>
               ),
               tabs: [
                 const Tab(
-                  text: "General Campaign",
+                  text: "Campaign",
                 ),
-                const Tab(text: "Your Transactions"),
+                const Tab(text: "Transactions"),
                 const Tab(text: "My Campaigns"),
-                if (isPresident) const Tab(text: "Approvals"),
+                if (_isPresident) const Tab(text: "Approvals"),
               ],
             ),
           ),
@@ -139,7 +156,7 @@ class _CampaignPageState extends ConsumerState<CampaignPage>
           _generalCampaignTab(),
           _yourTransactionsTab(),
           _myCampaignsTab(),
-          if (isPresident) _approvalsTab(),
+          if (_isPresident) _approvalsTab(),
         ],
       ),
     );
@@ -428,25 +445,37 @@ class _CampaignPageState extends ConsumerState<CampaignPage>
                   title: campaign.title ?? '',
                   category: campaign.category ?? '',
                   date: formatDate(campaign.targetDate) ?? '',
+                  startDate: formatDate(campaign.startDate),
                   image: campaign.coverImage ?? '',
                   raised: campaign.collectedAmount?.toInt() ?? 0,
                   goal: campaign.targetAmount?.toInt() ?? 0,
                   onDetails: () {},
                   isApprovalCard: true,
-                  onApprove: () async {
-                    final approved = await ref
-                        .read(pendingApprovalCampaignsProvider.notifier)
-                        .approveCampaign(campaign.id ?? '');
-                    if (approved && context.mounted) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('Campaign approved successfully'),
-                        ),
-                      );
-                    }
+                  onApprove: () {
+                    showDialog(
+                      context: context,
+                      builder: (context) => ConfirmationDialog(
+                        title: 'Approve Campaign',
+                        message:
+                            'Are you sure you want to approve "${campaign.title}"?',
+                        confirmButtonText: 'Approve',
+                        onConfirm: () async {
+                          final approved = await ref
+                              .read(pendingApprovalCampaignsProvider.notifier)
+                              .approveCampaign(campaign.id ?? '');
+                          if (approved) {
+                            SnackbarService().showSnackBar(
+                              'Campaign approved successfully',
+                              type: SnackbarType.success,
+                            );
+                          }
+                        },
+                        cancelButtonText: 'Cancel',
+                      ),
+                    );
                   },
                   onReject: () {
-                    _showRejectDialog(context, campaign.id ?? '');
+                    _showRejectDialog(context, campaign.id ?? '', campaign.title ?? '');
                   },
                 ),
               ),
@@ -473,42 +502,96 @@ class _CampaignPageState extends ConsumerState<CampaignPage>
     );
   }
 
-  void _showRejectDialog(BuildContext context, String campaignId) {
+  void _showRejectDialog(BuildContext context, String campaignId, String campaignTitle) {
     final reasonController = TextEditingController();
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Reject Campaign'),
-        content: TextField(
-          controller: reasonController,
-          decoration: const InputDecoration(
-            hintText: 'Enter rejection reason',
-            border: OutlineInputBorder(),
-          ),
-          maxLines: 3,
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
-          ),
-          TextButton(
-            onPressed: () async {
-              Navigator.pop(context);
-              final rejected = await ref
-                  .read(pendingApprovalCampaignsProvider.notifier)
-                  .rejectCampaign(campaignId, reasonController.text);
-              if (rejected && context.mounted) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('Campaign rejected successfully'),
+      builder: (context) => Dialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        backgroundColor: kWhite,
+        child: Padding(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                'Reject Campaign',
+                style: kHeadTitleR,
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 12),
+              Text(
+                'Are you sure you want to reject "$campaignTitle"?',
+                style: kBodyTitleR.copyWith(color: kSecondaryTextColor),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 16),
+              TextField(
+                controller: reasonController,
+                decoration: InputDecoration(
+                  hintText: 'Enter rejection reason',
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
                   ),
-                );
-              }
-            },
-            child: const Text('Reject'),
+                  contentPadding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 12,
+                  ),
+                ),
+                maxLines: 3,
+              ),
+              const SizedBox(height: 28),
+              Row(
+                children: [
+                  Expanded(
+                    child: OutlinedButton(
+                      onPressed: () => Navigator.pop(context),
+                      style: OutlinedButton.styleFrom(
+                        side: const BorderSide(color: kStrokeColor),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                      ),
+                      child: Text(
+                        'Cancel',
+                        style: kSmallerTitleL.copyWith(color: kTextColor),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: ElevatedButton(
+                      onPressed: () async {
+                        Navigator.pop(context);
+                        final rejected = await ref
+                            .read(pendingApprovalCampaignsProvider.notifier)
+                            .rejectCampaign(campaignId, reasonController.text);
+                        if (rejected) {
+                          SnackbarService().showSnackBar(
+                            'Campaign rejected successfully',
+                            type: SnackbarType.success,
+                          );
+                        }
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFFC62828),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                      ),
+                      child: Text(
+                        'Reject',
+                        style: kSmallerTitleL.copyWith(color: kWhite),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }

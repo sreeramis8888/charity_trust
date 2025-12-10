@@ -91,8 +91,8 @@ class CampaignsApi {
     String campaignId,
   ) async {
     return await _apiProvider.patch(
-      '$_endpoint/$campaignId/approve',
-      {},
+      '$_endpoint/approve/$campaignId',
+      {'action': 'approved'},
       requireAuth: true,
     );
   }
@@ -102,8 +102,11 @@ class CampaignsApi {
     String reason,
   ) async {
     return await _apiProvider.patch(
-      '$_endpoint/$campaignId/reject',
-      {'reason': reason},
+      '$_endpoint/approve/$campaignId',
+      {
+        'action': 'rejected',
+        'reason': reason,
+      },
       requireAuth: true,
     );
   }
