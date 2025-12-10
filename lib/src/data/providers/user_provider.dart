@@ -144,7 +144,7 @@ Future<List<UserModel>> fetchUsersByRole(
     );
 
     if (response.success && response.data != null) {
-      final data = response.data!['data'] as List?;
+      final data = response.data!['data']['users'] as List?;
       if (data != null) {
         return data
             .map((item) => UserModel.fromJson(item as Map<String, dynamic>))
@@ -255,5 +255,175 @@ Future<UserModel?> createNewUser(
   } catch (e) {
     log('Error creating new user: $e', name: 'createNewUser');
     return null;
+  }
+}
+
+@riverpod
+Future<List<UserModel>> fetchPendingApprovals(Ref ref) async {
+  try {
+    final apiProvider = ref.watch(apiProviderProvider);
+    final response = await apiProvider.get(
+      '/user/appovals',
+      requireAuth: true,
+    );
+
+    if (response.success && response.data != null) {
+      final data = response.data!['data'] as List?;
+      if (data != null) {
+        return data
+            .map((item) => UserModel.fromJson(item as Map<String, dynamic>))
+            .toList();
+      }
+    }
+    return [];
+  } catch (e) {
+    log('Error fetching pending approvals: $e', name: 'fetchPendingApprovals');
+    return [];
+  }
+}
+
+@riverpod
+Future<List<UserModel>> fetchUserReferrals(Ref ref) async {
+  try {
+    final secureStorage = ref.watch(secureStorageServiceProvider);
+    final userId = await secureStorage.getUserId();
+
+    if (userId == null || userId.isEmpty) {
+      log('User ID not found', name: 'fetchUserReferrals');
+      return [];
+    }
+
+    final apiProvider = ref.watch(apiProviderProvider);
+    final response = await apiProvider.get(
+      '/user/referals/$userId',
+      requireAuth: true,
+    );
+
+    if (response.success && response.data != null) {
+      final data = response.data!['data'] as List?;
+      if (data != null) {
+        return data
+            .map((item) => UserModel.fromJson(item as Map<String, dynamic>))
+            .toList();
+      }
+    }
+    return [];
+  } catch (e) {
+    log('Error fetching user referrals: $e', name: 'fetchUserReferrals');
+    return [];
+  }
+}
+
+@riverpod
+Future<bool> approveUser(
+  Ref ref,
+  String userId,
+) async {
+  try {
+    final apiProvider = ref.watch(apiProviderProvider);
+    final response = await apiProvider.patch(
+      '/user/action/$userId',
+      {'action': 'active'},
+      requireAuth: true,
+    );
+
+    if (response.success) {
+      log('User approved successfully: $userId', name: 'approveUser');
+      return true;
+    }
+    return false;
+  } catch (e) {
+    log('Error approving user: $e', name: 'approveUser');
+    return false;
+  }
+}
+
+@riverpod
+Future<bool> rejectUser(
+  Ref ref,
+  String userId,
+  String reason,
+) async {
+  try {
+    final apiProvider = ref.watch(apiProviderProvider);
+    final response = await apiProvider.patch(
+      '/user/action/$userId',
+      {
+        'action': 'rejected',
+        'reason': reason,
+      },
+      requireAuth: true,
+    );
+
+    if (response.success) {
+      log('User rejected successfully: $userId', name: 'rejectUser');
+      return true;
+    }
+    return false;
+  } catch (e) {
+    log('Error rejecting user: $e', name: 'rejectUser');
+    return false;
+  }
+}
+
+@riverpod
+class PendingApprovalsNotifier extends _$PendingApprovalsNotifier {
+  @override
+  Future<List<UserModel>> build() async {
+    final apiProvider = ref.watch(apiProviderProvider);
+    final response = await apiProvider.get(
+      '/user/appovals',
+      requireAuth: true,
+    );
+
+    if (response.success && response.data != null) {
+      final data = response.data!['data'] as List?;
+      if (data != null) {
+        return data
+            .map((item) => UserModel.fromJson(item as Map<String, dynamic>))
+            .toList();
+      }
+    }
+    return [];
+  }
+
+  Future<void> refresh() async {
+    state = const AsyncValue.loading();
+    state = await AsyncValue.guard(() => build());
+  }
+}
+
+@riverpod
+class UserReferralsNotifier extends _$UserReferralsNotifier {
+  @override
+  Future<List<UserModel>> build() async {
+    final secureStorage = ref.watch(secureStorageServiceProvider);
+    final userId = await secureStorage.getUserId();
+
+    if (userId == null || userId.isEmpty) {
+      log('User ID not found', name: 'UserReferralsNotifier');
+      return [];
+    }
+
+    final apiProvider = ref.watch(apiProviderProvider);
+    final response = await apiProvider.get(
+      '/user/referals/$userId',
+      requireAuth: true,
+    );
+
+    if (response.success && response.data != null) {
+      final data = response.data!['data'] as List?;
+      if (data != null) {
+        return data
+            .map((item) => UserModel.fromJson(item as Map<String, dynamic>))
+            .toList();
+      }
+    }
+    return [];
+  }
+
+  Future<void> refresh() async {
+    state = const AsyncValue.loading();
+    state = await AsyncValue.guard(() => build());
   }
 }

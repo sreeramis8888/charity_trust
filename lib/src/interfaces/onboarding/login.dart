@@ -228,7 +228,7 @@ class _PhoneNumberScreenState extends ConsumerState<PhoneNumberScreen> {
         return;
       }
 
-      SnackbarService().showSnackBar('OTP sent successfully');
+      // SnackbarService().showSnackBar('OTP sent successfully');
 
       if (context.mounted) {
         Navigator.of(context).push(

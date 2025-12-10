@@ -82,7 +82,7 @@ final class HomePageDataProvider extends $FunctionalProvider<
   }
 }
 
-String _$homePageDataHash() => r'5b7af9566bcb7f490e8f4047d33e7bc311d36957';
+String _$homePageDataHash() => r'aa486a1fb0b0e8a0a5ff371fc4bf4d7eaa642636';
 
 @ProviderFor(HomePageNotifier)
 const homePageProvider = HomePageNotifierProvider._();
@@ -108,7 +108,7 @@ final class HomePageNotifierProvider
   HomePageNotifier create() => HomePageNotifier();
 }
 
-String _$homePageNotifierHash() => r'9fa3915cb14501ab5ffaacf5cb72e2840eab44e3';
+String _$homePageNotifierHash() => r'4a8e1bd6a5f9ed4c93c67445d4be5fe963da010a';
 
 abstract class _$HomePageNotifier extends $AsyncNotifier<HomePageData> {
   FutureOr<HomePageData> build();

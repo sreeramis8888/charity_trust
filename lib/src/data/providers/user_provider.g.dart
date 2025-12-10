@@ -216,7 +216,7 @@ final class FetchUsersByRoleProvider extends $FunctionalProvider<
   }
 }
 
-String _$fetchUsersByRoleHash() => r'60629ad86a3e7044e9b3a72c6fd3dfd1b81a750c';
+String _$fetchUsersByRoleHash() => r'e28b5b774bf4ac0136ea8bfc56497cc0ccc1c258';
 
 final class FetchUsersByRoleFamily extends $Family
     with $FunctionalFamilyOverride<FutureOr<List<UserModel>>, UsersListParams> {
@@ -438,4 +438,326 @@ final class CreateNewUserFamily extends $Family
 
   @override
   String toString() => r'createNewUserProvider';
+}
+
+@ProviderFor(fetchPendingApprovals)
+const fetchPendingApprovalsProvider = FetchPendingApprovalsProvider._();
+
+final class FetchPendingApprovalsProvider extends $FunctionalProvider<
+        AsyncValue<List<UserModel>>, List<UserModel>, FutureOr<List<UserModel>>>
+    with $FutureModifier<List<UserModel>>, $FutureProvider<List<UserModel>> {
+  const FetchPendingApprovalsProvider._()
+      : super(
+          from: null,
+          argument: null,
+          retry: null,
+          name: r'fetchPendingApprovalsProvider',
+          isAutoDispose: true,
+          dependencies: null,
+          $allTransitiveDependencies: null,
+        );
+
+  @override
+  String debugGetCreateSourceHash() => _$fetchPendingApprovalsHash();
+
+  @$internal
+  @override
+  $FutureProviderElement<List<UserModel>> $createElement(
+          $ProviderPointer pointer) =>
+      $FutureProviderElement(pointer);
+
+  @override
+  FutureOr<List<UserModel>> create(Ref ref) {
+    return fetchPendingApprovals(ref);
+  }
+}
+
+String _$fetchPendingApprovalsHash() =>
+    r'81405320b3a5c30ccc3e6c86a76c06e26aff0ca7';
+
+@ProviderFor(fetchUserReferrals)
+const fetchUserReferralsProvider = FetchUserReferralsProvider._();
+
+final class FetchUserReferralsProvider extends $FunctionalProvider<
+        AsyncValue<List<UserModel>>, List<UserModel>, FutureOr<List<UserModel>>>
+    with $FutureModifier<List<UserModel>>, $FutureProvider<List<UserModel>> {
+  const FetchUserReferralsProvider._()
+      : super(
+          from: null,
+          argument: null,
+          retry: null,
+          name: r'fetchUserReferralsProvider',
+          isAutoDispose: true,
+          dependencies: null,
+          $allTransitiveDependencies: null,
+        );
+
+  @override
+  String debugGetCreateSourceHash() => _$fetchUserReferralsHash();
+
+  @$internal
+  @override
+  $FutureProviderElement<List<UserModel>> $createElement(
+          $ProviderPointer pointer) =>
+      $FutureProviderElement(pointer);
+
+  @override
+  FutureOr<List<UserModel>> create(Ref ref) {
+    return fetchUserReferrals(ref);
+  }
+}
+
+String _$fetchUserReferralsHash() =>
+    r'2a50b26cbe4daecad03d12ba0f84be17b5f74ec1';
+
+@ProviderFor(approveUser)
+const approveUserProvider = ApproveUserFamily._();
+
+final class ApproveUserProvider
+    extends $FunctionalProvider<AsyncValue<bool>, bool, FutureOr<bool>>
+    with $FutureModifier<bool>, $FutureProvider<bool> {
+  const ApproveUserProvider._(
+      {required ApproveUserFamily super.from, required String super.argument})
+      : super(
+          retry: null,
+          name: r'approveUserProvider',
+          isAutoDispose: true,
+          dependencies: null,
+          $allTransitiveDependencies: null,
+        );
+
+  @override
+  String debugGetCreateSourceHash() => _$approveUserHash();
+
+  @override
+  String toString() {
+    return r'approveUserProvider'
+        ''
+        '($argument)';
+  }
+
+  @$internal
+  @override
+  $FutureProviderElement<bool> $createElement($ProviderPointer pointer) =>
+      $FutureProviderElement(pointer);
+
+  @override
+  FutureOr<bool> create(Ref ref) {
+    final argument = this.argument as String;
+    return approveUser(
+      ref,
+      argument,
+    );
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other is ApproveUserProvider && other.argument == argument;
+  }
+
+  @override
+  int get hashCode {
+    return argument.hashCode;
+  }
+}
+
+String _$approveUserHash() => r'abb18b8e6fa97a24235425e051fd925ad989dd77';
+
+final class ApproveUserFamily extends $Family
+    with $FunctionalFamilyOverride<FutureOr<bool>, String> {
+  const ApproveUserFamily._()
+      : super(
+          retry: null,
+          name: r'approveUserProvider',
+          dependencies: null,
+          $allTransitiveDependencies: null,
+          isAutoDispose: true,
+        );
+
+  ApproveUserProvider call(
+    String userId,
+  ) =>
+      ApproveUserProvider._(argument: userId, from: this);
+
+  @override
+  String toString() => r'approveUserProvider';
+}
+
+@ProviderFor(rejectUser)
+const rejectUserProvider = RejectUserFamily._();
+
+final class RejectUserProvider
+    extends $FunctionalProvider<AsyncValue<bool>, bool, FutureOr<bool>>
+    with $FutureModifier<bool>, $FutureProvider<bool> {
+  const RejectUserProvider._(
+      {required RejectUserFamily super.from,
+      required (
+        String,
+        String,
+      )
+          super.argument})
+      : super(
+          retry: null,
+          name: r'rejectUserProvider',
+          isAutoDispose: true,
+          dependencies: null,
+          $allTransitiveDependencies: null,
+        );
+
+  @override
+  String debugGetCreateSourceHash() => _$rejectUserHash();
+
+  @override
+  String toString() {
+    return r'rejectUserProvider'
+        ''
+        '$argument';
+  }
+
+  @$internal
+  @override
+  $FutureProviderElement<bool> $createElement($ProviderPointer pointer) =>
+      $FutureProviderElement(pointer);
+
+  @override
+  FutureOr<bool> create(Ref ref) {
+    final argument = this.argument as (
+      String,
+      String,
+    );
+    return rejectUser(
+      ref,
+      argument.$1,
+      argument.$2,
+    );
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other is RejectUserProvider && other.argument == argument;
+  }
+
+  @override
+  int get hashCode {
+    return argument.hashCode;
+  }
+}
+
+String _$rejectUserHash() => r'0712e762fceaefcac7587504e694f9157485e515';
+
+final class RejectUserFamily extends $Family
+    with
+        $FunctionalFamilyOverride<
+            FutureOr<bool>,
+            (
+              String,
+              String,
+            )> {
+  const RejectUserFamily._()
+      : super(
+          retry: null,
+          name: r'rejectUserProvider',
+          dependencies: null,
+          $allTransitiveDependencies: null,
+          isAutoDispose: true,
+        );
+
+  RejectUserProvider call(
+    String userId,
+    String reason,
+  ) =>
+      RejectUserProvider._(argument: (
+        userId,
+        reason,
+      ), from: this);
+
+  @override
+  String toString() => r'rejectUserProvider';
+}
+
+@ProviderFor(PendingApprovalsNotifier)
+const pendingApprovalsProvider = PendingApprovalsNotifierProvider._();
+
+final class PendingApprovalsNotifierProvider
+    extends $AsyncNotifierProvider<PendingApprovalsNotifier, List<UserModel>> {
+  const PendingApprovalsNotifierProvider._()
+      : super(
+          from: null,
+          argument: null,
+          retry: null,
+          name: r'pendingApprovalsProvider',
+          isAutoDispose: true,
+          dependencies: null,
+          $allTransitiveDependencies: null,
+        );
+
+  @override
+  String debugGetCreateSourceHash() => _$pendingApprovalsNotifierHash();
+
+  @$internal
+  @override
+  PendingApprovalsNotifier create() => PendingApprovalsNotifier();
+}
+
+String _$pendingApprovalsNotifierHash() =>
+    r'b07c72528e0aa5dbafcd5ab32ad79c1910ac2a0a';
+
+abstract class _$PendingApprovalsNotifier
+    extends $AsyncNotifier<List<UserModel>> {
+  FutureOr<List<UserModel>> build();
+  @$mustCallSuper
+  @override
+  void runBuild() {
+    final created = build();
+    final ref = this.ref as $Ref<AsyncValue<List<UserModel>>, List<UserModel>>;
+    final element = ref.element as $ClassProviderElement<
+        AnyNotifier<AsyncValue<List<UserModel>>, List<UserModel>>,
+        AsyncValue<List<UserModel>>,
+        Object?,
+        Object?>;
+    element.handleValue(ref, created);
+  }
+}
+
+@ProviderFor(UserReferralsNotifier)
+const userReferralsProvider = UserReferralsNotifierProvider._();
+
+final class UserReferralsNotifierProvider
+    extends $AsyncNotifierProvider<UserReferralsNotifier, List<UserModel>> {
+  const UserReferralsNotifierProvider._()
+      : super(
+          from: null,
+          argument: null,
+          retry: null,
+          name: r'userReferralsProvider',
+          isAutoDispose: true,
+          dependencies: null,
+          $allTransitiveDependencies: null,
+        );
+
+  @override
+  String debugGetCreateSourceHash() => _$userReferralsNotifierHash();
+
+  @$internal
+  @override
+  UserReferralsNotifier create() => UserReferralsNotifier();
+}
+
+String _$userReferralsNotifierHash() =>
+    r'279161bf70ef5a6337883c1cf21e8f3fb3bcf952';
+
+abstract class _$UserReferralsNotifier extends $AsyncNotifier<List<UserModel>> {
+  FutureOr<List<UserModel>> build();
+  @$mustCallSuper
+  @override
+  void runBuild() {
+    final created = build();
+    final ref = this.ref as $Ref<AsyncValue<List<UserModel>>, List<UserModel>>;
+    final element = ref.element as $ClassProviderElement<
+        AnyNotifier<AsyncValue<List<UserModel>>, List<UserModel>>,
+        AsyncValue<List<UserModel>>,
+        Object?,
+        Object?>;
+    element.handleValue(ref, created);
+  }
 }

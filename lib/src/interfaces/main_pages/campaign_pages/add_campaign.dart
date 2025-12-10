@@ -7,6 +7,7 @@ import 'package:Annujoom/src/data/providers/loading_provider.dart';
 import 'package:Annujoom/src/data/services/snackbar_service.dart';
 import 'package:Annujoom/src/data/services/image_upload.dart';
 import 'package:Annujoom/src/data/providers/campaigns_provider.dart';
+import 'package:Annujoom/src/data/providers/user_provider.dart';
 import 'package:Annujoom/src/interfaces/components/input_field.dart';
 import 'package:Annujoom/src/interfaces/components/dropdown.dart';
 import 'package:Annujoom/src/interfaces/components/loading_indicator.dart';
@@ -162,6 +163,9 @@ class _AddCampaignPageState extends ConsumerState<AddCampaignPage> {
         }
       }
 
+      final userRole = ref.read(userProvider)?.role ?? '';
+      final approvalStatus = userRole == 'president' ? 'approved' : 'pending';
+
       final campaignData = <String, dynamic>{
         'title': titleController.text.trim(),
         'description': descriptionController.text.trim(),
@@ -170,6 +174,7 @@ class _AddCampaignPageState extends ConsumerState<AddCampaignPage> {
         'start_date': _formatDateForApi(startDateController.text.trim()),
         'target_date': _formatDateForApi(endDateController.text.trim()),
         'target_amount': int.tryParse(targetAmountController.text.trim()) ?? 0,
+        'approval_status': approvalStatus,
       };
 
       final result = await ref.read(

@@ -8,7 +8,12 @@ import 'package:Annujoom/src/data/constants/color_constants.dart';
 import 'package:Annujoom/src/data/constants/style_constants.dart';
 import 'package:Annujoom/src/interfaces/animations/index.dart' as anim;
 import 'package:Annujoom/src/data/providers/campaigns_provider.dart'
-    show generalCampaignsProvider, participatedCampaignsProvider;
+    show
+        generalCampaignsProvider,
+        participatedCampaignsProvider,
+        pendingApprovalCampaignsProvider;
+import 'package:Annujoom/src/data/providers/user_provider.dart'
+    show userProvider;
 import 'package:Annujoom/src/data/services/secure_storage_service.dart';
 import 'package:Annujoom/src/interfaces/main_pages/campaign_pages/add_campaign.dart';
 
@@ -25,12 +30,17 @@ class _CampaignPageState extends ConsumerState<CampaignPage>
 
   @override
   void initState() {
-    _controller = TabController(length: 3, vsync: this);
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
+    final user = ref.watch(userProvider);
+    final isPresident = user?.role == 'president';
+    final tabCount = isPresident ? 4 : 3;
+
+    _controller = TabController(length: tabCount, vsync: this);
+
     final secureStorageAsync = ref.watch(secureStorageServiceProvider);
 
     return Scaffold(
@@ -57,8 +67,8 @@ class _CampaignPageState extends ConsumerState<CampaignPage>
                 future:
                     secureStorageAsync.getUserData().then((user) => user?.role),
                 builder: (context, snapshot) {
-                  final isPresident = snapshot.data == 'president';
-                  if (!isPresident) {
+                  final isAdmin = snapshot.data != 'member';
+                  if (!isAdmin) {
                     return const SizedBox.shrink();
                   }
                   return GestureDetector(
@@ -111,12 +121,13 @@ class _CampaignPageState extends ConsumerState<CampaignPage>
                 ),
                 insets: EdgeInsets.zero,
               ),
-              tabs: const [
-                Tab(
+              tabs: [
+                const Tab(
                   text: "General Campaign",
                 ),
-                Tab(text: "Your Transactions"),
-                Tab(text: "My Campaigns"),
+                const Tab(text: "Your Transactions"),
+                const Tab(text: "My Campaigns"),
+                if (isPresident) const Tab(text: "Approvals"),
               ],
             ),
           ),
@@ -128,6 +139,7 @@ class _CampaignPageState extends ConsumerState<CampaignPage>
           _generalCampaignTab(),
           _yourTransactionsTab(),
           _myCampaignsTab(),
+          if (isPresident) _approvalsTab(),
         ],
       ),
     );
@@ -367,6 +379,136 @@ class _CampaignPageState extends ConsumerState<CampaignPage>
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  // ---------------- TAB 4 (APPROVALS) ---------------- //
+  Widget _approvalsTab() {
+    final approvalsState = ref.watch(pendingApprovalCampaignsProvider);
+
+    return approvalsState.when(
+      data: (paginationState) {
+        if (paginationState.campaigns.isEmpty) {
+          return const Center(
+            child: Text('No campaigns pending approval'),
+          );
+        }
+        return ListView.builder(
+          padding: const EdgeInsets.all(16),
+          itemCount: paginationState.campaigns.length +
+              (paginationState.hasMore ? 1 : 0),
+          itemBuilder: (context, index) {
+            if (index == paginationState.campaigns.length) {
+              return Padding(
+                padding: const EdgeInsets.symmetric(vertical: 16),
+                child: Center(
+                  child: ElevatedButton(
+                    onPressed: () {
+                      ref
+                          .read(pendingApprovalCampaignsProvider.notifier)
+                          .loadNextPage();
+                    },
+                    child: const Text('Load More'),
+                  ),
+                ),
+              );
+            }
+
+            final campaign = paginationState.campaigns[index];
+            return Padding(
+              padding: const EdgeInsets.only(bottom: 16),
+              child: anim.AnimatedWidgetWrapper(
+                animationType: anim.AnimationType.fadeSlideInFromBottom,
+                duration: anim.AnimationDuration.normal,
+                delayMilliseconds: index * 50,
+                child: CampaignCard(
+                  id: campaign.id ?? '',
+                  description: campaign.description ?? '',
+                  title: campaign.title ?? '',
+                  category: campaign.category ?? '',
+                  date: formatDate(campaign.targetDate) ?? '',
+                  image: campaign.coverImage ?? '',
+                  raised: campaign.collectedAmount?.toInt() ?? 0,
+                  goal: campaign.targetAmount?.toInt() ?? 0,
+                  onDetails: () {},
+                  isApprovalCard: true,
+                  onApprove: () async {
+                    final approved = await ref
+                        .read(pendingApprovalCampaignsProvider.notifier)
+                        .approveCampaign(campaign.id ?? '');
+                    if (approved && context.mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('Campaign approved successfully'),
+                        ),
+                      );
+                    }
+                  },
+                  onReject: () {
+                    _showRejectDialog(context, campaign.id ?? '');
+                  },
+                ),
+              ),
+            );
+          },
+        );
+      },
+      loading: () => const Center(child: LoadingAnimation()),
+      error: (error, stackTrace) => Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text('Error: $error'),
+            const SizedBox(height: 16),
+            ElevatedButton(
+              onPressed: () {
+                ref.read(pendingApprovalCampaignsProvider.notifier).refresh();
+              },
+              child: const Text('Retry'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _showRejectDialog(BuildContext context, String campaignId) {
+    final reasonController = TextEditingController();
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Reject Campaign'),
+        content: TextField(
+          controller: reasonController,
+          decoration: const InputDecoration(
+            hintText: 'Enter rejection reason',
+            border: OutlineInputBorder(),
+          ),
+          maxLines: 3,
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () async {
+              Navigator.pop(context);
+              final rejected = await ref
+                  .read(pendingApprovalCampaignsProvider.notifier)
+                  .rejectCampaign(campaignId, reasonController.text);
+              if (rejected && context.mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('Campaign rejected successfully'),
+                  ),
+                );
+              }
+            },
+            child: const Text('Reject'),
+          ),
+        ],
       ),
     );
   }

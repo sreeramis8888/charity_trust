@@ -7,6 +7,7 @@ import 'package:Annujoom/src/interfaces/main_pages/profile.dart';
 import 'package:Annujoom/src/interfaces/main_pages/profile_pages/edit_profile.dart';
 import 'package:Annujoom/src/interfaces/main_pages/profile_pages/my_participations.dart';
 import 'package:Annujoom/src/interfaces/main_pages/navbar.dart';
+import 'package:Annujoom/src/interfaces/main_pages/referrals/my_referrals_page.dart';
 import 'package:Annujoom/src/interfaces/onboarding/login.dart';
 import 'package:Annujoom/src/interfaces/onboarding/registration.dart';
 import 'package:Annujoom/src/interfaces/onboarding/create_user.dart';
@@ -175,6 +176,9 @@ Route<dynamic> generateRoute(RouteSettings? settings) {
       break;
     case 'News':
       page = NewsListPage();
+      break;
+    case 'MyReferrals':
+      page = MyReferralsPage();
       break;
     case 'Campaign':
       page = CampaignPage();

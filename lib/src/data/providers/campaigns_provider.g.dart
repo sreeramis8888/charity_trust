@@ -220,6 +220,55 @@ final class CreateNewCampaignFamily extends $Family
   String toString() => r'createNewCampaignProvider';
 }
 
+@ProviderFor(PendingApprovalCampaignsNotifier)
+const pendingApprovalCampaignsProvider =
+    PendingApprovalCampaignsNotifierProvider._();
+
+final class PendingApprovalCampaignsNotifierProvider
+    extends $AsyncNotifierProvider<PendingApprovalCampaignsNotifier,
+        CampaignPaginationState> {
+  const PendingApprovalCampaignsNotifierProvider._()
+      : super(
+          from: null,
+          argument: null,
+          retry: null,
+          name: r'pendingApprovalCampaignsProvider',
+          isAutoDispose: true,
+          dependencies: null,
+          $allTransitiveDependencies: null,
+        );
+
+  @override
+  String debugGetCreateSourceHash() => _$pendingApprovalCampaignsNotifierHash();
+
+  @$internal
+  @override
+  PendingApprovalCampaignsNotifier create() =>
+      PendingApprovalCampaignsNotifier();
+}
+
+String _$pendingApprovalCampaignsNotifierHash() =>
+    r'8380b115570d24cf0be41d37053c2648fc1b0de8';
+
+abstract class _$PendingApprovalCampaignsNotifier
+    extends $AsyncNotifier<CampaignPaginationState> {
+  FutureOr<CampaignPaginationState> build();
+  @$mustCallSuper
+  @override
+  void runBuild() {
+    final created = build();
+    final ref = this.ref
+        as $Ref<AsyncValue<CampaignPaginationState>, CampaignPaginationState>;
+    final element = ref.element as $ClassProviderElement<
+        AnyNotifier<AsyncValue<CampaignPaginationState>,
+            CampaignPaginationState>,
+        AsyncValue<CampaignPaginationState>,
+        Object?,
+        Object?>;
+    element.handleValue(ref, created);
+  }
+}
+
 @ProviderFor(categoryCampaigns)
 const categoryCampaignsProvider = CategoryCampaignsFamily._();
 

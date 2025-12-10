@@ -116,7 +116,7 @@ class _HomePageState extends ConsumerState<HomePage> {
           ),
       builder: (context, snapshot) {
         final userRole = snapshot.data ?? '';
-        final isAdmin = userRole == 'trustee' || userRole == 'president' || userRole == 'secretary';
+        final isAdmin = userRole != 'member';
 
         return Column(
           mainAxisAlignment: MainAxisAlignment.end,
@@ -401,6 +401,108 @@ class _HomePageState extends ConsumerState<HomePage> {
                     ),
                   ],
                 ),
+              ),
+              FutureBuilder<String?>(
+                future: ref.read(secureStorageServiceProvider).getUserData().then(
+                      (userData) => userData?.role,
+                    ),
+                builder: (context, snapshot) {
+                  final userRole = snapshot.data ?? '';
+                  final isAdmin = userRole != 'member';
+
+                  if (!isAdmin) {
+                    return SizedBox.shrink();
+                  }
+
+                  return Padding(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                    child: GestureDetector(
+                      onTap: () {
+                        Navigator.of(context).pushNamed('MyReferrals');
+                      },
+                      child: Container(
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                              colors: [Color(0xFFFFFFFF), Color(0xFFCEE8F8)],
+                              begin: AlignmentGeometry.topCenter,
+                              end: AlignmentGeometry.bottomCenter),
+                          borderRadius: BorderRadius.circular(22),
+                        ),
+                        child: Padding(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 16, vertical: 20),
+                            child: Row(
+                            children: [
+                              // LEFT SIDE
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      homeData.referralsReceived.toString(),
+                                      style: kHeadTitleSB.copyWith(
+                                          fontSize: 22, color: kThirdTextColor),
+                                    ),
+                                    const SizedBox(height: 4),
+                                    Text('Referrals Received',
+                                        style: kSmallerTitleR),
+                                  ],
+                                ),
+                              ),
+
+                              // CENTER DIVIDER (PERFECT CENTER)
+                              Container(
+                                width: 1,
+                                height: 60,
+                                color: Color(0xFFCFDBFF),
+                              ),
+
+                              // RIGHT SIDE
+                              Expanded(
+                                child: Padding(
+                                  padding: const EdgeInsets.only(left: 16),
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          Text(
+                                            homeData.pendingReferrals.toString(),
+                                            style: kHeadTitleSB.copyWith(
+                                                fontSize: 22,
+                                                color: kThirdTextColor),
+                                          ),
+                GestureDetector(
+                                            onTap: () {
+                                              Navigator.of(context).pushNamed('MyReferrals');
+                                            },
+                                            child: Text(
+                                              'Review Now',
+                                              style: kSmallerTitleM.copyWith(
+                                                color: kThirdTextColor,
+                                                decoration:
+                                                    TextDecoration.underline,
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                      const SizedBox(height: 4),
+                                      Text('Pending Approvals',
+                                          style: kSmallerTitleR),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ],
+                          )),
+                      ),
+                    ),
+                  );
+                },
               ),
               if (homeData.endingCampaign != null)
                 Padding(

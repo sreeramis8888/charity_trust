@@ -233,11 +233,14 @@ class ProfilePage extends ConsumerWidget {
   void _handleLogout(BuildContext context, WidgetRef ref) {
     showDialog(
       context: context,
-      builder: (context) => ConfirmationDialog(
+      builder: (dialogContext) => ConfirmationDialog(
         title: 'Logout',
         message: 'Are you sure you want to logout?',
         confirmButtonText: 'Logout',
-        onConfirm: () => _performLogout(context, ref),
+        onConfirm: () {
+          Navigator.of(dialogContext).pop();
+          _performLogout(context, ref);
+        },
       ),
     );
   }
@@ -248,20 +251,33 @@ class ProfilePage extends ConsumerWidget {
       final authProvider = ref.read(authProviderProvider);
 
       // Call logout API
-      final response = await authLoginApi.logout();
+      await authLoginApi.logout();
 
       // Clear local storage regardless of API response
       await authProvider.clearAllData();
 
       if (context.mounted) {
-        // Navigate to login screen
-        Navigator.of(context)
-            .pushNamedAndRemoveUntil('Phone', (route) => false);
+        // Navigate to login screen and remove all previous routes
+        Navigator.of(context).pushNamedAndRemoveUntil(
+          'Splash',
+          (route) => false,
+        );
       }
     } catch (e) {
+      // Clear local storage even if API fails
+      try {
+        final authProvider = ref.read(authProviderProvider);
+        await authProvider.clearAllData();
+      } catch (_) {}
+
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Logout failed: $e')),
+        );
+        // Still navigate to login even if there was an error
+        Navigator.of(context).pushNamedAndRemoveUntil(
+          'Phone',
+          (route) => false,
         );
       }
     }
@@ -270,12 +286,15 @@ class ProfilePage extends ConsumerWidget {
   void _handleDeleteAccount(BuildContext context, WidgetRef ref) {
     showDialog(
       context: context,
-      builder: (context) => ConfirmationDialog(
+      builder: (dialogContext) => ConfirmationDialog(
         title: 'Delete Account',
         message:
             'Are you sure you want to delete your account? This action cannot be undone.',
         confirmButtonText: 'Delete',
-        onConfirm: () => _performDeleteAccount(context, ref),
+        onConfirm: () {
+          Navigator.of(dialogContext).pop();
+          _performDeleteAccount(context, ref);
+        },
       ),
     );
   }
@@ -287,20 +306,33 @@ class ProfilePage extends ConsumerWidget {
       final authProvider = ref.read(authProviderProvider);
 
       // Call logout API (using same functionality for now)
-      final response = await authLoginApi.logout();
+      await authLoginApi.logout();
 
       // Clear local storage regardless of API response
       await authProvider.clearAllData();
 
       if (context.mounted) {
-        // Navigate to login screen
-        Navigator.of(context)
-            .pushNamedAndRemoveUntil('Phone', (route) => false);
+        // Navigate to login screen and remove all previous routes
+        Navigator.of(context).pushNamedAndRemoveUntil(
+          'Phone',
+          (route) => false,
+        );
       }
     } catch (e) {
+      // Clear local storage even if API fails
+      try {
+        final authProvider = ref.read(authProviderProvider);
+        await authProvider.clearAllData();
+      } catch (_) {}
+
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Delete account failed: $e')),
+        );
+        // Still navigate to login even if there was an error
+        Navigator.of(context).pushNamedAndRemoveUntil(
+          'Phone',
+          (route) => false,
         );
       }
     }

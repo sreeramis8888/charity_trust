@@ -136,6 +136,8 @@ class ApiProvider {
       );
 
       final decoded = json.decode(response.body);
+      log(name: 'API PATCH data ', '${decoded['data']}');
+      log(name: 'API PATCH message', '${decoded['message']}');
       if (response.statusCode == 200 || response.statusCode == 201) {
         return ApiResponse.success(decoded, response.statusCode);
       } else {

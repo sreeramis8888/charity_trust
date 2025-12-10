@@ -16,6 +16,9 @@ class CampaignCard extends StatelessWidget {
   final VoidCallback onDetails;
   final VoidCallback? onDonate;
   final bool isMyCampaign;
+  final bool isApprovalCard;
+  final VoidCallback? onApprove;
+  final VoidCallback? onReject;
 
   const CampaignCard({
     super.key,
@@ -30,6 +33,9 @@ class CampaignCard extends StatelessWidget {
     required this.onDetails,
     this.onDonate,
     this.isMyCampaign = false,
+    this.isApprovalCard = false,
+    this.onApprove,
+    this.onReject,
   });
 
   @override
@@ -141,43 +147,57 @@ class CampaignCard extends StatelessWidget {
           ] else
             const SizedBox(height: 16),
           const SizedBox(height: 16),
-          Row(
-            children: [
-              Expanded(
-                child: primaryButton(
-                  label: "View details",
-                  onPressed: () {
-                    Navigator.of(context).pushNamed(
-                      'CampaignDetail',
-                      arguments: {
-                        '_id': id,
-                        'title': title,
-                        'description': description,
-                        'category': category,
-                        'date': date,
-                        'image': image,
-                        'raised': raised,
-                        'goal': goal,
-                      },
-                    );
-                  },
-                  buttonColor: kCardBackgroundColor,
-                  labelColor: kTextColor,
-                  sideColor: kTextColor,
+          if (isApprovalCard)
+            Row(
+              children: [
+                Expanded(
+                  child: primaryButton(
+                    label: "Reject",
+                    onPressed: onReject,
+                    buttonColor: const Color(0xFFFFEBEE),
+                    labelColor: const Color(0xFFC62828),
+                    sideColor: const Color(0xFFC62828),
+                  ),
                 ),
-              ),
-              // if (!isMyCampaign) ...[
-              //   const SizedBox(width: 12),
-              //   Expanded(
-              //     child: primaryButton(
-              //       label: "Donate",
-              //       onPressed: onDonate,
-              //       buttonColor: kPrimaryColor,
-              //     ),
-              //   ),
-              // ],
-            ],
-          ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: primaryButton(
+                    label: "Accept",
+                    onPressed: onApprove,
+                    buttonColor: const Color(0xFF2E7D32),
+                    labelColor: kWhite,
+                  ),
+                ),
+              ],
+            )
+          else
+            Row(
+              children: [
+                Expanded(
+                  child: primaryButton(
+                    label: "View details",
+                    onPressed: () {
+                      Navigator.of(context).pushNamed(
+                        'CampaignDetail',
+                        arguments: {
+                          '_id': id,
+                          'title': title,
+                          'description': description,
+                          'category': category,
+                          'date': date,
+                          'image': image,
+                          'raised': raised,
+                          'goal': goal,
+                        },
+                      );
+                    },
+                    buttonColor: kCardBackgroundColor,
+                    labelColor: kTextColor,
+                    sideColor: kTextColor,
+                  ),
+                ),
+              ],
+            ),
         ],
       ),
     );

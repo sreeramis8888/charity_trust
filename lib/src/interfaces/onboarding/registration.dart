@@ -207,7 +207,7 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
         'state': selectedStateCode,
         'district': selectedDistrictCode,
         'pincode': pincodeController.text.trim(),
-        'aadhar_number': aadharNumberController.text.trim(),
+        'aadhar_number': int.parse(aadharNumberController.text.trim()),
         'profile_picture': profilePictureUrl,
         'gender': selectedGender,
         'whatsapp_number': whatsappNumber,
@@ -677,7 +677,7 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
                         delayMilliseconds: 1050,
                         child: InputField(
                           key: _fieldKeys['aadharNumber'],
-                          type: CustomFieldType.text,
+                          type: CustomFieldType.number,
                           hint: "Enter Aadhar number",
                           controller: aadharNumberController,
                           validator: (v) => v!.isEmpty ? "Required" : null,

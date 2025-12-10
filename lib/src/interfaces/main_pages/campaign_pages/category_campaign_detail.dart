@@ -37,8 +37,11 @@ class CategoryCampaignDetailPage extends ConsumerWidget {
               title: Text('Campaign Details', style: kBodyTitleM),
             ),
             backgroundColor: kBackgroundColor,
-            body: const Center(
-              child: Text('No campaign found'),
+            body: const Padding(
+              padding: EdgeInsets.all(16.0),
+              child: Center(
+                child: Text('No campaign found'),
+              ),
             ),
           );
         }
@@ -73,8 +76,11 @@ class CategoryCampaignDetailPage extends ConsumerWidget {
           title: Text('Campaign Details', style: kBodyTitleM),
         ),
         backgroundColor: kBackgroundColor,
-        body: const Center(
-          child: LoadingAnimation(),
+        body: const Padding(
+          padding: EdgeInsets.all(16.0),
+          child: Center(
+            child: LoadingAnimation(),
+          ),
         ),
       ),
       error: (error, stackTrace) => Scaffold(
@@ -93,19 +99,22 @@ class CategoryCampaignDetailPage extends ConsumerWidget {
           title: Text('Campaign Details', style: kBodyTitleM),
         ),
         backgroundColor: kBackgroundColor,
-        body: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text('Error: $error'),
-              const SizedBox(height: 16),
-              ElevatedButton(
-                onPressed: () {
-                  ref.refresh(categoryCampaignsProvider(category));
-                },
-                child: const Text('Retry'),
-              ),
-            ],
+        body: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text('Error: $error'),
+                const SizedBox(height: 16),
+                ElevatedButton(
+                  onPressed: () {
+                    ref.refresh(categoryCampaignsProvider(category));
+                  },
+                  child: const Text('Retry'),
+                ),
+              ],
+            ),
           ),
         ),
       ),

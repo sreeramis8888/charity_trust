@@ -243,7 +243,10 @@ class _CampaignDetailPageState extends ConsumerState<CampaignDetailPage> {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: LoadingAnimation());
           }
-          return _buildDetailContent(context);
+          return SingleChildScrollView(
+            padding: const EdgeInsets.symmetric(horizontal: 16.0),
+            child: _buildDetailContent(context),
+          );
         },
       ),
     );

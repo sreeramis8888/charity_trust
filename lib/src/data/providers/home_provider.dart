@@ -33,12 +33,16 @@ class HomePageData {
   final List<NewsModel> latestNews;
   final List<Promotions> posterPromotions;
   final List<Promotions> videoPromotions;
+  final int referralsReceived;
+  final int pendingReferrals;
 
   HomePageData({
     this.endingCampaign,
     required this.latestNews,
     required this.posterPromotions,
     required this.videoPromotions,
+    required this.referralsReceived,
+    required this.pendingReferrals,
   });
 
   HomePageData copyWith({
@@ -46,12 +50,16 @@ class HomePageData {
     List<NewsModel>? latestNews,
     List<Promotions>? posterPromotions,
     List<Promotions>? videoPromotions,
+    int? referralsReceived,
+    int? pendingReferrals,
   }) {
     return HomePageData(
       endingCampaign: endingCampaign ?? this.endingCampaign,
       latestNews: latestNews ?? this.latestNews,
       posterPromotions: posterPromotions ?? this.posterPromotions,
       videoPromotions: videoPromotions ?? this.videoPromotions,
+      referralsReceived: referralsReceived ?? this.referralsReceived,
+      pendingReferrals: pendingReferrals ?? this.pendingReferrals,
     );
   }
 }
@@ -84,11 +92,16 @@ Future<HomePageData> homePageData(Ref ref) async {
             .toList() ??
         [];
 
+    final referralsReceived = data?['referrals_received'] as int? ?? 0;
+    final pendingReferrals = data?['pending_referrals'] as int? ?? 0;
+
     return HomePageData(
       endingCampaign: endingCampaign,
       latestNews: latestNews,
       posterPromotions: posterPromotions,
       videoPromotions: videoPromotions,
+      referralsReceived: referralsReceived,
+      pendingReferrals: pendingReferrals,
     );
   } else {
     throw Exception(response.message ?? 'Failed to fetch home page data');
@@ -125,11 +138,16 @@ class HomePageNotifier extends _$HomePageNotifier {
               .toList() ??
           [];
 
+      final referralsReceived = data?['referrals_received'] as int? ?? 0;
+      final pendingReferrals = data?['pending_referrals'] as int? ?? 0;
+
       return HomePageData(
         endingCampaign: endingCampaign,
         latestNews: latestNews,
         posterPromotions: posterPromotions,
         videoPromotions: videoPromotions,
+        referralsReceived: referralsReceived,
+        pendingReferrals: pendingReferrals,
       );
     } else {
       throw Exception(response.message ?? 'Failed to fetch home page data');

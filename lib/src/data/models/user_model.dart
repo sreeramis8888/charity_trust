@@ -8,7 +8,7 @@ class UserModel {
   final String? fcm;
   final String? otp;
   final String? gender;
-  final String? aadharNumber;
+  final int? aadharNumber;
   final String? address;
   final String? area;
   final String? district;
@@ -162,7 +162,7 @@ class UserModel {
     String? fcm,
     String? otp,
     String? gender,
-    String? aadharNumber,
+    int? aadharNumber,
     String? address,
     String? area,
     String? district,
