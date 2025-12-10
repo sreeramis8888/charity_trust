@@ -389,7 +389,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
                       angle: _rotationAnimation.value,
                       child: Transform.scale(
                         scale: _scaleAnimation.value,
-                        child: SizedBox(width: 200,
+                        child: SizedBox(width: 230,
                           child: Container(
                             child: Image.asset(
                               'assets/png/annujoom_logo.png',
