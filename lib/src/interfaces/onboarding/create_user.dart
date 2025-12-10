@@ -440,7 +440,7 @@ class _CreateUserPageState extends ConsumerState<CreateUserPage> {
           animationType: anim.AnimationType.fadeSlideInFromLeft,
           duration: anim.AnimationDuration.normal,
           delayMilliseconds: 300,
-          child: Text("Email Address", style: kSmallTitleR),
+          child: Text("Email Address *", style: kSmallTitleR),
         ),
         const SizedBox(height: 6),
         anim.AnimatedWidgetWrapper(
@@ -452,6 +452,7 @@ class _CreateUserPageState extends ConsumerState<CreateUserPage> {
             type: CustomFieldType.text,
             hint: "Enter email",
             controller: emailController,
+            validator: (v) => v!.isEmpty ? "Required" : null,
           ),
         ),
       ],

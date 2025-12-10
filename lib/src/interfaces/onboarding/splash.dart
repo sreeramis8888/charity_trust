@@ -3,6 +3,7 @@ import 'dart:developer';
 import 'package:Annujoom/src/data/models/user_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../data/constants/color_constants.dart';
@@ -388,9 +389,11 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
                       angle: _rotationAnimation.value,
                       child: Transform.scale(
                         scale: _scaleAnimation.value,
-                        child: Container(
-                          child: Image.asset(
-                            'assets/png/annujoom_logo.png',
+                        child: SizedBox(width: 200,
+                          child: Container(
+                            child: Image.asset(
+                              'assets/png/annujoom_logo.png',
+                            ),
                           ),
                         ),
                       ),

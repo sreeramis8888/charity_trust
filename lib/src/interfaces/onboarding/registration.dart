@@ -423,7 +423,7 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
                         animationType: anim.AnimationType.fadeSlideInFromLeft,
                         duration: anim.AnimationDuration.normal,
                         delayMilliseconds: 300,
-                        child: Text("Email Address", style: kSmallTitleR),
+                        child: Text("Email Address *", style: kSmallTitleR),
                       ),
                       const SizedBox(height: 6),
                       anim.AnimatedWidgetWrapper(
@@ -433,8 +433,9 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
                         child: InputField(
                           key: _fieldKeys['email'],
                           type: CustomFieldType.text,
-                          hint: "Enter address",
+                          hint: "Enter email address",
                           controller: emailController,
+                          validator: (v) => v!.isEmpty ? "Required" : null,
                         ),
                       ),
                       const SizedBox(height: 18),
