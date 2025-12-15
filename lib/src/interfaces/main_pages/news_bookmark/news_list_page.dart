@@ -1,4 +1,5 @@
 import 'package:Annujoom/src/data/providers/news_provider.dart';
+import 'package:Annujoom/src/data/services/secure_storage_service.dart';
 import 'package:Annujoom/src/interfaces/components/cards/news_card.dart';
 import 'package:Annujoom/src/interfaces/components/loading_indicator.dart';
 import 'package:Annujoom/src/interfaces/animations/index.dart' as anim;
@@ -118,6 +119,7 @@ class _NewsListPageState extends ConsumerState<NewsListPage> {
   @override
   Widget build(BuildContext context) {
     final asyncNewsState = ref.watch(newsListProvider);
+    final secureStorageService = ref.watch(secureStorageServiceProvider);
 
     return Scaffold(
         backgroundColor: kBackgroundColor,
@@ -157,16 +159,27 @@ class _NewsListPageState extends ConsumerState<NewsListPage> {
                     decoration: BoxDecoration(
                         color: Color(0xFFF3EFEF), shape: BoxShape.circle),
                     constraints: BoxConstraints(minWidth: 18, minHeight: 18),
-                    child: Text(
-                      '${asyncNewsState.maybeWhen(
-                        data: (paginationState) => paginationState.news
-                            .where(
-                                (news) => news.bookmarked?.isNotEmpty ?? false)
-                            .length,
-                        orElse: () => 0,
-                      )}',
-                      style: kSmallTitleR.copyWith(fontSize: 10),
-                      textAlign: TextAlign.center,
+                    child: FutureBuilder<String?>(
+                      future: secureStorageService.getUserId(),
+                      builder: (context, userIdSnapshot) {
+                        final bookmarkCount = asyncNewsState.maybeWhen(
+                          data: (paginationState) {
+                            if (userIdSnapshot.hasData && userIdSnapshot.data != null) {
+                              return paginationState.news
+                                  .where((news) =>
+                                      news.bookmarked?.contains(userIdSnapshot.data) ?? false)
+                                  .length;
+                            }
+                            return 0;
+                          },
+                          orElse: () => 0,
+                        );
+                        return Text(
+                          '$bookmarkCount',
+                          style: kSmallTitleR.copyWith(fontSize: 10),
+                          textAlign: TextAlign.center,
+                        );
+                      },
                     ),
                   ),
                 ),

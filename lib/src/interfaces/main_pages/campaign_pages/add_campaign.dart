@@ -59,8 +59,7 @@ class _AddCampaignPageState extends ConsumerState<AddCampaignPage> {
   };
 
   bool _requiresTargetAmount() {
-    return selectedCategory == 'General Campaign' ||
-        selectedCategory == 'General Funding';
+    return selectedCategory == 'General Campaign';
   }
 
   void _scrollToFirstError() {
@@ -182,7 +181,6 @@ class _AddCampaignPageState extends ConsumerState<AddCampaignPage> {
         'start_date': _formatDateForApi(startDateController.text.trim()),
         'target_date': _formatDateForApi(endDateController.text.trim()),
         'target_amount': int.tryParse(targetAmountController.text.trim()) ?? 0,
-        'approval_status': approvalStatus,
       };
 
       final result = await ref.read(

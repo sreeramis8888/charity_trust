@@ -1,4 +1,5 @@
 import 'package:Annujoom/src/interfaces/components/cards/news_card.dart';
+import 'package:Annujoom/src/data/services/secure_storage_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
@@ -45,6 +46,7 @@ class _BookmarkPageState extends ConsumerState<BookmarkPage> {
   @override
   Widget build(BuildContext context) {
     final asyncBookmarkedState = ref.watch(bookmarkedNewsListProvider);
+    final secureStorageService = ref.watch(secureStorageServiceProvider);
 
     return Scaffold(
       backgroundColor: kWhite,
@@ -57,100 +59,116 @@ class _BookmarkPageState extends ConsumerState<BookmarkPage> {
         backgroundColor: kWhite,
         scrolledUnderElevation: 0,
       ),
-      body: asyncBookmarkedState.when(
-        data: (paginationState) {
-          if (paginationState.news.isEmpty) {
-            return anim.AnimatedWidgetWrapper(
+      body: FutureBuilder<String?>(
+        future: secureStorageService.getUserId(),
+        builder: (context, userIdSnapshot) {
+          return asyncBookmarkedState.when(
+            data: (paginationState) {
+              final userId = userIdSnapshot.data;
+              final filteredNews = userId != null
+                  ? paginationState.news
+                      .where((news) =>
+                          news.bookmarked?.contains(userId) ?? false)
+                      .toList() as List<NewsModel>
+                  : <NewsModel>[];
+
+              if (filteredNews.isEmpty) {
+                return anim.AnimatedWidgetWrapper(
+                  animationType: anim.AnimationType.fadeSlideInFromBottom,
+                  duration: anim.AnimationDuration.normal,
+                  child: Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Icons.bookmark_border,
+                          size: 64,
+                          color: Colors.grey[400],
+                        ),
+                        SizedBox(height: 16),
+                        Text(
+                          'No bookmarked news yet',
+                          style: TextStyle(
+                            fontSize: 16,
+                            color: Colors.grey[600],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              }
+
+              return anim.AnimatedWidgetWrapper(
+                animationType: anim.AnimationType.fadeSlideInFromBottom,
+                duration: anim.AnimationDuration.normal,
+                child: ListView.builder(
+                  controller: _scrollController,
+                  itemCount: filteredNews.length +
+                      (paginationState.hasMore ? 1 : 0),
+                  itemBuilder: (context, index) {
+                    if (index == filteredNews.length) {
+                      return Padding(
+                        padding: EdgeInsets.all(16),
+                        child: Center(
+                          child: LoadingAnimation(),
+                        ),
+                      );
+                    }
+
+                    final newsItem = filteredNews[index];
+                    return GestureDetector(
+                      onTap: () {
+                        final initialIndex =
+                            filteredNews.indexOf(newsItem);
+                        if (initialIndex != -1) {
+                          ref.read(currentNewsIndexProvider.notifier).state =
+                              initialIndex;
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) =>
+                                  NewsDetailView(news: filteredNews),
+                            ),
+                          );
+                        }
+                      },
+                      child: NewsCard(
+                        allNews: filteredNews,
+                        news: newsItem,
+                      ),
+                    );
+                  },
+                ),
+              );
+            },
+            loading: () => Center(child: LoadingAnimation()),
+            error: (error, stackTrace) => anim.AnimatedWidgetWrapper(
               animationType: anim.AnimationType.fadeSlideInFromBottom,
               duration: anim.AnimationDuration.normal,
               child: Center(
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Icon(
-                      Icons.bookmark_border,
-                      size: 64,
-                      color: Colors.grey[400],
+                    Text(
+                      'Error loading bookmarks',
+                      style: kBodyTitleB,
                     ),
                     SizedBox(height: 16),
-                    Text(
-                      'No bookmarked news yet',
-                      style: TextStyle(
-                        fontSize: 16,
-                        color: Colors.grey[600],
-                      ),
+                    ElevatedButton(
+                      onPressed: () {
+                        ref
+                            .read(bookmarkedNewsListProvider.notifier)
+                            .refresh();
+                      },
+                      child: Text('Retry'),
                     ),
                   ],
                 ),
               ),
-            );
-          }
-
-          return anim.AnimatedWidgetWrapper(
-            animationType: anim.AnimationType.fadeSlideInFromBottom,
-            duration: anim.AnimationDuration.normal,
-            child: ListView.builder(
-              controller: _scrollController,
-              itemCount: paginationState.news.length +
-                  (paginationState.hasMore ? 1 : 0),
-              itemBuilder: (context, index) {
-                if (index == paginationState.news.length) {
-                  return Padding(
-                    padding: EdgeInsets.all(16),
-                    child: Center(
-                      child: LoadingAnimation(),
-                    ),
-                  );
-                }
-
-                final newsItem = paginationState.news[index];
-                return GestureDetector(
-                  onTap: () {
-                    final initialIndex = paginationState.news.indexOf(newsItem);
-                    if (initialIndex != -1) {
-                      ref.read(currentNewsIndexProvider.notifier).state =
-                          initialIndex;
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) =>
-                              NewsDetailView(news: paginationState.news),
-                        ),
-                      );
-                    }
-                  },
-                  child: NewsCard(
-                    allNews: paginationState.news,
-                    news: newsItem,
-                  ),
-                );
-              },
             ),
           );
         },
-        loading: () => Center(child: LoadingAnimation()),
-        error: (error, stackTrace) => anim.AnimatedWidgetWrapper(
-          animationType: anim.AnimationType.fadeSlideInFromBottom,
-          duration: anim.AnimationDuration.normal,
-          child: Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(
-                  'Error loading bookmarks',
-                  style: kBodyTitleB,
-                ),
-                SizedBox(height: 16),
-                ElevatedButton(
-                  onPressed: () {
-                    ref.read(bookmarkedNewsListProvider.notifier).refresh();
-                  },
-                  child: Text('Retry'),
-                ),
-              ],
-            ),
-          ),
-        ),
       ),
     );
   }

@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:Annujoom/src/data/providers/api_provider.dart';
 import 'package:Annujoom/src/data/models/news_model.dart';
+import 'package:Annujoom/src/data/services/secure_storage_service.dart';
 
 part 'news_provider.g.dart';
 
@@ -243,16 +244,22 @@ class NewsListNotifier extends _$NewsListNotifier {
 
     try {
       final newsApi = ref.watch(newsApiProvider);
+      final secureStorageService = ref.watch(secureStorageServiceProvider);
+      final userId = await secureStorageService.getUserId();
+
       final response = await newsApi.toggleBookmark(newsId);
 
       if (response.success) {
         final currentState = state.value!;
         final updatedNews = currentState.news.map((news) {
-          if (news.id == newsId) {
-            final isCurrentlyBookmarked = news.bookmarked?.isNotEmpty ?? false;
-            return news.copyWith(
-              bookmarked: isCurrentlyBookmarked ? [] : ['bookmarked'],
-            );
+          if (news.id == newsId && userId != null) {
+            final bookmarkedList = List<String>.from(news.bookmarked ?? []);
+            if (bookmarkedList.contains(userId)) {
+              bookmarkedList.remove(userId);
+            } else {
+              bookmarkedList.add(userId);
+            }
+            return news.copyWith(bookmarked: bookmarkedList);
           }
           return news;
         }).toList();
@@ -274,11 +281,13 @@ class BookmarkedNewsListNotifier extends _$BookmarkedNewsListNotifier {
   @override
   Future<PaginationState> build() async {
     final allNewsState = ref.watch(newsListProvider);
+    final secureStorageService = ref.watch(secureStorageServiceProvider);
+    final userId = await secureStorageService.getUserId();
 
     return allNewsState.when(
       data: (paginationState) {
         final bookmarkedNewsList = paginationState.news
-            .where((news) => news.bookmarked?.isNotEmpty ?? false)
+            .where((news) => news.bookmarked?.contains(userId) ?? false)
             .toList();
 
         return PaginationState(
@@ -304,11 +313,13 @@ class BookmarkedNewsListNotifier extends _$BookmarkedNewsListNotifier {
     state = const AsyncValue.loading();
     state = await AsyncValue.guard(() async {
       final allNewsState = ref.watch(newsListProvider);
+      final secureStorageService = ref.watch(secureStorageServiceProvider);
+      final userId = await secureStorageService.getUserId();
 
       return allNewsState.when(
         data: (paginationState) {
           final bookmarkedNewsList = paginationState.news
-              .where((news) => news.bookmarked?.isNotEmpty ?? false)
+              .where((news) => news.bookmarked?.contains(userId) ?? false)
               .toList();
 
           final nextPage = currentState.currentPage + 1;

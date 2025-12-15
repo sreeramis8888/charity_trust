@@ -3,6 +3,7 @@ import 'package:Annujoom/src/data/constants/color_constants.dart';
 import 'package:Annujoom/src/data/constants/style_constants.dart';
 import 'package:Annujoom/src/interfaces/components/cards/index.dart';
 import 'package:Annujoom/src/data/providers/home_provider.dart';
+import 'package:Annujoom/src/data/providers/notifications_provider.dart';
 import 'package:Annujoom/src/data/services/secure_storage_service.dart';
 import 'package:Annujoom/src/interfaces/components/cards/video_card.dart';
 import 'package:Annujoom/src/interfaces/components/loading_indicator.dart';
@@ -10,7 +11,9 @@ import 'package:Annujoom/src/interfaces/animations/index.dart';
 import 'package:Annujoom/src/interfaces/onboarding/create_user.dart';
 import 'package:Annujoom/src/interfaces/main_pages/campaign_pages/category_campaign_detail.dart';
 import 'package:Annujoom/src/interfaces/main_pages/news_bookmark/news_page.dart';
+import 'package:Annujoom/src/interfaces/main_pages/notifications_page.dart';
 import 'package:Annujoom/src/data/router/nav_router.dart';
+import 'package:Annujoom/src/data/utils/launch_url.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
@@ -223,26 +226,78 @@ class _HomePageState extends ConsumerState<HomePage> {
                         fit: BoxFit.contain,
                       ),
                     ),
-                    // Row(
-                    //   children: [
-                    //     IconButton(
-                    //       onPressed: () {},
-                    //       icon: SvgPicture.asset(
-                    //         'assets/svg/bell.svg',
-                    //         height: 20,
-                    //         width: 20,
-                    //       ),
-                    //     ),
-                    //     IconButton(
-                    //       onPressed: () {},
-                    //       icon: SvgPicture.asset(
-                    //         'assets/svg/call.svg',
-                    //         height: 20,
-                    //         width: 20,
-                    //       ),
-                    //     ),
-                    //   ],
-                    // )
+                    Row(
+                      children: [
+                        Stack(
+                          children: [
+                            IconButton(
+                              onPressed: () {
+                                final notificationsAsync =
+                                    ref.read(notificationsProvider);
+                                Navigator.of(context).push(
+                                  MaterialPageRoute(
+                                    builder: (context) =>
+                                        const NotificationsPage(),
+                                  ),
+                                );
+                              },
+                              icon: SvgPicture.asset(
+                                'assets/svg/bell.svg',
+                                height: 20,
+                                width: 20,
+                              ),
+                            ),
+                            Consumer(
+                              builder: (context, ref, child) {
+                                final notificationsAsync =
+                                    ref.watch(notificationsProvider);
+                                return notificationsAsync.when(
+                                  data: (state) {
+                                    final unreadCount = state.notifications
+                                        .where((n) => !n.isRead)
+                                        .length;
+                                    return unreadCount > 0
+                                        ? Positioned(
+                                            right: 8,
+                                            top: 8,
+                                            child: Container(
+                                              padding: const EdgeInsets.all(4),
+                                              decoration: BoxDecoration(
+                                                color: kPrimaryColor,
+                                                shape: BoxShape.circle,
+                                              ),
+                                              child: Text(
+                                                unreadCount > 99
+                                                    ? '99+'
+                                                    : unreadCount.toString(),
+                                                style: kSmallerTitleR.copyWith(
+                                                  color: kWhite,
+                                                  fontSize: 10,
+                                                ),
+                                              ),
+                                            ),
+                                          )
+                                        : SizedBox.shrink();
+                                  },
+                                  loading: () => SizedBox.shrink(),
+                                  error: (_, __) => SizedBox.shrink(),
+                                );
+                              },
+                            ),
+                          ],
+                        ),
+                        IconButton(
+                          onPressed: () {
+                            launchPhone('+918891646431');
+                          },
+                          icon: SvgPicture.asset(
+                            'assets/svg/call.svg',
+                            height: 20,
+                            width: 20,
+                          ),
+                        ),
+                      ],
+                    )
                   ],
                 ),
               ),
@@ -783,6 +838,4 @@ class _HomePageState extends ConsumerState<HomePage> {
       },
     );
   }
-
-
 }

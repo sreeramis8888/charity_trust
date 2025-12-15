@@ -75,7 +75,6 @@ class CampaignsApi {
     final queryParams = {
       'page_no': pageNo,
       'limit': limit,
-      'approval_status': 'pending',
     };
 
     final queryString =

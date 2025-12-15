@@ -105,6 +105,38 @@ Future<({UserModel? user, String? error})> updateUserProfile(
   }
 }
 
+@riverpod
+Future<({UserModel? user, String? error})> handleSuccessfulRegistration(
+  Ref ref,
+  UserModel user,
+) async {
+  try {
+    final secureStorage = ref.watch(secureStorageServiceProvider);
+    
+    // Save user data to secure storage
+    await secureStorage.saveUserData(user);
+    
+    // Save user ID for reference
+    if (user.id != null) {
+      await secureStorage.saveUserId(user.id!);
+    }
+    
+    // Clear any temporary registration data
+    await secureStorage.clearRegistrationData();
+    
+    // Update the user provider
+    if (ref.mounted) {
+      ref.read(userProvider.notifier).setUser(user);
+    }
+    
+    log('User registration successful and data stored', name: 'handleSuccessfulRegistration');
+    return (user: user, error: null);
+  } catch (e) {
+    log('Error handling successful registration: $e', name: 'handleSuccessfulRegistration');
+    return (user: null, error: e.toString());
+  }
+}
+
 class UsersListParams {
   final String role;
   final int pageNo;

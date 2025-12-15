@@ -81,6 +81,30 @@ class SecureStorageService {
     final user = await getUserData();
     return user?.phone == '+919645398555';
   }
+
+  /// Save registration data temporarily during the registration process
+  Future<void> saveRegistrationData(Map<String, dynamic> data) async {
+    final jsonString = json.encode(data);
+    await _storage.write(key: 'registration_data', value: jsonString);
+  }
+
+  /// Retrieve registration data
+  Future<Map<String, dynamic>?> getRegistrationData() async {
+    final jsonString = await _storage.read(key: 'registration_data');
+    if (jsonString != null) {
+      try {
+        return json.decode(jsonString) as Map<String, dynamic>;
+      } catch (e) {
+        return null;
+      }
+    }
+    return null;
+  }
+
+  /// Clear registration data after successful registration
+  Future<void> clearRegistrationData() async {
+    await _storage.delete(key: 'registration_data');
+  }
 }
 
 @riverpod

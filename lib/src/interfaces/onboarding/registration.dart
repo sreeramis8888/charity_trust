@@ -1219,42 +1219,63 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
                         animationType: anim.AnimationType.fadeSlideInFromBottom,
                         duration: anim.AnimationDuration.normal,
                         delayMilliseconds: 1750,
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              recommendedByType == 'trustee'
-                                  ? "Choose Trustee *"
-                                  : "Choose Charity Member *",
-                              style: kSmallTitleR,
-                            ),
-                            const SizedBox(height: 6),
-                            SearchableDropdown<UserModel>(
-                              key: ValueKey('recommendedBy_$recommendedByType'),
-                              hint: recommendedByType == 'trustee'
-                                  ? "Search trustee"
-                                  : "Search charity member",
-                              value: selectedRecommendedBy,
-                              itemLabel: (user) => user.name ?? 'Unknown',
-                              onChanged: (user) {
-                                setState(() {
-                                  selectedRecommendedBy = user;
-                                });
-                              },
-                              onFetch: (search, page) async {
-                                final params = UsersListParams(
-                                  role: recommendedByType == 'trustee'
-                                      ? 'trustee'
-                                      : 'member',
-                                  pageNo: page,
-                                  search: search.isEmpty ? null : search,
-                                );
-                                return ref.read(
-                                  fetchUsersByRoleProvider(params).future,
-                                );
-                              },
-                            ),
-                          ],
+                        child: FormField<UserModel>(
+                          key: _fieldKeys['recommendedBy'],
+                          validator: (value) {
+                            if (value == null) {
+                              return 'Required';
+                            }
+                            return null;
+                          },
+                          builder: (field) => Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                recommendedByType == 'trustee'
+                                    ? "Choose Trustee *"
+                                    : "Choose Charity Member *",
+                                style: kSmallTitleR,
+                              ),
+                              const SizedBox(height: 6),
+                              SearchableDropdown<UserModel>(
+                                hint: recommendedByType == 'trustee'
+                                    ? "Search trustee"
+                                    : "Search charity member",
+                                value: selectedRecommendedBy,
+                                itemLabel: (user) => user.name ?? 'Unknown',
+                                onChanged: (user) {
+                                  setState(() {
+                                    selectedRecommendedBy = user;
+                                    field.didChange(user);
+                                  });
+                                },
+                                onFetch: (search, page) async {
+                                  final params = UsersListParams(
+                                    role: recommendedByType == 'trustee'
+                                        ? 'trustee'
+                                        : 'member',
+                                    pageNo: page,
+                                    search: search.isEmpty ? null : search,
+                                  );
+                                  return ref.read(
+                                    fetchUsersByRoleProvider(params).future,
+                                  );
+                                },
+                              ),
+                              if (field.hasError)
+                                Padding(
+                                  padding:
+                                      const EdgeInsets.only(top: 4.0, left: 4.0),
+                                  child: Text(
+                                    field.errorText ?? '',
+                                    style: const TextStyle(
+                                      fontSize: 12,
+                                      color: Colors.red,
+                                    ),
+                                  ),
+                                ),
+                            ],
+                          ),
                         ),
                       ),
                       const SizedBox(height: 30),

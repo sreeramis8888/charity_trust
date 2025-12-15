@@ -260,7 +260,7 @@ final class NewsListNotifierProvider
   NewsListNotifier create() => NewsListNotifier();
 }
 
-String _$newsListNotifierHash() => r'c1a75afb0795d867bc7f2aa8eced341aa921aba4';
+String _$newsListNotifierHash() => r'28576776575cc7f87089e35336b8601f3561ac67';
 
 abstract class _$NewsListNotifier extends $AsyncNotifier<PaginationState> {
   FutureOr<PaginationState> build();
@@ -303,7 +303,7 @@ final class BookmarkedNewsListNotifierProvider extends $AsyncNotifierProvider<
 }
 
 String _$bookmarkedNewsListNotifierHash() =>
-    r'ca0102bf1e6ff24efa7954e75f03a8a9d61c61cf';
+    r'd30f52229a357476763dbe5eb35b0ffcedcf397a';
 
 abstract class _$BookmarkedNewsListNotifier
     extends $AsyncNotifier<PaginationState> {

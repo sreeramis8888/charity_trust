@@ -202,6 +202,122 @@ final class UpdateUserProfileFamily extends $Family
   String toString() => r'updateUserProfileProvider';
 }
 
+@ProviderFor(handleSuccessfulRegistration)
+const handleSuccessfulRegistrationProvider =
+    HandleSuccessfulRegistrationFamily._();
+
+final class HandleSuccessfulRegistrationProvider extends $FunctionalProvider<
+        AsyncValue<
+            ({
+              String? error,
+              UserModel? user,
+            })>,
+        ({
+          String? error,
+          UserModel? user,
+        }),
+        FutureOr<
+            ({
+              String? error,
+              UserModel? user,
+            })>>
+    with
+        $FutureModifier<
+            ({
+              String? error,
+              UserModel? user,
+            })>,
+        $FutureProvider<
+            ({
+              String? error,
+              UserModel? user,
+            })> {
+  const HandleSuccessfulRegistrationProvider._(
+      {required HandleSuccessfulRegistrationFamily super.from,
+      required UserModel super.argument})
+      : super(
+          retry: null,
+          name: r'handleSuccessfulRegistrationProvider',
+          isAutoDispose: true,
+          dependencies: null,
+          $allTransitiveDependencies: null,
+        );
+
+  @override
+  String debugGetCreateSourceHash() => _$handleSuccessfulRegistrationHash();
+
+  @override
+  String toString() {
+    return r'handleSuccessfulRegistrationProvider'
+        ''
+        '($argument)';
+  }
+
+  @$internal
+  @override
+  $FutureProviderElement<
+      ({
+        String? error,
+        UserModel? user,
+      })> $createElement(
+          $ProviderPointer pointer) =>
+      $FutureProviderElement(pointer);
+
+  @override
+  FutureOr<
+      ({
+        String? error,
+        UserModel? user,
+      })> create(Ref ref) {
+    final argument = this.argument as UserModel;
+    return handleSuccessfulRegistration(
+      ref,
+      argument,
+    );
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other is HandleSuccessfulRegistrationProvider &&
+        other.argument == argument;
+  }
+
+  @override
+  int get hashCode {
+    return argument.hashCode;
+  }
+}
+
+String _$handleSuccessfulRegistrationHash() =>
+    r'64c2d553da54ad25f96a1ebdfa2f30d1049e88f4';
+
+final class HandleSuccessfulRegistrationFamily extends $Family
+    with
+        $FunctionalFamilyOverride<
+            FutureOr<
+                ({
+                  String? error,
+                  UserModel? user,
+                })>,
+            UserModel> {
+  const HandleSuccessfulRegistrationFamily._()
+      : super(
+          retry: null,
+          name: r'handleSuccessfulRegistrationProvider',
+          dependencies: null,
+          $allTransitiveDependencies: null,
+          isAutoDispose: true,
+        );
+
+  HandleSuccessfulRegistrationProvider call(
+    UserModel user,
+  ) =>
+      HandleSuccessfulRegistrationProvider._(argument: user, from: this);
+
+  @override
+  String toString() => r'handleSuccessfulRegistrationProvider';
+}
+
 @ProviderFor(fetchUsersByRole)
 const fetchUsersByRoleProvider = FetchUsersByRoleFamily._();
 

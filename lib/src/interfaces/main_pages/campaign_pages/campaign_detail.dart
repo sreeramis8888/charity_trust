@@ -11,6 +11,8 @@ import 'package:Annujoom/src/interfaces/components/input_field.dart';
 import 'package:Annujoom/src/interfaces/animations/index.dart' as anim;
 import 'package:Annujoom/src/data/providers/donation_provider.dart';
 import 'package:Annujoom/src/data/providers/razorpay_provider.dart';
+import 'package:Annujoom/src/data/providers/campaigns_provider.dart'
+    show generalCampaignsProvider, participatedCampaignsProvider;
 import 'package:Annujoom/src/data/services/snackbar_service.dart';
 import 'package:Annujoom/src/data/services/secure_storage_service.dart';
 import 'package:Annujoom/src/interfaces/components/additional_pages/payment_success_page.dart';
@@ -160,6 +162,10 @@ class _CampaignDetailPageState extends ConsumerState<CampaignDetailPage> {
               _donationController.clear();
 
               if (mounted) {
+                // Invalidate campaign providers to refresh data
+                ref.invalidate(generalCampaignsProvider);
+                ref.invalidate(participatedCampaignsProvider);
+                
                 Navigator.of(context).pushReplacement(
                   MaterialPageRoute(
                     builder: (_) => PaymentSuccessPage(

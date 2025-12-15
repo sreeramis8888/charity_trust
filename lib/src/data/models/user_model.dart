@@ -30,6 +30,10 @@ class UserModel {
   final String? rejectReason;
   final DateTime? createdAt;
   final DateTime? updatedAt;
+  final int? totalCampaignsParticipated;
+  final int? totalAmountDonated;
+  final int? totalReferrals;
+  final int? activeReferrals;
 
   UserModel({
     this.id,
@@ -63,6 +67,10 @@ class UserModel {
     this.rejectReason,
     this.createdAt,
     this.updatedAt,
+    this.totalCampaignsParticipated,
+    this.totalAmountDonated,
+    this.totalReferrals,
+    this.activeReferrals,
   });
 
   // -------------------------
@@ -107,6 +115,10 @@ class UserModel {
       updatedAt: json["updatedAt"] != null
           ? DateTime.tryParse(json["updatedAt"])
           : null,
+      totalCampaignsParticipated: json["total_campaigns_participated"],
+      totalAmountDonated: json["total_amount_donated"],
+      totalReferrals: json["total_referrals"],
+      activeReferrals: json["active_referrals"],
     );
   }
 
@@ -146,6 +158,10 @@ class UserModel {
       "reject_reason": rejectReason,
       "createdAt": createdAt?.toIso8601String(),
       "updatedAt": updatedAt?.toIso8601String(),
+      "total_campaigns_participated": totalCampaignsParticipated,
+      "total_amount_donated": totalAmountDonated,
+      "total_referrals": totalReferrals,
+      "active_referrals": activeReferrals,
     };
   }
 
@@ -184,6 +200,10 @@ class UserModel {
     String? rejectReason,
     DateTime? createdAt,
     DateTime? updatedAt,
+    int? totalCampaignsParticipated,
+    int? totalAmountDonated,
+    int? totalReferrals,
+    int? activeReferrals,
   }) {
     return UserModel(
       id: id ?? this.id,
@@ -217,6 +237,11 @@ class UserModel {
       rejectReason: rejectReason ?? this.rejectReason,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
+      totalCampaignsParticipated:
+          totalCampaignsParticipated ?? this.totalCampaignsParticipated,
+      totalAmountDonated: totalAmountDonated ?? this.totalAmountDonated,
+      totalReferrals: totalReferrals ?? this.totalReferrals,
+      activeReferrals: activeReferrals ?? this.activeReferrals,
     );
   }
 }

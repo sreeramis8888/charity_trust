@@ -84,35 +84,59 @@ class ProfilePage extends ConsumerWidget {
                     ),
                   ),
                 ),
-                // const SizedBox(height: 22),
-                // Text("Account Statistics", style: kBodyTitleM),
-                // const SizedBox(height: 10),
-                // Container(
-                //     padding: const EdgeInsets.all(18),
-                //     decoration: BoxDecoration(
-                //       gradient: LinearGradient(
-                //           colors: [Color(0xFFFFFFFF), Color(0xFFEEEDFF)],
-                //           begin: AlignmentGeometry.topCenter,
-                //           end: AlignmentGeometry.bottomCenter),
-                //       borderRadius: BorderRadius.circular(22),
-                //     ),
-                //     child: Column(
-                //     crossAxisAlignment: CrossAxisAlignment.start,
-                //     children: [
-                //       Row(
-                //         mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                //         children: [
-                //           _statItem("10", "My Participations"),
-                //           _statItem("₹12,500", "Contributions"),
-                //         ],
-                //       ),
-                //       const SizedBox(height: 18),
-                //       Container(height: 2, color: kStrokeColor.withOpacity(0.06)),
-                //       const SizedBox(height: 18),
-                //       _statItem("₹10,000", "Zakat"),
-                //     ],
-                //   ),
-                // ),
+                const SizedBox(height: 22),
+                Text("Account Statistics", style: kBodyTitleM),
+                const SizedBox(height: 10),
+                Container(
+                  padding: const EdgeInsets.all(18),
+                  decoration: BoxDecoration(
+                    gradient: const LinearGradient(
+                      colors: [Color(0xFFFFFFFF), Color(0xFFEEEDFF)],
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                    ),
+                    borderRadius: BorderRadius.circular(22),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          _statItem(
+                            "${userData?.totalCampaignsParticipated ?? 0}",
+                            "My Participations",
+                          ),
+                          _statItem(
+                            "₹${userData?.totalAmountDonated ?? 0}",
+                            "Amount Donated",
+                          ),
+                        ],
+                      ),
+                      if (userData?.role != 'member') ...[
+                        const SizedBox(height: 18),
+                        Container(
+                          height: 2,
+                          color: kStrokeColor.withOpacity(0.06),
+                        ),
+                        const SizedBox(height: 18),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            _statItem(
+                              "${userData?.totalReferrals ?? 0}",
+                              "Total Referrals",
+                            ),
+                            _statItem(
+                              "${userData?.activeReferrals ?? 0}",
+                              "Active Referrals",
+                            ),
+                          ],
+                        ),
+                      ],
+                    ],
+                  ),
+                ),
                 const SizedBox(height: 26),
                 Container(
                   padding: const EdgeInsets.symmetric(vertical: 8),
