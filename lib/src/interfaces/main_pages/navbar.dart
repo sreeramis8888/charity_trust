@@ -1,4 +1,5 @@
 import 'package:Annujoom/src/data/constants/color_constants.dart';
+import 'package:Annujoom/src/data/router/nav_router.dart';
 import 'package:Annujoom/src/interfaces/main_pages/home.dart';
 import 'package:Annujoom/src/interfaces/main_pages/campaign_pages/campaign.dart';
 import 'package:Annujoom/src/interfaces/main_pages/news_bookmark/news_list_page.dart';
@@ -7,15 +8,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
-class NavBar extends ConsumerStatefulWidget {
+class NavBar extends ConsumerWidget {
   const NavBar({super.key});
-
-  @override
-  ConsumerState<NavBar> createState() => _NavBarState();
-}
-
-class _NavBarState extends ConsumerState<NavBar> {
-  int _selectedIndex = 0;
 
   static const List<Widget> _widgetOptions = <Widget>[
     HomePage(),
@@ -40,17 +34,13 @@ class _NavBarState extends ConsumerState<NavBar> {
     'assets/svg/active_profile.svg',
   ];
 
-  void _onItemTapped(int index) {
-    setState(() {
-      _selectedIndex = index;
-    });
-  }
-
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final selectedIndex = ref.watch(selectedIndexProvider);
+
     return Scaffold(
       backgroundColor: kWhite,
-      body: _widgetOptions.elementAt(_selectedIndex),
+      body: _widgetOptions.elementAt(selectedIndex),
       bottomNavigationBar: Container(
         decoration: BoxDecoration(
           color: kWhite,
@@ -72,10 +62,12 @@ class _NavBarState extends ConsumerState<NavBar> {
                   padding: const EdgeInsets.symmetric(horizontal: 16),
                   child: Row(
                     children: List.generate(4, (index) {
-                      final bool isSelected = _selectedIndex == index;
+                      final bool isSelected = selectedIndex == index;
                       return Expanded(
                         child: GestureDetector(
-                          onTap: () => _onItemTapped(index),
+                          onTap: () => ref
+                              .read(selectedIndexProvider.notifier)
+                              .updateIndex(index),
                           behavior: HitTestBehavior.opaque,
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.center,

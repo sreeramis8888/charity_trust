@@ -9,6 +9,8 @@ import 'package:Annujoom/src/interfaces/components/loading_indicator.dart';
 import 'package:Annujoom/src/interfaces/animations/index.dart';
 import 'package:Annujoom/src/interfaces/onboarding/create_user.dart';
 import 'package:Annujoom/src/interfaces/main_pages/campaign_pages/category_campaign_detail.dart';
+import 'package:Annujoom/src/interfaces/main_pages/news_bookmark/news_page.dart';
+import 'package:Annujoom/src/data/router/nav_router.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
@@ -548,6 +550,7 @@ class _HomePageState extends ConsumerState<HomePage> {
                                   ?.toString()
                                   .split(' ')[0] ??
                               '',
+                          category: homeData.endingCampaign!.category ?? '',
                           onViewDetails: () {
                             Navigator.of(context).pushNamed(
                               'CampaignDetail',
@@ -680,7 +683,9 @@ class _HomePageState extends ConsumerState<HomePage> {
                               style: kHeadTitleM.copyWith(fontSize: 18)),
                           GestureDetector(
                             onTap: () {
-                              Navigator.of(context).pushNamed('News');
+                              ref
+                                  .read(selectedIndexProvider.notifier)
+                                  .updateIndex(2);
                             },
                             child: Text('See All >',
                                 style: kSmallTitleM.copyWith(
@@ -707,31 +712,33 @@ class _HomePageState extends ConsumerState<HomePage> {
                       padEnds: false,
                       initialPage: 0,
                       pauseAutoPlayOnTouch: true),
-                  items: homeData.latestNews.map((news) {
+                  items: homeData.latestNews.asMap().entries.map((entry) {
+                    int index = entry.key;
+                    var news = entry.value;
                     return Padding(
                       padding: const EdgeInsets.only(left: 16.0),
                       child: HomeNewsCard(
                         title: news.title ?? '',
                         subtitle: news.subTitle ?? '',
                         image: news.media ?? '',
-                        onTap: () {},
+                        onTap: () {
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (context) => NewsDetailView(
+                                news: homeData.latestNews,
+                              ),
+                            ),
+                          );
+                          Future.microtask(() {
+                            ref.read(currentNewsIndexProvider.notifier).state =
+                                index;
+                          });
+                        },
                       ),
                     );
                   }).toList(),
                 ),
               const SizedBox(height: 24),
-              if (homeData.videoPromotions.isNotEmpty)
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text('Featured Videos',
-                          style: kHeadTitleM.copyWith(fontSize: 18)),
-                      const SizedBox(height: 12),
-                    ],
-                  ),
-                ),
               if (homeData.videoPromotions.isNotEmpty)
                 SizedBox(
                   height: 200,
@@ -741,11 +748,11 @@ class _HomePageState extends ConsumerState<HomePage> {
                       setState(() => _videoIndex = page);
                     },
                     children: homeData.videoPromotions.map((video) {
-                      final videoId = _extractYoutubeId(video.link ?? '');
+                      final videoId = extractYouTubeVideoId(video.link ?? '');
                       return Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 16),
                         child: videoId != null
-                            ? youtubeVideoCard(
+                            ? YoutubeVideoCard(
                                 videoId: videoId,
                                 title: video.title ?? '',
                               )
@@ -777,12 +784,5 @@ class _HomePageState extends ConsumerState<HomePage> {
     );
   }
 
-  String? _extractYoutubeId(String url) {
-    final RegExp regExp = RegExp(
-      r'(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([^&\n?#]+)',
-      caseSensitive: false,
-    );
-    final match = regExp.firstMatch(url);
-    return match?.group(1);
-  }
+
 }

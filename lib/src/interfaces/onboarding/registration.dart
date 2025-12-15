@@ -3,6 +3,7 @@ import 'dart:developer';
 import 'package:Annujoom/src/data/constants/color_constants.dart';
 import 'package:Annujoom/src/data/constants/style_constants.dart';
 import 'package:Annujoom/src/data/utils/media_picker.dart';
+import 'package:Annujoom/src/data/utils/validators.dart';
 import 'package:Annujoom/src/data/providers/loading_provider.dart';
 import 'package:Annujoom/src/data/services/snackbar_service.dart';
 import 'package:Annujoom/src/data/services/image_upload.dart';
@@ -13,6 +14,7 @@ import 'package:Annujoom/src/interfaces/components/input_field.dart';
 import 'package:Annujoom/src/interfaces/components/dropdown.dart';
 import 'package:Annujoom/src/interfaces/components/loading_indicator.dart';
 import 'package:Annujoom/src/interfaces/components/searchable_dropdown.dart';
+import 'package:Annujoom/src/interfaces/components/modal_sheet.dart';
 import 'package:Annujoom/src/interfaces/components/primaryButton.dart';
 import 'package:Annujoom/src/interfaces/animations/index.dart' as anim;
 import 'package:flutter/material.dart';
@@ -41,10 +43,14 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
   final aadharNumberController = TextEditingController();
   final dobController = TextEditingController();
   final recommendedByController = TextEditingController();
+  XFile? panCardImage;
 
   String? selectedCountryCode;
+  String? selectedCountryName;
   String? selectedStateCode;
+  String? selectedStateName;
   String? selectedDistrictCode;
+  String? selectedDistrictName;
   String? selectedGender;
   XFile? profileImage;
   String? recommendedByType = 'trustee';
@@ -64,6 +70,7 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
     'district': GlobalKey(),
     'pincode': GlobalKey(),
     'aadharNumber': GlobalKey(),
+    'panCard': GlobalKey(),
     'dob': GlobalKey(),
     'gender': GlobalKey(),
     'whatsapp': GlobalKey(),
@@ -131,6 +138,7 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
     dobController.dispose();
     whatsappController.dispose();
     recommendedByController.dispose();
+    panCardImage = null;
     super.dispose();
   }
 
@@ -156,7 +164,19 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
     }
   }
 
-
+  Future<void> _pickPanCard() async {
+    FocusScope.of(context).requestFocus(_unfocusNode);
+    final result = await pickMedia(
+      context: context,
+      enableCrop: false,
+    );
+    if (!mounted) return;
+    if (result != null && result is XFile) {
+      setState(() {
+        panCardImage = result;
+      });
+    }
+  }
 
   Future<void> _handleRegistration() async {
     try {
@@ -179,7 +199,21 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
         }
       }
 
-
+      // Upload PAN card if available
+      String? panCardUrl;
+      if (panCardImage != null) {
+        try {
+          panCardUrl = await imageUpload(panCardImage!.path);
+          log('PAN card uploaded: $panCardUrl', name: 'RegistrationPage');
+        } catch (e) {
+          if (mounted) {
+            ref.read(loadingProvider.notifier).stopLoading();
+          }
+          SnackbarService().showSnackBar('Failed to upload PAN card');
+          log('Error uploading PAN card: $e', name: 'RegistrationPage');
+          return;
+        }
+      }
 
       // Convert date from dd/mm/yyyy to yyyy-mm-dd format
       String formattedDob = dobController.text.trim();
@@ -203,12 +237,13 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
         'email': emailController.text.trim(),
         'address': addressController.text.trim(),
         'area': areaController.text.trim(),
-        'country': selectedCountryCode,
-        'state': selectedStateCode,
-        'district': selectedDistrictCode,
+        'country': selectedCountryName ?? selectedCountryCode,
+        'state': selectedStateName ?? selectedStateCode,
+        'district': selectedDistrictName ?? selectedDistrictCode,
         'pincode': pincodeController.text.trim(),
         'aadhar_number': int.parse(aadharNumberController.text.trim()),
         'profile_picture': profilePictureUrl,
+        'pan_copy': panCardUrl,
         'gender': selectedGender,
         'whatsapp_number': whatsappNumber,
         'dob': formattedDob,
@@ -228,7 +263,7 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
 
       ref.read(loadingProvider.notifier).stopLoading();
 
-      if (result != null) {
+      if (result.user != null) {
         log('User registration successful', name: 'RegistrationPage');
         SnackbarService().showSnackBar('Registration submitted successfully');
 
@@ -248,7 +283,8 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
           }
         }
       } else {
-        SnackbarService().showSnackBar('Failed to submit registration',
+        final errorMessage = result.error ?? 'Failed to submit registration';
+        SnackbarService().showSnackBar(errorMessage,
             type: SnackbarType.error);
       }
     } catch (e) {
@@ -435,7 +471,7 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
                           type: CustomFieldType.text,
                           hint: "Enter email address",
                           controller: emailController,
-                          validator: (v) => v!.isEmpty ? "Required" : null,
+                          validator: Validators.validateEmail,
                         ),
                       ),
                       const SizedBox(height: 18),
@@ -443,7 +479,7 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
                         animationType: anim.AnimationType.fadeSlideInFromLeft,
                         duration: anim.AnimationDuration.normal,
                         delayMilliseconds: 400,
-                        child: Text("Addresss", style: kSmallTitleR),
+                        child: Text("Address", style: kSmallTitleR),
                       ),
                       const SizedBox(height: 6),
                       anim.AnimatedWidgetWrapper(
@@ -494,38 +530,108 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
                                 ref.watch(getAllCountriesProvider);
                             return countriesAsync.when(
                               data: (countries) {
-                                return AnimatedDropdown<String>(
-                                  key: _fieldKeys['country'],
-                                  hint: "Select country",
-                                  value: selectedCountryCode,
-                                  items: countries
-                                      .map((c) => c.iso2 ?? '')
-                                      .cast<String>()
-                                      .where((code) => code.isNotEmpty)
-                                      .toList(),
-                                  itemLabel: (code) {
-                                    try {
-                                      return countries
-                                              .firstWhere((c) => c.iso2 == code)
-                                              .name ??
-                                          'Unknown';
-                                    } catch (e) {
-                                      return code;
-                                    }
+                                final countryMap = {
+                                  for (var c in countries)
+                                    c.iso2 ?? '': c.name ?? ''
+                                };
+                                return GestureDetector(
+                                  onTap: () {
+                                    ModalSheet<String>(
+                                      context: context,
+                                      title: 'Select Country',
+                                      items: countries
+                                          .map((c) => c.iso2 ?? '')
+                                          .where((code) => code.isNotEmpty)
+                                          .toList(),
+                                      itemLabel: (code) =>
+                                          countryMap[code] ?? code,
+                                      onItemSelected: (code) {
+                                        setState(() {
+                                          selectedCountryCode = code;
+                                          selectedCountryName = countryMap[code];
+                                          selectedStateCode = null;
+                                          selectedStateName = null;
+                                          selectedDistrictCode = null;
+                                          selectedDistrictName = null;
+                                        });
+                                      },
+                                      searchFilter: (code, query) {
+                                        final name = countryMap[code] ?? '';
+                                        return name
+                                                .toLowerCase()
+                                                .contains(
+                                                    query.toLowerCase()) ||
+                                            code
+                                                .toLowerCase()
+                                                .contains(
+                                                    query.toLowerCase());
+                                      },
+                                    ).show();
                                   },
-                                  onChanged: (v) {
-                                    setState(() {
-                                      selectedCountryCode = v;
-                                      selectedStateCode = null;
-                                      selectedDistrictCode = null;
-                                    });
-                                  },
+                                  child: Container(
+                                    height: 52,
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 14),
+                                    decoration: BoxDecoration(
+                                      color: Colors.white,
+                                      borderRadius: BorderRadius.circular(12),
+                                      border: Border.all(
+                                          color: Colors.grey.shade300),
+                                    ),
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Text(
+                                          selectedCountryName ??
+                                              'Search country',
+                                          style: TextStyle(
+                                            color: selectedCountryName == null
+                                                ? Colors.grey.shade600
+                                                : Colors.black,
+                                            fontSize: 14,
+                                          ),
+                                        ),
+                                        Icon(
+                                          Icons.keyboard_arrow_down,
+                                          color: Colors.grey.shade600,
+                                        ),
+                                      ],
+                                    ),
+                                  ),
                                 );
                               },
-                              loading: () => const Center(
-                                child: LoadingAnimation(),
+                              loading: () => Container(
+                                height: 52,
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(12),
+                                  border: Border.all(
+                                      color: Colors.grey.shade300),
+                                ),
+                                child: const Center(
+                                  child: SizedBox(
+                                    height: 20,
+                                    width: 20,
+                                    child: CircularProgressIndicator(
+                                        strokeWidth: 2),
+                                  ),
+                                ),
                               ),
-                              error: (err, stack) => Text('Error: $err'),
+                              error: (err, stack) => Container(
+                                height: 52,
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(12),
+                                  border: Border.all(
+                                      color: Colors.grey.shade300),
+                                ),
+                                child: Center(
+                                  child: Text('Error: $err',
+                                      style: const TextStyle(
+                                          color: Colors.red, fontSize: 12)),
+                                ),
+                              ),
                             );
                           },
                         ),
@@ -553,37 +659,106 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
                                       selectedCountryCode!));
                               return statesAsync.when(
                                 data: (states) {
-                                  return AnimatedDropdown<String>(
-                                    key: _fieldKeys['state'],
-                                    hint: "Select state",
-                                    value: selectedStateCode,
-                                    items: states
-                                        .map((s) => s.stateCode.toString())
-                                        .toList(),
-                                    itemLabel: (code) {
-                                      try {
-                                        return states
-                                                .firstWhere((s) =>
-                                                    s.stateCode.toString() ==
-                                                    code)
-                                                .name ??
-                                            'Unknown';
-                                      } catch (e) {
-                                        return code;
-                                      }
+                                  final stateMap = {
+                                    for (var s in states)
+                                      s.stateCode.toString(): s.name ?? ''
+                                  };
+                                  return GestureDetector(
+                                    onTap: () {
+                                      ModalSheet<String>(
+                                        context: context,
+                                        title: 'Select State',
+                                        items: states
+                                            .map((s) => s.stateCode.toString())
+                                            .toList(),
+                                        itemLabel: (code) =>
+                                            stateMap[code] ?? code,
+                                        onItemSelected: (code) {
+                                          setState(() {
+                                            selectedStateCode = code;
+                                            selectedStateName = stateMap[code];
+                                            selectedDistrictCode = null;
+                                            selectedDistrictName = null;
+                                          });
+                                        },
+                                        searchFilter: (code, query) {
+                                          final name = stateMap[code] ?? '';
+                                          return name
+                                                  .toLowerCase()
+                                                  .contains(
+                                                      query.toLowerCase()) ||
+                                              code
+                                                  .toLowerCase()
+                                                  .contains(
+                                                      query.toLowerCase());
+                                        },
+                                      ).show();
                                     },
-                                    onChanged: (v) {
-                                      setState(() {
-                                        selectedStateCode = v;
-                                        selectedDistrictCode = null;
-                                      });
-                                    },
+                                    child: Container(
+                                      height: 52,
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 14),
+                                      decoration: BoxDecoration(
+                                        color: Colors.white,
+                                        borderRadius:
+                                            BorderRadius.circular(12),
+                                        border: Border.all(
+                                            color: Colors.grey.shade300),
+                                      ),
+                                      child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          Text(
+                                            selectedStateName ??
+                                                'Search state',
+                                            style: TextStyle(
+                                              color: selectedStateName == null
+                                                  ? Colors.grey.shade600
+                                                  : Colors.black,
+                                              fontSize: 14,
+                                            ),
+                                          ),
+                                          Icon(
+                                            Icons.keyboard_arrow_down,
+                                            color: Colors.grey.shade600,
+                                          ),
+                                        ],
+                                      ),
+                                    ),
                                   );
                                 },
-                                loading: () => const Center(
-                                  child: LoadingAnimation(),
+                                loading: () => Container(
+                                  height: 52,
+                                  decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    borderRadius: BorderRadius.circular(12),
+                                    border: Border.all(
+                                        color: Colors.grey.shade300),
+                                  ),
+                                  child: const Center(
+                                    child: SizedBox(
+                                      height: 20,
+                                      width: 20,
+                                      child: CircularProgressIndicator(
+                                          strokeWidth: 2),
+                                    ),
+                                  ),
                                 ),
-                                error: (err, stack) => Text('Error: $err'),
+                                error: (err, stack) => Container(
+                                  height: 52,
+                                  decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    borderRadius: BorderRadius.circular(12),
+                                    border: Border.all(
+                                        color: Colors.grey.shade300),
+                                  ),
+                                  child: Center(
+                                    child: Text('Error: $err',
+                                        style: const TextStyle(
+                                            color: Colors.red, fontSize: 12)),
+                                  ),
+                                ),
                               );
                             },
                           ),
@@ -612,35 +787,100 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
                                       selectedStateCode!));
                               return citiesAsync.when(
                                 data: (cities) {
-                                  return AnimatedDropdown<String>(
-                                    key: _fieldKeys['district'],
-                                    hint: "Select district / city",
-                                    value: selectedDistrictCode,
-                                    items: cities
-                                        .map((c) => c.id.toString())
-                                        .toList(),
-                                    itemLabel: (id) {
-                                      try {
-                                        return cities
-                                                .firstWhere((c) =>
-                                                    c.id.toString() == id)
-                                                .name ??
-                                            'Unknown';
-                                      } catch (e) {
-                                        return id;
-                                      }
+                                  final districtMap = {
+                                    for (var c in cities)
+                                      c.id.toString(): c.name ?? ''
+                                  };
+                                  return GestureDetector(
+                                    onTap: () {
+                                      ModalSheet<String>(
+                                        context: context,
+                                        title: 'Select District',
+                                        items: cities
+                                            .map((c) => c.id.toString())
+                                            .toList(),
+                                        itemLabel: (id) =>
+                                            districtMap[id] ?? id,
+                                        onItemSelected: (id) {
+                                          setState(() {
+                                            selectedDistrictCode = id;
+                                            selectedDistrictName = districtMap[id];
+                                          });
+                                        },
+                                        searchFilter: (id, query) {
+                                          final name = districtMap[id] ?? '';
+                                          return name
+                                              .toLowerCase()
+                                              .contains(
+                                                  query.toLowerCase());
+                                        },
+                                      ).show();
                                     },
-                                    onChanged: (v) {
-                                      setState(() {
-                                        selectedDistrictCode = v;
-                                      });
-                                    },
+                                    child: Container(
+                                      height: 52,
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 14),
+                                      decoration: BoxDecoration(
+                                        color: Colors.white,
+                                        borderRadius:
+                                            BorderRadius.circular(12),
+                                        border: Border.all(
+                                            color: Colors.grey.shade300),
+                                      ),
+                                      child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          Text(
+                                            selectedDistrictName ??
+                                                'Search district / city',
+                                            style: TextStyle(
+                                              color: selectedDistrictName == null
+                                                  ? Colors.grey.shade600
+                                                  : Colors.black,
+                                              fontSize: 14,
+                                            ),
+                                          ),
+                                          Icon(
+                                            Icons.keyboard_arrow_down,
+                                            color: Colors.grey.shade600,
+                                          ),
+                                        ],
+                                      ),
+                                    ),
                                   );
                                 },
-                                loading: () => const Center(
-                                  child: LoadingAnimation(),
+                                loading: () => Container(
+                                  height: 52,
+                                  decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    borderRadius: BorderRadius.circular(12),
+                                    border: Border.all(
+                                        color: Colors.grey.shade300),
+                                  ),
+                                  child: const Center(
+                                    child: SizedBox(
+                                      height: 20,
+                                      width: 20,
+                                      child: CircularProgressIndicator(
+                                          strokeWidth: 2),
+                                    ),
+                                  ),
                                 ),
-                                error: (err, stack) => Text('Error: $err'),
+                                error: (err, stack) => Container(
+                                  height: 52,
+                                  decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    borderRadius: BorderRadius.circular(12),
+                                    border: Border.all(
+                                        color: Colors.grey.shade300),
+                                  ),
+                                  child: Center(
+                                    child: Text('Error: $err',
+                                        style: const TextStyle(
+                                            color: Colors.red, fontSize: 12)),
+                                  ),
+                                ),
                               );
                             },
                           ),
@@ -650,7 +890,7 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
                         animationType: anim.AnimationType.fadeSlideInFromLeft,
                         duration: anim.AnimationDuration.normal,
                         delayMilliseconds: 900,
-                        child: Text("Pincode", style: kSmallTitleR),
+                        child: Text("Pincode *", style: kSmallTitleR),
                       ),
                       const SizedBox(height: 6),
                       anim.AnimatedWidgetWrapper(
@@ -662,6 +902,7 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
                           type: CustomFieldType.text,
                           hint: "Enter pincode",
                           controller: pincodeController,
+                          validator: (v) => v!.isEmpty ? "Required" : null,
                         ),
                       ),
                       const SizedBox(height: 20),
@@ -681,21 +922,105 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
                           type: CustomFieldType.number,
                           hint: "Enter Aadhar number",
                           controller: aadharNumberController,
-                          validator: (v) => v!.isEmpty ? "Required" : null,
+                          validator: Validators.validateAadharNumber,
                         ),
                       ),
                       const SizedBox(height: 20),
                       anim.AnimatedWidgetWrapper(
                         animationType: anim.AnimationType.fadeSlideInFromLeft,
                         duration: anim.AnimationDuration.normal,
-                        delayMilliseconds: 1250,
+                        delayMilliseconds: 1100,
+                        child: Text("Upload PAN Card", style: kSmallTitleR),
+                      ),
+                      const SizedBox(height: 4),
+                      anim.AnimatedWidgetWrapper(
+                        animationType: anim.AnimationType.fadeSlideInFromLeft,
+                        duration: anim.AnimationDuration.normal,
+                        delayMilliseconds: 1150,
+                        child: Text(
+                          "Image (JPG/PNG) - Recommended size: 400x400",
+                          style: kSmallerTitleR.copyWith(color: Colors.grey),
+                        ),
+                      ),
+                      const SizedBox(height: 6),
+                      anim.AnimatedWidgetWrapper(
+                        animationType: anim.AnimationType.fadeSlideInFromBottom,
+                        duration: anim.AnimationDuration.normal,
+                        delayMilliseconds: 1200,
+                        child: FormField<void>(
+                          key: _fieldKeys['panCard'],
+                          validator: (_) {
+                            if (panCardImage == null) {
+                              return 'Required';
+                            }
+                            return null;
+                          },
+                          builder: (field) => Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              GestureDetector(
+                                onTap: _pickPanCard,
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(
+                                      vertical: 16, horizontal: 12),
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(8),
+                                    border: Border.all(
+                                        color: field.hasError
+                                            ? Colors.red
+                                            : kBorder),
+                                    color: kWhite,
+                                  ),
+                                  child: Row(
+                                    children: [
+                                      const Icon(Icons.cloud_upload_outlined,
+                                          color: kTextColor),
+                                      const SizedBox(width: 12),
+                                      Expanded(
+                                        child: Text(
+                                          panCardImage != null
+                                              ? panCardImage!.name
+                                              : "Upload",
+                                          style: TextStyle(
+                                            fontSize: 14,
+                                            color: panCardImage != null
+                                                ? kTextColor
+                                                : kSecondaryTextColor,
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                              if (field.hasError)
+                                Padding(
+                                  padding:
+                                      const EdgeInsets.only(top: 4.0, left: 4.0),
+                                  child: Text(
+                                    field.errorText ?? '',
+                                    style: const TextStyle(
+                                      fontSize: 12,
+                                      color: Colors.red,
+                                    ),
+                                  ),
+                                ),
+                            ],
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 20),
+                      anim.AnimatedWidgetWrapper(
+                        animationType: anim.AnimationType.fadeSlideInFromLeft,
+                        duration: anim.AnimationDuration.normal,
+                        delayMilliseconds: 1300,
                         child: Text("Date of Birth *", style: kSmallTitleR),
                       ),
                       const SizedBox(height: 6),
                       anim.AnimatedWidgetWrapper(
                         animationType: anim.AnimationType.fadeSlideInFromBottom,
                         duration: anim.AnimationDuration.normal,
-                        delayMilliseconds: 1300,
+                        delayMilliseconds: 1350,
                         child: InputField(
                           key: _fieldKeys['dob'],
                           type: CustomFieldType.date,
@@ -708,14 +1033,14 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
                       anim.AnimatedWidgetWrapper(
                         animationType: anim.AnimationType.fadeSlideInFromLeft,
                         duration: anim.AnimationDuration.normal,
-                        delayMilliseconds: 1350,
+                        delayMilliseconds: 1400,
                         child: Text("Gender *", style: kSmallTitleR),
                       ),
                       const SizedBox(height: 6),
                       anim.AnimatedWidgetWrapper(
                         animationType: anim.AnimationType.fadeSlideInFromBottom,
                         duration: anim.AnimationDuration.normal,
-                        delayMilliseconds: 1400,
+                        delayMilliseconds: 1450,
                         child: AnimatedDropdown<String>(
                           key: _fieldKeys['gender'],
                           hint: "Select gender",
@@ -733,14 +1058,14 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
                       anim.AnimatedWidgetWrapper(
                         animationType: anim.AnimationType.fadeSlideInFromLeft,
                         duration: anim.AnimationDuration.normal,
-                        delayMilliseconds: 1450,
+                        delayMilliseconds: 1500,
                         child: Text("WhatsApp Number *", style: kSmallTitleR),
                       ),
                       const SizedBox(height: 12),
                       anim.AnimatedWidgetWrapper(
                         animationType: anim.AnimationType.fadeSlideInFromBottom,
                         duration: anim.AnimationDuration.normal,
-                        delayMilliseconds: 1500,
+                        delayMilliseconds: 1550,
                         child: Row(
                           children: [
                             Checkbox(
@@ -769,7 +1094,7 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
                           animationType:
                               anim.AnimationType.fadeSlideInFromBottom,
                           duration: anim.AnimationDuration.normal,
-                          delayMilliseconds: 1550,
+                          delayMilliseconds: 1600,
                           child: IntlPhoneField(
                             key: _fieldKeys['whatsapp'],
                             validator: (phone) {
@@ -844,14 +1169,14 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
                       anim.AnimatedWidgetWrapper(
                         animationType: anim.AnimationType.fadeSlideInFromLeft,
                         duration: anim.AnimationDuration.normal,
-                        delayMilliseconds: 1600,
+                        delayMilliseconds: 1650,
                         child: Text("Recommended By *", style: kSmallTitleR),
                       ),
                       const SizedBox(height: 12),
                       anim.AnimatedWidgetWrapper(
                         animationType: anim.AnimationType.fadeSlideInFromBottom,
                         duration: anim.AnimationDuration.normal,
-                        delayMilliseconds: 1650,
+                        delayMilliseconds: 1700,
                         child: Row(
                           children: [
                             Row(
@@ -869,21 +1194,23 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
                                 const Text("Trustee"),
                               ],
                             ),
-                            Row(
-                              children: [
-                                Radio<String>(
-                                  value: 'charity_member',
-                                  groupValue: recommendedByType,
-                                  onChanged: (value) {
-                                    setState(() {
-                                      recommendedByType = value;
-                                      selectedRecommendedBy = null;
-                                    });
-                                  },
-                                ),
-                                const Text("Charity Member"),
-                              ],
-                            ),
+                            // Charity Member radio button hidden for now
+                            if (false)
+                              Row(
+                                children: [
+                                  Radio<String>(
+                                    value: 'charity_member',
+                                    groupValue: recommendedByType,
+                                    onChanged: (value) {
+                                      setState(() {
+                                        recommendedByType = value;
+                                        selectedRecommendedBy = null;
+                                      });
+                                    },
+                                  ),
+                                  const Text("Charity Member"),
+                                ],
+                              ),
                           ],
                         ),
                       ),
@@ -891,7 +1218,7 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
                       anim.AnimatedWidgetWrapper(
                         animationType: anim.AnimationType.fadeSlideInFromBottom,
                         duration: anim.AnimationDuration.normal,
-                        delayMilliseconds: 1700,
+                        delayMilliseconds: 1750,
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
@@ -903,7 +1230,7 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
                             ),
                             const SizedBox(height: 6),
                             SearchableDropdown<UserModel>(
-                              key: _fieldKeys['recommendedBy'],
+                              key: ValueKey('recommendedBy_$recommendedByType'),
                               hint: recommendedByType == 'trustee'
                                   ? "Search trustee"
                                   : "Search charity member",
@@ -941,6 +1268,32 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
                           child: primaryButton(
                             label: "Register",
                             onPressed: () {
+                              // Log userData regardless of validation
+                              final debugUserData = <String, dynamic>{
+                                'name': nameController.text.trim(),
+                                'email': emailController.text.trim(),
+                                'address': addressController.text.trim(),
+                                'area': areaController.text.trim(),
+                                'country': selectedCountryName ?? selectedCountryCode,
+                                'state': selectedStateName ?? selectedStateCode,
+                                'district': selectedDistrictName ?? selectedDistrictCode,
+                                'pincode': pincodeController.text.trim(),
+                                'aadhar_number':
+                                    aadharNumberController.text.trim(),
+                                'gender': selectedGender,
+                                'dob': dobController.text.trim(),
+                                'whatsapp_same_as_phone': isSameAsPhone,
+                                'whatsapp_number': isSameAsPhone
+                                    ? mobileController.text.trim()
+                                    : whatsappController.text.trim(),
+                                'recommended_by_type': recommendedByType,
+                                'selected_recommended_by':
+                                    selectedRecommendedBy?.name,
+                                'profile_image_selected': profileImage != null,
+                              };
+                              log('Register clicked - userData: $debugUserData',
+                                  name: 'RegistrationPage');
+
                               if (_formKey.currentState!.validate()) {
                                 _handleRegistration();
                               } else {

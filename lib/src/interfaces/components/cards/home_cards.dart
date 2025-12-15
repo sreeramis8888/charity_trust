@@ -475,6 +475,7 @@ class HomeGradientCampaignCard extends StatelessWidget {
   final int raised;
   final int goal;
   final String dueDate;
+  final String? category;
   final VoidCallback onViewDetails;
   final VoidCallback? onDonate;
 
@@ -488,6 +489,7 @@ class HomeGradientCampaignCard extends StatelessWidget {
     required this.onViewDetails,
     this.onDonate,
     this.image,
+    this.category,
   });
 
   @override
@@ -570,42 +572,48 @@ class HomeGradientCampaignCard extends StatelessWidget {
             overflow: TextOverflow.ellipsis,
           ),
           const SizedBox(height: 12),
-          LinearProgressIndicator(
-            color: const Color(0xFFFFD400),
-            minHeight: 8,
-            borderRadius: BorderRadius.circular(10),
-            value: percent,
-            backgroundColor: Colors.white.withOpacity(0.3),
-          ),
-          const SizedBox(height: 8),
-          Row(
-            children: [
-              Text(
-                "₹$raised",
-                style: kSmallTitleM.copyWith(color: const Color(0xFFFFD400)),
-              ),
-              const SizedBox(width: 4),
-              Text(
-                "raised of",
-                style: kSmallTitleR.copyWith(color: kWhite),
-              ),
-              const SizedBox(width: 4),
-              Text(
-                "₹$goal",
-                style: kSmallTitleSB.copyWith(color: kWhite),
-              ),
-              const SizedBox(width: 4),
-              Text(
-                "goal",
-                style: kSmallTitleR.copyWith(color: kWhite),
-              ),
-              const Spacer(),
-              Text(
-                "${(percent * 100).toInt()}%",
-                style: kSmallTitleSB.copyWith(color: kWhite),
-              ),
-            ],
-          ),
+          if (category != 'General Campaign')
+            Column(
+              children: [
+                LinearProgressIndicator(
+                  color: const Color(0xFFFFD400),
+                  minHeight: 8,
+                  borderRadius: BorderRadius.circular(10),
+                  value: percent,
+                  backgroundColor: Colors.white.withOpacity(0.3),
+                ),
+                const SizedBox(height: 8),
+                Row(
+                  children: [
+                    Text(
+                      "₹$raised",
+                      style: kSmallTitleM.copyWith(
+                          color: const Color(0xFFFFD400)),
+                    ),
+                    const SizedBox(width: 4),
+                    Text(
+                      "raised of",
+                      style: kSmallTitleR.copyWith(color: kWhite),
+                    ),
+                    const SizedBox(width: 4),
+                    Text(
+                      "₹$goal",
+                      style: kSmallTitleSB.copyWith(color: kWhite),
+                    ),
+                    const SizedBox(width: 4),
+                    Text(
+                      "goal",
+                      style: kSmallTitleR.copyWith(color: kWhite),
+                    ),
+                    const Spacer(),
+                    Text(
+                      "${(percent * 100).toInt()}%",
+                      style: kSmallTitleSB.copyWith(color: kWhite),
+                    ),
+                  ],
+                ),
+              ],
+            ),
           const SizedBox(height: 12),
           Row(
             children: [

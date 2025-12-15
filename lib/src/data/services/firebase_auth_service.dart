@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:developer';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'crashlytics_service.dart';
 
 class FirebaseAuthService {
   final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
@@ -19,7 +20,15 @@ class FirebaseAuthService {
           log('Phone number automatically verified', name: 'FirebaseAuthService');
         },
         verificationFailed: (FirebaseAuthException e) {
-          log('Verification failed: ${e.message}', name: 'FirebaseAuthService');
+          log('🔥 FirebaseAuthException');
+          log('CODE  : ${e.code}');
+          log('MSG   : ${e.message}');
+          log('STACK : ${e.stackTrace}');
+          
+          CrashlyticsService.logError(e, e.stackTrace);
+          CrashlyticsService.setCustomKey('phone_number', phoneNumber);
+          CrashlyticsService.setCustomKey('error_code', e.code);
+
           verificationIdCompleter.complete('');
           resendTokenCompleter.complete('');
         },
@@ -40,8 +49,9 @@ class FirebaseAuthService {
         'verificationId': await verificationIdCompleter.future,
         'resendToken': await resendTokenCompleter.future,
       };
-    } catch (e) {
+    } catch (e, stackTrace) {
       log('Error sending OTP: $e', name: 'FirebaseAuthService');
+      CrashlyticsService.logError(e, stackTrace);
       rethrow;
     }
   }
@@ -67,6 +77,8 @@ class FirebaseAuthService {
         verificationFailed: (FirebaseAuthException e) {
           log('Resend verification failed: ${e.message}',
               name: 'FirebaseAuthService');
+          CrashlyticsService.logError(e, e.stackTrace);
+          CrashlyticsService.setCustomKey('resend_attempt', true);
           verificationIdCompleter.complete('');
           newResendTokenCompleter.complete('');
         },
@@ -86,8 +98,9 @@ class FirebaseAuthService {
         'verificationId': await verificationIdCompleter.future,
         'resendToken': await newResendTokenCompleter.future,
       };
-    } catch (e) {
+    } catch (e, stackTrace) {
       log('Error resending OTP: $e', name: 'FirebaseAuthService');
+      CrashlyticsService.logError(e, stackTrace);
       rethrow;
     }
   }
@@ -119,11 +132,13 @@ class FirebaseAuthService {
       log('OTP verified successfully. ID Token obtained',
           name: 'FirebaseAuthService');
       return idToken;
-    } on FirebaseAuthException catch (e) {
+    } on FirebaseAuthException catch (e, stackTrace) {
       log('OTP verification failed: ${e.message}', name: 'FirebaseAuthService');
+      CrashlyticsService.logError(e, stackTrace);
       throw Exception('Invalid OTP: ${e.message}');
-    } catch (e) {
+    } catch (e, stackTrace) {
       log('Error verifying OTP: $e', name: 'FirebaseAuthService');
+      CrashlyticsService.logError(e, stackTrace);
       rethrow;
     }
   }
@@ -133,8 +148,9 @@ class FirebaseAuthService {
     try {
       await _firebaseAuth.signOut();
       log('Signed out successfully', name: 'FirebaseAuthService');
-    } catch (e) {
+    } catch (e, stackTrace) {
       log('Error signing out: $e', name: 'FirebaseAuthService');
+      CrashlyticsService.logError(e, stackTrace);
       rethrow;
     }
   }

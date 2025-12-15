@@ -93,8 +93,31 @@ String _$fetchUserProfileHash() => r'b7deacf1d1016d99d98ea2a4de0a99d98c173a2a';
 const updateUserProfileProvider = UpdateUserProfileFamily._();
 
 final class UpdateUserProfileProvider extends $FunctionalProvider<
-        AsyncValue<UserModel?>, UserModel?, FutureOr<UserModel?>>
-    with $FutureModifier<UserModel?>, $FutureProvider<UserModel?> {
+        AsyncValue<
+            ({
+              String? error,
+              UserModel? user,
+            })>,
+        ({
+          String? error,
+          UserModel? user,
+        }),
+        FutureOr<
+            ({
+              String? error,
+              UserModel? user,
+            })>>
+    with
+        $FutureModifier<
+            ({
+              String? error,
+              UserModel? user,
+            })>,
+        $FutureProvider<
+            ({
+              String? error,
+              UserModel? user,
+            })> {
   const UpdateUserProfileProvider._(
       {required UpdateUserProfileFamily super.from,
       required Map<String, dynamic> super.argument})
@@ -118,11 +141,20 @@ final class UpdateUserProfileProvider extends $FunctionalProvider<
 
   @$internal
   @override
-  $FutureProviderElement<UserModel?> $createElement($ProviderPointer pointer) =>
+  $FutureProviderElement<
+      ({
+        String? error,
+        UserModel? user,
+      })> $createElement(
+          $ProviderPointer pointer) =>
       $FutureProviderElement(pointer);
 
   @override
-  FutureOr<UserModel?> create(Ref ref) {
+  FutureOr<
+      ({
+        String? error,
+        UserModel? user,
+      })> create(Ref ref) {
     final argument = this.argument as Map<String, dynamic>;
     return updateUserProfile(
       ref,
@@ -141,10 +173,17 @@ final class UpdateUserProfileProvider extends $FunctionalProvider<
   }
 }
 
-String _$updateUserProfileHash() => r'978cc9aa5146f96e49a77b2b11253a45cf91fe20';
+String _$updateUserProfileHash() => r'2e1cd930f527118dae42a100c2c591122cb5c4ce';
 
 final class UpdateUserProfileFamily extends $Family
-    with $FunctionalFamilyOverride<FutureOr<UserModel?>, Map<String, dynamic>> {
+    with
+        $FunctionalFamilyOverride<
+            FutureOr<
+                ({
+                  String? error,
+                  UserModel? user,
+                })>,
+            Map<String, dynamic>> {
   const UpdateUserProfileFamily._()
       : super(
           retry: null,
@@ -216,7 +255,7 @@ final class FetchUsersByRoleProvider extends $FunctionalProvider<
   }
 }
 
-String _$fetchUsersByRoleHash() => r'e28b5b774bf4ac0136ea8bfc56497cc0ccc1c258';
+String _$fetchUsersByRoleHash() => r'2e748c373f1eb2b877f1955d1d2ecb7342c0eaff';
 
 final class FetchUsersByRoleFamily extends $Family
     with $FunctionalFamilyOverride<FutureOr<List<UserModel>>, UsersListParams> {
@@ -370,8 +409,31 @@ String _$fetchCurrentUserStatusHash() =>
 const createNewUserProvider = CreateNewUserFamily._();
 
 final class CreateNewUserProvider extends $FunctionalProvider<
-        AsyncValue<UserModel?>, UserModel?, FutureOr<UserModel?>>
-    with $FutureModifier<UserModel?>, $FutureProvider<UserModel?> {
+        AsyncValue<
+            ({
+              String? error,
+              UserModel? user,
+            })>,
+        ({
+          String? error,
+          UserModel? user,
+        }),
+        FutureOr<
+            ({
+              String? error,
+              UserModel? user,
+            })>>
+    with
+        $FutureModifier<
+            ({
+              String? error,
+              UserModel? user,
+            })>,
+        $FutureProvider<
+            ({
+              String? error,
+              UserModel? user,
+            })> {
   const CreateNewUserProvider._(
       {required CreateNewUserFamily super.from,
       required Map<String, dynamic> super.argument})
@@ -395,11 +457,20 @@ final class CreateNewUserProvider extends $FunctionalProvider<
 
   @$internal
   @override
-  $FutureProviderElement<UserModel?> $createElement($ProviderPointer pointer) =>
+  $FutureProviderElement<
+      ({
+        String? error,
+        UserModel? user,
+      })> $createElement(
+          $ProviderPointer pointer) =>
       $FutureProviderElement(pointer);
 
   @override
-  FutureOr<UserModel?> create(Ref ref) {
+  FutureOr<
+      ({
+        String? error,
+        UserModel? user,
+      })> create(Ref ref) {
     final argument = this.argument as Map<String, dynamic>;
     return createNewUser(
       ref,
@@ -418,10 +489,17 @@ final class CreateNewUserProvider extends $FunctionalProvider<
   }
 }
 
-String _$createNewUserHash() => r'dfe04814d1417d719a7632621b85b25c7409d663';
+String _$createNewUserHash() => r'776f4a1141b3bcbe3d6bafc6b3d5ab8c42a68a0e';
 
 final class CreateNewUserFamily extends $Family
-    with $FunctionalFamilyOverride<FutureOr<UserModel?>, Map<String, dynamic>> {
+    with
+        $FunctionalFamilyOverride<
+            FutureOr<
+                ({
+                  String? error,
+                  UserModel? user,
+                })>,
+            Map<String, dynamic>> {
   const CreateNewUserFamily._()
       : super(
           retry: null,

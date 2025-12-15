@@ -1,8 +1,7 @@
 import 'package:Annujoom/src/data/constants/color_constants.dart';
 import 'package:Annujoom/src/data/constants/style_constants.dart';
 import 'package:Annujoom/src/data/models/news_model.dart';
-import 'package:Annujoom/src/data/utils/get_time_ago.dart';
-import 'package:Annujoom/src/interfaces/components/text_pill.dart';
+import 'package:Annujoom/src/data/utils/date_formatter.dart';
 import 'package:Annujoom/src/interfaces/main_pages/news_bookmark/news_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -15,7 +14,7 @@ class NewsCard extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final time = timeAgo(news.updatedAt!);
+    final formattedDate = formatDate(news.updatedAt);
 
     return GestureDetector(
       onTap: () {
@@ -67,21 +66,8 @@ class NewsCard extends ConsumerWidget {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      TextPill(
-                        text: news.category ?? "Latest",
-                        color: kCardBackgroundColor,
-                        borderColor: const Color(0xFF2EC866),
-                        textStyle: kSmallTitleSB.copyWith(
-                          color: const Color(0xFF2EC866),
-                          fontSize: 10,
-                        ),
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 8,
-                          vertical: 4,
-                        ),
-                      ),
                       Text(
-                        time,
+                        formattedDate,
                         style:
                             const TextStyle(fontSize: 10, color: Colors.grey),
                       ),

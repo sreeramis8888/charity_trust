@@ -114,14 +114,26 @@ class _SearchableDropdownState<T> extends ConsumerState<SearchableDropdown<T>>
     _currentPage = 1;
     _hasMorePages = true;
     await _loadItems();
-    _overlayEntry?.markNeedsBuild();
+    if (mounted && _overlayEntry != null) {
+      try {
+        _overlayEntry?.markNeedsBuild();
+      } catch (e) {
+        debugPrint("Error marking overlay for rebuild: $e");
+      }
+    }
   }
 
   Future<void> _loadMore() async {
     if (!_hasMorePages || _isLoading) return;
     _currentPage++;
     await _loadItems();
-    _overlayEntry?.markNeedsBuild();
+    if (mounted && _overlayEntry != null) {
+      try {
+        _overlayEntry?.markNeedsBuild();
+      } catch (e) {
+        debugPrint("Error marking overlay for rebuild: $e");
+      }
+    }
   }
 
   void _determineOpenDirection() {

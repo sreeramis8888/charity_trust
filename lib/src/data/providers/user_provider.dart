@@ -72,7 +72,7 @@ Future<UserModel?> fetchUserProfile(Ref ref) async {
 }
 
 @riverpod
-Future<UserModel?> updateUserProfile(
+Future<({UserModel? user, String? error})> updateUserProfile(
   Ref ref,
   Map<String, dynamic> userData,
 ) async {
@@ -95,13 +95,13 @@ Future<UserModel?> updateUserProfile(
       if (ref.mounted) {
         ref.read(userProvider.notifier).setUser(user);
       }
-      return user;
+      return (user: user, error: null);
     }
 
-    return null;
+    return (user: null, error: response.message ?? 'Failed to update profile');
   } catch (e) {
     log('Error updating user profile: $e', name: 'updateUserProfile');
-    return null;
+    return (user: null, error: e.toString());
   }
 }
 
@@ -125,7 +125,7 @@ Future<List<UserModel>> fetchUsersByRole(
   try {
     final apiProvider = ref.watch(apiProviderProvider);
     final queryParams = {
-      'role': params.role,
+      'role[]': params.role,
       'page_no': params.pageNo,
       'limit': 10,
     };
@@ -226,7 +226,7 @@ Future<UserModel?> fetchCurrentUserStatus(Ref ref) async {
 }
 
 @riverpod
-Future<UserModel?> createNewUser(
+Future<({UserModel? user, String? error})> createNewUser(
   Ref ref,
   Map<String, dynamic> userData,
 ) async {
@@ -247,14 +247,14 @@ Future<UserModel?> createNewUser(
       final data = response.data!['data'] as Map<String, dynamic>?;
       if (data != null) {
         final user = UserModel.fromJson(data);
-        return user;
+        return (user: user, error: null);
       }
     }
 
-    return null;
+    return (user: null, error: response.message ?? 'Failed to create user');
   } catch (e) {
     log('Error creating new user: $e', name: 'createNewUser');
-    return null;
+    return (user: null, error: e.toString());
   }
 }
 

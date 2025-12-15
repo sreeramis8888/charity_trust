@@ -84,18 +84,23 @@ class SnackbarService {
         ),
       );
 
-  Widget _okButton() => Container(
-        padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-        decoration: BoxDecoration(
-          color: kWhite.withOpacity(0.2),
-          borderRadius: BorderRadius.circular(20),
-        ),
-        child: Text(
-          'OK',
-          style: TextStyle(
-            color: kWhite,
-            fontSize: 12,
-            fontWeight: FontWeight.w700,
+  Widget _okButton() => GestureDetector(
+        onTap: () {
+          scaffoldMessengerKey.currentState?.hideCurrentSnackBar();
+        },
+        child: Container(
+          padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+          decoration: BoxDecoration(
+            color: kWhite.withOpacity(0.2),
+            borderRadius: BorderRadius.circular(20),
+          ),
+          child: Text(
+            'OK',
+            style: TextStyle(
+              color: kWhite,
+              fontSize: 12,
+              fontWeight: FontWeight.w700,
+            ),
           ),
         ),
       );

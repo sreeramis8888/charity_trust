@@ -2,7 +2,9 @@ import 'dart:io';
 import 'dart:developer';
 import 'package:Annujoom/src/data/constants/color_constants.dart';
 import 'package:Annujoom/src/data/constants/style_constants.dart';
+import 'package:Annujoom/src/data/models/user_model.dart';
 import 'package:Annujoom/src/data/utils/media_picker.dart';
+import 'package:Annujoom/src/data/utils/validators.dart';
 import 'package:Annujoom/src/data/providers/loading_provider.dart';
 import 'package:Annujoom/src/data/services/snackbar_service.dart';
 import 'package:Annujoom/src/data/services/image_upload.dart';
@@ -12,6 +14,7 @@ import 'package:Annujoom/src/data/services/secure_storage_service.dart';
 import 'package:Annujoom/src/interfaces/components/input_field.dart';
 import 'package:Annujoom/src/interfaces/components/dropdown.dart';
 import 'package:Annujoom/src/interfaces/components/loading_indicator.dart';
+import 'package:Annujoom/src/interfaces/components/modal_sheet.dart';
 import 'package:Annujoom/src/interfaces/components/primaryButton.dart';
 import 'package:Annujoom/src/interfaces/animations/index.dart' as anim;
 import 'package:flutter/material.dart';
@@ -37,15 +40,17 @@ class _CreateUserPageState extends ConsumerState<CreateUserPage> {
   final addressController = TextEditingController();
   final areaController = TextEditingController();
   final pincodeController = TextEditingController();
-  final panNumberController = TextEditingController();
+  final aadharNumberController = TextEditingController();
   final dobController = TextEditingController();
 
   String? selectedCountryCode;
+  String? selectedCountryName;
   String? selectedStateCode;
+  String? selectedStateName;
   String? selectedDistrictCode;
+  String? selectedDistrictName;
   String? selectedGender;
   XFile? profileImage;
-  XFile? panCardImage;
 
   final Map<String, GlobalKey> _fieldKeys = {
     'name': GlobalKey(),
@@ -57,8 +62,7 @@ class _CreateUserPageState extends ConsumerState<CreateUserPage> {
     'state': GlobalKey(),
     'district': GlobalKey(),
     'pincode': GlobalKey(),
-    'panNumber': GlobalKey(),
-    'panCard': GlobalKey(),
+    'aadharNumber': GlobalKey(),
     'dob': GlobalKey(),
     'gender': GlobalKey(),
   };
@@ -73,7 +77,7 @@ class _CreateUserPageState extends ConsumerState<CreateUserPage> {
     addressController.dispose();
     areaController.dispose();
     pincodeController.dispose();
-    panNumberController.dispose();
+    aadharNumberController.dispose();
     dobController.dispose();
     super.dispose();
   }
@@ -94,20 +98,6 @@ class _CreateUserPageState extends ConsumerState<CreateUserPage> {
     }
   }
 
-  Future<void> _pickPanCard() async {
-    FocusScope.of(context).requestFocus(_unfocusNode);
-    final result = await pickMedia(
-      context: context,
-      enableCrop: false,
-    );
-    if (!mounted) return;
-    if (result != null && result is XFile) {
-      setState(() {
-        panCardImage = result;
-      });
-    }
-  }
-
   Future<void> _handleCreateUser() async {
     try {
       ref.read(loadingProvider.notifier).startLoading();
@@ -121,19 +111,6 @@ class _CreateUserPageState extends ConsumerState<CreateUserPage> {
             ref.read(loadingProvider.notifier).stopLoading();
           }
           SnackbarService().showSnackBar('Failed to upload profile picture');
-          return;
-        }
-      }
-
-      String? panCardUrl;
-      if (panCardImage != null) {
-        try {
-          panCardUrl = await imageUpload(panCardImage!.path);
-        } catch (e) {
-          if (mounted) {
-            ref.read(loadingProvider.notifier).stopLoading();
-          }
-          SnackbarService().showSnackBar('Failed to upload PAN card');
           return;
         }
       }
@@ -169,12 +146,11 @@ class _CreateUserPageState extends ConsumerState<CreateUserPage> {
         'phone': mobileController.text.trim(),
         'address': addressController.text.trim(),
         'area': areaController.text.trim(),
-        'country': selectedCountryCode,
-        'state': selectedStateCode,
-        'district': selectedDistrictCode,
+        'country': selectedCountryName ?? selectedCountryCode,
+        'state': selectedStateName ?? selectedStateCode,
+        'district': selectedDistrictName ?? selectedDistrictCode,
         'pincode': pincodeController.text.trim(),
-        'pan_number': panNumberController.text.trim(),
-        'pan_copy': panCardUrl,
+        'aadhar_number': int.parse(aadharNumberController.text.trim()),
         'image': profilePictureUrl,
         'gender': selectedGender,
         'dob': formattedDob,
@@ -187,14 +163,15 @@ class _CreateUserPageState extends ConsumerState<CreateUserPage> {
       if (!mounted) return;
       ref.read(loadingProvider.notifier).stopLoading();
 
-      if (result != null) {
+      if (result.user != null) {
         SnackbarService().showSnackBar('User created successfully');
         if (mounted) {
           Navigator.of(context).pop(true);
         }
       } else {
+        final errorMessage = result.error ?? 'Failed to create user';
         SnackbarService()
-            .showSnackBar('Failed to create user', type: SnackbarType.error);
+            .showSnackBar(errorMessage, type: SnackbarType.error);
       }
     } catch (e) {
       if (mounted) {
@@ -251,19 +228,17 @@ class _CreateUserPageState extends ConsumerState<CreateUserPage> {
                   const SizedBox(height: 18),
                   _buildAddressField(),
                   const SizedBox(height: 18),
-                  _buildAreaField(),
-                  const SizedBox(height: 18),
                   _buildCountryField(),
                   const SizedBox(height: 18),
                   _buildStateField(),
-                  const SizedBox(height: 18),
+                  if (selectedStateName != null) const SizedBox(height: 18),
                   _buildDistrictField(),
+                  if (selectedDistrictName != null) const SizedBox(height: 18),
+                  _buildAreaField(),
                   const SizedBox(height: 18),
                   _buildPincodeField(),
                   const SizedBox(height: 20),
-                  _buildPanNumberField(),
-                  const SizedBox(height: 20),
-                  _buildPanCardField(),
+                  _buildAadharNumberField(),
                   const SizedBox(height: 20),
                   _buildDobField(),
                   const SizedBox(height: 20),
@@ -452,7 +427,7 @@ class _CreateUserPageState extends ConsumerState<CreateUserPage> {
             type: CustomFieldType.text,
             hint: "Enter email",
             controller: emailController,
-            validator: (v) => v!.isEmpty ? "Required" : null,
+            validator: Validators.validateEmail,
           ),
         ),
       ],
@@ -531,38 +506,95 @@ class _CreateUserPageState extends ConsumerState<CreateUserPage> {
               final countriesAsync = ref.watch(getAllCountriesProvider);
               return countriesAsync.when(
                 data: (countries) {
-                  return AnimatedDropdown<String>(
-                    key: _fieldKeys['country'],
-                    hint: "Select country",
-                    value: selectedCountryCode,
-                    items: countries
-                        .map((c) => c.iso2 ?? '')
-                        .cast<String>()
-                        .where((code) => code.isNotEmpty)
-                        .toList(),
-                    itemLabel: (code) {
-                      try {
-                        return countries
-                                .firstWhere((c) => c.iso2 == code)
-                                .name ??
-                            'Unknown';
-                      } catch (e) {
-                        return code;
-                      }
+                  final countryMap = {
+                    for (var c in countries) c.iso2 ?? '': c.name ?? ''
+                  };
+                  return GestureDetector(
+                    onTap: () {
+                      ModalSheet<String>(
+                        context: context,
+                        title: 'Select Country',
+                        items: countries
+                            .map((c) => c.iso2 ?? '')
+                            .where((code) => code.isNotEmpty)
+                            .toList(),
+                        itemLabel: (code) => countryMap[code] ?? code,
+                        onItemSelected: (code) {
+                          setState(() {
+                            selectedCountryCode = code;
+                            selectedCountryName = countryMap[code];
+                            selectedStateCode = null;
+                            selectedStateName = null;
+                            selectedDistrictCode = null;
+                            selectedDistrictName = null;
+                          });
+                        },
+                        searchFilter: (code, query) {
+                          final name = countryMap[code] ?? '';
+                          return name
+                                  .toLowerCase()
+                                  .contains(query.toLowerCase()) ||
+                              code.toLowerCase().contains(query.toLowerCase());
+                        },
+                      ).show();
                     },
-                    onChanged: (v) {
-                      setState(() {
-                        selectedCountryCode = v;
-                        selectedStateCode = null;
-                        selectedDistrictCode = null;
-                      });
-                    },
+                    child: Container(
+                      height: 52,
+                      padding: const EdgeInsets.symmetric(horizontal: 14),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(color: Colors.grey.shade300),
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            selectedCountryName ?? 'Select country',
+                            style: TextStyle(
+                              color: selectedCountryName == null
+                                  ? Colors.grey.shade600
+                                  : Colors.black,
+                              fontSize: 14,
+                            ),
+                          ),
+                          Icon(
+                            Icons.keyboard_arrow_down,
+                            color: Colors.grey.shade600,
+                          ),
+                        ],
+                      ),
+                    ),
                   );
                 },
-                loading: () => const Center(
-                  child: LoadingAnimation(),
+                loading: () => Container(
+                  height: 52,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: Colors.grey.shade300),
+                  ),
+                  child: const Center(
+                    child: SizedBox(
+                      height: 20,
+                      width: 20,
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    ),
+                  ),
                 ),
-                error: (err, stack) => Text('Error: $err'),
+                error: (err, stack) => Container(
+                  height: 52,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: Colors.grey.shade300),
+                  ),
+                  child: Center(
+                    child: Text('Error: $err',
+                        style:
+                            const TextStyle(color: Colors.red, fontSize: 12)),
+                  ),
+                ),
               );
             },
           ),
@@ -593,34 +625,91 @@ class _CreateUserPageState extends ConsumerState<CreateUserPage> {
                   ref.watch(getStatesByCountryProvider(selectedCountryCode!));
               return statesAsync.when(
                 data: (states) {
-                  return AnimatedDropdown<String>(
-                    key: _fieldKeys['state'],
-                    hint: "Select state",
-                    value: selectedStateCode,
-                    items: states.map((s) => s.stateCode.toString()).toList(),
-                    itemLabel: (code) {
-                      try {
-                        return states
-                                .firstWhere(
-                                    (s) => s.stateCode.toString() == code)
-                                .name ??
-                            'Unknown';
-                      } catch (e) {
-                        return code;
-                      }
+                  final stateMap = {
+                    for (var s in states) s.stateCode.toString(): s.name ?? ''
+                  };
+                  return GestureDetector(
+                    onTap: () {
+                      ModalSheet<String>(
+                        context: context,
+                        title: 'Select State',
+                        items:
+                            states.map((s) => s.stateCode.toString()).toList(),
+                        itemLabel: (code) => stateMap[code] ?? code,
+                        onItemSelected: (code) {
+                          setState(() {
+                            selectedStateCode = code;
+                            selectedStateName = stateMap[code];
+                            selectedDistrictCode = null;
+                            selectedDistrictName = null;
+                          });
+                        },
+                        searchFilter: (code, query) {
+                          final name = stateMap[code] ?? '';
+                          return name
+                                  .toLowerCase()
+                                  .contains(query.toLowerCase()) ||
+                              code.toLowerCase().contains(query.toLowerCase());
+                        },
+                      ).show();
                     },
-                    onChanged: (v) {
-                      setState(() {
-                        selectedStateCode = v;
-                        selectedDistrictCode = null;
-                      });
-                    },
+                    child: Container(
+                      height: 52,
+                      padding: const EdgeInsets.symmetric(horizontal: 14),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(color: Colors.grey.shade300),
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            selectedStateName ?? 'Select state',
+                            style: TextStyle(
+                              color: selectedStateName == null
+                                  ? Colors.grey.shade600
+                                  : Colors.black,
+                              fontSize: 14,
+                            ),
+                          ),
+                          Icon(
+                            Icons.keyboard_arrow_down,
+                            color: Colors.grey.shade600,
+                          ),
+                        ],
+                      ),
+                    ),
                   );
                 },
-                loading: () => const Center(
-                  child: LoadingAnimation(),
+                loading: () => Container(
+                  height: 52,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: Colors.grey.shade300),
+                  ),
+                  child: const Center(
+                    child: SizedBox(
+                      height: 20,
+                      width: 20,
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    ),
+                  ),
                 ),
-                error: (err, stack) => Text('Error: $err'),
+                error: (err, stack) => Container(
+                  height: 52,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: Colors.grey.shade300),
+                  ),
+                  child: Center(
+                    child: Text('Error: $err',
+                        style:
+                            const TextStyle(color: Colors.red, fontSize: 12)),
+                  ),
+                ),
               );
             },
           ),
@@ -651,32 +740,87 @@ class _CreateUserPageState extends ConsumerState<CreateUserPage> {
                   selectedCountryCode!, selectedStateCode!));
               return citiesAsync.when(
                 data: (cities) {
-                  return AnimatedDropdown<String>(
-                    key: _fieldKeys['district'],
-                    hint: "Select district / city",
-                    value: selectedDistrictCode,
-                    items: cities.map((c) => c.id.toString()).toList(),
-                    itemLabel: (id) {
-                      try {
-                        return cities
-                                .firstWhere((c) => c.id.toString() == id)
-                                .name ??
-                            'Unknown';
-                      } catch (e) {
-                        return id;
-                      }
+                  final districtMap = {
+                    for (var c in cities) c.id.toString(): c.name ?? ''
+                  };
+                  return GestureDetector(
+                    onTap: () {
+                      ModalSheet<String>(
+                        context: context,
+                        title: 'Select District',
+                        items: cities.map((c) => c.id.toString()).toList(),
+                        itemLabel: (id) => districtMap[id] ?? id,
+                        onItemSelected: (id) {
+                          setState(() {
+                            selectedDistrictCode = id;
+                            selectedDistrictName = districtMap[id];
+                          });
+                        },
+                        searchFilter: (id, query) {
+                          final name = districtMap[id] ?? '';
+                          return name
+                              .toLowerCase()
+                              .contains(query.toLowerCase());
+                        },
+                      ).show();
                     },
-                    onChanged: (v) {
-                      setState(() {
-                        selectedDistrictCode = v;
-                      });
-                    },
+                    child: Container(
+                      height: 52,
+                      padding: const EdgeInsets.symmetric(horizontal: 14),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(color: Colors.grey.shade300),
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            selectedDistrictName ?? 'Select district / city',
+                            style: TextStyle(
+                              color: selectedDistrictName == null
+                                  ? Colors.grey.shade600
+                                  : Colors.black,
+                              fontSize: 14,
+                            ),
+                          ),
+                          Icon(
+                            Icons.keyboard_arrow_down,
+                            color: Colors.grey.shade600,
+                          ),
+                        ],
+                      ),
+                    ),
                   );
                 },
-                loading: () => const Center(
-                  child: LoadingAnimation(),
+                loading: () => Container(
+                  height: 52,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: Colors.grey.shade300),
+                  ),
+                  child: const Center(
+                    child: SizedBox(
+                      height: 20,
+                      width: 20,
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    ),
+                  ),
                 ),
-                error: (err, stack) => Text('Error: $err'),
+                error: (err, stack) => Container(
+                  height: 52,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: Colors.grey.shade300),
+                  ),
+                  child: Center(
+                    child: Text('Error: $err',
+                        style:
+                            const TextStyle(color: Colors.red, fontSize: 12)),
+                  ),
+                ),
               );
             },
           ),
@@ -693,7 +837,7 @@ class _CreateUserPageState extends ConsumerState<CreateUserPage> {
           animationType: anim.AnimationType.fadeSlideInFromLeft,
           duration: anim.AnimationDuration.normal,
           delayMilliseconds: 900,
-          child: Text("Pincode", style: kSmallTitleR),
+          child: Text("Pincode *", style: kSmallTitleR),
         ),
         const SizedBox(height: 6),
         anim.AnimatedWidgetWrapper(
@@ -705,32 +849,6 @@ class _CreateUserPageState extends ConsumerState<CreateUserPage> {
             type: CustomFieldType.text,
             hint: "Enter pincode",
             controller: pincodeController,
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildPanNumberField() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        anim.AnimatedWidgetWrapper(
-          animationType: anim.AnimationType.fadeSlideInFromLeft,
-          duration: anim.AnimationDuration.normal,
-          delayMilliseconds: 1000,
-          child: Text("PAN Number *", style: kSmallTitleR),
-        ),
-        const SizedBox(height: 6),
-        anim.AnimatedWidgetWrapper(
-          animationType: anim.AnimationType.fadeSlideInFromBottom,
-          duration: anim.AnimationDuration.normal,
-          delayMilliseconds: 1050,
-          child: InputField(
-            key: _fieldKeys['panNumber'],
-            type: CustomFieldType.text,
-            hint: "Enter PAN number",
-            controller: panNumberController,
             validator: (v) => v!.isEmpty ? "Required" : null,
           ),
         ),
@@ -738,88 +856,27 @@ class _CreateUserPageState extends ConsumerState<CreateUserPage> {
     );
   }
 
-  Widget _buildPanCardField() {
+  Widget _buildAadharNumberField() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         anim.AnimatedWidgetWrapper(
           animationType: anim.AnimationType.fadeSlideInFromLeft,
           duration: anim.AnimationDuration.normal,
-          delayMilliseconds: 1100,
-          child: Text("Upload PAN Card", style: kSmallTitleR),
-        ),
-        const SizedBox(height: 4),
-        anim.AnimatedWidgetWrapper(
-          animationType: anim.AnimationType.fadeSlideInFromLeft,
-          duration: anim.AnimationDuration.normal,
-          delayMilliseconds: 1150,
-          child: Text(
-            "Image (JPG/PNG) - Recommended size: 400x400",
-            style: kSmallerTitleR.copyWith(color: Colors.grey),
-          ),
+          delayMilliseconds: 1000,
+          child: Text("Aadhar Number *", style: kSmallTitleR),
         ),
         const SizedBox(height: 6),
         anim.AnimatedWidgetWrapper(
           animationType: anim.AnimationType.fadeSlideInFromBottom,
           duration: anim.AnimationDuration.normal,
-          delayMilliseconds: 1200,
-          child: FormField<void>(
-            key: _fieldKeys['panCard'],
-            validator: (_) {
-              if (panCardImage == null) {
-                return 'Required';
-              }
-              return null;
-            },
-            builder: (field) => Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                GestureDetector(
-                  onTap: _pickPanCard,
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(
-                        vertical: 16, horizontal: 12),
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(8),
-                      border: Border.all(
-                          color: field.hasError ? Colors.red : kBorder),
-                      color: kWhite,
-                    ),
-                    child: Row(
-                      children: [
-                        const Icon(Icons.cloud_upload_outlined,
-                            color: kTextColor),
-                        const SizedBox(width: 12),
-                        Expanded(
-                          child: Text(
-                            panCardImage != null
-                                ? panCardImage!.name
-                                : "Upload",
-                            style: TextStyle(
-                              fontSize: 14,
-                              color: panCardImage != null
-                                  ? kTextColor
-                                  : kSecondaryTextColor,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-                if (field.hasError)
-                  Padding(
-                    padding: const EdgeInsets.only(top: 4.0, left: 4.0),
-                    child: Text(
-                      field.errorText ?? '',
-                      style: const TextStyle(
-                        fontSize: 12,
-                        color: Colors.red,
-                      ),
-                    ),
-                  ),
-              ],
-            ),
+          delayMilliseconds: 1050,
+          child: InputField(
+            key: _fieldKeys['aadharNumber'],
+            type: CustomFieldType.number,
+            hint: "Enter Aadhar number",
+            controller: aadharNumberController,
+            validator: Validators.validateAadharNumber,
           ),
         ),
       ],
@@ -833,14 +890,14 @@ class _CreateUserPageState extends ConsumerState<CreateUserPage> {
         anim.AnimatedWidgetWrapper(
           animationType: anim.AnimationType.fadeSlideInFromLeft,
           duration: anim.AnimationDuration.normal,
-          delayMilliseconds: 1250,
+          delayMilliseconds: 1100,
           child: Text("Date of Birth *", style: kSmallTitleR),
         ),
         const SizedBox(height: 6),
         anim.AnimatedWidgetWrapper(
           animationType: anim.AnimationType.fadeSlideInFromBottom,
           duration: anim.AnimationDuration.normal,
-          delayMilliseconds: 1300,
+          delayMilliseconds: 1150,
           child: InputField(
             key: _fieldKeys['dob'],
             type: CustomFieldType.date,
@@ -860,14 +917,14 @@ class _CreateUserPageState extends ConsumerState<CreateUserPage> {
         anim.AnimatedWidgetWrapper(
           animationType: anim.AnimationType.fadeSlideInFromLeft,
           duration: anim.AnimationDuration.normal,
-          delayMilliseconds: 1350,
+          delayMilliseconds: 1200,
           child: Text("Gender *", style: kSmallTitleR),
         ),
         const SizedBox(height: 6),
         anim.AnimatedWidgetWrapper(
           animationType: anim.AnimationType.fadeSlideInFromBottom,
           duration: anim.AnimationDuration.normal,
-          delayMilliseconds: 1400,
+          delayMilliseconds: 1250,
           child: AnimatedDropdown<String>(
             key: _fieldKeys['gender'],
             hint: "Select gender",
@@ -889,7 +946,7 @@ class _CreateUserPageState extends ConsumerState<CreateUserPage> {
     return anim.AnimatedWidgetWrapper(
       animationType: anim.AnimationType.fadeScaleUp,
       duration: anim.AnimationDuration.normal,
-      delayMilliseconds: 1450,
+      delayMilliseconds: 1300,
       child: SizedBox(
         height: 50,
         width: double.infinity,

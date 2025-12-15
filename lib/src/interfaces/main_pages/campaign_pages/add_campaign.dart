@@ -58,6 +58,11 @@ class _AddCampaignPageState extends ConsumerState<AddCampaignPage> {
     'targetAmount': GlobalKey(),
   };
 
+  bool _requiresTargetAmount() {
+    return selectedCategory == 'General Campaign' ||
+        selectedCategory == 'General Funding';
+  }
+
   void _scrollToFirstError() {
     Future.delayed(const Duration(milliseconds: 50), () {
       if (!mounted) return;
@@ -77,7 +82,8 @@ class _AddCampaignPageState extends ConsumerState<AddCampaignPage> {
           firstErrorKey = 'startDate';
         } else if (endDateController.text.trim().isEmpty) {
           firstErrorKey = 'endDate';
-        } else if (targetAmountController.text.trim().isEmpty) {
+        } else if (_requiresTargetAmount() &&
+            targetAmountController.text.trim().isEmpty) {
           firstErrorKey = 'targetAmount';
         }
 
@@ -431,26 +437,33 @@ class _AddCampaignPageState extends ConsumerState<AddCampaignPage> {
                         validator: (v) => v!.isEmpty ? "Required" : null,
                       ),
                     ),
-                    const SizedBox(height: 18),
-                    anim.AnimatedWidgetWrapper(
-                      animationType: anim.AnimationType.fadeSlideInFromLeft,
-                      duration: anim.AnimationDuration.normal,
-                      delayMilliseconds: 750,
-                      child: Text("Target Amount *", style: kSmallTitleR),
-                    ),
-                    const SizedBox(height: 6),
-                    anim.AnimatedWidgetWrapper(
-                      animationType: anim.AnimationType.fadeSlideInFromBottom,
-                      duration: anim.AnimationDuration.normal,
-                      delayMilliseconds: 800,
-                      child: InputField(
-                        key: _fieldKeys['targetAmount'],
-                        type: CustomFieldType.number,
-                        hint: "Enter target amount",
-                        controller: targetAmountController,
-                        validator: (v) => v!.isEmpty ? "Required" : null,
+                    if (_requiresTargetAmount()) const SizedBox(height: 18),
+                    if (_requiresTargetAmount())
+                      anim.AnimatedWidgetWrapper(
+                        animationType: anim.AnimationType.fadeSlideInFromLeft,
+                        duration: anim.AnimationDuration.normal,
+                        delayMilliseconds: 750,
+                        child: Text("Target Amount *", style: kSmallTitleR),
                       ),
-                    ),
+                    if (_requiresTargetAmount()) const SizedBox(height: 6),
+                    if (_requiresTargetAmount())
+                      anim.AnimatedWidgetWrapper(
+                        animationType: anim.AnimationType.fadeSlideInFromBottom,
+                        duration: anim.AnimationDuration.normal,
+                        delayMilliseconds: 800,
+                        child: InputField(
+                          key: _fieldKeys['targetAmount'],
+                          type: CustomFieldType.number,
+                          hint: "Enter target amount",
+                          controller: targetAmountController,
+                          validator: (v) {
+                            if (_requiresTargetAmount() && v!.isEmpty) {
+                              return "Required";
+                            }
+                            return null;
+                          },
+                        ),
+                      ),
                     const SizedBox(height: 30),
                     anim.AnimatedWidgetWrapper(
                       animationType: anim.AnimationType.fadeScaleUp,
