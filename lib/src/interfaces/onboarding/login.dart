@@ -540,27 +540,31 @@ class _OTPScreenState extends ConsumerState<OTPScreen> {
             log('OTP verified and login successful', name: 'OTPScreen');
 
             if (context.mounted) {
-              // Navigate based on user status
+              // Navigate based on user status, removing all previous routes
+              String routeName;
               switch (user.status) {
                 case 'active':
-                  Navigator.of(context).pushReplacementNamed('navbar');
+                  routeName = 'navbar';
                   break;
                 case 'inactive':
-                  Navigator.of(context).pushReplacementNamed('registration');
+                  routeName = 'registration';
                   break;
                 case 'pending':
-                  Navigator.of(context).pushReplacementNamed('requestSent');
+                  routeName = 'requestSent';
                   break;
                 case 'rejected':
-                  Navigator.of(context).pushReplacementNamed('requestRejected');
+                  routeName = 'requestRejected';
                   break;
                 case 'suspended':
-                  Navigator.of(context)
-                      .pushReplacementNamed('accountSuspended');
+                  routeName = 'accountSuspended';
                   break;
                 default:
-                  Navigator.of(context).pushReplacementNamed('navbar');
+                  routeName = 'navbar';
               }
+              Navigator.of(context).pushNamedAndRemoveUntil(
+                routeName,
+                (route) => false,
+              );
             }
           } else {
             SnackbarService().showSnackBar('Invalid response data');

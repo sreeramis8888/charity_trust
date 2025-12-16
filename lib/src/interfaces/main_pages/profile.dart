@@ -281,9 +281,9 @@ class ProfilePage extends ConsumerWidget {
       await authProvider.clearAllData();
 
       if (context.mounted) {
-        // Navigate to login screen and remove all previous routes
+        // Navigate to Phone screen and remove all previous routes
         Navigator.of(context).pushNamedAndRemoveUntil(
-          'Splash',
+          'Phone',
           (route) => false,
         );
       }

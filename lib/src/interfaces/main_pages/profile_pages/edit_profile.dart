@@ -6,6 +6,7 @@ import 'package:Annujoom/src/data/utils/media_picker.dart';
 import 'package:Annujoom/src/data/providers/loading_provider.dart';
 import 'package:Annujoom/src/data/services/snackbar_service.dart';
 import 'package:Annujoom/src/data/services/secure_storage_service.dart';
+import 'package:Annujoom/src/data/services/image_upload.dart';
 import 'package:Annujoom/src/data/providers/user_provider.dart';
 import 'package:Annujoom/src/interfaces/components/input_field.dart';
 import 'package:Annujoom/src/interfaces/components/loading_indicator.dart';
@@ -189,19 +190,37 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
         }
       }
 
+      // Handle profile image upload if selected
+      String? profileImageUrl;
+      if (profileImage != null) {
+        try {
+          profileImageUrl = await imageUpload(profileImage!.path);
+          if (profileImageUrl.isNotEmpty) {
+            userData['image'] = profileImageUrl;
+          }
+        } catch (e) {
+          log('Error uploading profile image: $e', name: 'EditProfilePage');
+          SnackbarService().showSnackBar('Failed to upload profile image',
+              type: SnackbarType.error);
+          ref.read(loadingProvider.notifier).stopLoading();
+          return;
+        }
+      }
+
       // Update local storage with complete user data
       final updatedUser = currentUser.copyWith(
         name: newName,
         email: newEmail,
         address: newAddress,
         dob: parsedDob,
+        image: profileImageUrl ?? currentUser.image,
       );
 
       final result = await ref.read(updateUserProfileProvider(userData).future);
 
       ref.read(loadingProvider.notifier).stopLoading();
 
-      if (result != null) {
+      if (result.user != null) {
         log('Profile updated successfully', name: 'EditProfilePage');
 
         // Update local secure storage with complete user data
@@ -213,8 +232,9 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
           Navigator.of(context).pop();
         }
       } else {
-        SnackbarService()
-            .showSnackBar('Failed to update profile', type: SnackbarType.error);
+        SnackbarService().showSnackBar(
+            result.error ?? 'Failed to update profile',
+            type: SnackbarType.error);
       }
     } catch (e) {
       ref.read(loadingProvider.notifier).stopLoading();

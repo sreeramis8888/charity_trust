@@ -56,11 +56,19 @@ Future<UserModel?> fetchUserProfile(Ref ref) async {
     final apiProvider = ref.watch(apiProviderProvider);
     final response = await apiProvider.get('/user/profile', requireAuth: true);
 
+    if (!ref.mounted) {
+      log('fetchUserProfile: Ref not mounted after API call, skipping state update',
+          name: 'fetchUserProfile');
+      return null;
+    }
+
     if (response.success && response.data != null) {
       final data = response.data!['data'] as Map<String, dynamic>?;
       if (data != null) {
         final user = UserModel.fromJson(data);
-        ref.read(userProvider.notifier).setUser(user);
+        if (ref.mounted) {
+          ref.read(userProvider.notifier).setUser(user);
+        }
         return user;
       }
     }
