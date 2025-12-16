@@ -122,9 +122,55 @@ final class GeneralCampaignsNotifierProvider extends $AsyncNotifierProvider<
 }
 
 String _$generalCampaignsNotifierHash() =>
-    r'513d7a7287d8bd9c18975f4648b09d33a4e46cc0';
+    r'529a4b8dfb58bb97c984f288046ce621909a6a05';
 
 abstract class _$GeneralCampaignsNotifier
+    extends $AsyncNotifier<CampaignPaginationState> {
+  FutureOr<CampaignPaginationState> build();
+  @$mustCallSuper
+  @override
+  void runBuild() {
+    final created = build();
+    final ref = this.ref
+        as $Ref<AsyncValue<CampaignPaginationState>, CampaignPaginationState>;
+    final element = ref.element as $ClassProviderElement<
+        AnyNotifier<AsyncValue<CampaignPaginationState>,
+            CampaignPaginationState>,
+        AsyncValue<CampaignPaginationState>,
+        Object?,
+        Object?>;
+    element.handleValue(ref, created);
+  }
+}
+
+@ProviderFor(CreatedCampaignsNotifier)
+const createdCampaignsProvider = CreatedCampaignsNotifierProvider._();
+
+final class CreatedCampaignsNotifierProvider extends $AsyncNotifierProvider<
+    CreatedCampaignsNotifier, CampaignPaginationState> {
+  const CreatedCampaignsNotifierProvider._()
+      : super(
+          from: null,
+          argument: null,
+          retry: null,
+          name: r'createdCampaignsProvider',
+          isAutoDispose: true,
+          dependencies: null,
+          $allTransitiveDependencies: null,
+        );
+
+  @override
+  String debugGetCreateSourceHash() => _$createdCampaignsNotifierHash();
+
+  @$internal
+  @override
+  CreatedCampaignsNotifier create() => CreatedCampaignsNotifier();
+}
+
+String _$createdCampaignsNotifierHash() =>
+    r'2157e0cc49fed3bdac88ffeff6eeaad32105888e';
+
+abstract class _$CreatedCampaignsNotifier
     extends $AsyncNotifier<CampaignPaginationState> {
   FutureOr<CampaignPaginationState> build();
   @$mustCallSuper

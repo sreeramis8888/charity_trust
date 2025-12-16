@@ -13,11 +13,13 @@ import 'package:Annujoom/src/data/providers/campaigns_provider.dart'
         generalCampaignsProvider,
         participatedCampaignsProvider,
         pendingApprovalCampaignsProvider,
-        myCampaignsFilterProvider;
+        myCampaignsFilterProvider,
+        createdCampaignsProvider;
 import 'package:Annujoom/src/data/services/secure_storage_service.dart';
 import 'package:Annujoom/src/data/services/snackbar_service.dart';
 import 'package:Annujoom/src/interfaces/components/confirmation_dialog.dart';
 import 'package:Annujoom/src/interfaces/main_pages/campaign_pages/add_campaign.dart';
+import 'package:Annujoom/src/data/models/campaign_model.dart';
 
 class CampaignPage extends ConsumerStatefulWidget {
   const CampaignPage({super.key});
@@ -343,7 +345,6 @@ class _CampaignPageState extends ConsumerState<CampaignPage>
 
   // ---------------- TAB 3 ---------------- //
   Widget _myCampaignsTab() {
-    final campaignsState = ref.watch(generalCampaignsProvider);
     final secureStorage = ref.watch(secureStorageServiceProvider);
     final currentFilter = ref.watch(myCampaignsFilterProvider);
 
@@ -364,98 +365,201 @@ class _CampaignPageState extends ConsumerState<CampaignPage>
                 },
               ),
             Expanded(
-              child: campaignsState.when(
-                data: (paginationState) {
-                  if (paginationState.campaigns.isEmpty) {
-                    final filterLabel = currentFilter ? 'created' : 'joined';
-                    return Center(
-                      child: Text(
-                        'No $filterLabel campaigns',
-                        style: kBodyTitleR.copyWith(color: kSecondaryTextColor),
-                      ),
-                    );
-                  }
-              return ListView.builder(
-                padding: const EdgeInsets.all(16),
-                itemCount: paginationState.campaigns.length +
-                    (paginationState.hasMore ? 1 : 0),
-                itemBuilder: (context, index) {
-                  if (index == paginationState.campaigns.length) {
-                    return Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 16),
-                      child: Center(
-                        child: ElevatedButton(
-                          onPressed: () {
-                            ref
-                                .read(generalCampaignsProvider.notifier)
-                                .loadNextPage();
-                          },
-                          child: const Text('Load More'),
-                        ),
-                      ),
-                    );
-                  }
+              child: currentFilter
+                  ? _buildCreatedCampaignsView()
+                  : _buildJoinedCampaignsView(),
+            ),
+          ],
+        );
+      },
+    );
+  }
 
-                  final campaign = paginationState.campaigns[index];
-                  return Padding(
-                    padding: const EdgeInsets.only(bottom: 16),
-                    child: anim.AnimatedWidgetWrapper(
-                      animationType: anim.AnimationType.fadeSlideInFromBottom,
-                      duration: anim.AnimationDuration.normal,
-                      delayMilliseconds: index * 50,
-                      child: CampaignCard(
-                        id: campaign.id ?? '',
-                        description: campaign.description ?? '',
-                        title: campaign.title ?? '',
-                        category: campaign.category ?? '',
-                        date: formatDate(campaign.targetDate) ?? '',
-                        image: campaign.coverImage ?? '',
-                        raised: campaign.collectedAmount?.toInt() ?? 0,
-                        goal: campaign.targetAmount?.toInt() ?? 0,
-                        onDetails: () {
-                          Navigator.of(context).pushNamed(
-                            'CampaignDetail',
-                            arguments: {
-                              '_id': campaign.id ?? '',
-                              'title': campaign.title ?? '',
-                              'description': campaign.description ?? '',
-                              'category': campaign.category ?? '',
-                              'date': formatDate(campaign.targetDate) ?? '',
-                              'image': campaign.coverImage ?? '',
-                              'raised': campaign.collectedAmount?.toInt() ?? 0,
-                              'goal': campaign.targetAmount?.toInt() ?? 0,
-                            },
-                          );
-                        },
-                        isMyCampaign: true,
-                      ),
-                    ),
-                  );
-                },
-              );
-            },
-                loading: () => const Center(child: LoadingAnimation()),
-                error: (error, stackTrace) => Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text('Error: $error'),
-                      const SizedBox(height: 16),
-                      ElevatedButton(
-                        onPressed: () {
-                          ref.read(generalCampaignsProvider.notifier).refresh();
-                        },
-                        child: const Text('Retry'),
-                      ),
-                      ],
-                    ),
+  Widget _buildCreatedCampaignsView() {
+    final campaignsState = ref.watch(createdCampaignsProvider);
+
+    return campaignsState.when(
+      data: (paginationState) {
+        if (paginationState.campaigns.isEmpty) {
+          return Center(
+            child: Text(
+              'No created campaigns',
+              style: kBodyTitleR.copyWith(color: kSecondaryTextColor),
+            ),
+          );
+        }
+        return ListView.builder(
+          padding: const EdgeInsets.all(16),
+          itemCount: paginationState.campaigns.length +
+              (paginationState.hasMore ? 1 : 0),
+          itemBuilder: (context, index) {
+            if (index == paginationState.campaigns.length) {
+              return Padding(
+                padding: const EdgeInsets.symmetric(vertical: 16),
+                child: Center(
+                  child: ElevatedButton(
+                    onPressed: () {
+                      ref
+                          .read(createdCampaignsProvider.notifier)
+                          .loadNextPage();
+                    },
+                    child: const Text('Load More'),
                   ),
                 ),
+              );
+            }
+
+            final campaign = paginationState.campaigns[index];
+            return Padding(
+              padding: const EdgeInsets.only(bottom: 16),
+              child: anim.AnimatedWidgetWrapper(
+                animationType: anim.AnimationType.fadeSlideInFromBottom,
+                duration: anim.AnimationDuration.normal,
+                delayMilliseconds: index * 50,
+                child: CampaignCard(
+                  id: campaign.id ?? '',
+                  description: campaign.description ?? '',
+                  title: campaign.title ?? '',
+                  category: campaign.category ?? '',
+                  date: formatDate(campaign.targetDate) ?? '',
+                  image: campaign.coverImage ?? '',
+                  raised: campaign.collectedAmount?.toInt() ?? 0,
+                  goal: campaign.targetAmount?.toInt() ?? 0,
+                  onDetails: () {
+                    Navigator.of(context).pushNamed(
+                      'CampaignDetail',
+                      arguments: {
+                        '_id': campaign.id ?? '',
+                        'title': campaign.title ?? '',
+                        'description': campaign.description ?? '',
+                        'category': campaign.category ?? '',
+                        'date': formatDate(campaign.targetDate) ?? '',
+                        'image': campaign.coverImage ?? '',
+                        'raised': campaign.collectedAmount?.toInt() ?? 0,
+                        'goal': campaign.targetAmount?.toInt() ?? 0,
+                      },
+                    );
+                  },
+                  isMyCampaign: true,
+                ),
               ),
-            ],
+            );
+          },
+        );
+      },
+      loading: () => const Center(child: LoadingAnimation()),
+      error: (error, stackTrace) => Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text('Error: $error'),
+            const SizedBox(height: 16),
+            ElevatedButton(
+              onPressed: () {
+                ref.read(createdCampaignsProvider.notifier).refresh();
+              },
+              child: const Text('Retry'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildJoinedCampaignsView() {
+    final donationsState = ref.watch(participatedCampaignsProvider);
+
+    return donationsState.when(
+      data: (paginationState) {
+        final campaigns = paginationState.donations
+            .map((donation) => donation.campaign)
+            .whereType<CampaignModel>()
+            .toList();
+
+        if (campaigns.isEmpty) {
+          return Center(
+            child: Text(
+              'No joined campaigns',
+              style: kBodyTitleR.copyWith(color: kSecondaryTextColor),
+            ),
           );
-        },
-      );
+        }
+        return ListView.builder(
+          padding: const EdgeInsets.all(16),
+          itemCount: campaigns.length +
+              (paginationState.hasMore ? 1 : 0),
+          itemBuilder: (context, index) {
+            if (index == campaigns.length) {
+              return Padding(
+                padding: const EdgeInsets.symmetric(vertical: 16),
+                child: Center(
+                  child: ElevatedButton(
+                    onPressed: () {
+                      ref
+                          .read(participatedCampaignsProvider.notifier)
+                          .loadNextPage();
+                    },
+                    child: const Text('Load More'),
+                  ),
+                ),
+              );
+            }
+
+            final campaign = campaigns[index];
+            return Padding(
+              padding: const EdgeInsets.only(bottom: 16),
+              child: anim.AnimatedWidgetWrapper(
+                animationType: anim.AnimationType.fadeSlideInFromBottom,
+                duration: anim.AnimationDuration.normal,
+                delayMilliseconds: index * 50,
+                child: CampaignCard(
+                  id: campaign.id ?? '',
+                  description: campaign.description ?? '',
+                  title: campaign.title ?? '',
+                  category: campaign.category ?? '',
+                  date: formatDate(campaign.targetDate) ?? '',
+                  image: campaign.coverImage ?? '',
+                  raised: campaign.collectedAmount?.toInt() ?? 0,
+                  goal: campaign.targetAmount?.toInt() ?? 0,
+                  onDetails: () {
+                    Navigator.of(context).pushNamed(
+                      'CampaignDetail',
+                      arguments: {
+                        '_id': campaign.id ?? '',
+                        'title': campaign.title ?? '',
+                        'description': campaign.description ?? '',
+                        'category': campaign.category ?? '',
+                        'date': formatDate(campaign.targetDate) ?? '',
+                        'image': campaign.coverImage ?? '',
+                        'raised': campaign.collectedAmount?.toInt() ?? 0,
+                        'goal': campaign.targetAmount?.toInt() ?? 0,
+                      },
+                    );
+                  },
+                  isMyCampaign: true,
+                ),
+              ),
+            );
+          },
+        );
+      },
+      loading: () => const Center(child: LoadingAnimation()),
+      error: (error, stackTrace) => Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text('Error: $error'),
+            const SizedBox(height: 16),
+            ElevatedButton(
+              onPressed: () {
+                ref.read(participatedCampaignsProvider.notifier).refresh();
+              },
+              child: const Text('Retry'),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 
   // ---------------- TAB 4 (APPROVALS) ---------------- //

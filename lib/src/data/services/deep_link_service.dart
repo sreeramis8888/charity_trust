@@ -75,37 +75,7 @@ class DeepLinkService {
       }
 
       switch (pathSegments[0]) {
-        case 'chat':
-          // if (pathSegments.length > 1) {
-          //   final userId = pathSegments[1];
-          //   try {
-          //     final chatApi = _ref.read(chatApiServiceProvider);
-          //     final conversation = await chatApi.create1to1Conversation(userId);
-          //     UserModel? otherMember = conversation?.members
-          //         ?.firstWhere((m) => m.id != id, orElse: () => UserModel());
-
-          //     if (conversation != null) {
-          //       // NavigationService.navigatorKey.currentState?.push(
-          //       //   MaterialPageRoute(
-          //       //     builder: (context) => ChatScreen(
-          //       //       userImage: otherMember?.image ?? '',
-          //       //       conversationId: conversation.id ?? '',
-          //       //       chatTitle: otherMember?.name ?? '',
-          //       //       userId: userId,
-          //       //     ),
-          //       //   ),
-          //       // );
-          //     } else {
-          //       _showError('Failed to start chat.');
-          //     }
-          //   } catch (e) {
-          //     debugPrint('Error starting chat: $e');
-          //     _showError('Failed to start chat.');
-          //   }
-          // }
-          break;
-
-        case 'my_requirements':
+        case 'campaign':
           try {
             if (NavigationService.navigatorKey.currentState != null) {
               NavigationService.navigatorKey.currentState
@@ -114,86 +84,17 @@ class DeepLinkService {
                 (route) => false,
               );
               await Future.delayed(Duration(milliseconds: 500));
-              NavigationService.navigatorKey.currentState
-                  ?.pushNamed('MyRequirements');
+              _ref.read(selectedIndexProvider.notifier).updateIndex(1);
             }
           } catch (e) {
-            debugPrint('Error navigating to requirements: $e');
-            _showError('Unable to navigate to requirements');
-          }
-          break;
-        case 'analytics':
-          try {
-            if (NavigationService.navigatorKey.currentState != null) {
-              NavigationService.navigatorKey.currentState
-                  ?.pushNamedAndRemoveUntil(
-                'MainPage',
-                (route) => false,
-              );
-              await Future.delayed(Duration(milliseconds: 500));
-              NavigationService.navigatorKey.currentState
-                  ?.pushNamed('Analytics');
-            }
-          } catch (e) {
-            debugPrint('Error navigating to Activity: $e');
-            _showError('Unable to navigate to Activity');
-          }
-          break;
-        case 'my_enquiries':
-          try {
-            if (NavigationService.navigatorKey.currentState != null) {
-              NavigationService.navigatorKey.currentState
-                  ?.pushNamedAndRemoveUntil(
-                'MainPage',
-                (route) => false,
-              );
-              await Future.delayed(Duration(milliseconds: 500));
-              NavigationService.navigatorKey.currentState
-                  ?.pushNamed('EnquiriesPage');
-            }
-          } catch (e) {
-            debugPrint('Error navigating to Enquiries: $e');
-            _showError('Unable to navigate to Enquiries');
-          }
-          break;
-        case 'my_reviews':
-          try {
-            if (NavigationService.navigatorKey.currentState != null) {
-              NavigationService.navigatorKey.currentState
-                  ?.pushNamedAndRemoveUntil(
-                'MainPage',
-                (route) => false,
-              );
-              await Future.delayed(Duration(milliseconds: 500));
-              NavigationService.navigatorKey.currentState
-                  ?.pushNamed('MyReviews');
-            }
-          } catch (e) {
-            debugPrint('Error navigating to Reviews: $e');
-            _showError('Unable to navigate to Reviews');
+            debugPrint('Error navigating to campaign: $e');
+            _showError('Unable to navigate to Campaign');
           }
           break;
 
-        case 'requirements':
+        case 'general':
+        default:
           try {
-            if (NavigationService.navigatorKey.currentState != null) {
-              NavigationService.navigatorKey.currentState
-                  ?.pushNamedAndRemoveUntil(
-                'MainPage',
-                (route) => false,
-              );
-              await Future.delayed(Duration(milliseconds: 500));
-              _ref.read(selectedIndexProvider.notifier).updateIndex(2);
-            }
-          } catch (e) {
-            debugPrint('Error updating tab: $e');
-            _showError('Unable to navigate to requirements');
-          }
-          break;
-
-        case 'news':
-          try {
-            // First navigate to mainpage if not already there
             if (NavigationService.navigatorKey.currentState != null) {
               NavigationService.navigatorKey.currentState
                   ?.pushNamedAndRemoveUntil(
@@ -202,46 +103,14 @@ class DeepLinkService {
               );
               await Future.delayed(Duration(milliseconds: 500));
               _ref.read(selectedIndexProvider.notifier).updateIndex(3);
+              
+              // Navigate to notifications page
+              NavigationService.navigatorKey.currentState?.pushNamed('Notifications');
             }
           } catch (e) {
-            debugPrint('Error updating tab: $e');
-            _showError('Unable to navigate to News');
+            debugPrint('Error navigating to notifications: $e');
+            _showError('Unable to navigate to Notifications');
           }
-          break;
-        case 'products':
-          try {
-            // First navigate to mainpage if not already there
-            if (NavigationService.navigatorKey.currentState != null) {
-              NavigationService.navigatorKey.currentState
-                  ?.pushNamedAndRemoveUntil(
-                'MainPage',
-                (route) => false,
-              );
-              await Future.delayed(Duration(milliseconds: 500));
-              _ref.read(selectedIndexProvider.notifier).updateIndex(5);
-            }
-          } catch (e) {
-            debugPrint('Error updating tab: $e');
-            _showError('Unable to navigate to products');
-          }
-          break;
-
-        case 'mainpage':
-          NavigationService.navigatorKey.currentState?.pushNamedAndRemoveUntil(
-            'MainPage',
-            (route) => false,
-          );
-          break;
-
-        default:
-          // final notificationApiService =
-          //     _ref.watch(notificationApiServiceProvider);
-          // List<NotificationModel> notifications =
-          //     await notificationApiService.fetchNotifications();
-
-          // NavigationService.navigatorKey.currentState
-          //     ?.pushNamed('NotificationPage', arguments: notifications);
-
           break;
       }
     } catch (e) {
@@ -261,40 +130,14 @@ class DeepLinkService {
 
   String? getDeepLinkPath(String screen, {String? id}) {
     switch (screen) {
-      case 'chat':
-        return id != null ? 'Annujoom://app/chat/$id' : 'Annujoom://app/chat';
-      case 'events':
-        return id != null
-            ? 'Annujoom://app/events/$id'
-            : 'Annujoom://app/events';
-      case 'my_products':
-        return 'Annujoom://app/my_products';
-      case 'my_requirements':
-        return 'Annujoom://app/my_requirements';
-      case 'analytics':
-        return 'Annujoom://app/analytics';
-      case 'in-app':
-        return 'Annujoom://app/notification';
-      // case 'products':
-      //   return id != null
-      //       ? 'Annujoom://app/products/$id'
-      //       : 'Annujoom://app/products';
+      case 'campaign':
+        return 'annujoom://app/campaign${id != null ? '/$id' : ''}';
+      case 'general':
+        return 'annujoom://app/general';
       case 'news':
-        return 'Annujoom://app/news';
-      case 'my_events':
-        return 'Annujoom://app/my_events';
-      case 'requirements':
-        return 'Annujoom://app/requirements';
-      case 'my_enquiries':
-        return 'Annujoom://app/my_enquiries';
-      case 'my_reviews':
-        return 'Annujoom://app/my_reviews';
-      case 'mainpage':
-        return 'Annujoom://app/mainpage';
-      case 'products':
-        return 'Annujoom://app/products';
+        return 'annujoom://app/news';
       default:
-        return 'Annujoom://app/general';
+        return 'annujoom://app/general';
     }
   }
 }

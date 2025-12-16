@@ -44,6 +44,16 @@
 				<string>Annuojoom</string>
 			</array>
 		</dict>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLName</key>
+			<string>annujoom</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>annujoom</string>
+			</array>
+		</dict>
 	</array>
 
 	<key>CFBundleVersion</key>

@@ -183,12 +183,11 @@ class GeneralCampaignsNotifier extends _$GeneralCampaignsNotifier {
   @override
   Future<CampaignPaginationState> build() async {
     final campaignsApi = ref.watch(campaignsApiProvider);
-    final myCampaignsFilter = ref.watch(myCampaignsFilterProvider);
 
     final response = await campaignsApi.getAllCampaigns(
       pageNo: 1,
       limit: 10,
-      myCampaigns: myCampaignsFilter,
+      myCampaigns: false,
     );
 
     if (response.success && response.data != null) {
@@ -222,12 +221,11 @@ class GeneralCampaignsNotifier extends _$GeneralCampaignsNotifier {
     state = const AsyncValue.loading();
     state = await AsyncValue.guard(() async {
       final campaignsApi = ref.watch(campaignsApiProvider);
-      final myCampaignsFilter = ref.watch(myCampaignsFilterProvider);
       final nextPage = currentState.currentPage + 1;
       final response = await campaignsApi.getAllCampaigns(
         pageNo: nextPage,
         limit: currentState.limit,
-        myCampaigns: myCampaignsFilter,
+        myCampaigns: false,
       );
 
       if (response.success && response.data != null) {
@@ -248,6 +246,84 @@ class GeneralCampaignsNotifier extends _$GeneralCampaignsNotifier {
         );
       } else {
         throw Exception(response.message ?? 'Failed to load more campaigns');
+      }
+    });
+  }
+
+  Future<void> refresh() async {
+    state = const AsyncValue.loading();
+    state = await AsyncValue.guard(() => build());
+  }
+}
+
+@riverpod
+class CreatedCampaignsNotifier extends _$CreatedCampaignsNotifier {
+  @override
+  Future<CampaignPaginationState> build() async {
+    final campaignsApi = ref.watch(campaignsApiProvider);
+
+    final response = await campaignsApi.getAllCampaigns(
+      pageNo: 1,
+      limit: 10,
+      myCampaigns: true,
+    );
+
+    if (response.success && response.data != null) {
+      final campaignsList = (response.data!['data'] as List<dynamic>?)
+              ?.map((item) =>
+                  CampaignModel.fromJson(item as Map<String, dynamic>))
+              .toList() ??
+          [];
+      final totalCountValue = response.data!['total_count'];
+      final totalCount = totalCountValue is int
+          ? totalCountValue
+          : int.tryParse(totalCountValue.toString()) ?? 0;
+
+      return CampaignPaginationState(
+        currentPage: 1,
+        limit: 10,
+        totalCount: totalCount,
+        campaigns: campaignsList,
+      );
+    } else {
+      throw Exception(response.message ?? 'Failed to fetch created campaigns');
+    }
+  }
+
+  Future<void> loadNextPage() async {
+    if (!state.hasValue) return;
+
+    final currentState = state.value!;
+    if (!currentState.hasMore) return;
+
+    state = const AsyncValue.loading();
+    state = await AsyncValue.guard(() async {
+      final campaignsApi = ref.watch(campaignsApiProvider);
+      final nextPage = currentState.currentPage + 1;
+      final response = await campaignsApi.getAllCampaigns(
+        pageNo: nextPage,
+        limit: currentState.limit,
+        myCampaigns: true,
+      );
+
+      if (response.success && response.data != null) {
+        final campaignsList = (response.data!['data'] as List<dynamic>?)
+                ?.map((item) =>
+                    CampaignModel.fromJson(item as Map<String, dynamic>))
+                .toList() ??
+            [];
+        final totalCountValue = response.data!['total_count'];
+        final totalCount = totalCountValue is int
+            ? totalCountValue
+            : int.tryParse(totalCountValue.toString()) ?? 0;
+
+        return currentState.copyWith(
+          currentPage: nextPage,
+          totalCount: totalCount,
+          campaigns: [...currentState.campaigns, ...campaignsList],
+        );
+      } else {
+        throw Exception(response.message ?? 'Failed to load more created campaigns');
       }
     });
   }
