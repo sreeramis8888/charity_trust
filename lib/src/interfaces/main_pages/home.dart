@@ -19,6 +19,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:page_view_dot_indicator/page_view_dot_indicator.dart';
+import 'package:flutter_expandable_fab/flutter_expandable_fab.dart';
 
 class HomePage extends ConsumerStatefulWidget {
   const HomePage({super.key});
@@ -33,6 +34,7 @@ class _HomePageState extends ConsumerState<HomePage> {
   int _completedCampaignIndex = 0;
   int _videoIndex = 0;
   bool _imagesPrecached = false;
+  final _expandableFabKey = GlobalKey<ExpandableFabState>();
 
   @override
   void initState() {
@@ -111,6 +113,7 @@ class _HomePageState extends ConsumerState<HomePage> {
           ),
         ),
       ),
+      floatingActionButtonLocation: ExpandableFab.location,
       floatingActionButton: _buildFloatingActionButton(context, ref),
     );
   }
@@ -124,64 +127,71 @@ class _HomePageState extends ConsumerState<HomePage> {
         final userRole = snapshot.data ?? '';
         final isAdmin = userRole != 'member';
 
-        return Column(
-          mainAxisAlignment: MainAxisAlignment.end,
-          children: [
-            if (isAdmin)
-              Container(
-                height: 45,
-                width: 45,
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: [Color(0xFFED3C5F), Color(0xFFED3C5F)],
-                    begin: Alignment.bottomRight,
-                    end: Alignment.topLeft,
-                  ),
-                  shape: BoxShape.circle,
-                ),
-                child: FloatingActionButton(
-                  heroTag: 'addUserButton',
-                  onPressed: () {
-                    Navigator.of(context).pushNamed('CreateUser');
-                  },
-                  backgroundColor: Colors.transparent,
-                  elevation: 0,
-                  child: SvgPicture.asset(
-                    'assets/svg/add.svg',
-                    height: 24,
-                    width: 24,
-                    colorFilter: ColorFilter.mode(kWhite, BlendMode.srcIn),
-                  ),
+        if (isAdmin) {
+          return ExpandableFab(
+            type: ExpandableFabType.up,
+            distance: 70,
+            openButtonBuilder: DefaultFloatingActionButtonBuilder(
+              child: const Icon(Icons.menu, size: 20),
+              fabSize: ExpandableFabSize.regular,
+              foregroundColor: Colors.white,
+              backgroundColor: const Color(0xFFED3C5F),
+              shape: const CircleBorder(), // 👈 force round
+            ),
+            closeButtonBuilder: DefaultFloatingActionButtonBuilder(
+              child: const Icon(Icons.close, size: 20),
+              fabSize: ExpandableFabSize.regular,
+              foregroundColor: Colors.white,
+              backgroundColor: const Color(0xFFED3C5F),
+              shape: const CircleBorder(), // 👈 force round
+            ),
+            children: [
+              FloatingActionButton(
+                heroTag: null,
+                shape: const CircleBorder(), // 👈 force round
+                backgroundColor: const Color(0xFFED3C5F),
+                onPressed: () {
+                  Navigator.of(context).pushNamed('CreateUser');
+                },
+                child: SvgPicture.asset(
+                  'assets/svg/add.svg',
+                  height: 20,
+                  width: 20,
+                  colorFilter:
+                      const ColorFilter.mode(Colors.white, BlendMode.srcIn),
                 ),
               ),
-            if (isAdmin) const SizedBox(height: 16),
-            Container(
-              height: 45,
-              width: 45,
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [Color(0xFFED3C5F), Color(0xFFED3C5F)],
-                  begin: Alignment.bottomRight,
-                  end: Alignment.topLeft,
-                ),
-                shape: BoxShape.circle,
-              ),
-              child: FloatingActionButton(
-                heroTag: 'donateButton',
+              FloatingActionButton(
+                heroTag: null,
+                shape: const CircleBorder(), // 👈 force round
+                backgroundColor: const Color(0xFFED3C5F),
                 onPressed: () {
                   Navigator.of(context).pushNamed('DonationCategories');
                 },
-                backgroundColor: Colors.transparent,
-                elevation: 0,
                 child: SvgPicture.asset(
                   'assets/svg/donation.svg',
-                  height: 24,
-                  width: 24,
-                  colorFilter: ColorFilter.mode(kWhite, BlendMode.srcIn),
+                  height: 20,
+                  width: 20,
+                  colorFilter:
+                      const ColorFilter.mode(Colors.white, BlendMode.srcIn),
                 ),
               ),
-            ),
-          ],
+            ],
+          );
+        }
+
+        return FloatingActionButton(
+          heroTag: 'memberDonateButton',
+          onPressed: () {
+            Navigator.of(context).pushNamed('DonationCategories');
+          },
+          backgroundColor: Color(0xFFED3C5F),
+          child: SvgPicture.asset(
+            'assets/svg/donation.svg',
+            height: 24,
+            width: 24,
+            colorFilter: ColorFilter.mode(kWhite, BlendMode.srcIn),
+          ),
         );
       },
     );

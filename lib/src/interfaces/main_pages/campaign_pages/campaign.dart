@@ -27,12 +27,15 @@ class CampaignPage extends ConsumerStatefulWidget {
 class _CampaignPageState extends ConsumerState<CampaignPage>
     with TickerProviderStateMixin {
   late TabController _controller;
+  late ScrollController _scrollController;
   bool _isPresident = false;
 
   @override
   void initState() {
     super.initState();
     _controller = TabController(length: 3, vsync: this);
+    _scrollController = ScrollController();
+    _scrollController.addListener(_onScroll);
     _loadUserRole();
   }
 
@@ -54,7 +57,28 @@ class _CampaignPageState extends ConsumerState<CampaignPage>
   @override
   void dispose() {
     _controller.dispose();
+    _scrollController.dispose();
     super.dispose();
+  }
+
+  void _onScroll() {
+    if (_scrollController.position.pixels >=
+        _scrollController.position.maxScrollExtent - 500) {
+      _loadMoreBasedOnTab();
+    }
+  }
+
+  void _loadMoreBasedOnTab() {
+    final tabIndex = _controller.index;
+    if (tabIndex == 0) {
+      ref.read(generalCampaignsProvider.notifier).loadNextPage();
+    } else if (tabIndex == 1) {
+      ref.read(participatedCampaignsProvider.notifier).loadNextPage();
+    } else if (tabIndex == 2) {
+      ref.read(participatedCampaignsProvider.notifier).loadNextPage();
+    } else if (tabIndex == 3 && _isPresident) {
+      ref.read(pendingApprovalCampaignsProvider.notifier).loadNextPage();
+    }
   }
 
   @override

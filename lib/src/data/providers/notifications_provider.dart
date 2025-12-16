@@ -24,7 +24,7 @@ class NotificationsApi {
         queryParams.entries.map((e) => '${e.key}=${e.value}').join('&');
 
     return await _apiProvider.get(
-      '$_endpoint?$queryString',
+      '$_endpoint/user?$queryString',
       requireAuth: true,
     );
   }
@@ -104,15 +104,15 @@ class NotificationsNotifier extends _$NotificationsNotifier {
     final notificationsApi = ref.watch(notificationsApiProvider);
     final user = ref.watch(userProvider);
     final secureStorage = ref.watch(secureStorageServiceProvider);
-    
+
     // Get current user ID - try from userProvider first, then from secure storage
     String? currentUserId = user?.id;
-    
+
     if (currentUserId == null || currentUserId.isEmpty) {
       final storedUser = await secureStorage.getUserData();
       currentUserId = storedUser?.id;
     }
-    
+
     print('DEBUG PROVIDER: Current user ID from provider: ${user?.id}');
     print('DEBUG PROVIDER: Final current user ID: $currentUserId');
 
@@ -123,8 +123,7 @@ class NotificationsNotifier extends _$NotificationsNotifier {
 
     if (response.success && response.data != null) {
       final notificationsList = (response.data!['data'] as List<dynamic>?)
-              ?.map((item) =>
-                  NotificationModel.fromJson(
+              ?.map((item) => NotificationModel.fromJson(
                     item as Map<String, dynamic>,
                     currentUserId: currentUserId,
                   ))
@@ -157,10 +156,10 @@ class NotificationsNotifier extends _$NotificationsNotifier {
       final notificationsApi = ref.watch(notificationsApiProvider);
       final user = ref.watch(userProvider);
       final secureStorage = ref.watch(secureStorageServiceProvider);
-      
+
       // Get current user ID - try from userProvider first, then from secure storage
       String? currentUserId = user?.id;
-      
+
       if (currentUserId == null || currentUserId.isEmpty) {
         final storedUser = await secureStorage.getUserData();
         currentUserId = storedUser?.id;
@@ -174,8 +173,7 @@ class NotificationsNotifier extends _$NotificationsNotifier {
 
       if (response.success && response.data != null) {
         final notificationsList = (response.data!['data'] as List<dynamic>?)
-                ?.map((item) =>
-                    NotificationModel.fromJson(
+                ?.map((item) => NotificationModel.fromJson(
                       item as Map<String, dynamic>,
                       currentUserId: currentUserId,
                     ))
@@ -216,7 +214,7 @@ class NotificationsNotifier extends _$NotificationsNotifier {
           }
           return notif;
         }).toList();
-        
+
         state = AsyncValue.data(currentState.copyWith(
           notifications: updatedNotifications,
         ));
@@ -238,7 +236,7 @@ class NotificationsNotifier extends _$NotificationsNotifier {
         final updatedNotifications = currentState.notifications
             .map((notif) => notif.copyWith(isRead: true))
             .toList();
-        
+
         state = AsyncValue.data(currentState.copyWith(
           notifications: updatedNotifications,
         ));
@@ -261,7 +259,7 @@ class NotificationsNotifier extends _$NotificationsNotifier {
         final updatedNotifications = currentState.notifications
             .where((notif) => notif.id != notificationId)
             .toList();
-        
+
         state = AsyncValue.data(currentState.copyWith(
           notifications: updatedNotifications,
           totalCount: currentState.totalCount - 1,
