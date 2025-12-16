@@ -35,6 +35,7 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
   final recommendedByController = TextEditingController();
 
   XFile? profileImage;
+  String? existingImageUrl;
 
   final Map<String, GlobalKey> _fieldKeys = {
     'name': GlobalKey(),
@@ -96,6 +97,7 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
               '${userData.dob!.day.toString().padLeft(2, '0')}/${userData.dob!.month.toString().padLeft(2, '0')}/${userData.dob!.year}';
         }
         recommendedByController.text = userData.recommendedBy ?? '';
+        existingImageUrl = userData.image;
       });
     }
   }
@@ -300,8 +302,19 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
                                           fit: BoxFit.cover,
                                         ),
                                       )
-                                    : const Icon(Icons.person,
-                                        color: kGreyDark, size: 50),
+                                    : existingImageUrl != null && existingImageUrl!.isNotEmpty
+                                        ? ClipOval(
+                                            child: Image.network(
+                                              existingImageUrl!,
+                                              fit: BoxFit.cover,
+                                              errorBuilder: (context, error, stackTrace) {
+                                                return const Icon(Icons.person,
+                                                    color: kGreyDark, size: 50);
+                                              },
+                                            ),
+                                          )
+                                        : const Icon(Icons.person,
+                                            color: kGreyDark, size: 50),
                               ),
                               Positioned(
                                 bottom: 4,

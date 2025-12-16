@@ -4,7 +4,7 @@ import 'package:Annujoom/src/data/router/nav_router.dart';
 import 'package:Annujoom/src/interfaces/main_pages/home.dart';
 import 'package:Annujoom/src/interfaces/main_pages/campaign_pages/campaign.dart';
 import 'package:Annujoom/src/interfaces/main_pages/news_bookmark/news_list_page.dart';
-import 'package:Annujoom/src/interfaces/main_pages/profile.dart';
+import 'package:Annujoom/src/interfaces/main_pages/profile_pages/profile.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';

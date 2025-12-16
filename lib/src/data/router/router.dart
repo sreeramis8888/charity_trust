@@ -3,7 +3,7 @@ import 'package:Annujoom/src/interfaces/main_pages/campaign_pages/campaign_detai
 import 'package:Annujoom/src/interfaces/main_pages/home.dart';
 import 'package:Annujoom/src/interfaces/main_pages/donation_categories.dart';
 import 'package:Annujoom/src/interfaces/main_pages/news_bookmark/news_list_page.dart';
-import 'package:Annujoom/src/interfaces/main_pages/profile.dart';
+import 'package:Annujoom/src/interfaces/main_pages/profile_pages/profile.dart';
 import 'package:Annujoom/src/interfaces/main_pages/profile_pages/edit_profile.dart';
 import 'package:Annujoom/src/interfaces/main_pages/profile_pages/my_participations.dart';
 import 'package:Annujoom/src/interfaces/main_pages/navbar.dart';

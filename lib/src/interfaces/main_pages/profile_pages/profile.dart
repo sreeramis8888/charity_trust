@@ -51,8 +51,17 @@ class ProfilePage extends ConsumerWidget {
                             width: 60,
                             height: 60,
                             color: kGreyDark,
-                            child: const Icon(Icons.person,
-                                color: kWhite, size: 40),
+                            child: userData?.image != null && userData!.image!.isNotEmpty
+                                ? Image.network(
+                                    userData!.image!,
+                                    fit: BoxFit.cover,
+                                    errorBuilder: (context, error, stackTrace) {
+                                      return const Icon(Icons.person,
+                                          color: kWhite, size: 40);
+                                    },
+                                  )
+                                : const Icon(Icons.person,
+                                    color: kWhite, size: 40),
                           ),
                         ),
                         const SizedBox(width: 18),
