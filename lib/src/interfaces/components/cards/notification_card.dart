@@ -7,15 +7,11 @@ import 'package:intl/intl.dart';
 class NotificationCard extends StatelessWidget {
   final NotificationModel notification;
   final VoidCallback? onTap;
-  final VoidCallback? onDelete;
-  final bool isDismissible;
 
   const NotificationCard({
     super.key,
     required this.notification,
     this.onTap,
-    this.onDelete,
-    this.isDismissible = true,
   });
 
   String _getTimeAgo(DateTime dateTime) {
@@ -38,10 +34,9 @@ class NotificationCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isRead = notification.isRead;
-    final cardColor = isRead ? Color(0xFFE8EAED) : kWhite;
-    final textColor = isRead ? Color(0xFF8A8A8A) : kTextColor;
+    final cardColor = isRead ? kBackgroundColor : kWhite;
 
-    Widget card = GestureDetector(
+    return GestureDetector(
       onTap: onTap,
       child: Container(
         margin: const EdgeInsets.symmetric(horizontal: 0, vertical: 6),
@@ -57,8 +52,8 @@ class NotificationCard extends StatelessWidget {
                 Expanded(
                   child: Text(
                     notification.subject,
-                    style: kBodyTitleSB.copyWith(
-                      color: textColor,
+                    style: kSmallTitleM.copyWith(
+                      color: kTextColor,
                     ),
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
@@ -68,7 +63,7 @@ class NotificationCard extends StatelessWidget {
                 Text(
                   _getTimeAgo(notification.createdAt),
                   style: kSmallerTitleR.copyWith(
-                    color: textColor,
+                    color: kSecondaryTextColor,
                   ),
                 ),
               ],
@@ -77,7 +72,7 @@ class NotificationCard extends StatelessWidget {
             Text(
               notification.content,
               style: kSmallerTitleR.copyWith(
-                color: textColor,
+                color: kSecondaryTextColor,
               ),
               maxLines: 3,
               overflow: TextOverflow.ellipsis,
@@ -85,24 +80,6 @@ class NotificationCard extends StatelessWidget {
           ],
         ),
       ),
-    );
-
-    if (!isDismissible) {
-      return card;
-    }
-
-    return Dismissible(
-      key: Key(notification.id),
-      background: Container(
-        color: kRed,
-        alignment: Alignment.centerRight,
-        padding: const EdgeInsets.only(right: 16),
-        child: const Icon(Icons.delete, color: kWhite),
-      ),
-      onDismissed: (direction) {
-        onDelete?.call();
-      },
-      child: card,
     );
   }
 }

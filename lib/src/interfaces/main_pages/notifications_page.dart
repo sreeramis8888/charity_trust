@@ -204,11 +204,6 @@ class _NotificationsPageState extends ConsumerState<NotificationsPage> {
           ref.read(notificationsProvider.notifier).markAsRead(notification.id);
         }
       },
-      onDelete: () {
-        ref
-            .read(notificationsProvider.notifier)
-            .deleteNotification(notification.id);
-      },
     );
   }
 }

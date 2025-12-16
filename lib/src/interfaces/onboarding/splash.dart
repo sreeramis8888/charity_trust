@@ -12,6 +12,7 @@ import '../../data/providers/auth_provider.dart';
 import '../../data/providers/user_provider.dart';
 import '../../data/services/version_check_service.dart';
 import '../../data/services/secure_storage_service.dart';
+import '../../data/services/notification_service/get_fcm.dart';
 
 class SplashScreen extends ConsumerStatefulWidget {
   @override
@@ -79,6 +80,10 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
 
   Future<void> _initializeApp() async {
     try {
+      log('_initializeApp: Starting notification permissions', name: 'SplashScreen');
+      // Request notification permissions first
+      await handleNotificationPermissions(context, ref);
+
       log('_initializeApp: Starting version check', name: 'SplashScreen');
       // Check version first
       await _checkAppVersion();

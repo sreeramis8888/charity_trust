@@ -14,6 +14,7 @@ import 'package:Annujoom/src/interfaces/main_pages/news_bookmark/news_page.dart'
 import 'package:Annujoom/src/interfaces/main_pages/notifications_page.dart';
 import 'package:Annujoom/src/data/router/nav_router.dart';
 import 'package:Annujoom/src/data/utils/launch_url.dart';
+import 'package:Annujoom/src/data/services/notification_service/get_fcm.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
@@ -231,15 +232,26 @@ class _HomePageState extends ConsumerState<HomePage> {
                         Stack(
                           children: [
                             IconButton(
-                              onPressed: () {
+                              onPressed: () async {
+                                // Request FCM token only if not already saved
+                                final secureStorage =
+                                    ref.read(secureStorageServiceProvider);
+                                final existingFcmToken =
+                                    await secureStorage.getFcmToken();
+                                if (existingFcmToken == null ||
+                                    existingFcmToken.isEmpty) {
+                                  await getFcmToken(context, ref);
+                                }
                                 final notificationsAsync =
                                     ref.read(notificationsProvider);
-                                Navigator.of(context).push(
-                                  MaterialPageRoute(
-                                    builder: (context) =>
-                                        const NotificationsPage(),
-                                  ),
-                                );
+                                if (context.mounted) {
+                                  Navigator.of(context).push(
+                                    MaterialPageRoute(
+                                      builder: (context) =>
+                                          const NotificationsPage(),
+                                    ),
+                                  );
+                                }
                               },
                               icon: SvgPicture.asset(
                                 'assets/svg/bell.svg',

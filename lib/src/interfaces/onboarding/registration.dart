@@ -43,7 +43,6 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
   final aadharNumberController = TextEditingController();
   final dobController = TextEditingController();
   final recommendedByController = TextEditingController();
-  XFile? panCardImage;
 
   String? selectedCountryCode;
   String? selectedCountryName;
@@ -70,7 +69,6 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
     'district': GlobalKey(),
     'pincode': GlobalKey(),
     'aadharNumber': GlobalKey(),
-    'panCard': GlobalKey(),
     'dob': GlobalKey(),
     'gender': GlobalKey(),
     'whatsapp': GlobalKey(),
@@ -138,7 +136,6 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
     dobController.dispose();
     whatsappController.dispose();
     recommendedByController.dispose();
-    panCardImage = null;
     super.dispose();
   }
 
@@ -164,19 +161,7 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
     }
   }
 
-  Future<void> _pickPanCard() async {
-    FocusScope.of(context).requestFocus(_unfocusNode);
-    final result = await pickMedia(
-      context: context,
-      enableCrop: false,
-    );
-    if (!mounted) return;
-    if (result != null && result is XFile) {
-      setState(() {
-        panCardImage = result;
-      });
-    }
-  }
+
 
   Future<void> _handleRegistration() async {
     try {
@@ -195,22 +180,6 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
           }
           SnackbarService().showSnackBar('Failed to upload profile picture');
           log('Error uploading profile picture: $e', name: 'RegistrationPage');
-          return;
-        }
-      }
-
-      // Upload PAN card if available
-      String? panCardUrl;
-      if (panCardImage != null) {
-        try {
-          panCardUrl = await imageUpload(panCardImage!.path);
-          log('PAN card uploaded: $panCardUrl', name: 'RegistrationPage');
-        } catch (e) {
-          if (mounted) {
-            ref.read(loadingProvider.notifier).stopLoading();
-          }
-          SnackbarService().showSnackBar('Failed to upload PAN card');
-          log('Error uploading PAN card: $e', name: 'RegistrationPage');
           return;
         }
       }
@@ -243,7 +212,6 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
         'pincode': pincodeController.text.trim(),
         'aadhar_number': int.parse(aadharNumberController.text.trim()),
         'profile_picture': profilePictureUrl,
-        'pan_copy': panCardUrl,
         'gender': selectedGender,
         'whatsapp_number': whatsappNumber,
         'dob': formattedDob,
@@ -929,90 +897,6 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
                       anim.AnimatedWidgetWrapper(
                         animationType: anim.AnimationType.fadeSlideInFromLeft,
                         duration: anim.AnimationDuration.normal,
-                        delayMilliseconds: 1100,
-                        child: Text("Upload PAN Card", style: kSmallTitleR),
-                      ),
-                      const SizedBox(height: 4),
-                      anim.AnimatedWidgetWrapper(
-                        animationType: anim.AnimationType.fadeSlideInFromLeft,
-                        duration: anim.AnimationDuration.normal,
-                        delayMilliseconds: 1150,
-                        child: Text(
-                          "Image (JPG/PNG) - Recommended size: 400x400",
-                          style: kSmallerTitleR.copyWith(color: Colors.grey),
-                        ),
-                      ),
-                      const SizedBox(height: 6),
-                      anim.AnimatedWidgetWrapper(
-                        animationType: anim.AnimationType.fadeSlideInFromBottom,
-                        duration: anim.AnimationDuration.normal,
-                        delayMilliseconds: 1200,
-                        child: FormField<void>(
-                          key: _fieldKeys['panCard'],
-                          validator: (_) {
-                            if (panCardImage == null) {
-                              return 'Required';
-                            }
-                            return null;
-                          },
-                          builder: (field) => Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              GestureDetector(
-                                onTap: _pickPanCard,
-                                child: Container(
-                                  padding: const EdgeInsets.symmetric(
-                                      vertical: 16, horizontal: 12),
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(8),
-                                    border: Border.all(
-                                        color: field.hasError
-                                            ? Colors.red
-                                            : kBorder),
-                                    color: kWhite,
-                                  ),
-                                  child: Row(
-                                    children: [
-                                      const Icon(Icons.cloud_upload_outlined,
-                                          color: kTextColor),
-                                      const SizedBox(width: 12),
-                                      Expanded(
-                                        child: Text(
-                                          panCardImage != null
-                                              ? panCardImage!.name
-                                              : "Upload",
-                                          style: TextStyle(
-                                            fontSize: 14,
-                                            color: panCardImage != null
-                                                ? kTextColor
-                                                : kSecondaryTextColor,
-                                          ),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                              if (field.hasError)
-                                Padding(
-                                  padding:
-                                      const EdgeInsets.only(top: 4.0, left: 4.0),
-                                  child: Text(
-                                    field.errorText ?? '',
-                                    style: const TextStyle(
-                                      fontSize: 12,
-                                      color: Colors.red,
-                                    ),
-                                  ),
-                                ),
-                            ],
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 20),
-                      anim.AnimatedWidgetWrapper(
-                        animationType: anim.AnimationType.fadeSlideInFromLeft,
-                        duration: anim.AnimationDuration.normal,
                         delayMilliseconds: 1300,
                         child: Text("Date of Birth *", style: kSmallTitleR),
                       ),
@@ -1310,7 +1194,6 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
                                 'recommended_by_type': recommendedByType,
                                 'selected_recommended_by':
                                     selectedRecommendedBy?.name,
-                                'profile_image_selected': profileImage != null,
                               };
                               log('Register clicked - userData: $debugUserData',
                                   name: 'RegistrationPage');

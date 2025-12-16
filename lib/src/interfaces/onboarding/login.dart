@@ -12,6 +12,7 @@ import 'package:Annujoom/src/data/providers/user_provider.dart';
 import 'package:Annujoom/src/data/models/user_model.dart';
 import 'package:Annujoom/src/interfaces/components/primaryButton.dart';
 import 'package:Annujoom/src/interfaces/animations/index.dart' as anim;
+import 'package:Annujoom/src/data/services/notification_service/get_fcm.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
@@ -213,6 +214,13 @@ class _PhoneNumberScreenState extends ConsumerState<PhoneNumberScreen> {
 
     try {
       ref.read(loadingProvider.notifier).startLoading();
+
+      // Request FCM token only if not already saved
+      final secureStorage = ref.read(secureStorageServiceProvider);
+      final existingFcmToken = await secureStorage.getFcmToken();
+      if (existingFcmToken == null || existingFcmToken.isEmpty) {
+        await getFcmToken(context, ref);
+      }
 
       final firebaseAuthService = ref.read(firebaseAuthServiceProvider);
       final fullPhone = "+$countryCode$phoneNumber";
@@ -499,7 +507,8 @@ class _OTPScreenState extends ConsumerState<OTPScreen> {
         smsCode: otp,
       );
 
-      // Step 2: Get FCM token
+      // Step 2: Get FCM token using the notification service
+      await getFcmToken(context, ref);
       final secureStorage = SecureStorageService();
       final fcmToken = await secureStorage.getFcmToken();
 

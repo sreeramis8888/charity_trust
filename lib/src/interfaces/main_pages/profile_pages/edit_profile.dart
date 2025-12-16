@@ -225,6 +225,9 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
 
   @override
   Widget build(BuildContext context) {
+    final user = ref.watch(userProvider);
+    final isTrustee = user?.role == 'trustee';
+
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -378,26 +381,28 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
                             v?.isEmpty ?? true ? "Required" : null,
                       ),
                     ),
-                    const SizedBox(height: 18),
-                    anim.AnimatedWidgetWrapper(
-                      animationType: anim.AnimationType.fadeSlideInFromLeft,
-                      duration: anim.AnimationDuration.normal,
-                      delayMilliseconds: 500,
-                      child: Text("Recommended By", style: kSmallTitleR),
-                    ),
-                    const SizedBox(height: 6),
-                    anim.AnimatedWidgetWrapper(
-                      animationType: anim.AnimationType.fadeSlideInFromBottom,
-                      duration: anim.AnimationDuration.normal,
-                      delayMilliseconds: 550,
-                      child: InputField(
-                        key: _fieldKeys['recommendedBy'],
-                        type: CustomFieldType.text,
-                        hint: "Recommended by",
-                        controller: recommendedByController,
-                        readOnly: true,
+                    if (!isTrustee) ...[
+                      const SizedBox(height: 18),
+                      anim.AnimatedWidgetWrapper(
+                        animationType: anim.AnimationType.fadeSlideInFromLeft,
+                        duration: anim.AnimationDuration.normal,
+                        delayMilliseconds: 500,
+                        child: Text("Recommended By", style: kSmallTitleR),
                       ),
-                    ),
+                      const SizedBox(height: 6),
+                      anim.AnimatedWidgetWrapper(
+                        animationType: anim.AnimationType.fadeSlideInFromBottom,
+                        duration: anim.AnimationDuration.normal,
+                        delayMilliseconds: 550,
+                        child: InputField(
+                          key: _fieldKeys['recommendedBy'],
+                          type: CustomFieldType.text,
+                          hint: "Recommended by",
+                          controller: recommendedByController,
+                          readOnly: true,
+                        ),
+                      ),
+                    ],
                     const SizedBox(height: 30),
                     anim.AnimatedWidgetWrapper(
                       animationType: anim.AnimationType.fadeScaleUp,

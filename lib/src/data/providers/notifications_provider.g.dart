@@ -76,7 +76,7 @@ final class NotificationsNotifierProvider extends $AsyncNotifierProvider<
 }
 
 String _$notificationsNotifierHash() =>
-    r'a31fbed06e78c9f75913b3502ab088f7fc8851ec';
+    r'5d3b75767c0c2177c6d705d325d4dc48241a5ccb';
 
 abstract class _$NotificationsNotifier
     extends $AsyncNotifier<NotificationPaginationState> {

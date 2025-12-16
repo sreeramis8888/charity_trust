@@ -1,3 +1,4 @@
+import 'dart:developer';
 import 'package:Annujoom/src/data/constants/color_constants.dart';
 import 'package:Annujoom/src/data/router/nav_router.dart';
 import 'package:Annujoom/src/interfaces/main_pages/home.dart';
@@ -38,10 +39,18 @@ class NavBar extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final selectedIndex = ref.watch(selectedIndexProvider);
 
-    return Scaffold(
-      backgroundColor: kWhite,
-      body: _widgetOptions.elementAt(selectedIndex),
-      bottomNavigationBar: Container(
+    return PopScope(
+      canPop: selectedIndex == 0,
+      onPopInvokedWithResult: (didPop, result) {
+        log('inside navbar popscope');
+        if (selectedIndex != 0) {
+          ref.read(selectedIndexProvider.notifier).updateIndex(0);
+        }
+      },
+      child: Scaffold(
+        backgroundColor: kWhite,
+        body: _widgetOptions.elementAt(selectedIndex),
+        bottomNavigationBar: Container(
         decoration: BoxDecoration(
           color: kWhite,
           boxShadow: [
@@ -111,6 +120,7 @@ class NavBar extends ConsumerWidget {
             ),
           ),
         ),
+      ),
       ),
     );
   }
