@@ -170,8 +170,7 @@ class _CreateUserPageState extends ConsumerState<CreateUserPage> {
         }
       } else {
         final errorMessage = result.error ?? 'Failed to create user';
-        SnackbarService()
-            .showSnackBar(errorMessage, type: SnackbarType.error);
+        SnackbarService().showSnackBar(errorMessage, type: SnackbarType.error);
       }
     } catch (e) {
       if (mounted) {
@@ -224,8 +223,8 @@ class _CreateUserPageState extends ConsumerState<CreateUserPage> {
                   const SizedBox(height: 18),
                   _buildMobileField(),
                   const SizedBox(height: 18),
-                  _buildEmailField(),
-                  const SizedBox(height: 18),
+                  // _buildEmailField(),
+                  // const SizedBox(height: 18),
                   _buildAddressField(),
                   const SizedBox(height: 18),
                   _buildCountryField(),

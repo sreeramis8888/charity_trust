@@ -308,9 +308,9 @@ class _ReferralDetailsPageState extends ConsumerState<ReferralDetailsPage> {
                     _buildDetailRow(
                         'Mobile Number', widget.user.phone ?? 'N/A'),
                     const SizedBox(height: 16),
-                    _buildDetailRow(
-                        'Email Address', widget.user.email ?? 'N/A'),
-                    const SizedBox(height: 16),
+                    // _buildDetailRow(
+                    //     'Email Address', widget.user.email ?? 'N/A'),
+                    // const SizedBox(height: 16),
                     _buildDetailRow(
                       'Address',
                       '${widget.user.area ?? ''}, ${widget.user.district ?? ''}\n${widget.user.state ?? ''}\n${widget.user.country ?? ''}',

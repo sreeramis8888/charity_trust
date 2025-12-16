@@ -235,10 +235,10 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
       if (isAuthenticated) {
         log('_checkAuthenticationAndLoadUser: User is authenticated, loading user data',
             name: 'SplashScreen');
-        // Fetch current user status from API
-        log('_checkAuthenticationAndLoadUser: Fetching current user status from API',
+        // Fetch complete user profile from API
+        log('_checkAuthenticationAndLoadUser: Fetching complete user profile from API',
             name: 'SplashScreen');
-        var user = await ref.read(fetchCurrentUserStatusProvider.future);
+        var user = await ref.read(fetchUserProfileProvider.future);
 
         if (!mounted) {
           log('_checkAuthenticationAndLoadUser: Widget not mounted after API call, skipping navigation',
@@ -247,10 +247,10 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
         }
 
         if (user != null) {
-          log('_checkAuthenticationAndLoadUser: User status fetched from API - id: ${user.id}, status: ${user.status}',
+          log('_checkAuthenticationAndLoadUser: User profile fetched from API - id: ${user.id}, status: ${user.status}',
               name: 'SplashScreen');
         } else {
-          log('_checkAuthenticationAndLoadUser: Failed to fetch user status from API, trying local storage',
+          log('_checkAuthenticationAndLoadUser: Failed to fetch user profile from API, trying local storage',
               name: 'SplashScreen');
           // Fallback to local storage if API fails
           final secureStorage = ref.read(secureStorageServiceProvider);

@@ -161,8 +161,6 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
     }
   }
 
-
-
   Future<void> _handleRegistration() async {
     try {
       ref.read(loadingProvider.notifier).startLoading();
@@ -252,8 +250,7 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
         }
       } else {
         final errorMessage = result.error ?? 'Failed to submit registration';
-        SnackbarService().showSnackBar(errorMessage,
-            type: SnackbarType.error);
+        SnackbarService().showSnackBar(errorMessage, type: SnackbarType.error);
       }
     } catch (e) {
       // Check if widget is still mounted before using ref
@@ -423,26 +420,26 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
                       //   ),
                       // ),
                       const SizedBox(height: 18),
-                      anim.AnimatedWidgetWrapper(
-                        animationType: anim.AnimationType.fadeSlideInFromLeft,
-                        duration: anim.AnimationDuration.normal,
-                        delayMilliseconds: 300,
-                        child: Text("Email Address *", style: kSmallTitleR),
-                      ),
-                      const SizedBox(height: 6),
-                      anim.AnimatedWidgetWrapper(
-                        animationType: anim.AnimationType.fadeSlideInFromBottom,
-                        duration: anim.AnimationDuration.normal,
-                        delayMilliseconds: 350,
-                        child: InputField(
-                          key: _fieldKeys['email'],
-                          type: CustomFieldType.text,
-                          hint: "Enter email address",
-                          controller: emailController,
-                          validator: Validators.validateEmail,
-                        ),
-                      ),
-                      const SizedBox(height: 18),
+                      // anim.AnimatedWidgetWrapper(
+                      //   animationType: anim.AnimationType.fadeSlideInFromLeft,
+                      //   duration: anim.AnimationDuration.normal,
+                      //   delayMilliseconds: 300,
+                      //   child: Text("Email Address *", style: kSmallTitleR),
+                      // ),
+                      // const SizedBox(height: 6),
+                      // anim.AnimatedWidgetWrapper(
+                      //   animationType: anim.AnimationType.fadeSlideInFromBottom,
+                      //   duration: anim.AnimationDuration.normal,
+                      //   delayMilliseconds: 350,
+                      //   child: InputField(
+                      //     key: _fieldKeys['email'],
+                      //     type: CustomFieldType.text,
+                      //     hint: "Enter email address",
+                      //     controller: emailController,
+                      //     validator: Validators.validateEmail,
+                      //   ),
+                      // ),
+                      // const SizedBox(height: 18),
                       anim.AnimatedWidgetWrapper(
                         animationType: anim.AnimationType.fadeSlideInFromLeft,
                         duration: anim.AnimationDuration.normal,
@@ -516,7 +513,8 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
                                       onItemSelected: (code) {
                                         setState(() {
                                           selectedCountryCode = code;
-                                          selectedCountryName = countryMap[code];
+                                          selectedCountryName =
+                                              countryMap[code];
                                           selectedStateCode = null;
                                           selectedStateName = null;
                                           selectedDistrictCode = null;
@@ -525,14 +523,11 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
                                       },
                                       searchFilter: (code, query) {
                                         final name = countryMap[code] ?? '';
-                                        return name
-                                                .toLowerCase()
-                                                .contains(
-                                                    query.toLowerCase()) ||
+                                        return name.toLowerCase().contains(
+                                                query.toLowerCase()) ||
                                             code
                                                 .toLowerCase()
-                                                .contains(
-                                                    query.toLowerCase());
+                                                .contains(query.toLowerCase());
                                       },
                                     ).show();
                                   },
@@ -574,8 +569,8 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
                                 decoration: BoxDecoration(
                                   color: Colors.white,
                                   borderRadius: BorderRadius.circular(12),
-                                  border: Border.all(
-                                      color: Colors.grey.shade300),
+                                  border:
+                                      Border.all(color: Colors.grey.shade300),
                                 ),
                                 child: const Center(
                                   child: SizedBox(
@@ -591,8 +586,8 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
                                 decoration: BoxDecoration(
                                   color: Colors.white,
                                   borderRadius: BorderRadius.circular(12),
-                                  border: Border.all(
-                                      color: Colors.grey.shade300),
+                                  border:
+                                      Border.all(color: Colors.grey.shade300),
                                 ),
                                 child: Center(
                                   child: Text('Error: $err',
@@ -651,14 +646,10 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
                                         },
                                         searchFilter: (code, query) {
                                           final name = stateMap[code] ?? '';
-                                          return name
-                                                  .toLowerCase()
-                                                  .contains(
-                                                      query.toLowerCase()) ||
-                                              code
-                                                  .toLowerCase()
-                                                  .contains(
-                                                      query.toLowerCase());
+                                          return name.toLowerCase().contains(
+                                                  query.toLowerCase()) ||
+                                              code.toLowerCase().contains(
+                                                  query.toLowerCase());
                                         },
                                       ).show();
                                     },
@@ -668,8 +659,7 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
                                           horizontal: 14),
                                       decoration: BoxDecoration(
                                         color: Colors.white,
-                                        borderRadius:
-                                            BorderRadius.circular(12),
+                                        borderRadius: BorderRadius.circular(12),
                                         border: Border.all(
                                             color: Colors.grey.shade300),
                                       ),
@@ -678,8 +668,7 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
                                             MainAxisAlignment.spaceBetween,
                                         children: [
                                           Text(
-                                            selectedStateName ??
-                                                'Search state',
+                                            selectedStateName ?? 'Search state',
                                             style: TextStyle(
                                               color: selectedStateName == null
                                                   ? Colors.grey.shade600
@@ -701,8 +690,8 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
                                   decoration: BoxDecoration(
                                     color: Colors.white,
                                     borderRadius: BorderRadius.circular(12),
-                                    border: Border.all(
-                                        color: Colors.grey.shade300),
+                                    border:
+                                        Border.all(color: Colors.grey.shade300),
                                   ),
                                   child: const Center(
                                     child: SizedBox(
@@ -718,8 +707,8 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
                                   decoration: BoxDecoration(
                                     color: Colors.white,
                                     borderRadius: BorderRadius.circular(12),
-                                    border: Border.all(
-                                        color: Colors.grey.shade300),
+                                    border:
+                                        Border.all(color: Colors.grey.shade300),
                                   ),
                                   child: Center(
                                     child: Text('Error: $err',
@@ -772,15 +761,15 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
                                         onItemSelected: (id) {
                                           setState(() {
                                             selectedDistrictCode = id;
-                                            selectedDistrictName = districtMap[id];
+                                            selectedDistrictName =
+                                                districtMap[id];
                                           });
                                         },
                                         searchFilter: (id, query) {
                                           final name = districtMap[id] ?? '';
                                           return name
                                               .toLowerCase()
-                                              .contains(
-                                                  query.toLowerCase());
+                                              .contains(query.toLowerCase());
                                         },
                                       ).show();
                                     },
@@ -790,8 +779,7 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
                                           horizontal: 14),
                                       decoration: BoxDecoration(
                                         color: Colors.white,
-                                        borderRadius:
-                                            BorderRadius.circular(12),
+                                        borderRadius: BorderRadius.circular(12),
                                         border: Border.all(
                                             color: Colors.grey.shade300),
                                       ),
@@ -803,9 +791,10 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
                                             selectedDistrictName ??
                                                 'Search district / city',
                                             style: TextStyle(
-                                              color: selectedDistrictName == null
-                                                  ? Colors.grey.shade600
-                                                  : Colors.black,
+                                              color:
+                                                  selectedDistrictName == null
+                                                      ? Colors.grey.shade600
+                                                      : Colors.black,
                                               fontSize: 14,
                                             ),
                                           ),
@@ -823,8 +812,8 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
                                   decoration: BoxDecoration(
                                     color: Colors.white,
                                     borderRadius: BorderRadius.circular(12),
-                                    border: Border.all(
-                                        color: Colors.grey.shade300),
+                                    border:
+                                        Border.all(color: Colors.grey.shade300),
                                   ),
                                   child: const Center(
                                     child: SizedBox(
@@ -840,8 +829,8 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
                                   decoration: BoxDecoration(
                                     color: Colors.white,
                                     borderRadius: BorderRadius.circular(12),
-                                    border: Border.all(
-                                        color: Colors.grey.shade300),
+                                    border:
+                                        Border.all(color: Colors.grey.shade300),
                                   ),
                                   child: Center(
                                     child: Text('Error: $err',
@@ -1148,8 +1137,8 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
                               ),
                               if (field.hasError)
                                 Padding(
-                                  padding:
-                                      const EdgeInsets.only(top: 4.0, left: 4.0),
+                                  padding: const EdgeInsets.only(
+                                      top: 4.0, left: 4.0),
                                   child: Text(
                                     field.errorText ?? '',
                                     style: const TextStyle(
@@ -1179,9 +1168,11 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
                                 'email': emailController.text.trim(),
                                 'address': addressController.text.trim(),
                                 'area': areaController.text.trim(),
-                                'country': selectedCountryName ?? selectedCountryCode,
+                                'country':
+                                    selectedCountryName ?? selectedCountryCode,
                                 'state': selectedStateName ?? selectedStateCode,
-                                'district': selectedDistrictName ?? selectedDistrictCode,
+                                'district': selectedDistrictName ??
+                                    selectedDistrictCode,
                                 'pincode': pincodeController.text.trim(),
                                 'aadhar_number':
                                     aadharNumberController.text.trim(),
