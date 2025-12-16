@@ -87,7 +87,7 @@ final class FetchUserProfileProvider extends $FunctionalProvider<
   }
 }
 
-String _$fetchUserProfileHash() => r'b7deacf1d1016d99d98ea2a4de0a99d98c173a2a';
+String _$fetchUserProfileHash() => r'b63fa7c5c81e3585c56d5e0f4b7b2c222acde13b';
 
 @ProviderFor(updateUserProfile)
 const updateUserProfileProvider = UpdateUserProfileFamily._();

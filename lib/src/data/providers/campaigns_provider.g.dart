@@ -50,6 +50,53 @@ final class CampaignsApiProvider
 
 String _$campaignsApiHash() => r'620d3b70287337180fc2b9f792fd5b70be173dde';
 
+@ProviderFor(MyCampaignsFilter)
+const myCampaignsFilterProvider = MyCampaignsFilterProvider._();
+
+final class MyCampaignsFilterProvider
+    extends $NotifierProvider<MyCampaignsFilter, bool> {
+  const MyCampaignsFilterProvider._()
+      : super(
+          from: null,
+          argument: null,
+          retry: null,
+          name: r'myCampaignsFilterProvider',
+          isAutoDispose: true,
+          dependencies: null,
+          $allTransitiveDependencies: null,
+        );
+
+  @override
+  String debugGetCreateSourceHash() => _$myCampaignsFilterHash();
+
+  @$internal
+  @override
+  MyCampaignsFilter create() => MyCampaignsFilter();
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(bool value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<bool>(value),
+    );
+  }
+}
+
+String _$myCampaignsFilterHash() => r'bcc66b6ea0a7a72babe71109723a1ee62d1d1279';
+
+abstract class _$MyCampaignsFilter extends $Notifier<bool> {
+  bool build();
+  @$mustCallSuper
+  @override
+  void runBuild() {
+    final created = build();
+    final ref = this.ref as $Ref<bool, bool>;
+    final element = ref.element as $ClassProviderElement<
+        AnyNotifier<bool, bool>, bool, Object?, Object?>;
+    element.handleValue(ref, created);
+  }
+}
+
 @ProviderFor(GeneralCampaignsNotifier)
 const generalCampaignsProvider = GeneralCampaignsNotifierProvider._();
 
@@ -75,7 +122,7 @@ final class GeneralCampaignsNotifierProvider extends $AsyncNotifierProvider<
 }
 
 String _$generalCampaignsNotifierHash() =>
-    r'db9ddb7d506952a5ffbf0d02dfdccd40142b4baa';
+    r'513d7a7287d8bd9c18975f4648b09d33a4e46cc0';
 
 abstract class _$GeneralCampaignsNotifier
     extends $AsyncNotifier<CampaignPaginationState> {

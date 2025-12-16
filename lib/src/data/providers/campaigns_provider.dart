@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_riverpod/legacy.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:Annujoom/src/data/providers/api_provider.dart';
 import 'package:Annujoom/src/data/models/campaign_model.dart';
@@ -17,8 +18,14 @@ class CampaignsApi {
   Future<ApiResponse<Map<String, dynamic>>> getAllCampaigns({
     int pageNo = 1,
     int limit = 10,
+    bool myCampaigns = false,
   }) async {
-    final queryParams = {'page_no': pageNo, 'limit': limit, 'status': 'active'};
+    final queryParams = {
+      'page_no': pageNo,
+      'limit': limit,
+      'status': 'active',
+      if (myCampaigns) 'my_campaigns': true,
+    };
 
     final queryString =
         queryParams.entries.map((e) => '${e.key}=${e.value}').join('&');
@@ -53,10 +60,12 @@ class CampaignsApi {
   Future<ApiResponse<Map<String, dynamic>>> getParticipatedCampaigns({
     int pageNo = 1,
     int limit = 10,
+    bool myCampaigns = false,
   }) async {
     final queryParams = {
       'page_no': pageNo,
       'limit': limit,
+      if (myCampaigns) 'my_campaigns': true,
     };
 
     final queryString =
@@ -128,6 +137,18 @@ CampaignsApi campaignsApi(Ref ref) {
   return CampaignsApi(apiProvider: apiProvider);
 }
 
+@riverpod
+class MyCampaignsFilter extends _$MyCampaignsFilter {
+  @override
+  bool build() {
+    return false; // false = Joined, true = Created
+  }
+
+  void setFilter(bool myCampaigns) {
+    state = myCampaigns;
+  }
+}
+
 class CampaignPaginationState {
   final int currentPage;
   final int limit;
@@ -162,9 +183,12 @@ class GeneralCampaignsNotifier extends _$GeneralCampaignsNotifier {
   @override
   Future<CampaignPaginationState> build() async {
     final campaignsApi = ref.watch(campaignsApiProvider);
+    final myCampaignsFilter = ref.watch(myCampaignsFilterProvider);
+
     final response = await campaignsApi.getAllCampaigns(
       pageNo: 1,
       limit: 10,
+      myCampaigns: myCampaignsFilter,
     );
 
     if (response.success && response.data != null) {
@@ -198,10 +222,12 @@ class GeneralCampaignsNotifier extends _$GeneralCampaignsNotifier {
     state = const AsyncValue.loading();
     state = await AsyncValue.guard(() async {
       final campaignsApi = ref.watch(campaignsApiProvider);
+      final myCampaignsFilter = ref.watch(myCampaignsFilterProvider);
       final nextPage = currentState.currentPage + 1;
       final response = await campaignsApi.getAllCampaigns(
         pageNo: nextPage,
         limit: currentState.limit,
+        myCampaigns: myCampaignsFilter,
       );
 
       if (response.success && response.data != null) {

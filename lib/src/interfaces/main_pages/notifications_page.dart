@@ -1,8 +1,10 @@
 import 'package:Annujoom/src/data/constants/color_constants.dart';
 import 'package:Annujoom/src/data/constants/style_constants.dart';
 import 'package:Annujoom/src/data/providers/notifications_provider.dart';
+import 'package:Annujoom/src/data/providers/user_provider.dart';
 import 'package:Annujoom/src/interfaces/components/cards/notification_card.dart';
 import 'package:Annujoom/src/interfaces/components/loading_indicator.dart';
+import 'package:Annujoom/src/interfaces/components/primaryButton.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
@@ -168,7 +170,7 @@ class _NotificationsPageState extends ConsumerState<NotificationsPage> {
                         ),
                       ),
                     ),
-                  _buildNotificationCard(notification),
+                  ..._buildNotificationCard(notification),
                 ],
               );
             },
@@ -196,14 +198,38 @@ class _NotificationsPageState extends ConsumerState<NotificationsPage> {
     );
   }
 
-  Widget _buildNotificationCard(dynamic notification) {
-    return NotificationCard(
-      notification: notification,
-      onTap: () {
-        if (!notification.isRead) {
-          ref.read(notificationsProvider.notifier).markAsRead(notification.id);
-        }
-      },
-    );
+  List<Widget> _buildNotificationCard(dynamic notification) {
+    final currentUser = ref.watch(userProvider);
+    final isApprovalNotification = notification.tag == 'approval';
+    final isNotPresident = currentUser?.role != 'president';
+    final shouldShowReviewButton = isApprovalNotification && isNotPresident;
+
+    return [
+      NotificationCard(
+        notification: notification,
+        onTap: () {
+          if (!notification.isRead) {
+            ref
+                .read(notificationsProvider.notifier)
+                .markAsRead(notification.id);
+          }
+        },
+      ),
+      if (shouldShowReviewButton)
+        Padding(
+          padding: const EdgeInsets.only(left: 16, right: 8),
+          child: SizedBox(
+            width: 120,
+            child: primaryButton(
+              label: 'Review Now',
+              onPressed: () {
+                Navigator.of(context).pushNamed('MyReferrals');
+              },
+              buttonHeight: 32,
+              fontSize: 12,
+            ),
+          ),
+        ),
+    ];
   }
 }

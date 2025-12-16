@@ -68,15 +68,16 @@ class NotificationCard extends StatelessWidget {
                 ),
               ],
             ),
-            const SizedBox(height: 8),
-            Text(
-              notification.content,
-              style: kSmallerTitleR.copyWith(
-                color: kSecondaryTextColor,
+            if (notification.content != "") const SizedBox(height: 8),
+            if (notification.content != "")
+              Text(
+                notification.content,
+                style: kSmallerTitleR.copyWith(
+                  color: kSecondaryTextColor,
+                ),
+                maxLines: 3,
+                overflow: TextOverflow.ellipsis,
               ),
-              maxLines: 3,
-              overflow: TextOverflow.ellipsis,
-            ),
           ],
         ),
       ),
