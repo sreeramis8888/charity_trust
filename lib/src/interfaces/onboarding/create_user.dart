@@ -228,11 +228,11 @@ class _CreateUserPageState extends ConsumerState<CreateUserPage> {
                   _buildAddressField(),
                   const SizedBox(height: 18),
                   _buildCountryField(),
-                  const SizedBox(height: 18),
+                  if (selectedStateName != null) const SizedBox(height: 18),
                   _buildStateField(),
                   if (selectedStateName != null) const SizedBox(height: 18),
                   _buildDistrictField(),
-                  if (selectedDistrictName != null) const SizedBox(height: 18),
+                  const SizedBox(height: 18),
                   _buildAreaField(),
                   const SizedBox(height: 18),
                   _buildPincodeField(),
@@ -406,33 +406,6 @@ class _CreateUserPageState extends ConsumerState<CreateUserPage> {
     );
   }
 
-  Widget _buildEmailField() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        anim.AnimatedWidgetWrapper(
-          animationType: anim.AnimationType.fadeSlideInFromLeft,
-          duration: anim.AnimationDuration.normal,
-          delayMilliseconds: 300,
-          child: Text("Email Address *", style: kSmallTitleR),
-        ),
-        const SizedBox(height: 6),
-        anim.AnimatedWidgetWrapper(
-          animationType: anim.AnimationType.fadeSlideInFromBottom,
-          duration: anim.AnimationDuration.normal,
-          delayMilliseconds: 350,
-          child: InputField(
-            key: _fieldKeys['email'],
-            type: CustomFieldType.text,
-            hint: "Enter email",
-            controller: emailController,
-            validator: Validators.validateEmail,
-          ),
-        ),
-      ],
-    );
-  }
-
   Widget _buildAddressField() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -485,103 +458,31 @@ class _CreateUserPageState extends ConsumerState<CreateUserPage> {
     );
   }
 
-  Widget _buildCountryField() {
+  Widget _buildModalSheetField({
+    required String label,
+    required String? selectedValue,
+    required String hintText,
+    required int delayMilliseconds,
+    required VoidCallback onTap,
+    bool isLoading = false,
+    String? error,
+  }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         anim.AnimatedWidgetWrapper(
           animationType: anim.AnimationType.fadeSlideInFromLeft,
           duration: anim.AnimationDuration.normal,
-          delayMilliseconds: 600,
-          child: Text("Country *", style: kSmallTitleR),
+          delayMilliseconds: delayMilliseconds,
+          child: Text(label, style: kSmallTitleR),
         ),
         const SizedBox(height: 6),
         anim.AnimatedWidgetWrapper(
           animationType: anim.AnimationType.fadeSlideInFromBottom,
           duration: anim.AnimationDuration.normal,
-          delayMilliseconds: 650,
-          child: Consumer(
-            builder: (context, ref, _) {
-              final countriesAsync = ref.watch(getAllCountriesProvider);
-              return countriesAsync.when(
-                data: (countries) {
-                  final countryMap = {
-                    for (var c in countries) c.iso2 ?? '': c.name ?? ''
-                  };
-                  return GestureDetector(
-                    onTap: () {
-                      ModalSheet<String>(
-                        context: context,
-                        title: 'Select Country',
-                        items: countries
-                            .map((c) => c.iso2 ?? '')
-                            .where((code) => code.isNotEmpty)
-                            .toList(),
-                        itemLabel: (code) => countryMap[code] ?? code,
-                        onItemSelected: (code) {
-                          setState(() {
-                            selectedCountryCode = code;
-                            selectedCountryName = countryMap[code];
-                            selectedStateCode = null;
-                            selectedStateName = null;
-                            selectedDistrictCode = null;
-                            selectedDistrictName = null;
-                          });
-                        },
-                        searchFilter: (code, query) {
-                          final name = countryMap[code] ?? '';
-                          return name
-                                  .toLowerCase()
-                                  .contains(query.toLowerCase()) ||
-                              code.toLowerCase().contains(query.toLowerCase());
-                        },
-                      ).show();
-                    },
-                    child: Container(
-                      height: 52,
-                      padding: const EdgeInsets.symmetric(horizontal: 14),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(12),
-                        border: Border.all(color: Colors.grey.shade300),
-                      ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            selectedCountryName ?? 'Select country',
-                            style: TextStyle(
-                              color: selectedCountryName == null
-                                  ? Colors.grey.shade600
-                                  : Colors.black,
-                              fontSize: 14,
-                            ),
-                          ),
-                          Icon(
-                            Icons.keyboard_arrow_down,
-                            color: Colors.grey.shade600,
-                          ),
-                        ],
-                      ),
-                    ),
-                  );
-                },
-                loading: () => Container(
-                  height: 52,
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: Colors.grey.shade300),
-                  ),
-                  child: const Center(
-                    child: SizedBox(
-                      height: 20,
-                      width: 20,
-                      child: LoadingAnimation(),
-                    ),
-                  ),
-                ),
-                error: (err, stack) => Container(
+          delayMilliseconds: delayMilliseconds + 50,
+          child: error != null
+              ? Container(
                   height: 52,
                   decoration: BoxDecoration(
                     color: Colors.white,
@@ -589,242 +490,239 @@ class _CreateUserPageState extends ConsumerState<CreateUserPage> {
                     border: Border.all(color: Colors.grey.shade300),
                   ),
                   child: Center(
-                    child: Text('Error: $err',
+                    child: Text('Error: $error',
                         style:
                             const TextStyle(color: Colors.red, fontSize: 12)),
                   ),
-                ),
-              );
-            },
-          ),
+                )
+              : isLoading
+                  ? Container(
+                      height: 52,
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(color: Colors.grey.shade300),
+                      ),
+                      child: const Center(
+                        child: SizedBox(
+                          height: 20,
+                          width: 20,
+                          child: LoadingAnimation(),
+                        ),
+                      ),
+                    )
+                  : GestureDetector(
+                      onTap: onTap,
+                      child: Container(
+                        height: 52,
+                        padding: const EdgeInsets.symmetric(horizontal: 14),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(color: Colors.grey.shade300),
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              selectedValue ?? hintText,
+                              style: TextStyle(
+                                color: selectedValue == null
+                                    ? Colors.grey.shade600
+                                    : Colors.black,
+                                fontSize: 14,
+                              ),
+                            ),
+                            Icon(
+                              Icons.keyboard_arrow_down,
+                              color: Colors.grey.shade600,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
         ),
       ],
+    );
+  }
+
+  Widget _buildCountryField() {
+    return Consumer(
+      builder: (context, ref, _) {
+        final countriesAsync = ref.watch(getAllCountriesProvider);
+        return countriesAsync.when(
+          data: (countries) {
+            final countryMap = {
+              for (var c in countries) c.iso2 ?? '': c.name ?? ''
+            };
+            return _buildModalSheetField(
+              label: "Country *",
+              selectedValue: selectedCountryName,
+              hintText: 'Select country',
+              delayMilliseconds: 600,
+              onTap: () {
+                ModalSheet<String>(
+                  context: context,
+                  title: 'Select Country',
+                  items: countries
+                      .map((c) => c.iso2 ?? '')
+                      .where((code) => code.isNotEmpty)
+                      .toList(),
+                  itemLabel: (code) => countryMap[code] ?? code,
+                  onItemSelected: (code) {
+                    setState(() {
+                      selectedCountryCode = code;
+                      selectedCountryName = countryMap[code];
+                      selectedStateCode = null;
+                      selectedStateName = null;
+                      selectedDistrictCode = null;
+                      selectedDistrictName = null;
+                    });
+                  },
+                  searchFilter: (code, query) {
+                    final name = countryMap[code] ?? '';
+                    return name.toLowerCase().contains(query.toLowerCase()) ||
+                        code.toLowerCase().contains(query.toLowerCase());
+                  },
+                ).show();
+              },
+            );
+          },
+          loading: () => _buildModalSheetField(
+            label: "Country *",
+            selectedValue: selectedCountryName,
+            hintText: 'Select country',
+            delayMilliseconds: 600,
+            onTap: () {},
+            isLoading: true,
+          ),
+          error: (err, stack) => _buildModalSheetField(
+            label: "Country *",
+            selectedValue: selectedCountryName,
+            hintText: 'Select country',
+            delayMilliseconds: 600,
+            onTap: () {},
+            error: err.toString(),
+          ),
+        );
+      },
     );
   }
 
   Widget _buildStateField() {
     if (selectedCountryCode == null) return const SizedBox();
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        anim.AnimatedWidgetWrapper(
-          animationType: anim.AnimationType.fadeSlideInFromLeft,
-          duration: anim.AnimationDuration.normal,
-          delayMilliseconds: 700,
-          child: Text("State *", style: kSmallTitleR),
-        ),
-        const SizedBox(height: 6),
-        anim.AnimatedWidgetWrapper(
-          animationType: anim.AnimationType.fadeSlideInFromBottom,
-          duration: anim.AnimationDuration.normal,
-          delayMilliseconds: 750,
-          child: Consumer(
-            builder: (context, ref, _) {
-              final statesAsync =
-                  ref.watch(getStatesByCountryProvider(selectedCountryCode!));
-              return statesAsync.when(
-                data: (states) {
-                  final stateMap = {
-                    for (var s in states) s.stateCode.toString(): s.name ?? ''
-                  };
-                  return GestureDetector(
-                    onTap: () {
-                      ModalSheet<String>(
-                        context: context,
-                        title: 'Select State',
-                        items:
-                            states.map((s) => s.stateCode.toString()).toList(),
-                        itemLabel: (code) => stateMap[code] ?? code,
-                        onItemSelected: (code) {
-                          setState(() {
-                            selectedStateCode = code;
-                            selectedStateName = stateMap[code];
-                            selectedDistrictCode = null;
-                            selectedDistrictName = null;
-                          });
-                        },
-                        searchFilter: (code, query) {
-                          final name = stateMap[code] ?? '';
-                          return name
-                                  .toLowerCase()
-                                  .contains(query.toLowerCase()) ||
-                              code.toLowerCase().contains(query.toLowerCase());
-                        },
-                      ).show();
-                    },
-                    child: Container(
-                      height: 52,
-                      padding: const EdgeInsets.symmetric(horizontal: 14),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(12),
-                        border: Border.all(color: Colors.grey.shade300),
-                      ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            selectedStateName ?? 'Select state',
-                            style: TextStyle(
-                              color: selectedStateName == null
-                                  ? Colors.grey.shade600
-                                  : Colors.black,
-                              fontSize: 14,
-                            ),
-                          ),
-                          Icon(
-                            Icons.keyboard_arrow_down,
-                            color: Colors.grey.shade600,
-                          ),
-                        ],
-                      ),
-                    ),
-                  );
-                },
-                loading: () => Container(
-                  height: 52,
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: Colors.grey.shade300),
-                  ),
-                  child: const Center(
-                    child: SizedBox(
-                      height: 20,
-                      width: 20,
-                      child: LoadingAnimation( ),
-                    ),
-                  ),
-                ),
-                error: (err, stack) => Container(
-                  height: 52,
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: Colors.grey.shade300),
-                  ),
-                  child: Center(
-                    child: Text('Error: $err',
-                        style:
-                            const TextStyle(color: Colors.red, fontSize: 12)),
-                  ),
-                ),
-              );
-            },
+    return Consumer(
+      builder: (context, ref, _) {
+        final statesAsync =
+            ref.watch(getStatesByCountryProvider(selectedCountryCode!));
+        return statesAsync.when(
+          data: (states) {
+            final stateMap = {
+              for (var s in states) s.stateCode.toString(): s.name ?? ''
+            };
+            return _buildModalSheetField(
+              label: "State *",
+              selectedValue: selectedStateName,
+              hintText: 'Select state',
+              delayMilliseconds: 700,
+              onTap: () {
+                ModalSheet<String>(
+                  context: context,
+                  title: 'Select State',
+                  items: states.map((s) => s.stateCode.toString()).toList(),
+                  itemLabel: (code) => stateMap[code] ?? code,
+                  onItemSelected: (code) {
+                    setState(() {
+                      selectedStateCode = code;
+                      selectedStateName = stateMap[code];
+                      selectedDistrictCode = null;
+                      selectedDistrictName = null;
+                    });
+                  },
+                  searchFilter: (code, query) {
+                    final name = stateMap[code] ?? '';
+                    return name.toLowerCase().contains(query.toLowerCase()) ||
+                        code.toLowerCase().contains(query.toLowerCase());
+                  },
+                ).show();
+              },
+            );
+          },
+          loading: () => _buildModalSheetField(
+            label: "State *",
+            selectedValue: selectedStateName,
+            hintText: 'Select state',
+            delayMilliseconds: 700,
+            onTap: () {},
+            isLoading: true,
           ),
-        ),
-      ],
+          error: (err, stack) => _buildModalSheetField(
+            label: "State *",
+            selectedValue: selectedStateName,
+            hintText: 'Select state',
+            delayMilliseconds: 700,
+            onTap: () {},
+            error: err.toString(),
+          ),
+        );
+      },
     );
   }
 
   Widget _buildDistrictField() {
     if (selectedStateCode == null) return const SizedBox();
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        anim.AnimatedWidgetWrapper(
-          animationType: anim.AnimationType.fadeSlideInFromLeft,
-          duration: anim.AnimationDuration.normal,
-          delayMilliseconds: 800,
-          child: Text("District *", style: kSmallTitleR),
-        ),
-        const SizedBox(height: 6),
-        anim.AnimatedWidgetWrapper(
-          animationType: anim.AnimationType.fadeSlideInFromBottom,
-          duration: anim.AnimationDuration.normal,
-          delayMilliseconds: 850,
-          child: Consumer(
-            builder: (context, ref, _) {
-              final citiesAsync = ref.watch(getDistrictsByStateProvider(
-                  selectedCountryCode!, selectedStateCode!));
-              return citiesAsync.when(
-                data: (cities) {
-                  final districtMap = {
-                    for (var c in cities) c.id.toString(): c.name ?? ''
-                  };
-                  return GestureDetector(
-                    onTap: () {
-                      ModalSheet<String>(
-                        context: context,
-                        title: 'Select District',
-                        items: cities.map((c) => c.id.toString()).toList(),
-                        itemLabel: (id) => districtMap[id] ?? id,
-                        onItemSelected: (id) {
-                          setState(() {
-                            selectedDistrictCode = id;
-                            selectedDistrictName = districtMap[id];
-                          });
-                        },
-                        searchFilter: (id, query) {
-                          final name = districtMap[id] ?? '';
-                          return name
-                              .toLowerCase()
-                              .contains(query.toLowerCase());
-                        },
-                      ).show();
-                    },
-                    child: Container(
-                      height: 52,
-                      padding: const EdgeInsets.symmetric(horizontal: 14),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(12),
-                        border: Border.all(color: Colors.grey.shade300),
-                      ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            selectedDistrictName ?? 'Select district / city',
-                            style: TextStyle(
-                              color: selectedDistrictName == null
-                                  ? Colors.grey.shade600
-                                  : Colors.black,
-                              fontSize: 14,
-                            ),
-                          ),
-                          Icon(
-                            Icons.keyboard_arrow_down,
-                            color: Colors.grey.shade600,
-                          ),
-                        ],
-                      ),
-                    ),
-                  );
-                },
-                loading: () => Container(
-                  height: 52,
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: Colors.grey.shade300),
-                  ),
-                  child: const Center(
-                    child: SizedBox(
-                      height: 20,
-                      width: 20,
-                      child: LoadingAnimation(),
-                    ),
-                  ),
-                ),
-                error: (err, stack) => Container(
-                  height: 52,
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: Colors.grey.shade300),
-                  ),
-                  child: Center(
-                    child: Text('Error: $err',
-                        style:
-                            const TextStyle(color: Colors.red, fontSize: 12)),
-                  ),
-                ),
-              );
-            },
+    return Consumer(
+      builder: (context, ref, _) {
+        final citiesAsync = ref.watch(getDistrictsByStateProvider(
+            selectedCountryCode!, selectedStateCode!));
+        return citiesAsync.when(
+          data: (cities) {
+            final districtMap = {
+              for (var c in cities) c.id.toString(): c.name ?? ''
+            };
+            return _buildModalSheetField(
+              label: "District *",
+              selectedValue: selectedDistrictName,
+              hintText: 'Select district / city',
+              delayMilliseconds: 800,
+              onTap: () {
+                ModalSheet<String>(
+                  context: context,
+                  title: 'Select District',
+                  items: cities.map((c) => c.id.toString()).toList(),
+                  itemLabel: (id) => districtMap[id] ?? id,
+                  onItemSelected: (id) {
+                    setState(() {
+                      selectedDistrictCode = id;
+                      selectedDistrictName = districtMap[id];
+                    });
+                  },
+                  searchFilter: (id, query) {
+                    final name = districtMap[id] ?? '';
+                    return name.toLowerCase().contains(query.toLowerCase());
+                  },
+                ).show();
+              },
+            );
+          },
+          loading: () => _buildModalSheetField(
+            label: "District *",
+            selectedValue: selectedDistrictName,
+            hintText: 'Select district / city',
+            delayMilliseconds: 800,
+            onTap: () {},
+            isLoading: true,
           ),
-        ),
-      ],
+          error: (err, stack) => _buildModalSheetField(
+            label: "District *",
+            selectedValue: selectedDistrictName,
+            hintText: 'Select district / city',
+            delayMilliseconds: 800,
+            onTap: () {},
+            error: err.toString(),
+          ),
+        );
+      },
     );
   }
 
