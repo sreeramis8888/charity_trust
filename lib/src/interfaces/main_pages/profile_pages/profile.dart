@@ -2,10 +2,13 @@ import 'package:Annujoom/src/data/constants/color_constants.dart';
 import 'package:Annujoom/src/data/constants/style_constants.dart';
 import 'package:Annujoom/src/interfaces/animations/index.dart' as anim;
 import 'package:Annujoom/src/interfaces/main_pages/profile_pages/my_participations.dart';
+import 'package:Annujoom/src/interfaces/main_pages/profile_pages/about_us.dart';
+import 'package:Annujoom/src/interfaces/main_pages/referrals/my_referrals_page.dart';
 import 'package:Annujoom/src/interfaces/components/confirmation_dialog.dart';
 import 'package:Annujoom/src/data/services/secure_storage_service.dart';
 import 'package:Annujoom/src/data/providers/auth_login_provider.dart';
 import 'package:Annujoom/src/data/providers/auth_provider.dart';
+import 'package:Annujoom/src/data/providers/user_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -14,6 +17,8 @@ class ProfilePage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final userDataAsync = ref.watch(fetchUserProfileProvider);
+
     return Scaffold(
       backgroundColor: kBackgroundColor,
       appBar: AppBar(
@@ -22,12 +27,19 @@ class ProfilePage extends ConsumerWidget {
         elevation: 0,
         title: Text("Profile", style: kSubHeadingM),
       ),
-      body: FutureBuilder(
-        future: ref.read(secureStorageServiceProvider).getUserData(),
-        builder: (context, snapshot) {
-          final userData = snapshot.data;
-          final userName = userData?.name ?? 'User';
-          final userPhone = userData?.phone ?? 'Phone number';
+      body: userDataAsync.when(
+        data: (userData) {
+          if (userData == null) {
+            return Center(
+              child: Text(
+                'Unable to load profile data',
+                style: kBodyTitleR.copyWith(color: kSecondaryTextColor),
+              ),
+            );
+          }
+
+          final userName = userData.name ?? 'User';
+          final userPhone = userData.phone ?? 'Phone number';
 
           return SingleChildScrollView(
             padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
@@ -42,53 +54,101 @@ class ProfilePage extends ConsumerWidget {
                       color: kWhite,
                       borderRadius: BorderRadius.circular(22),
                     ),
-                    padding: const EdgeInsets.all(20),
+                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
                     child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
+                        /// Avatar
                         ClipRRect(
                           borderRadius: BorderRadius.circular(60),
                           child: Container(
                             width: 60,
                             height: 60,
                             color: kGreyDark,
-                            child: userData?.image != null && userData!.image!.isNotEmpty
+                            child: userData.image != null &&
+                                    userData.image!.isNotEmpty
                                 ? Image.network(
-                                    userData!.image!,
+                                    userData.image!,
                                     fit: BoxFit.cover,
-                                    errorBuilder: (context, error, stackTrace) {
-                                      return const Icon(Icons.person,
-                                          color: kWhite, size: 40);
-                                    },
+                                    errorBuilder: (_, __, ___) => const Icon(
+                                      Icons.person,
+                                      color: kWhite,
+                                      size: 36,
+                                    ),
                                   )
-                                : const Icon(Icons.person,
-                                    color: kWhite, size: 40),
+                                : const Icon(
+                                    Icons.person,
+                                    color: kWhite,
+                                    size: 36,
+                                  ),
                           ),
                         ),
-                        const SizedBox(width: 18),
+
+                        const SizedBox(width: 10),
+
+                        /// User info (safe for long text)
                         Expanded(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisSize: MainAxisSize.min,
                             children: [
-                              Text(
-                                userName,
-                                style: kHeadTitleR,
+                              Row(
+                                children: [
+                                  /// Name
+                                  Expanded(
+                                    child: Text(
+                                      userName,
+                                      style: kHeadTitleR.copyWith(height: 1.0),
+                                      maxLines: 2,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ),
+
+                                  /// Verified icon
+                                  if (userData.role != null &&
+                                      userData.role != 'member') ...[
+                                    const SizedBox(width: 4),
+                                    const Icon(
+                                      Icons.verified,
+                                      color: Color(0xFFFFC107),
+                                      size: 16,
+                                    ),
+                                  ],
+                                ],
                               ),
-                              const SizedBox(height: 4),
+
+                              /// Phone
                               Text(
                                 userPhone,
                                 style: kBodyTitleR.copyWith(
-                                    color: kSecondaryTextColor),
+                                  color: kSecondaryTextColor,
+                                  height: 0.9,
+                                ),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
                               ),
                             ],
                           ),
                         ),
+
+                        const SizedBox(width: 2),
+
+                        /// Edit button
                         IconButton(
+                          constraints: const BoxConstraints(
+                            minWidth: 36,
+                            minHeight: 36,
+                          ),
+                          padding: EdgeInsets.zero,
                           onPressed: () {
                             Navigator.of(context).pushNamed('EditProfile');
                           },
-                          icon:
-                              const Icon(Icons.edit_square, color: kTextColor),
-                        )
+                          icon: const Icon(
+                            Icons.edit_square,
+                            color: kTextColor,
+                            size: 20,
+                          ),
+                        ),
                       ],
                     ),
                   ),
@@ -113,16 +173,17 @@ class ProfilePage extends ConsumerWidget {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           _statItem(
-                            "${userData?.totalCampaignsParticipated ?? 0}",
+                            "${userData.totalCampaignsParticipated ?? 0}",
                             "My Participations",
                           ),
                           _statItem(
-                            "₹${userData?.totalAmountDonated ?? 0}",
+                            "₹${userData.totalAmountDonated ?? 0}",
                             "Amount Donated",
                           ),
                         ],
                       ),
-                      if (userData?.role != 'member') ...[
+                      if (userData.role != null &&
+                          userData.role != 'member') ...[
                         const SizedBox(height: 18),
                         Container(
                           height: 2,
@@ -133,11 +194,11 @@ class ProfilePage extends ConsumerWidget {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             _statItem(
-                              "${userData?.totalReferrals ?? 0}",
+                              "${userData.totalReferrals ?? 0}",
                               "Total Referrals",
                             ),
                             _statItem(
-                              "${userData?.activeReferrals ?? 0}",
+                              "${userData.activeReferrals ?? 0}",
                               "Active Referrals",
                             ),
                           ],
@@ -166,7 +227,36 @@ class ProfilePage extends ConsumerWidget {
                           );
                         },
                         child: _tile(
-                            Icons.volunteer_activism, "My Participations"),
+                          Icons.volunteer_activism,
+                          userData.role != null && userData.role != 'member'
+                              ? "My Campaigns"
+                              : "My Participations",
+                        ),
+                      ),
+                      if (userData.role != null &&
+                          userData.role != 'member') ...[
+                        _divider(),
+                        GestureDetector(
+                          onTap: () {
+                            Navigator.of(context).push(
+                              MaterialPageRoute(
+                                builder: (context) => const MyReferralsPage(),
+                              ),
+                            );
+                          },
+                          child: _tile(Icons.people, "Referrals"),
+                        ),
+                      ],
+                      _divider(),
+                      GestureDetector(
+                        onTap: () {
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (context) => const AboutUsPage(),
+                            ),
+                          );
+                        },
+                        child: _tile(Icons.info_outline, "About Us"),
                       ),
                       _divider(),
                       GestureDetector(
@@ -186,6 +276,12 @@ class ProfilePage extends ConsumerWidget {
             ),
           );
         },
+        loading: () => const Center(
+          child: CircularProgressIndicator(),
+        ),
+        error: (error, stackTrace) => Center(
+          child: Text('Error loading profile: $error'),
+        ),
       ),
     );
   }

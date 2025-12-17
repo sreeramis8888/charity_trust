@@ -249,6 +249,11 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
         if (user != null) {
           log('_checkAuthenticationAndLoadUser: User profile fetched from API - id: ${user.id}, status: ${user.status}',
               name: 'SplashScreen');
+          // Save user data to secure storage
+          final secureStorage = ref.read(secureStorageServiceProvider);
+          await secureStorage.saveUserData(user);
+          log('_checkAuthenticationAndLoadUser: User data saved to secure storage',
+              name: 'SplashScreen');
         } else {
           log('_checkAuthenticationAndLoadUser: Failed to fetch user profile from API, trying local storage',
               name: 'SplashScreen');
