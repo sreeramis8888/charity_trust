@@ -33,16 +33,63 @@ class CampaignPage extends ConsumerStatefulWidget {
 class _CampaignPageState extends ConsumerState<CampaignPage>
     with TickerProviderStateMixin {
   late TabController _controller;
-  late ScrollController _scrollController;
+  late ScrollController _generalCampaignsController;
+  late ScrollController _userTransactionsController;
+  late ScrollController _memberTransactionsController;
+  late ScrollController _createdCampaignsController;
+  late ScrollController _joinedCampaignsController;
+  late ScrollController _approvalsController;
   bool _isPresident = false;
 
   @override
   void initState() {
     super.initState();
     _controller = TabController(length: 3, vsync: this);
-    _scrollController = ScrollController();
-    _scrollController.addListener(_onScroll);
+    _generalCampaignsController = ScrollController();
+    _userTransactionsController = ScrollController();
+    _memberTransactionsController = ScrollController();
+    _createdCampaignsController = ScrollController();
+    _joinedCampaignsController = ScrollController();
+    _approvalsController = ScrollController();
+
+    _setupScrollController(
+      _generalCampaignsController,
+      () => ref.read(generalCampaignsProvider.notifier).loadNextPage(),
+    );
+    _setupScrollController(
+      _userTransactionsController,
+      () => ref.read(participatedCampaignsProvider.notifier).loadNextPage(),
+    );
+    _setupScrollController(
+      _memberTransactionsController,
+      () => ref.read(memberDonationsProvider.notifier).loadNextPage(),
+    );
+    _setupScrollController(
+      _createdCampaignsController,
+      () => ref.read(createdCampaignsProvider.notifier).loadNextPage(),
+    );
+    _setupScrollController(
+      _joinedCampaignsController,
+      () => ref.read(participatedCampaignsProvider.notifier).loadNextPage(),
+    );
+    _setupScrollController(
+      _approvalsController,
+      () => ref.read(pendingApprovalCampaignsProvider.notifier).loadNextPage(),
+    );
     _loadUserRole();
+  }
+
+  void _setupScrollController(
+    ScrollController controller,
+    VoidCallback onEndReached,
+  ) {
+    controller.addListener(() {
+      if (!controller.hasClients) return;
+      final position = controller.position;
+      if (position.pixels >= position.maxScrollExtent - 500) {
+        onEndReached();
+      }
+    });
   }
 
   Future<void> _loadUserRole() async {
@@ -63,28 +110,13 @@ class _CampaignPageState extends ConsumerState<CampaignPage>
   @override
   void dispose() {
     _controller.dispose();
-    _scrollController.dispose();
+    _generalCampaignsController.dispose();
+    _userTransactionsController.dispose();
+    _memberTransactionsController.dispose();
+    _createdCampaignsController.dispose();
+    _joinedCampaignsController.dispose();
+    _approvalsController.dispose();
     super.dispose();
-  }
-
-  void _onScroll() {
-    if (_scrollController.position.pixels >=
-        _scrollController.position.maxScrollExtent - 500) {
-      _loadMoreBasedOnTab();
-    }
-  }
-
-  void _loadMoreBasedOnTab() {
-    final tabIndex = _controller.index;
-    if (tabIndex == 0) {
-      ref.read(generalCampaignsProvider.notifier).loadNextPage();
-    } else if (tabIndex == 1) {
-      ref.read(participatedCampaignsProvider.notifier).loadNextPage();
-    } else if (tabIndex == 2) {
-      ref.read(participatedCampaignsProvider.notifier).loadNextPage();
-    } else if (tabIndex == 3 && _isPresident) {
-      ref.read(pendingApprovalCampaignsProvider.notifier).loadNextPage();
-    }
   }
 
   @override
@@ -200,25 +232,9 @@ class _CampaignPageState extends ConsumerState<CampaignPage>
       data: (paginationState) {
         return ListView.builder(
           padding: const EdgeInsets.all(16),
-          itemCount: paginationState.campaigns.length +
-              (paginationState.hasMore ? 1 : 0),
+          controller: _generalCampaignsController,
+          itemCount: paginationState.campaigns.length,
           itemBuilder: (context, index) {
-            if (index == paginationState.campaigns.length) {
-              return Padding(
-                padding: const EdgeInsets.symmetric(vertical: 16),
-                child: Center(
-                  child: ElevatedButton(
-                    onPressed: () {
-                      ref
-                          .read(generalCampaignsProvider.notifier)
-                          .loadNextPage();
-                    },
-                    child: const Text('Load More'),
-                  ),
-                ),
-              );
-            }
-
             final campaign = paginationState.campaigns[index];
             return Padding(
               padding: const EdgeInsets.only(bottom: 16),
@@ -321,25 +337,9 @@ class _CampaignPageState extends ConsumerState<CampaignPage>
       data: (paginationState) {
         return ListView.builder(
           padding: const EdgeInsets.all(16),
-          itemCount: paginationState.donations.length +
-              (paginationState.hasMore ? 1 : 0),
+          controller: _userTransactionsController,
+          itemCount: paginationState.donations.length,
           itemBuilder: (context, index) {
-            if (index == paginationState.donations.length) {
-              return Padding(
-                padding: const EdgeInsets.symmetric(vertical: 16),
-                child: Center(
-                  child: ElevatedButton(
-                    onPressed: () {
-                      ref
-                          .read(participatedCampaignsProvider.notifier)
-                          .loadNextPage();
-                    },
-                    child: const Text('Load More'),
-                  ),
-                ),
-              );
-            }
-
             final donation = paginationState.donations[index];
             return Padding(
               padding: const EdgeInsets.only(bottom: 16),
@@ -395,25 +395,9 @@ class _CampaignPageState extends ConsumerState<CampaignPage>
         }
         return ListView.builder(
           padding: const EdgeInsets.all(16),
-          itemCount: paginationState.donations.length +
-              (paginationState.hasMore ? 1 : 0),
+          controller: _memberTransactionsController,
+          itemCount: paginationState.donations.length,
           itemBuilder: (context, index) {
-            if (index == paginationState.donations.length) {
-              return Padding(
-                padding: const EdgeInsets.symmetric(vertical: 16),
-                child: Center(
-                  child: ElevatedButton(
-                    onPressed: () {
-                      ref
-                          .read(memberDonationsProvider.notifier)
-                          .loadNextPage();
-                    },
-                    child: const Text('Load More'),
-                  ),
-                ),
-              );
-            }
-
             final donation = paginationState.donations[index];
             return Padding(
               padding: const EdgeInsets.only(bottom: 16),
@@ -501,25 +485,9 @@ class _CampaignPageState extends ConsumerState<CampaignPage>
         }
         return ListView.builder(
           padding: const EdgeInsets.all(16),
-          itemCount: paginationState.campaigns.length +
-              (paginationState.hasMore ? 1 : 0),
+          controller: _createdCampaignsController,
+          itemCount: paginationState.campaigns.length,
           itemBuilder: (context, index) {
-            if (index == paginationState.campaigns.length) {
-              return Padding(
-                padding: const EdgeInsets.symmetric(vertical: 16),
-                child: Center(
-                  child: ElevatedButton(
-                    onPressed: () {
-                      ref
-                          .read(createdCampaignsProvider.notifier)
-                          .loadNextPage();
-                    },
-                    child: const Text('Load More'),
-                  ),
-                ),
-              );
-            }
-
             final campaign = paginationState.campaigns[index];
             return Padding(
               padding: const EdgeInsets.only(bottom: 16),
@@ -597,25 +565,9 @@ class _CampaignPageState extends ConsumerState<CampaignPage>
         }
         return ListView.builder(
           padding: const EdgeInsets.all(16),
-          itemCount: campaigns.length +
-              (paginationState.hasMore ? 1 : 0),
+          controller: _joinedCampaignsController,
+          itemCount: campaigns.length,
           itemBuilder: (context, index) {
-            if (index == campaigns.length) {
-              return Padding(
-                padding: const EdgeInsets.symmetric(vertical: 16),
-                child: Center(
-                  child: ElevatedButton(
-                    onPressed: () {
-                      ref
-                          .read(participatedCampaignsProvider.notifier)
-                          .loadNextPage();
-                    },
-                    child: const Text('Load More'),
-                  ),
-                ),
-              );
-            }
-
             final campaign = campaigns[index];
             return Padding(
               padding: const EdgeInsets.only(bottom: 16),
@@ -686,25 +638,9 @@ class _CampaignPageState extends ConsumerState<CampaignPage>
         }
         return ListView.builder(
           padding: const EdgeInsets.all(16),
-          itemCount: paginationState.campaigns.length +
-              (paginationState.hasMore ? 1 : 0),
+          controller: _approvalsController,
+          itemCount: paginationState.campaigns.length,
           itemBuilder: (context, index) {
-            if (index == paginationState.campaigns.length) {
-              return Padding(
-                padding: const EdgeInsets.symmetric(vertical: 16),
-                child: Center(
-                  child: ElevatedButton(
-                    onPressed: () {
-                      ref
-                          .read(pendingApprovalCampaignsProvider.notifier)
-                          .loadNextPage();
-                    },
-                    child: const Text('Load More'),
-                  ),
-                ),
-              );
-            }
-
             final campaign = paginationState.campaigns[index];
             return Padding(
               padding: const EdgeInsets.only(bottom: 16),

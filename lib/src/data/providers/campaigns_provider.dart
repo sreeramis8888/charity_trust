@@ -247,8 +247,6 @@ class GeneralCampaignsNotifier extends _$GeneralCampaignsNotifier {
 
     final currentState = state.value!;
     if (!currentState.hasMore) return;
-
-    state = const AsyncValue.loading();
     state = await AsyncValue.guard(() async {
       final campaignsApi = ref.watch(campaignsApiProvider);
       final nextPage = currentState.currentPage + 1;
@@ -325,8 +323,6 @@ class CreatedCampaignsNotifier extends _$CreatedCampaignsNotifier {
 
     final currentState = state.value!;
     if (!currentState.hasMore) return;
-
-    state = const AsyncValue.loading();
     state = await AsyncValue.guard(() async {
       final campaignsApi = ref.watch(campaignsApiProvider);
       final nextPage = currentState.currentPage + 1;
@@ -431,8 +427,6 @@ class ParticipatedCampaignsNotifier extends _$ParticipatedCampaignsNotifier {
 
     final currentState = state.value!;
     if (!currentState.hasMore) return;
-
-    state = const AsyncValue.loading();
     state = await AsyncValue.guard(() async {
       final campaignsApi = ref.watch(campaignsApiProvider);
       final nextPage = currentState.currentPage + 1;
@@ -506,8 +500,6 @@ class MemberDonationsNotifier extends _$MemberDonationsNotifier {
 
     final currentState = state.value!;
     if (!currentState.hasMore) return;
-
-    state = const AsyncValue.loading();
     state = await AsyncValue.guard(() async {
       final campaignsApi = ref.watch(campaignsApiProvider);
       final nextPage = currentState.currentPage + 1;
@@ -604,8 +596,6 @@ class PendingApprovalCampaignsNotifier
 
     final currentState = state.value!;
     if (!currentState.hasMore) return;
-
-    state = const AsyncValue.loading();
     state = await AsyncValue.guard(() async {
       final campaignsApi = ref.watch(campaignsApiProvider);
       final nextPage = currentState.currentPage + 1;
