@@ -3,6 +3,7 @@ import 'campaign_model.dart';
 class DonationModel {
   final String? id;
   final String? user;
+  final String? user_name;
   final CampaignModel? campaign;
   final String? currency;
   final double? amount;
@@ -16,6 +17,7 @@ class DonationModel {
   DonationModel({
     this.id,
     this.user,
+    this.user_name,
     this.campaign,
     this.currency,
     this.amount,
@@ -46,6 +48,7 @@ class DonationModel {
     return DonationModel(
       id: json["_id"]?.toString(),
       user: json["user"]?.toString(),
+      user_name: json["user_name"]?.toString(),
       campaign: json["campaign"] != null
           ? CampaignModel.fromJson(json["campaign"])
           : null,
@@ -69,6 +72,7 @@ class DonationModel {
     return {
       "_id": id,
       "user": user,
+      "user_name": user_name,
       "campaign": campaign?.toJson(),
       "currency": currency,
       "amount": amount,
@@ -87,6 +91,7 @@ class DonationModel {
   DonationModel copyWith({
     String? id,
     String? user,
+    String? user_name,
     CampaignModel? campaign,
     String? currency,
     double? amount,
@@ -100,6 +105,7 @@ class DonationModel {
     return DonationModel(
       id: id ?? this.id,
       user: user ?? this.user,
+      user_name: user ?? this.user_name,
       campaign: campaign ?? this.campaign,
       currency: currency ?? this.currency,
       amount: amount ?? this.amount,

@@ -97,13 +97,16 @@ Future<({UserModel? user, String? error})> updateUserProfile(
       requireAuth: true,
     );
 
-    if (response.success) {
-      final user = UserModel.fromJson(cleanedData);
-      // Check if ref is still valid before using it
-      if (ref.mounted) {
-        ref.read(userProvider.notifier).setUser(user);
+    if (response.success && response.data != null) {
+      final data = response.data!['data'] as Map<String, dynamic>?;
+      if (data != null) {
+        final user = UserModel.fromJson(data);
+        // Check if ref is still valid before using it
+        if (ref.mounted) {
+          ref.read(userProvider.notifier).setUser(user);
+        }
+        return (user: user, error: null);
       }
-      return (user: user, error: null);
     }
 
     return (user: null, error: response.message ?? 'Failed to update profile');
@@ -120,38 +123,40 @@ Future<({UserModel? user, String? error})> handleSuccessfulRegistration(
 ) async {
   try {
     final secureStorage = ref.watch(secureStorageServiceProvider);
-    
+
     // Save user data to secure storage
     await secureStorage.saveUserData(user);
-    
+
     // Save user ID for reference
     if (user.id != null) {
       await secureStorage.saveUserId(user.id!);
     }
-    
+
     // Clear any temporary registration data
     await secureStorage.clearRegistrationData();
-    
+
     // Update the user provider
     if (ref.mounted) {
       ref.read(userProvider.notifier).setUser(user);
     }
-    
-    log('User registration successful and data stored', name: 'handleSuccessfulRegistration');
+
+    log('User registration successful and data stored',
+        name: 'handleSuccessfulRegistration');
     return (user: user, error: null);
   } catch (e) {
-    log('Error handling successful registration: $e', name: 'handleSuccessfulRegistration');
+    log('Error handling successful registration: $e',
+        name: 'handleSuccessfulRegistration');
     return (user: null, error: e.toString());
   }
 }
 
 class UsersListParams {
-  final String role;
+  final List<String> roles;
   final int pageNo;
   final String? search;
 
   UsersListParams({
-    required this.role,
+    required this.roles,
     this.pageNo = 1,
     this.search,
   });
@@ -164,19 +169,21 @@ Future<List<UserModel>> fetchUsersByRole(
 ) async {
   try {
     final apiProvider = ref.watch(apiProviderProvider);
-    final queryParams = {
-      'role[]': params.role,
-      'page_no': params.pageNo,
-      'limit': 10,
-    };
+
+    // Build query string with multiple role[] parameters
+    final queryParts = <String>[];
+    for (final role in params.roles) {
+      queryParts.add('role[]=${Uri.encodeComponent(role)}');
+    }
+    queryParts.add('page_no=${params.pageNo}');
+    queryParts.add('limit=10');
+
     final search = params.search;
     if (search != null && search.isNotEmpty) {
-      queryParams['search'] = search;
+      queryParts.add('search=${Uri.encodeComponent(search)}');
     }
 
-    final queryString = queryParams.entries
-        .map((e) => '${e.key}=${Uri.encodeComponent(e.value.toString())}')
-        .join('&');
+    final queryString = queryParts.join('&');
 
     final response = await apiProvider.get(
       '/user?$queryString',
@@ -278,7 +285,7 @@ Future<({UserModel? user, String? error})> createNewUser(
 
     final apiProvider = ref.watch(apiProviderProvider);
     final response = await apiProvider.post(
-      '/user/create',
+      '/user',
       cleanedData,
       requireAuth: true,
     );

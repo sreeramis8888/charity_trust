@@ -180,17 +180,23 @@ class _HomePageState extends ConsumerState<HomePage> {
           );
         }
 
-        return FloatingActionButton(
-          heroTag: 'memberDonateButton',
-          onPressed: () {
-            Navigator.of(context).pushNamed('DonationCategories');
-          },
-          backgroundColor: Color(0xFFED3C5F),
-          child: SvgPicture.asset(
-            'assets/svg/donation.svg',
-            height: 24,
-            width: 24,
-            colorFilter: ColorFilter.mode(kWhite, BlendMode.srcIn),
+        return Align(
+          alignment: Alignment.bottomRight,
+          child: Padding(
+            padding: const EdgeInsets.only(right: 16, bottom: 16),
+            child: FloatingActionButton(
+              heroTag: 'memberDonateButton',
+              onPressed: () {
+                Navigator.of(context).pushNamed('DonationCategories');
+              },
+              backgroundColor: const Color(0xFFED3C5F),
+              child: SvgPicture.asset(
+                'assets/svg/donation.svg',
+                height: 24,
+                width: 24,
+                colorFilter: ColorFilter.mode(kWhite, BlendMode.srcIn),
+              ),
+            ),
           ),
         );
       },

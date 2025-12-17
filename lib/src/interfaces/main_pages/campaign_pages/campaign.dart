@@ -14,7 +14,9 @@ import 'package:Annujoom/src/data/providers/campaigns_provider.dart'
         participatedCampaignsProvider,
         pendingApprovalCampaignsProvider,
         myCampaignsFilterProvider,
-        createdCampaignsProvider;
+        createdCampaignsProvider,
+        transactionsFilterProvider,
+        memberDonationsProvider;
 import 'package:Annujoom/src/data/services/secure_storage_service.dart';
 import 'package:Annujoom/src/data/services/snackbar_service.dart';
 import 'package:Annujoom/src/interfaces/components/confirmation_dialog.dart';
@@ -276,6 +278,43 @@ class _CampaignPageState extends ConsumerState<CampaignPage>
 
   // ---------------- TAB 2 ---------------- //
   Widget _yourTransactionsTab() {
+    final secureStorage = ref.watch(secureStorageServiceProvider);
+    final currentFilter = ref.watch(transactionsFilterProvider);
+
+    return FutureBuilder<String?>(
+      future: secureStorage.getUserData().then((user) => user?.role),
+      builder: (context, snapshot) {
+        final userRole = snapshot.data;
+        final isNonMember = userRole != null && userRole != 'member';
+
+        return Column(
+          children: [
+            if (isNonMember)
+              FutureBuilder<String?>(
+                future: secureStorage.getUserData().then((user) => user?.name),
+                builder: (context, nameSnapshot) {
+                  final userName = nameSnapshot.data ?? 'User';
+                  return ChoiceChipFilter(
+                    options: [userName, 'Member Transactions'],
+                    selectedOption: currentFilter ? 'Member Transactions' : userName,
+                    onSelectionChanged: (selected) {
+                      ref.read(transactionsFilterProvider.notifier).setFilter(selected == 'Member Transactions');
+                    },
+                  );
+                },
+              ),
+            Expanded(
+              child: currentFilter
+                  ? _buildMemberTransactionsView()
+                  : _buildUserTransactionsView(),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Widget _buildUserTransactionsView() {
     final participatedState = ref.watch(participatedCampaignsProvider);
 
     return participatedState.when(
@@ -311,13 +350,11 @@ class _CampaignPageState extends ConsumerState<CampaignPage>
                 child: TransactionCard(
                   id: donation.paymentId ?? '',
                   type: donation.campaign?.category ?? '',
-                  // campaignTitle: donation.campaign?.title ?? '',
                   amount: donation.amount?.toString() ?? '-',
-                  // currency: donation.currency ?? 'INR',
-                  // paymentMethod: donation.paymentMethod ?? '',
                   status: donation.status ?? '',
                   date: formatDate(donation.createdAt) ?? '',
                   receipt: donation.receipt ?? '',
+                  donorName: donation.user_name ?? '',
                 ),
               ),
             );
@@ -334,6 +371,80 @@ class _CampaignPageState extends ConsumerState<CampaignPage>
             ElevatedButton(
               onPressed: () {
                 ref.read(participatedCampaignsProvider.notifier).refresh();
+              },
+              child: const Text('Retry'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildMemberTransactionsView() {
+    final memberDonationsState = ref.watch(memberDonationsProvider);
+
+    return memberDonationsState.when(
+      data: (paginationState) {
+        if (paginationState.donations.isEmpty) {
+          return Center(
+            child: Text(
+              'No member transactions',
+              style: kBodyTitleR.copyWith(color: kSecondaryTextColor),
+            ),
+          );
+        }
+        return ListView.builder(
+          padding: const EdgeInsets.all(16),
+          itemCount: paginationState.donations.length +
+              (paginationState.hasMore ? 1 : 0),
+          itemBuilder: (context, index) {
+            if (index == paginationState.donations.length) {
+              return Padding(
+                padding: const EdgeInsets.symmetric(vertical: 16),
+                child: Center(
+                  child: ElevatedButton(
+                    onPressed: () {
+                      ref
+                          .read(memberDonationsProvider.notifier)
+                          .loadNextPage();
+                    },
+                    child: const Text('Load More'),
+                  ),
+                ),
+              );
+            }
+
+            final donation = paginationState.donations[index];
+            return Padding(
+              padding: const EdgeInsets.only(bottom: 16),
+              child: anim.AnimatedWidgetWrapper(
+                animationType: anim.AnimationType.fadeSlideInFromBottom,
+                duration: anim.AnimationDuration.normal,
+                delayMilliseconds: index * 50,
+                child: TransactionCard(
+                  id: donation.paymentId ?? '',
+                  type: donation.campaign?.category ?? '',
+                  amount: donation.amount?.toString() ?? '-',
+                  status: donation.status ?? '',
+                  date: formatDate(donation.createdAt) ?? '',
+                  receipt: donation.receipt ?? '',
+                  donorName: donation.user_name ?? '',
+                ),
+              ),
+            );
+          },
+        );
+      },
+      loading: () => const Center(child: LoadingAnimation()),
+      error: (error, stackTrace) => Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text('Error: $error'),
+            const SizedBox(height: 16),
+            ElevatedButton(
+              onPressed: () {
+                ref.read(memberDonationsProvider.notifier).refresh();
               },
               child: const Text('Retry'),
             ),

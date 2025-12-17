@@ -209,7 +209,7 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
         'district': selectedDistrictName ?? selectedDistrictCode,
         'pincode': pincodeController.text.trim(),
         'aadhar_number': int.parse(aadharNumberController.text.trim()),
-        'profile_picture': profilePictureUrl,
+        'image': profilePictureUrl,
         'gender': selectedGender,
         'whatsapp_number': whatsappNumber,
         'dob': formattedDob,
@@ -1124,9 +1124,9 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
                                 },
                                 onFetch: (search, page) async {
                                   final params = UsersListParams(
-                                    role: recommendedByType == 'trustee'
-                                        ? 'trustee'
-                                        : 'member',
+                                    roles: recommendedByType == 'trustee'
+                                        ? ['trustee', 'president', 'secretary', 'treasurer']
+                                        : ['member'],
                                     pageNo: page,
                                     search: search.isEmpty ? null : search,
                                   );

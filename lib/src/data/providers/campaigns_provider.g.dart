@@ -97,6 +97,54 @@ abstract class _$MyCampaignsFilter extends $Notifier<bool> {
   }
 }
 
+@ProviderFor(TransactionsFilter)
+const transactionsFilterProvider = TransactionsFilterProvider._();
+
+final class TransactionsFilterProvider
+    extends $NotifierProvider<TransactionsFilter, bool> {
+  const TransactionsFilterProvider._()
+      : super(
+          from: null,
+          argument: null,
+          retry: null,
+          name: r'transactionsFilterProvider',
+          isAutoDispose: true,
+          dependencies: null,
+          $allTransitiveDependencies: null,
+        );
+
+  @override
+  String debugGetCreateSourceHash() => _$transactionsFilterHash();
+
+  @$internal
+  @override
+  TransactionsFilter create() => TransactionsFilter();
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(bool value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<bool>(value),
+    );
+  }
+}
+
+String _$transactionsFilterHash() =>
+    r'6b89aa34cdfc801b6022d82c327665fe2342554a';
+
+abstract class _$TransactionsFilter extends $Notifier<bool> {
+  bool build();
+  @$mustCallSuper
+  @override
+  void runBuild() {
+    final created = build();
+    final ref = this.ref as $Ref<bool, bool>;
+    final element = ref.element as $ClassProviderElement<
+        AnyNotifier<bool, bool>, bool, Object?, Object?>;
+    element.handleValue(ref, created);
+  }
+}
+
 @ProviderFor(GeneralCampaignsNotifier)
 const generalCampaignsProvider = GeneralCampaignsNotifierProvider._();
 
@@ -218,6 +266,52 @@ String _$participatedCampaignsNotifierHash() =>
     r'b1590637a6a4770da72d77556a8026ab5482eca4';
 
 abstract class _$ParticipatedCampaignsNotifier
+    extends $AsyncNotifier<DonationPaginationState> {
+  FutureOr<DonationPaginationState> build();
+  @$mustCallSuper
+  @override
+  void runBuild() {
+    final created = build();
+    final ref = this.ref
+        as $Ref<AsyncValue<DonationPaginationState>, DonationPaginationState>;
+    final element = ref.element as $ClassProviderElement<
+        AnyNotifier<AsyncValue<DonationPaginationState>,
+            DonationPaginationState>,
+        AsyncValue<DonationPaginationState>,
+        Object?,
+        Object?>;
+    element.handleValue(ref, created);
+  }
+}
+
+@ProviderFor(MemberDonationsNotifier)
+const memberDonationsProvider = MemberDonationsNotifierProvider._();
+
+final class MemberDonationsNotifierProvider extends $AsyncNotifierProvider<
+    MemberDonationsNotifier, DonationPaginationState> {
+  const MemberDonationsNotifierProvider._()
+      : super(
+          from: null,
+          argument: null,
+          retry: null,
+          name: r'memberDonationsProvider',
+          isAutoDispose: true,
+          dependencies: null,
+          $allTransitiveDependencies: null,
+        );
+
+  @override
+  String debugGetCreateSourceHash() => _$memberDonationsNotifierHash();
+
+  @$internal
+  @override
+  MemberDonationsNotifier create() => MemberDonationsNotifier();
+}
+
+String _$memberDonationsNotifierHash() =>
+    r'bccbfa82b2750d09ae0d14ffd227a4a107d674b0';
+
+abstract class _$MemberDonationsNotifier
     extends $AsyncNotifier<DonationPaginationState> {
   FutureOr<DonationPaginationState> build();
   @$mustCallSuper

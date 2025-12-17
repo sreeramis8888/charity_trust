@@ -14,6 +14,7 @@ class TransactionCard extends ConsumerWidget {
   final String amount;
   final String status;
   final String receipt;
+  final String donorName;
   const TransactionCard({
     super.key,
     required this.id,
@@ -22,6 +23,7 @@ class TransactionCard extends ConsumerWidget {
     required this.amount,
     required this.status,
     required this.receipt,
+    this.donorName = '',
   });
 
   @override
@@ -75,6 +77,10 @@ class TransactionCard extends ConsumerWidget {
             ],
           ),
           const SizedBox(height: 12),
+          if (donorName.isNotEmpty) ...[
+            _row("Name", donorName),
+            const Divider(),
+          ],
           _row("Type", type),
           const Divider(),
           _row("Date & time", date),

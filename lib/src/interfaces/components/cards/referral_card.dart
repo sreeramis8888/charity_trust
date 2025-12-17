@@ -76,7 +76,7 @@ class ReferralCard extends StatelessWidget {
                 children: [
                   Text(user.name ?? 'Unknown', style: kBodyTitleM),
                   const SizedBox(height: 4),
-                  Text(user.area ?? 'N/A',
+                  Text(user.area ?? 'Unkown Area',
                       style: kSmallTitleL.copyWith(color: kSecondaryTextColor)),
                   const SizedBox(height: 2),
                   Text(user.phone ?? 'N/A',

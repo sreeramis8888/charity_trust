@@ -605,7 +605,7 @@ final class CreateNewUserProvider extends $FunctionalProvider<
   }
 }
 
-String _$createNewUserHash() => r'776f4a1141b3bcbe3d6bafc6b3d5ab8c42a68a0e';
+String _$createNewUserHash() => r'de066e622c32944a86db20e1ce300c681f984a5a';
 
 final class CreateNewUserFamily extends $Family
     with

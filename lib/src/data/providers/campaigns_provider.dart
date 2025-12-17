@@ -23,7 +23,7 @@ class CampaignsApi {
     final queryParams = {
       'page_no': pageNo,
       'limit': limit,
-      'status': 'active',
+      if (!myCampaigns)  'status': 'active',
       if (myCampaigns) 'my_campaigns': true,
     };
 
@@ -73,6 +73,24 @@ class CampaignsApi {
 
     return await _apiProvider.get(
       '$_donationEndpoint/participated-campaigns?$queryString',
+      requireAuth: true,
+    );
+  }
+
+  Future<ApiResponse<Map<String, dynamic>>> getMemberDonations({
+    int pageNo = 1,
+    int limit = 10,
+  }) async {
+    final queryParams = {
+      'page_no': pageNo,
+      'limit': limit,
+    };
+
+    final queryString =
+        queryParams.entries.map((e) => '${e.key}=${e.value}').join('&');
+
+    return await _apiProvider.get(
+      '$_donationEndpoint/member-donations?$queryString',
       requireAuth: true,
     );
   }
@@ -146,6 +164,18 @@ class MyCampaignsFilter extends _$MyCampaignsFilter {
 
   void setFilter(bool myCampaigns) {
     state = myCampaigns;
+  }
+}
+
+@riverpod
+class TransactionsFilter extends _$TransactionsFilter {
+  @override
+  bool build() {
+    return false; // false = User transactions, true = Member transactions
+  }
+
+  void setFilter(bool isMemberTransactions) {
+    state = isMemberTransactions;
   }
 }
 
@@ -429,6 +459,81 @@ class ParticipatedCampaignsNotifier extends _$ParticipatedCampaignsNotifier {
         );
       } else {
         throw Exception(response.message ?? 'Failed to load more donations');
+      }
+    });
+  }
+
+  Future<void> refresh() async {
+    state = const AsyncValue.loading();
+    state = await AsyncValue.guard(() => build());
+  }
+}
+
+@riverpod
+class MemberDonationsNotifier extends _$MemberDonationsNotifier {
+  @override
+  Future<DonationPaginationState> build() async {
+    final campaignsApi = ref.watch(campaignsApiProvider);
+    final response = await campaignsApi.getMemberDonations(
+      pageNo: 1,
+      limit: 10,
+    );
+
+    if (response.success && response.data != null) {
+      final donationsList = (response.data!['data'] as List<dynamic>?)
+              ?.map((item) =>
+                  DonationModel.fromJson(item as Map<String, dynamic>))
+              .toList() ??
+          [];
+      final totalCountValue = response.data!['total_count'];
+      final totalCount = totalCountValue is int
+          ? totalCountValue
+          : int.tryParse(totalCountValue.toString()) ?? 0;
+
+      return DonationPaginationState(
+        currentPage: 1,
+        limit: 10,
+        totalCount: totalCount,
+        donations: donationsList,
+      );
+    } else {
+      throw Exception(response.message ?? 'Failed to fetch member donations');
+    }
+  }
+
+  Future<void> loadNextPage() async {
+    if (!state.hasValue) return;
+
+    final currentState = state.value!;
+    if (!currentState.hasMore) return;
+
+    state = const AsyncValue.loading();
+    state = await AsyncValue.guard(() async {
+      final campaignsApi = ref.watch(campaignsApiProvider);
+      final nextPage = currentState.currentPage + 1;
+      final response = await campaignsApi.getMemberDonations(
+        pageNo: nextPage,
+        limit: currentState.limit,
+      );
+
+      if (response.success && response.data != null) {
+        final donationsList = (response.data!['data'] as List<dynamic>?)
+                ?.map((item) =>
+                    DonationModel.fromJson(item as Map<String, dynamic>))
+                .toList() ??
+            [];
+        final totalCountValue = response.data!['total_count'];
+        final totalCount = totalCountValue is int
+            ? totalCountValue
+            : int.tryParse(totalCountValue.toString()) ?? 0;
+
+        return currentState.copyWith(
+          currentPage: nextPage,
+          totalCount: totalCount,
+          donations: [...currentState.donations, ...donationsList],
+        );
+      } else {
+        throw Exception(response.message ?? 'Failed to load more member donations');
       }
     });
   }

@@ -271,7 +271,6 @@ class ProfilePage extends ConsumerWidget {
         message: 'Are you sure you want to logout?',
         confirmButtonText: 'Logout',
         onConfirm: () {
-          Navigator.of(dialogContext).pop();
           _performLogout(context, ref);
         },
       ),
