@@ -5,8 +5,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 
 import '../../data/constants/color_constants.dart';
+import '../../data/constants/style_constants.dart';
 import '../../data/services/navigation_service.dart';
 import '../../data/providers/auth_provider.dart';
 import '../../data/providers/user_provider.dart';
@@ -88,9 +90,9 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
       // Check version first
       await _checkAppVersion();
 
-      // If update is required and forced, show dialog and don't proceed
-      if (isAppUpdateRequired && forceUpdate) {
-        log('_initializeApp: Force update required, stopping initialization',
+      // If update is required (forced or optional), stop initialization and stay on splash
+      if (isAppUpdateRequired) {
+        log('_initializeApp: Update required, stopping initialization and staying on splash',
             name: 'SplashScreen');
         return;
       }
@@ -112,25 +114,38 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
       final versionResponse = await versionCheckService.checkVersion();
 
       if (versionResponse != null) {
-        log('_checkAppVersion: Version response received - force: ${versionResponse.force}, version: ${versionResponse.version}',
-            name: 'SplashScreen');
-        setState(() {
-          isAppUpdateRequired = true;
-          forceUpdate = versionResponse.force;
-          errorMessage = versionResponse.updateMessage;
-          updateLink = versionResponse.applink;
-        });
-        log('_checkAppVersion: State updated - isAppUpdateRequired: $isAppUpdateRequired, forceUpdate: $forceUpdate',
+        // Get current app version
+        final packageInfo = await PackageInfo.fromPlatform();
+        final currentVersion = int.tryParse(packageInfo.buildNumber) ?? 0;
+        final newVersion = versionResponse.version;
+
+        log('_checkAppVersion: Version comparison - Current: $currentVersion, New: $newVersion, Force: ${versionResponse.force}',
             name: 'SplashScreen');
 
-        if (forceUpdate) {
-          log('_checkAppVersion: Showing force update dialog',
+        // Only show update if new version is greater than current version
+        if (newVersion > currentVersion) {
+          setState(() {
+            isAppUpdateRequired = true;
+            forceUpdate = versionResponse.force;
+            errorMessage = versionResponse.updateMessage;
+            updateLink = versionResponse.applink;
+            hasVersionCheckError = false;
+          });
+          log('_checkAppVersion: State updated - isAppUpdateRequired: $isAppUpdateRequired, forceUpdate: $forceUpdate',
               name: 'SplashScreen');
-          _showForceUpdateDialog();
+
+          if (forceUpdate) {
+            log('_checkAppVersion: Showing force update dialog',
+                name: 'SplashScreen');
+            _showForceUpdateDialog();
+          } else {
+            log('_checkAppVersion: Showing optional update dialog',
+                name: 'SplashScreen');
+            _showOptionalUpdateDialog();
+          }
         } else {
-          log('_checkAppVersion: Showing optional update dialog',
+          log('_checkAppVersion: App is up to date. Current: $currentVersion, New: $newVersion',
               name: 'SplashScreen');
-          _showOptionalUpdateDialog();
         }
       } else {
         log('_checkAppVersion: No version response received',
@@ -138,60 +153,166 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
       }
     } catch (e) {
       log('Error checking version: $e', name: 'SplashScreen');
+      setState(() {
+        hasVersionCheckError = true;
+        errorMessage = 'Server is down. Please try again later.';
+        isAppUpdateRequired = true;
+      });
     }
   }
 
   void _showForceUpdateDialog() {
-    log('_showForceUpdateDialog: Displaying force update dialog',
+    log('_showForceUpdateDialog: Displaying force update dialog - Current version: $errorMessage',
         name: 'SplashScreen');
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (context) => AlertDialog(
-        title: const Text('Update Required'),
-        content: Text(errorMessage),
-        actions: [
-          TextButton(
-            onPressed: () {
-              log('_showForceUpdateDialog: User tapped Update Now',
-                  name: 'SplashScreen');
-              _openAppStore();
-            },
-            child: const Text('Update Now'),
+      builder: (context) => Dialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        backgroundColor: kWhite,
+        child: Padding(
+          padding: const EdgeInsets.all(24.0),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: kPrimaryColor.withOpacity(0.1),
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(
+                  Icons.system_update,
+                  color: kPrimaryColor,
+                  size: 32,
+                ),
+              ),
+              const SizedBox(height: 16),
+              Text(
+                'Update Required',
+                style: kHeadTitleB.copyWith(color: kTextColor),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 12),
+              Text(
+                errorMessage,
+                style: kBodyTitleR.copyWith(color: kSecondaryTextColor),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 24),
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: () {
+                    log('_showForceUpdateDialog: User tapped Update Now',
+                        name: 'SplashScreen');
+                    _openAppStore();
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: kPrimaryColor,
+                    padding: const EdgeInsets.symmetric(vertical: 12),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                  ),
+                  child: Text(
+                    'Update Now',
+                    style: kBodyTitleM.copyWith(color: kWhite),
+                  ),
+                ),
+              ),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }
 
   void _showOptionalUpdateDialog() {
-    log('_showOptionalUpdateDialog: Displaying optional update dialog',
+    log('_showOptionalUpdateDialog: Displaying optional update dialog - Current version: $errorMessage',
         name: 'SplashScreen');
     showDialog(
       context: context,
-      barrierDismissible: true,
-      builder: (context) => AlertDialog(
-        title: const Text('Update Available'),
-        content: Text(errorMessage),
-        actions: [
-          TextButton(
-            onPressed: () {
-              log('_showOptionalUpdateDialog: User tapped Later',
-                  name: 'SplashScreen');
-              Navigator.pop(context);
-              _checkAuthenticationAndLoadUser();
-            },
-            child: const Text('Later'),
+      barrierDismissible: false,
+      builder: (context) => Dialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        backgroundColor: kWhite,
+        child: Padding(
+          padding: const EdgeInsets.all(24.0),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: kThirdTextColor.withOpacity(0.1),
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(
+                  Icons.cloud_download_outlined,
+                  color: kThirdTextColor,
+                  size: 32,
+                ),
+              ),
+              const SizedBox(height: 16),
+              Text(
+                'Update Available',
+                style: kHeadTitleB.copyWith(color: kTextColor),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 12),
+              Text(
+                errorMessage,
+                style: kBodyTitleR.copyWith(color: kSecondaryTextColor),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 24),
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: () {
+                    log('_showOptionalUpdateDialog: User tapped Update',
+                        name: 'SplashScreen');
+                    _openAppStore();
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: kThirdTextColor,
+                    padding: const EdgeInsets.symmetric(vertical: 12),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                  ),
+                  child: Text(
+                    'Update',
+                    style: kBodyTitleM.copyWith(color: kWhite),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 12),
+              SizedBox(
+                width: double.infinity,
+                child: OutlinedButton(
+                  onPressed: () {
+                    log('_showOptionalUpdateDialog: User tapped Later, staying on splash',
+                        name: 'SplashScreen');
+                    Navigator.pop(context);
+                  },
+                  style: OutlinedButton.styleFrom(
+                    side: BorderSide(color: kBorder, width: 1.5),
+                    padding: const EdgeInsets.symmetric(vertical: 12),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                  ),
+                  child: Text(
+                    'Later',
+                    style: kBodyTitleM.copyWith(color: kTextColor),
+                  ),
+                ),
+              ),
+            ],
           ),
-          TextButton(
-            onPressed: () {
-              log('_showOptionalUpdateDialog: User tapped Update',
-                  name: 'SplashScreen');
-              _openAppStore();
-            },
-            child: const Text('Update'),
-          ),
-        ],
+        ),
       ),
     );
   }

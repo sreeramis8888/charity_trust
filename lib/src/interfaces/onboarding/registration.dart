@@ -576,8 +576,7 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
                                   child: SizedBox(
                                     height: 20,
                                     width: 20,
-                                    child: CircularProgressIndicator(
-                                        strokeWidth: 2),
+                                    child: LoadingAnimation(),
                                   ),
                                 ),
                               ),
@@ -697,8 +696,7 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
                                     child: SizedBox(
                                       height: 20,
                                       width: 20,
-                                      child: CircularProgressIndicator(
-                                          strokeWidth: 2),
+                                      child: LoadingAnimation( ),
                                     ),
                                   ),
                                 ),
@@ -819,8 +817,7 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
                                     child: SizedBox(
                                       height: 20,
                                       width: 20,
-                                      child: CircularProgressIndicator(
-                                          strokeWidth: 2),
+                                      child: LoadingAnimation( ),
                                     ),
                                   ),
                                 ),
@@ -1125,7 +1122,12 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
                                 onFetch: (search, page) async {
                                   final params = UsersListParams(
                                     roles: recommendedByType == 'trustee'
-                                        ? ['trustee', 'president', 'secretary', 'treasurer']
+                                        ? [
+                                            'trustee',
+                                            'president',
+                                            'secretary',
+                                            'treasurer'
+                                          ]
                                         : ['member'],
                                     pageNo: page,
                                     search: search.isEmpty ? null : search,

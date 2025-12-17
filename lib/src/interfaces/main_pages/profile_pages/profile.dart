@@ -1,6 +1,7 @@
 import 'package:Annujoom/src/data/constants/color_constants.dart';
 import 'package:Annujoom/src/data/constants/style_constants.dart';
 import 'package:Annujoom/src/interfaces/animations/index.dart' as anim;
+import 'package:Annujoom/src/interfaces/components/loading_indicator.dart';
 import 'package:Annujoom/src/interfaces/main_pages/profile_pages/my_participations.dart';
 import 'package:Annujoom/src/interfaces/main_pages/profile_pages/about_us.dart';
 import 'package:Annujoom/src/interfaces/main_pages/referrals/my_referrals_page.dart';
@@ -54,7 +55,8 @@ class ProfilePage extends ConsumerWidget {
                       color: kWhite,
                       borderRadius: BorderRadius.circular(22),
                     ),
-                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 14, vertical: 10),
                     child: Row(
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
@@ -86,7 +88,6 @@ class ProfilePage extends ConsumerWidget {
 
                         const SizedBox(width: 10),
 
-                        /// User info (safe for long text)
                         Expanded(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -116,8 +117,9 @@ class ProfilePage extends ConsumerWidget {
                                   ],
                                 ],
                               ),
-
-                              /// Phone
+                              SizedBox(
+                                height: 10,
+                              ),
                               Text(
                                 userPhone,
                                 style: kBodyTitleR.copyWith(
@@ -277,7 +279,7 @@ class ProfilePage extends ConsumerWidget {
           );
         },
         loading: () => const Center(
-          child: CircularProgressIndicator(),
+          child: LoadingAnimation(),
         ),
         error: (error, stackTrace) => Center(
           child: Text('Error loading profile: $error'),

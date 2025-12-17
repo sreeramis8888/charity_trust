@@ -15,7 +15,7 @@ class VersionCheckService {
   Future<AppVersionResponse?> checkVersion() async {
     try {
       final response = await _apiProvider.get(
-        '/app/version-check',
+        '/settings',
         requireAuth: false,
       );
 

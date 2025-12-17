@@ -75,6 +75,7 @@ dependencies:
   open_file: ^3.5.10
   flutter_launcher_icons: ^0.14.4
   flutter_expandable_fab: ^2.5.2
+  package_info_plus: ^8.0.0
 
 dev_dependencies:
   flutter_test:

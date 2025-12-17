@@ -577,7 +577,7 @@ class _CreateUserPageState extends ConsumerState<CreateUserPage> {
                     child: SizedBox(
                       height: 20,
                       width: 20,
-                      child: CircularProgressIndicator(strokeWidth: 2),
+                      child: LoadingAnimation(),
                     ),
                   ),
                 ),
@@ -692,7 +692,7 @@ class _CreateUserPageState extends ConsumerState<CreateUserPage> {
                     child: SizedBox(
                       height: 20,
                       width: 20,
-                      child: CircularProgressIndicator(strokeWidth: 2),
+                      child: LoadingAnimation( ),
                     ),
                   ),
                 ),
@@ -803,7 +803,7 @@ class _CreateUserPageState extends ConsumerState<CreateUserPage> {
                     child: SizedBox(
                       height: 20,
                       width: 20,
-                      child: CircularProgressIndicator(strokeWidth: 2),
+                      child: LoadingAnimation(),
                     ),
                   ),
                 ),
