@@ -208,7 +208,8 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
         'state': selectedStateName ?? selectedStateCode,
         'district': selectedDistrictName ?? selectedDistrictCode,
         'pincode': pincodeController.text.trim(),
-        'aadhar_number': int.parse(aadharNumberController.text.trim()),
+        if (aadharNumberController.text.trim().isNotEmpty)
+          'aadhar_number': int.parse(aadharNumberController.text.trim()),
         'image': profilePictureUrl,
         'gender': selectedGender,
         'whatsapp_number': whatsappNumber,
@@ -876,7 +877,18 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
                           type: CustomFieldType.number,
                           hint: "Enter Aadhar number",
                           controller: aadharNumberController,
-                          validator: Validators.validateAadharNumber,
+                          validator: (v) {
+                            if (v == null || v.isEmpty) {
+                              return null; // Optional field
+                            }
+                            if (v.length != 12) {
+                              return 'Aadhar number must be 12 digits';
+                            }
+                            if (!RegExp(r'^\d{12}$').hasMatch(v)) {
+                              return 'Aadhar number must contain only digits';
+                            }
+                            return null;
+                          },
                         ),
                       ),
                       const SizedBox(height: 20),

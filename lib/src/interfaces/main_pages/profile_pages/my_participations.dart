@@ -106,7 +106,8 @@ class _MyParticipationsPageState extends ConsumerState<MyParticipationsPage>
                 padding: const EdgeInsets.only(right: 16),
                 child: Center(
                   child: FutureBuilder<String?>(
-                    future: secureStorage.getUserData().then((user) => user?.role),
+                    future:
+                        secureStorage.getUserData().then((user) => user?.role),
                     builder: (context, snapshot) {
                       final isAdmin = snapshot.data != 'member';
                       if (!isAdmin) {
@@ -135,47 +136,49 @@ class _MyParticipationsPageState extends ConsumerState<MyParticipationsPage>
                 ),
               ),
             ],
-        bottom: PreferredSize(
-          preferredSize: Size.fromHeight(48),
-          child: Container(
-            decoration: BoxDecoration(
-              color: kWhite,
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.08),
-                  blurRadius: 8,
-                  offset: Offset(0, 4),
+            bottom: PreferredSize(
+              preferredSize: Size.fromHeight(48),
+              child: Container(
+                decoration: BoxDecoration(
+                  color: kWhite,
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.08),
+                      blurRadius: 8,
+                      offset: Offset(0, 4),
+                    ),
+                  ],
                 ),
-              ],
-            ),
-            child: TabBar(
-              indicatorSize: TabBarIndicatorSize.tab,
-              labelStyle: kSmallTitleR,
-              controller: _controller,
-              labelColor: kPrimaryColor,
-              unselectedLabelColor: kSecondaryTextColor,
-              indicator: UnderlineTabIndicator(
-                borderSide: BorderSide(
-                  color: kPrimaryColor,
-                  width: 3,
+                child: TabBar(
+                  indicatorSize: TabBarIndicatorSize.tab,
+                  labelStyle: kSmallTitleR,
+                  controller: _controller,
+                  labelColor: kPrimaryColor,
+                  unselectedLabelColor: kSecondaryTextColor,
+                  indicator: UnderlineTabIndicator(
+                    borderSide: BorderSide(
+                      color: kPrimaryColor,
+                      width: 3,
+                    ),
+                    insets: EdgeInsets.zero,
+                  ),
+                  tabs: [
+                    Tab(
+                        text:
+                            isNonMember ? "Transactions" : "Your Transactions"),
+                    Tab(text: isNonMember ? "My Campaigns" : "My Campaigns"),
+                  ],
                 ),
-                insets: EdgeInsets.zero,
               ),
-              tabs: [
-                Tab(text: isNonMember ? "Member Transactions" : "Your Transactions"),
-                Tab(text: isNonMember ? "My Campaigns" : "My Campaigns"),
-              ],
             ),
           ),
-        ),
-      ),
-      body: TabBarView(
-        controller: _controller,
-        children: [
-          _yourTransactionsTab(),
-          _myCampaignsTab(),
-        ],
-      ),
+          body: TabBarView(
+            controller: _controller,
+            children: [
+              _yourTransactionsTab(),
+              _myCampaignsTab(),
+            ],
+          ),
         );
       },
     );
@@ -201,9 +204,12 @@ class _MyParticipationsPageState extends ConsumerState<MyParticipationsPage>
                   final userName = nameSnapshot.data ?? 'User';
                   return ChoiceChipFilter(
                     options: [userName, 'Member Transactions'],
-                    selectedOption: currentFilter ? 'Member Transactions' : userName,
+                    selectedOption:
+                        currentFilter ? 'Member Transactions' : userName,
                     onSelectionChanged: (selected) {
-                      ref.read(transactionsFilterProvider.notifier).setFilter(selected == 'Member Transactions');
+                      ref
+                          .read(transactionsFilterProvider.notifier)
+                          .setFilter(selected == 'Member Transactions');
                     },
                   );
                 },

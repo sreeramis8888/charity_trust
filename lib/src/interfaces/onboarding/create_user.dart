@@ -150,7 +150,8 @@ class _CreateUserPageState extends ConsumerState<CreateUserPage> {
         'state': selectedStateName ?? selectedStateCode,
         'district': selectedDistrictName ?? selectedDistrictCode,
         'pincode': pincodeController.text.trim(),
-        'aadhar_number': int.parse(aadharNumberController.text.trim()),
+        if (aadharNumberController.text.trim().isNotEmpty)
+          'aadhar_number': int.parse(aadharNumberController.text.trim()),
         'image': profilePictureUrl,
         'gender': selectedGender,
         'dob': formattedDob,
@@ -761,7 +762,7 @@ class _CreateUserPageState extends ConsumerState<CreateUserPage> {
           animationType: anim.AnimationType.fadeSlideInFromLeft,
           duration: anim.AnimationDuration.normal,
           delayMilliseconds: 1000,
-          child: Text("Aadhar Number *", style: kSmallTitleR),
+          child: Text("Aadhar Number", style: kSmallTitleR),
         ),
         const SizedBox(height: 6),
         anim.AnimatedWidgetWrapper(
@@ -773,7 +774,18 @@ class _CreateUserPageState extends ConsumerState<CreateUserPage> {
             type: CustomFieldType.number,
             hint: "Enter Aadhar number",
             controller: aadharNumberController,
-            validator: Validators.validateAadharNumber,
+            validator: (v) {
+              if (v == null || v.isEmpty) {
+                return null; // Optional field
+              }
+              if (v.length != 12) {
+                return 'Aadhar number must be 12 digits';
+              }
+              if (!RegExp(r'^\d{12}$').hasMatch(v)) {
+                return 'Aadhar number must contain only digits';
+              }
+              return null;
+            },
           ),
         ),
       ],

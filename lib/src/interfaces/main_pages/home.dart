@@ -352,12 +352,12 @@ class _HomePageState extends ConsumerState<HomePage> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Hello, $userName!',
+                          'Assalamualaikkum, $userName!',
                           style: kHeadTitleSB.copyWith(
                               fontSize: 20, color: kThirdTextColor),
                         ),
                         Text(
-                          "Let's empowering lives through kindness",
+                          "Connect, Contribute, Make a Difference",
                           style: kSmallTitleL.copyWith(color: kThirdTextColor),
                         ),
                       ],
