@@ -41,11 +41,6 @@ class _AddCampaignPageState extends ConsumerState<AddCampaignPage> {
 
   final List<String> campaignCategories = [
     'General Campaign',
-    'General Funding',
-    'Zakat',
-    'Orphan',
-    'Widow',
-    'Ghusl Mayyit',
   ];
 
   final Map<String, GlobalKey> _fieldKeys = {

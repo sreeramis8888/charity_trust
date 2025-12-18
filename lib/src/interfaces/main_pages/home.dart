@@ -37,6 +37,7 @@ class _HomePageState extends ConsumerState<HomePage> {
   late CarouselSliderController _categoryCarouselController;
   int _completedCampaignIndex = 0;
   int _videoIndex = 0;
+  int _endingCampaignIndex = 0;
   bool _imagesPrecached = false;
   final _expandableFabKey = GlobalKey<ExpandableFabState>();
 
@@ -689,7 +690,7 @@ class _HomePageState extends ConsumerState<HomePage> {
                   );
                 },
               ),
-              if (homeData.endingCampaign != null)
+              if (homeData.endingCampaigns.isNotEmpty)
                 Padding(
                   padding: const EdgeInsets.all(16),
                   child: Column(
@@ -713,51 +714,65 @@ class _HomePageState extends ConsumerState<HomePage> {
                         ],
                       ),
                       const SizedBox(height: 12),
-                      Padding(
-                        padding: const EdgeInsets.only(bottom: 16),
-                        child: HomeGradientCampaignCard(
-                          title: homeData.endingCampaign!.title ?? '',
-                          description:
-                              homeData.endingCampaign!.description ?? '',
-                          image: homeData.endingCampaign!.coverImage ?? '',
-                          raised: homeData.endingCampaign!.collectedAmount
-                                  ?.toInt() ??
-                              0,
-                          goal:
-                              homeData.endingCampaign!.targetAmount?.toInt() ??
-                                  0,
-                          dueDate: homeData.endingCampaign!.targetDate
-                                  ?.toString()
-                                  .split(' ')[0] ??
-                              '',
-                          category: homeData.endingCampaign!.category ?? '',
-                          onViewDetails: () {
-                            Navigator.of(context).pushNamed(
-                              'CampaignDetail',
-                              arguments: {
-                                '_id': homeData.endingCampaign!.id ?? '',
-                                'title': homeData.endingCampaign!.title ?? '',
-                                'description':
-                                    homeData.endingCampaign!.description ?? '',
-                                'category':
-                                    homeData.endingCampaign!.category ?? '',
-                                'date': homeData.endingCampaign!.targetDate
+                      SizedBox(
+                        height: 280,
+                        child: CarouselSlider(
+                          options: CarouselOptions(
+                            height: 280,
+                            viewportFraction: 1,
+                            enableInfiniteScroll: true,
+                            autoPlay: false,
+                            onPageChanged: (index, reason) {
+                              setState(() => _endingCampaignIndex = index);
+                            },
+                          ),
+                          items: homeData.endingCampaigns.map((campaign) {
+                            return Padding(
+                              padding: const EdgeInsets.only(bottom: 16),
+                              child: HomeGradientCampaignCard(
+                                title: campaign.title,
+                                description: campaign.description,
+                                image: campaign.coverImage,
+                                raised: campaign.collectedAmount.toInt(),
+                                goal: campaign.targetAmount.toInt(),
+                                dueDate: campaign.targetDate
                                         ?.toString()
                                         .split(' ')[0] ??
                                     '',
-                                'image':
-                                    homeData.endingCampaign!.coverImage ?? '',
-                                'raised': homeData
-                                        .endingCampaign!.collectedAmount
-                                        ?.toInt() ??
-                                    0,
-                                'goal': homeData.endingCampaign!.targetAmount
-                                        ?.toInt() ??
-                                    0,
-                              },
+                                category: campaign.category,
+                                onViewDetails: () {
+                                  Navigator.of(context).pushNamed(
+                                    'CampaignDetail',
+                                    arguments: {
+                                      '_id': campaign.id ?? '',
+                                      'title': campaign.title,
+                                      'description': campaign.description,
+                                      'category': campaign.category,
+                                      'date': campaign.targetDate
+                                              ?.toString()
+                                              .split(' ')[0] ??
+                                          '',
+                                      'image': campaign.coverImage,
+                                      'raised': campaign.collectedAmount.toInt(),
+                                      'goal': campaign.targetAmount.toInt(),
+                                    },
+                                  );
+                                },
+                                onDonate: () {},
+                              ),
                             );
-                          },
-                          onDonate: () {},
+                          }).toList(),
+                        ),
+                      ),
+                      const SizedBox(height: 14),
+                      Center(
+                        child: PageViewDotIndicator(
+                          size: Size(8, 8),
+                          unselectedSize: Size(7, 7),
+                          currentItem: _endingCampaignIndex,
+                          count: homeData.endingCampaigns.length,
+                          unselectedColor: Color(0xFFAEB9E1),
+                          selectedColor: Color(0xFF0D74BC),
                         ),
                       ),
                     ],

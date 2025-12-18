@@ -29,7 +29,7 @@ HomeApi homeApi(Ref ref) {
 }
 
 class HomePageData {
-  final CampaignModel? endingCampaign;
+  final List<CampaignModel> endingCampaigns;
   final List<NewsModel> latestNews;
   final List<Promotions> posterPromotions;
   final List<Promotions> videoPromotions;
@@ -37,7 +37,7 @@ class HomePageData {
   final int pendingReferrals;
 
   HomePageData({
-    this.endingCampaign,
+    required this.endingCampaigns,
     required this.latestNews,
     required this.posterPromotions,
     required this.videoPromotions,
@@ -46,7 +46,7 @@ class HomePageData {
   });
 
   HomePageData copyWith({
-    CampaignModel? endingCampaign,
+    List<CampaignModel>? endingCampaigns,
     List<NewsModel>? latestNews,
     List<Promotions>? posterPromotions,
     List<Promotions>? videoPromotions,
@@ -54,7 +54,7 @@ class HomePageData {
     int? pendingReferrals,
   }) {
     return HomePageData(
-      endingCampaign: endingCampaign ?? this.endingCampaign,
+      endingCampaigns: endingCampaigns ?? this.endingCampaigns,
       latestNews: latestNews ?? this.latestNews,
       posterPromotions: posterPromotions ?? this.posterPromotions,
       videoPromotions: videoPromotions ?? this.videoPromotions,
@@ -72,10 +72,10 @@ Future<HomePageData> homePageData(Ref ref) async {
   if (response.success && response.data != null) {
     final data = response.data!['data'] as Map<String, dynamic>?;
 
-    final endingCampaign = data?['ending_campaign'] != null
-        ? CampaignModel.fromJson(
-            data!['ending_campaign'] as Map<String, dynamic>)
-        : null;
+    final endingCampaigns = (data?['ending_campaigns'] as List<dynamic>?)
+            ?.map((item) => CampaignModel.fromJson(item as Map<String, dynamic>))
+            .toList() ??
+        [];
 
     final latestNews = (data?['latest_news'] as List<dynamic>?)
             ?.map((item) => NewsModel.fromJson(item as Map<String, dynamic>))
@@ -96,7 +96,7 @@ Future<HomePageData> homePageData(Ref ref) async {
     final pendingReferrals = data?['pending_referrals'] as int? ?? 0;
 
     return HomePageData(
-      endingCampaign: endingCampaign,
+      endingCampaigns: endingCampaigns,
       latestNews: latestNews,
       posterPromotions: posterPromotions,
       videoPromotions: videoPromotions,
@@ -118,10 +118,10 @@ class HomePageNotifier extends _$HomePageNotifier {
     if (response.success && response.data != null) {
       final data = response.data!['data'] as Map<String, dynamic>?;
 
-      final endingCampaign = data?['ending_campaign'] != null
-          ? CampaignModel.fromJson(
-              data!['ending_campaign'] as Map<String, dynamic>)
-          : null;
+      final endingCampaigns = (data?['ending_campaigns'] as List<dynamic>?)
+              ?.map((item) => CampaignModel.fromJson(item as Map<String, dynamic>))
+              .toList() ??
+          [];
 
       final latestNews = (data?['latest_news'] as List<dynamic>?)
               ?.map((item) => NewsModel.fromJson(item as Map<String, dynamic>))
@@ -142,7 +142,7 @@ class HomePageNotifier extends _$HomePageNotifier {
       final pendingReferrals = data?['pending_referrals'] as int? ?? 0;
 
       return HomePageData(
-        endingCampaign: endingCampaign,
+        endingCampaigns: endingCampaigns,
         latestNews: latestNews,
         posterPromotions: posterPromotions,
         videoPromotions: videoPromotions,
