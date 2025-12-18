@@ -55,11 +55,11 @@ class _HomePageState extends ConsumerState<HomePage> {
 
   void _precacheImages() {
     final categoryImages = [
-      'assets/jpg/general_campaign.jpg',
+      'assets/png/general_campaign.png',
       'assets/jpg/general_funding.jpg',
-      'assets/jpg/zakat.jpg',
+      'assets/png/zakat.png',
       'assets/jpg/orphan.jpg',
-      'assets/jpg/widow.jpg',
+      'assets/png/widow.png',
       'assets/png/ghusal_mayyt.png',
     ];
     for (var image in categoryImages) {
@@ -387,7 +387,7 @@ class _HomePageState extends ConsumerState<HomePage> {
                         items: [
                           {
                             'title': 'General\nCampaign',
-                            'image': 'assets/jpg/general_campaign.jpg',
+                            'image': 'assets/png/general_campaign.png',
                             'category': 'General Campaign'
                           },
                           {
@@ -397,7 +397,7 @@ class _HomePageState extends ConsumerState<HomePage> {
                           },
                           {
                             'title': 'Zakat',
-                            'image': 'assets/jpg/zakat.jpg',
+                            'image': 'assets/png/zakat.png',
                             'category': 'Zakat'
                           },
                           {
@@ -407,7 +407,7 @@ class _HomePageState extends ConsumerState<HomePage> {
                           },
                           {
                             'title': 'Widow',
-                            'image': 'assets/jpg/widow.jpg',
+                            'image': 'assets/png/widow.png',
                             'category': 'Widow'
                           },
                           {

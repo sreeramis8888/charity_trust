@@ -82,7 +82,8 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
 
   Future<void> _initializeApp() async {
     try {
-      log('_initializeApp: Starting notification permissions', name: 'SplashScreen');
+      log('_initializeApp: Starting notification permissions',
+          name: 'SplashScreen');
       // Request notification permissions first
       await handleNotificationPermissions(context, ref);
 
@@ -375,6 +376,12 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
           await secureStorage.saveUserData(user);
           log('_checkAuthenticationAndLoadUser: User data saved to secure storage',
               name: 'SplashScreen');
+
+          if (mounted) {
+            log('_checkAuthenticationAndLoadUser: Widget mounted, navigating based on API status: ${user.status}',
+                name: 'SplashScreen');
+            _navigateBasedOnUserStatus(user.status);
+          }
         } else {
           log('_checkAuthenticationAndLoadUser: Failed to fetch user profile from API, trying local storage',
               name: 'SplashScreen');
@@ -384,16 +391,21 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
           if (user != null) {
             log('_checkAuthenticationAndLoadUser: User loaded from secure storage - id: ${user.id}, status: ${user.status}',
                 name: 'SplashScreen');
-          }
-        }
+            log('WARNING: Using cached user data from secure storage instead of fresh API data',
+                name: 'SplashScreen');
 
-        if (mounted) {
-          log('_checkAuthenticationAndLoadUser: Widget mounted, navigating based on status: ${user?.status}',
-              name: 'SplashScreen');
-          _navigateBasedOnUserStatus(user?.status);
-        } else {
-          log('_checkAuthenticationAndLoadUser: Widget not mounted, skipping navigation',
-              name: 'SplashScreen');
+            if (mounted) {
+              log('_checkAuthenticationAndLoadUser: Widget mounted, navigating based on local storage status: ${user.status}',
+                  name: 'SplashScreen');
+              _navigateBasedOnUserStatus(user.status);
+            }
+          } else {
+            log('_checkAuthenticationAndLoadUser: No user data in secure storage either, navigating to Phone',
+                name: 'SplashScreen');
+            if (mounted) {
+              NavigationService().pushNamedAndRemoveUntil('Phone');
+            }
+          }
         }
       } else {
         log('_checkAuthenticationAndLoadUser: User is not authenticated, starting navigation timer to Phone screen',

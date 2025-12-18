@@ -5,6 +5,7 @@ import 'package:Annujoom/src/interfaces/components/loading_indicator.dart';
 import 'package:Annujoom/src/interfaces/components/choice_chip_filter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:marquee/marquee.dart';
 import 'package:Annujoom/src/data/constants/color_constants.dart';
 import 'package:Annujoom/src/data/constants/style_constants.dart';
 import 'package:Annujoom/src/interfaces/animations/index.dart' as anim;
@@ -201,12 +202,12 @@ class _CampaignPageState extends ConsumerState<CampaignPage>
                 insets: EdgeInsets.zero,
               ),
               tabs: [
-                const Tab(
-                  text: "Campaign",
+                Tab(
+                  child: _buildMarqueeTab("Campaign"),
                 ),
-                const Tab(text: "Transactions"),
-                const Tab(text: "My Campaigns"),
-                if (_isPresident) const Tab(text: "Approvals"),
+                Tab(child: _buildMarqueeTab("Transactions")),
+                Tab(child: _buildMarqueeTab("My Campaigns")),
+                if (_isPresident) Tab(child: _buildMarqueeTab("Approvals")),
               ],
             ),
           ),
@@ -221,6 +222,23 @@ class _CampaignPageState extends ConsumerState<CampaignPage>
           if (_isPresident) _approvalsTab(),
         ],
       ),
+    );
+  }
+
+  Widget _buildMarqueeTab(String text) {
+    return Marquee(
+      text: text,
+      style: kSmallTitleR,
+      scrollAxis: Axis.horizontal,
+      crossAxisAlignment: CrossAxisAlignment.center,
+      blankSpace: 50.0,
+      velocity: 30.0,
+      pauseAfterRound: Duration(seconds: 2),
+      startPadding: 0.0,
+      accelerationDuration: Duration(seconds: 1),
+      accelerationCurve: Curves.linear,
+      decelerationDuration: Duration(milliseconds: 500),
+      decelerationCurve: Curves.easeOut,
     );
   }
 
@@ -312,9 +330,12 @@ class _CampaignPageState extends ConsumerState<CampaignPage>
                   final userName = nameSnapshot.data ?? 'User';
                   return ChoiceChipFilter(
                     options: [userName, 'Member Transactions'],
-                    selectedOption: currentFilter ? 'Member Transactions' : userName,
+                    selectedOption:
+                        currentFilter ? 'Member Transactions' : userName,
                     onSelectionChanged: (selected) {
-                      ref.read(transactionsFilterProvider.notifier).setFilter(selected == 'Member Transactions');
+                      ref
+                          .read(transactionsFilterProvider.notifier)
+                          .setFilter(selected == 'Member Transactions');
                     },
                   );
                 },
@@ -456,7 +477,9 @@ class _CampaignPageState extends ConsumerState<CampaignPage>
                 options: const ['Joined', 'Created'],
                 selectedOption: currentFilter ? 'Created' : 'Joined',
                 onSelectionChanged: (selected) {
-                  ref.read(myCampaignsFilterProvider.notifier).setFilter(selected == 'Created');
+                  ref
+                      .read(myCampaignsFilterProvider.notifier)
+                      .setFilter(selected == 'Created');
                 },
               ),
             Expanded(
@@ -684,7 +707,8 @@ class _CampaignPageState extends ConsumerState<CampaignPage>
                     );
                   },
                   onReject: () {
-                    _showRejectDialog(context, campaign.id ?? '', campaign.title ?? '');
+                    _showRejectDialog(
+                        context, campaign.id ?? '', campaign.title ?? '');
                   },
                 ),
               ),
@@ -711,7 +735,8 @@ class _CampaignPageState extends ConsumerState<CampaignPage>
     );
   }
 
-  void _showRejectDialog(BuildContext context, String campaignId, String campaignTitle) {
+  void _showRejectDialog(
+      BuildContext context, String campaignId, String campaignTitle) {
     final reasonController = TextEditingController();
     showDialog(
       context: context,

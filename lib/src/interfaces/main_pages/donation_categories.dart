@@ -12,7 +12,7 @@ class DonationCategoriesPage extends StatelessWidget {
     {
       'title': 'General Campaign',
       'subtitle': 'Donate for community initiatives and development',
-      'image': 'assets/jpg/general_campaign.jpg',
+      'image': 'assets/png/general_campaign.png',
       'category': 'General Campaign'
     },
     {
@@ -24,7 +24,7 @@ class DonationCategoriesPage extends StatelessWidget {
     {
       'title': 'Zakat',
       'subtitle': 'Fulfill religious duty by helping eligible people',
-      'image': 'assets/jpg/zakat.jpg',
+      'image': 'assets/png/zakat.png',
       'category': 'Zakat'
     },
     {
@@ -36,7 +36,7 @@ class DonationCategoriesPage extends StatelessWidget {
     {
       'title': 'Widow',
       'subtitle': 'Support widows with essential needs',
-      'image': 'assets/jpg/widow.jpg',
+      'image': 'assets/png/widow.png',
       'category': 'Widow'
     },
     {
