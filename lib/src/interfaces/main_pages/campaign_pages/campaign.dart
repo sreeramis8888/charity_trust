@@ -9,15 +9,9 @@ import 'package:marquee/marquee.dart';
 import 'package:Annujoom/src/data/constants/color_constants.dart';
 import 'package:Annujoom/src/data/constants/style_constants.dart';
 import 'package:Annujoom/src/interfaces/animations/index.dart' as anim;
-import 'package:Annujoom/src/data/providers/campaigns_provider.dart'
-    show
-        generalCampaignsProvider,
-        participatedCampaignsProvider,
-        pendingApprovalCampaignsProvider,
-        myCampaignsFilterProvider,
-        createdCampaignsProvider,
-        transactionsFilterProvider,
-        memberDonationsProvider;
+import 'package:Annujoom/src/data/providers/campaigns_provider.dart';
+import 'package:Annujoom/src/interfaces/components/input_field.dart';
+import 'package:Annujoom/src/interfaces/components/primaryButton.dart';
 import 'package:Annujoom/src/data/services/secure_storage_service.dart';
 import 'package:Annujoom/src/data/services/snackbar_service.dart';
 import 'package:Annujoom/src/interfaces/components/confirmation_dialog.dart';
@@ -40,11 +34,14 @@ class _CampaignPageState extends ConsumerState<CampaignPage>
   late ScrollController _createdCampaignsController;
   late ScrollController _joinedCampaignsController;
   late ScrollController _approvalsController;
+  late TextEditingController _searchController;
   bool _isPresident = false;
+  bool _categoryInitialized = false;
 
   @override
   void initState() {
     super.initState();
+    print('=== CampaignPage initState called ===');
     _controller = TabController(length: 3, vsync: this);
     _generalCampaignsController = ScrollController();
     _userTransactionsController = ScrollController();
@@ -52,6 +49,7 @@ class _CampaignPageState extends ConsumerState<CampaignPage>
     _createdCampaignsController = ScrollController();
     _joinedCampaignsController = ScrollController();
     _approvalsController = ScrollController();
+    _searchController = TextEditingController();
 
     _setupScrollController(
       _generalCampaignsController,
@@ -78,6 +76,41 @@ class _CampaignPageState extends ConsumerState<CampaignPage>
       () => ref.read(pendingApprovalCampaignsProvider.notifier).loadNextPage(),
     );
     _loadUserRole();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    print('=== didChangeDependencies called ===');
+    print('_categoryInitialized: $_categoryInitialized');
+
+    if (!_categoryInitialized) {
+      final args = ModalRoute.of(context)?.settings.arguments;
+      print('Route arguments: $args');
+
+      if (args is Map && args.containsKey('category')) {
+        final category = args['category'] as String;
+        print('Setting category to: $category');
+        // Use microtask to ensure the provider is updated after the first build
+        // starts watching it, which prevents immediate auto-disposal
+        Future.microtask(() {
+          if (mounted) {
+            print('Executing scheduled category initialization: $category');
+            ref
+                .read(campaignCategoryFilterProvider.notifier)
+                .setCategory(category);
+          }
+        });
+        _categoryInitialized = true;
+        print('Category initialization scheduled for: $category');
+      } else {
+        print('No category in arguments or args is null/not a map');
+        _categoryInitialized =
+            true; // Mark as initialized anyway to avoid re-checking
+      }
+    } else {
+      print('Category already initialized, skipping');
+    }
   }
 
   void _setupScrollController(
@@ -117,6 +150,7 @@ class _CampaignPageState extends ConsumerState<CampaignPage>
     _createdCampaignsController.dispose();
     _joinedCampaignsController.dispose();
     _approvalsController.dispose();
+    _searchController.dispose();
     super.dispose();
   }
 
@@ -245,68 +279,97 @@ class _CampaignPageState extends ConsumerState<CampaignPage>
   // ---------------- TAB 1 ---------------- //
   Widget _generalCampaignTab() {
     final campaignsState = ref.watch(generalCampaignsProvider);
+    final selectedCategory = ref.watch(campaignCategoryFilterProvider);
 
-    return campaignsState.when(
-      data: (paginationState) {
-        return ListView.builder(
-          padding: const EdgeInsets.all(16),
-          controller: _generalCampaignsController,
-          itemCount: paginationState.campaigns.length,
-          itemBuilder: (context, index) {
-            final campaign = paginationState.campaigns[index];
-            return Padding(
-              padding: const EdgeInsets.only(bottom: 16),
-              child: anim.AnimatedWidgetWrapper(
-                animationType: anim.AnimationType.fadeSlideInFromBottom,
-                duration: anim.AnimationDuration.normal,
-                delayMilliseconds: index * 50,
-                child: CampaignCard(
-                  id: campaign.id ?? '',
-                  description: campaign.description ?? '',
-                  title: campaign.title ?? '',
-                  category: campaign.category ?? '',
-                  date: formatDate(campaign.targetDate) ?? '',
-                  image: campaign.coverImage ?? '',
-                  raised: campaign.collectedAmount?.toInt() ?? 0,
-                  goal: campaign.targetAmount?.toInt() ?? 0,
-                  onDetails: () {
-                    Navigator.of(context).pushNamed(
-                      'CampaignDetail',
-                      arguments: {
-                        '_id': campaign.id ?? '',
-                        'title': campaign.title ?? '',
-                        'description': campaign.description ?? '',
-                        'category': campaign.category ?? '',
-                        'date': formatDate(campaign.targetDate) ?? '',
-                        'image': campaign.coverImage ?? '',
-                        'raised': campaign.collectedAmount?.toInt() ?? 0,
-                        'goal': campaign.targetAmount?.toInt() ?? 0,
-                      },
-                    );
-                  },
-                  onDonate: () {},
-                ),
-              ),
-            );
-          },
-        );
-      },
-      loading: () => const Center(child: LoadingAnimation()),
-      error: (error, stackTrace) => Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text('Error: $error'),
-            const SizedBox(height: 16),
-            ElevatedButton(
-              onPressed: () {
-                ref.read(generalCampaignsProvider.notifier).refresh();
-              },
-              child: const Text('Retry'),
-            ),
+    print('=== _generalCampaignTab rebuild ===');
+    print('selectedCategory from provider: $selectedCategory');
+
+    return Column(
+      children: [
+        ChoiceChipFilter(
+          options: const [
+            'All',
+            'General Campaign',
+            'General Funding',
+            'Zakat',
+            'Orphan',
+            'Widow',
+            'Ghusl Mayyit',
           ],
+          selectedOption: selectedCategory,
+          onSelectionChanged: (selected) {
+            print('Filter changed to: $selected');
+            ref
+                .read(campaignCategoryFilterProvider.notifier)
+                .setCategory(selected == 'All' ? '' : selected);
+          },
+          isScrollable: true,
         ),
-      ),
+        Expanded(
+          child: campaignsState.when(
+            data: (paginationState) {
+              return ListView.builder(
+                padding: const EdgeInsets.all(16),
+                controller: _generalCampaignsController,
+                itemCount: paginationState.campaigns.length,
+                itemBuilder: (context, index) {
+                  final campaign = paginationState.campaigns[index];
+                  return Padding(
+                    padding: const EdgeInsets.only(bottom: 16),
+                    child: anim.AnimatedWidgetWrapper(
+                      animationType: anim.AnimationType.fadeSlideInFromBottom,
+                      duration: anim.AnimationDuration.normal,
+                      delayMilliseconds: index * 50,
+                      child: CampaignCard(
+                        id: campaign.id ?? '',
+                        description: campaign.description ?? '',
+                        title: campaign.title ?? '',
+                        category: campaign.category ?? '',
+                        date: formatDate(campaign.targetDate) ?? '',
+                        image: campaign.coverImage ?? '',
+                        raised: campaign.collectedAmount?.toInt() ?? 0,
+                        goal: campaign.targetAmount?.toInt() ?? 0,
+                        onDetails: () {
+                          Navigator.of(context).pushNamed(
+                            'CampaignDetail',
+                            arguments: {
+                              '_id': campaign.id ?? '',
+                              'title': campaign.title ?? '',
+                              'description': campaign.description ?? '',
+                              'category': campaign.category ?? '',
+                              'date': formatDate(campaign.targetDate) ?? '',
+                              'image': campaign.coverImage ?? '',
+                              'raised': campaign.collectedAmount?.toInt() ?? 0,
+                              'goal': campaign.targetAmount?.toInt() ?? 0,
+                            },
+                          );
+                        },
+                        onDonate: () {},
+                      ),
+                    ),
+                  );
+                },
+              );
+            },
+            loading: () => const Center(child: LoadingAnimation()),
+            error: (error, stackTrace) => Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text('Error: $error'),
+                  const SizedBox(height: 16),
+                  ElevatedButton(
+                    onPressed: () {
+                      ref.read(generalCampaignsProvider.notifier).refresh();
+                    },
+                    child: const Text('Retry'),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ],
     );
   }
 
@@ -340,12 +403,175 @@ class _CampaignPageState extends ConsumerState<CampaignPage>
                   );
                 },
               ),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              child: Container(
+                height: 48,
+                decoration: BoxDecoration(
+                  color: kBackgroundColor,
+                  borderRadius: BorderRadius.circular(24),
+                  border: Border.all(color: kBorder),
+                ),
+                child: Row(
+                  children: [
+                    // 🔍 Search field
+                    Expanded(
+                      child: TextField(
+                        controller: _searchController,
+                        onChanged: (value) {
+                          ref
+                              .read(transactionSearchProvider.notifier)
+                              .setSearch(value);
+                        },
+                        decoration: InputDecoration(
+                          hintText: 'Search',
+                          hintStyle: kSmallTitleL.copyWith(color: kGrey),
+                          prefixIcon: const Icon(Icons.search, color: kGrey),
+                          border: InputBorder.none,
+                        ),
+                      ),
+                    ),
+
+                    // │ Vertical divider
+                    Container(
+                      height: 24,
+                      width: 1,
+                      color: kBorder,
+                    ),
+
+                    // 🎛 Filter icon
+                    GestureDetector(
+                      onTap: () => _showFilterBottomSheet(context),
+                      behavior: HitTestBehavior.opaque,
+                      child: const Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 14),
+                        child: Icon(Icons.tune, color: kGrey),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            SizedBox(
+              height: 10,
+            ),
             Expanded(
               child: currentFilter
                   ? _buildMemberTransactionsView()
                   : _buildUserTransactionsView(),
             ),
           ],
+        );
+      },
+    );
+  }
+
+  void _showFilterBottomSheet(BuildContext context) {
+    final startDateController = TextEditingController();
+    final endDateController = TextEditingController();
+
+    final currentDates = ref.read(transactionDateFilterProvider);
+    if (currentDates['start_date'] != null) {
+      final date = DateTime.parse(currentDates['start_date']!);
+      startDateController.text =
+          "${date.day.toString().padLeft(2, '0')}/${date.month.toString().padLeft(2, '0')}/${date.year}";
+    }
+    if (currentDates['end_date'] != null) {
+      final date = DateTime.parse(currentDates['end_date']!);
+      endDateController.text =
+          "${date.day.toString().padLeft(2, '0')}/${date.month.toString().padLeft(2, '0')}/${date.year}";
+    }
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: kWhite,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(20),
+          topRight: Radius.circular(20),
+        ),
+      ),
+      builder: (context) {
+        return Padding(
+          padding: EdgeInsets.only(
+            bottom: MediaQuery.of(context).viewInsets.bottom,
+            left: 16,
+            right: 16,
+            top: 8,
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Center(
+                child: Container(
+                  width: 40,
+                  height: 4,
+                  decoration: BoxDecoration(
+                    color: kGrey,
+                    borderRadius: BorderRadius.circular(2),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 20),
+              Text('Filter', style: kBodyTitleSB),
+              const SizedBox(height: 24),
+              Text('Start Date', style: kSmallTitleM),
+              const SizedBox(height: 8),
+              InputField(
+                type: CustomFieldType.date,
+                hint: 'dd/mm/yyyy',
+                controller: startDateController,
+              ),
+              const SizedBox(height: 20),
+              Text('End Date', style: kSmallTitleM),
+              const SizedBox(height: 8),
+              InputField(
+                type: CustomFieldType.date,
+                hint: 'dd/mm/yyyy',
+                controller: endDateController,
+              ),
+              const SizedBox(height: 32),
+              primaryButton(
+                label: 'Apply',
+                onPressed: () {
+                  String? formattedStart;
+                  String? formattedEnd;
+
+                  if (startDateController.text.isNotEmpty) {
+                    final parts = startDateController.text.split('/');
+                    formattedStart = "${parts[2]}-${parts[1]}-${parts[0]}";
+                  }
+                  if (endDateController.text.isNotEmpty) {
+                    final parts = endDateController.text.split('/');
+                    formattedEnd = "${parts[2]}-${parts[1]}-${parts[0]}";
+                  }
+
+                  ref
+                      .read(transactionDateFilterProvider.notifier)
+                      .setDates(formattedStart, formattedEnd);
+                  Navigator.pop(context);
+                },
+              ),
+              const SizedBox(height: 16),
+              if (currentDates['start_date'] != null ||
+                  currentDates['end_date'] != null)
+                Center(
+                  child: TextButton(
+                    onPressed: () {
+                      ref.read(transactionDateFilterProvider.notifier).clear();
+                      Navigator.pop(context);
+                    },
+                    child: Text(
+                      'Clear Filters',
+                      style: kSmallTitleM.copyWith(color: Colors.red),
+                    ),
+                  ),
+                ),
+              const SizedBox(height: 20),
+            ],
+          ),
         );
       },
     );

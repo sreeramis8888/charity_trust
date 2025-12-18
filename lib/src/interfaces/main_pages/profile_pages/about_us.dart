@@ -76,13 +76,13 @@ class AboutUsPage extends StatelessWidget {
                         image: "assets/png/member_1.png",
                       ),
                       _TeamMember(
-                        name: "Sameena Bai",
-                        role: "Secretary",
+                        name: "Thasneem Junaid",
+                        role: "Treasurer",
                         image: "assets/png/member_2.png",
                       ),
                       _TeamMember(
-                        name: "Thasneem Junaid",
-                        role: "Treasurer",
+                        name: "Sameena Bai",
+                        role: "Secretary",
                         image: "assets/png/member_3.png",
                       ),
                     ],

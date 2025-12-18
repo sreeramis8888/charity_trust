@@ -61,11 +61,17 @@ class CampaignsApi {
     int pageNo = 1,
     int limit = 10,
     bool myCampaigns = false,
+    String? search,
+    String? startDate,
+    String? endDate,
   }) async {
     final queryParams = {
       'page_no': pageNo,
       'limit': limit,
       if (myCampaigns) 'my_campaigns': true,
+      if (search != null && search.isNotEmpty) 'search': search,
+      if (startDate != null && startDate.isNotEmpty) 'start_date': startDate,
+      if (endDate != null && endDate.isNotEmpty) 'end_date': endDate,
     };
 
     final queryString =
@@ -80,10 +86,16 @@ class CampaignsApi {
   Future<ApiResponse<Map<String, dynamic>>> getMemberDonations({
     int pageNo = 1,
     int limit = 10,
+    String? search,
+    String? startDate,
+    String? endDate,
   }) async {
     final queryParams = {
       'page_no': pageNo,
       'limit': limit,
+      if (search != null && search.isNotEmpty) 'search': search,
+      if (startDate != null && startDate.isNotEmpty) 'start_date': startDate,
+      if (endDate != null && endDate.isNotEmpty) 'end_date': endDate,
     };
 
     final queryString =
@@ -179,6 +191,51 @@ class TransactionsFilter extends _$TransactionsFilter {
   }
 }
 
+@riverpod
+class TransactionSearch extends _$TransactionSearch {
+  @override
+  String build() => '';
+
+  void setSearch(String query) {
+    state = query;
+  }
+}
+
+@riverpod
+class TransactionDateFilter extends _$TransactionDateFilter {
+  @override
+  Map<String, String?> build() => {
+        'start_date': null,
+        'end_date': null,
+      };
+
+  void setDates(String? startDate, String? endDate) {
+    state = {
+      'start_date': startDate,
+      'end_date': endDate,
+    };
+  }
+
+  void clear() {
+    state = {
+      'start_date': null,
+      'end_date': null,
+    };
+  }
+}
+
+@riverpod
+class CampaignCategoryFilter extends _$CampaignCategoryFilter {
+  @override
+  String build() {
+    return 'All'; // Default to 'All' category
+  }
+
+  void setCategory(String category) {
+    state = category.isEmpty ? 'All' : category;
+  }
+}
+
 class CampaignPaginationState {
   final int currentPage;
   final int limit;
@@ -213,32 +270,64 @@ class GeneralCampaignsNotifier extends _$GeneralCampaignsNotifier {
   @override
   Future<CampaignPaginationState> build() async {
     final campaignsApi = ref.watch(campaignsApiProvider);
+    final selectedCategory = ref.watch(campaignCategoryFilterProvider);
 
-    final response = await campaignsApi.getAllCampaigns(
-      pageNo: 1,
-      limit: 10,
-      myCampaigns: false,
-    );
-
-    if (response.success && response.data != null) {
-      final campaignsList = (response.data!['data'] as List<dynamic>?)
-              ?.map((item) =>
-                  CampaignModel.fromJson(item as Map<String, dynamic>))
-              .toList() ??
-          [];
-      final totalCountValue = response.data!['total_count'];
-      final totalCount = totalCountValue is int
-          ? totalCountValue
-          : int.tryParse(totalCountValue.toString()) ?? 0;
-
-      return CampaignPaginationState(
-        currentPage: 1,
+    // If category is 'All' or empty, fetch all campaigns
+    if (selectedCategory == 'All' || selectedCategory.isEmpty) {
+      final response = await campaignsApi.getAllCampaigns(
+        pageNo: 1,
         limit: 10,
-        totalCount: totalCount,
-        campaigns: campaignsList,
+        myCampaigns: false,
       );
+
+      if (response.success && response.data != null) {
+        final campaignsList = (response.data!['data'] as List<dynamic>?)
+                ?.map((item) =>
+                    CampaignModel.fromJson(item as Map<String, dynamic>))
+                .toList() ??
+            [];
+        final totalCountValue = response.data!['total_count'];
+        final totalCount = totalCountValue is int
+            ? totalCountValue
+            : int.tryParse(totalCountValue.toString()) ?? 0;
+
+        return CampaignPaginationState(
+          currentPage: 1,
+          limit: 10,
+          totalCount: totalCount,
+          campaigns: campaignsList,
+        );
+      } else {
+        throw Exception(response.message ?? 'Failed to fetch campaigns');
+      }
     } else {
-      throw Exception(response.message ?? 'Failed to fetch campaigns');
+      // Fetch campaigns by category
+      final response = await campaignsApi.getCampaignsByCategory(
+        category: selectedCategory,
+        pageNo: 1,
+        limit: 10,
+      );
+
+      if (response.success && response.data != null) {
+        final campaignsList = (response.data!['data'] as List<dynamic>?)
+                ?.map((item) =>
+                    CampaignModel.fromJson(item as Map<String, dynamic>))
+                .toList() ??
+            [];
+        final totalCountValue = response.data!['total_count'];
+        final totalCount = totalCountValue is int
+            ? totalCountValue
+            : int.tryParse(totalCountValue.toString()) ?? 0;
+
+        return CampaignPaginationState(
+          currentPage: 1,
+          limit: 10,
+          totalCount: totalCount,
+          campaigns: campaignsList,
+        );
+      } else {
+        throw Exception(response.message ?? 'Failed to fetch campaigns');
+      }
     }
   }
 
@@ -249,12 +338,23 @@ class GeneralCampaignsNotifier extends _$GeneralCampaignsNotifier {
     if (!currentState.hasMore) return;
     state = await AsyncValue.guard(() async {
       final campaignsApi = ref.watch(campaignsApiProvider);
+      final selectedCategory = ref.watch(campaignCategoryFilterProvider);
       final nextPage = currentState.currentPage + 1;
-      final response = await campaignsApi.getAllCampaigns(
-        pageNo: nextPage,
-        limit: currentState.limit,
-        myCampaigns: false,
-      );
+
+      late final ApiResponse<Map<String, dynamic>> response;
+      if (selectedCategory == 'All' || selectedCategory.isEmpty) {
+        response = await campaignsApi.getAllCampaigns(
+          pageNo: nextPage,
+          limit: currentState.limit,
+          myCampaigns: false,
+        );
+      } else {
+        response = await campaignsApi.getCampaignsByCategory(
+          category: selectedCategory,
+          pageNo: nextPage,
+          limit: currentState.limit,
+        );
+      }
 
       if (response.success && response.data != null) {
         final campaignsList = (response.data!['data'] as List<dynamic>?)
@@ -394,9 +494,15 @@ class ParticipatedCampaignsNotifier extends _$ParticipatedCampaignsNotifier {
   @override
   Future<DonationPaginationState> build() async {
     final campaignsApi = ref.watch(campaignsApiProvider);
+    final search = ref.watch(transactionSearchProvider);
+    final dates = ref.watch(transactionDateFilterProvider);
+
     final response = await campaignsApi.getParticipatedCampaigns(
       pageNo: 1,
       limit: 10,
+      search: search,
+      startDate: dates['start_date'],
+      endDate: dates['end_date'],
     );
 
     if (response.success && response.data != null) {
@@ -429,10 +535,15 @@ class ParticipatedCampaignsNotifier extends _$ParticipatedCampaignsNotifier {
     if (!currentState.hasMore) return;
     state = await AsyncValue.guard(() async {
       final campaignsApi = ref.watch(campaignsApiProvider);
+      final search = ref.read(transactionSearchProvider);
+      final dates = ref.read(transactionDateFilterProvider);
       final nextPage = currentState.currentPage + 1;
       final response = await campaignsApi.getParticipatedCampaigns(
         pageNo: nextPage,
         limit: currentState.limit,
+        search: search,
+        startDate: dates['start_date'],
+        endDate: dates['end_date'],
       );
 
       if (response.success && response.data != null) {
@@ -468,9 +579,15 @@ class MemberDonationsNotifier extends _$MemberDonationsNotifier {
   @override
   Future<DonationPaginationState> build() async {
     final campaignsApi = ref.watch(campaignsApiProvider);
+    final search = ref.watch(transactionSearchProvider);
+    final dates = ref.watch(transactionDateFilterProvider);
+
     final response = await campaignsApi.getMemberDonations(
       pageNo: 1,
       limit: 10,
+      search: search,
+      startDate: dates['start_date'],
+      endDate: dates['end_date'],
     );
 
     if (response.success && response.data != null) {
@@ -502,10 +619,15 @@ class MemberDonationsNotifier extends _$MemberDonationsNotifier {
     if (!currentState.hasMore) return;
     state = await AsyncValue.guard(() async {
       final campaignsApi = ref.watch(campaignsApiProvider);
+      final search = ref.read(transactionSearchProvider);
+      final dates = ref.read(transactionDateFilterProvider);
       final nextPage = currentState.currentPage + 1;
       final response = await campaignsApi.getMemberDonations(
         pageNo: nextPage,
         limit: currentState.limit,
+        search: search,
+        startDate: dates['start_date'],
+        endDate: dates['end_date'],
       );
 
       if (response.success && response.data != null) {

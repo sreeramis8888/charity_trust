@@ -3,7 +3,6 @@ import 'package:Annujoom/src/data/constants/style_constants.dart';
 import 'package:Annujoom/src/interfaces/animations/index.dart';
 import 'package:Annujoom/src/interfaces/main_pages/campaign_pages/category_campaign_detail.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/svg.dart';
 
 class DonationCategoriesPage extends StatelessWidget {
   const DonationCategoriesPage({super.key});
@@ -49,7 +48,10 @@ class DonationCategoriesPage extends StatelessWidget {
 
   void _handleCategoryTap(BuildContext context, String category) {
     if (category == 'General Campaign') {
-      Navigator.of(context).pushNamed('Campaign');
+      Navigator.of(context).pushNamed(
+        'Campaign',
+        arguments: {'category': category},
+      );
     } else {
       Navigator.of(context).push(
         MaterialPageRoute(

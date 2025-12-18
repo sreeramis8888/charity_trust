@@ -38,8 +38,10 @@ PageRouteBuilder<T> createRoute<T>(
   Widget page, {
   TransitionType? transition,
   Duration duration = const Duration(milliseconds: 300),
+  RouteSettings? settings,
 }) {
   return PageRouteBuilder<T>(
+    settings: settings,
     pageBuilder: (context, animation, secondaryAnimation) => page,
     transitionDuration: duration,
     reverseTransitionDuration: duration,
@@ -210,6 +212,7 @@ Route<dynamic> generateRoute(RouteSettings? settings) {
 
     default:
       return MaterialPageRoute(
+        settings: settings,
         builder: (context) => Scaffold(
           backgroundColor: Colors.grey[100],
           body: Center(child: Text('No path for ${settings?.name}')),
@@ -217,10 +220,12 @@ Route<dynamic> generateRoute(RouteSettings? settings) {
       );
   }
   if (transitionToUse == null) {
-    return MaterialPageRoute(builder: (_) => page!);
+    return MaterialPageRoute(settings: settings, builder: (_) => page!);
   }
   return createRoute(page!,
-      transition: transitionToUse, duration: transitionDuration);
+      transition: transitionToUse,
+      duration: transitionDuration,
+      settings: settings);
 }
 
 extension NavigatorTransitionHelpers on NavigatorState {

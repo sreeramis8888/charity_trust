@@ -34,6 +34,7 @@ class HomePage extends ConsumerStatefulWidget {
 class _HomePageState extends ConsumerState<HomePage> {
   late PageController _completedCampaignController;
   late PageController _videoController;
+  late CarouselSliderController _categoryCarouselController;
   int _completedCampaignIndex = 0;
   int _videoIndex = 0;
   bool _imagesPrecached = false;
@@ -45,6 +46,7 @@ class _HomePageState extends ConsumerState<HomePage> {
     _completedCampaignController =
         PageController(initialPage: _completedCampaignIndex);
     _videoController = PageController(initialPage: _videoIndex);
+    _categoryCarouselController = CarouselSliderController();
   }
 
   @override
@@ -71,8 +73,15 @@ class _HomePageState extends ConsumerState<HomePage> {
   }
 
   void _handleCategoryTap(BuildContext context, String category) {
+    print('=== _handleCategoryTap called ===');
+    print('Category: $category');
+    
     if (category == 'General Campaign') {
-      Navigator.of(context).pushNamed('Campaign');
+      print('Navigating to Campaign with arguments: {category: $category}');
+      Navigator.of(context).pushNamed(
+        'Campaign',
+        arguments: {'category': category},
+      );
     } else {
       Navigator.of(context).push(
         MaterialPageRoute(
@@ -449,6 +458,7 @@ class _HomePageState extends ConsumerState<HomePage> {
                     SizedBox(
                       height: 120,
                       child: CarouselSlider(
+                        carouselController: _categoryCarouselController,
                         options: CarouselOptions(
                           height: 120,
                           viewportFraction: 0.25,
@@ -459,6 +469,14 @@ class _HomePageState extends ConsumerState<HomePage> {
                           enableInfiniteScroll: false,
                           initialPage: 0,
                           padEnds: false,
+                          onPageChanged: (index, reason) {
+                            // Reset to beginning when reaching the end
+                            if (index == 5) { // 5 is the last index (0-5 = 6 items)
+                              Future.delayed(const Duration(milliseconds: 800), () {
+                                _categoryCarouselController.jumpToPage(0);
+                              });
+                            }
+                          },
                         ),
                         items: [
                           {
@@ -683,7 +701,10 @@ class _HomePageState extends ConsumerState<HomePage> {
                           Text('Funding Campaigns', style: kBodyTitleM),
                           GestureDetector(
                             onTap: () {
-                              Navigator.of(context).pushNamed('Campaign');
+                              Navigator.of(context).pushNamed(
+                                'Campaign',
+                                arguments: {'category': 'All'},
+                              );
                             },
                             child: Text('See All >',
                                 style: kSmallTitleM.copyWith(

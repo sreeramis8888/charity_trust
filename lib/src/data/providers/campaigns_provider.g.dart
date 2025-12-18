@@ -145,6 +145,152 @@ abstract class _$TransactionsFilter extends $Notifier<bool> {
   }
 }
 
+@ProviderFor(TransactionSearch)
+const transactionSearchProvider = TransactionSearchProvider._();
+
+final class TransactionSearchProvider
+    extends $NotifierProvider<TransactionSearch, String> {
+  const TransactionSearchProvider._()
+      : super(
+          from: null,
+          argument: null,
+          retry: null,
+          name: r'transactionSearchProvider',
+          isAutoDispose: true,
+          dependencies: null,
+          $allTransitiveDependencies: null,
+        );
+
+  @override
+  String debugGetCreateSourceHash() => _$transactionSearchHash();
+
+  @$internal
+  @override
+  TransactionSearch create() => TransactionSearch();
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(String value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<String>(value),
+    );
+  }
+}
+
+String _$transactionSearchHash() => r'20c10cff0360c265e1e2b155db76bb8b6f1adbaf';
+
+abstract class _$TransactionSearch extends $Notifier<String> {
+  String build();
+  @$mustCallSuper
+  @override
+  void runBuild() {
+    final created = build();
+    final ref = this.ref as $Ref<String, String>;
+    final element = ref.element as $ClassProviderElement<
+        AnyNotifier<String, String>, String, Object?, Object?>;
+    element.handleValue(ref, created);
+  }
+}
+
+@ProviderFor(TransactionDateFilter)
+const transactionDateFilterProvider = TransactionDateFilterProvider._();
+
+final class TransactionDateFilterProvider
+    extends $NotifierProvider<TransactionDateFilter, Map<String, String?>> {
+  const TransactionDateFilterProvider._()
+      : super(
+          from: null,
+          argument: null,
+          retry: null,
+          name: r'transactionDateFilterProvider',
+          isAutoDispose: true,
+          dependencies: null,
+          $allTransitiveDependencies: null,
+        );
+
+  @override
+  String debugGetCreateSourceHash() => _$transactionDateFilterHash();
+
+  @$internal
+  @override
+  TransactionDateFilter create() => TransactionDateFilter();
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(Map<String, String?> value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<Map<String, String?>>(value),
+    );
+  }
+}
+
+String _$transactionDateFilterHash() =>
+    r'1d956ba640694210e30c5e203947e4b701f666ba';
+
+abstract class _$TransactionDateFilter extends $Notifier<Map<String, String?>> {
+  Map<String, String?> build();
+  @$mustCallSuper
+  @override
+  void runBuild() {
+    final created = build();
+    final ref = this.ref as $Ref<Map<String, String?>, Map<String, String?>>;
+    final element = ref.element as $ClassProviderElement<
+        AnyNotifier<Map<String, String?>, Map<String, String?>>,
+        Map<String, String?>,
+        Object?,
+        Object?>;
+    element.handleValue(ref, created);
+  }
+}
+
+@ProviderFor(CampaignCategoryFilter)
+const campaignCategoryFilterProvider = CampaignCategoryFilterProvider._();
+
+final class CampaignCategoryFilterProvider
+    extends $NotifierProvider<CampaignCategoryFilter, String> {
+  const CampaignCategoryFilterProvider._()
+      : super(
+          from: null,
+          argument: null,
+          retry: null,
+          name: r'campaignCategoryFilterProvider',
+          isAutoDispose: true,
+          dependencies: null,
+          $allTransitiveDependencies: null,
+        );
+
+  @override
+  String debugGetCreateSourceHash() => _$campaignCategoryFilterHash();
+
+  @$internal
+  @override
+  CampaignCategoryFilter create() => CampaignCategoryFilter();
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(String value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<String>(value),
+    );
+  }
+}
+
+String _$campaignCategoryFilterHash() =>
+    r'a8d52e00799c9b7d2885ba03025a8b46ac4676b8';
+
+abstract class _$CampaignCategoryFilter extends $Notifier<String> {
+  String build();
+  @$mustCallSuper
+  @override
+  void runBuild() {
+    final created = build();
+    final ref = this.ref as $Ref<String, String>;
+    final element = ref.element as $ClassProviderElement<
+        AnyNotifier<String, String>, String, Object?, Object?>;
+    element.handleValue(ref, created);
+  }
+}
+
 @ProviderFor(GeneralCampaignsNotifier)
 const generalCampaignsProvider = GeneralCampaignsNotifierProvider._();
 
@@ -170,7 +316,7 @@ final class GeneralCampaignsNotifierProvider extends $AsyncNotifierProvider<
 }
 
 String _$generalCampaignsNotifierHash() =>
-    r'ddfa1345044a538afcd33764c9acb98ab7875cc9';
+    r'3205725d4ea3ff698dea960983347bbc20c514bf';
 
 abstract class _$GeneralCampaignsNotifier
     extends $AsyncNotifier<CampaignPaginationState> {
@@ -263,7 +409,7 @@ final class ParticipatedCampaignsNotifierProvider
 }
 
 String _$participatedCampaignsNotifierHash() =>
-    r'd7f9ec0cb28b659e516e122f92daedaad0cd6c27';
+    r'5ce33aeeac0c05a68a7ff1aaf56bf43717c52a90';
 
 abstract class _$ParticipatedCampaignsNotifier
     extends $AsyncNotifier<DonationPaginationState> {
@@ -309,7 +455,7 @@ final class MemberDonationsNotifierProvider extends $AsyncNotifierProvider<
 }
 
 String _$memberDonationsNotifierHash() =>
-    r'15ed3564f5fa0531afb71dd734276ec5bba84b5e';
+    r'c0980657366b79a9bccf129363092d69b3cf81ba';
 
 abstract class _$MemberDonationsNotifier
     extends $AsyncNotifier<DonationPaginationState> {
