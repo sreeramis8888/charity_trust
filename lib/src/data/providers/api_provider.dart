@@ -65,11 +65,17 @@ class ApiProvider {
   Future<ApiResponse<Map<String, dynamic>>> get(
     String endpoint, {
     bool requireAuth = false,
+    Map<String, String>? queryParams,
   }) async {
     try {
       final headers = await _buildHeaders(requireAuth: requireAuth);
+      final uri = Uri.parse('$baseUrl$endpoint');
+      final uriWithParams = queryParams != null && queryParams.isNotEmpty
+          ? uri.replace(queryParameters: queryParams)
+          : uri;
+
       final response = await _client.get(
-        Uri.parse('$baseUrl$endpoint'),
+        uriWithParams,
         headers: headers,
       );
 

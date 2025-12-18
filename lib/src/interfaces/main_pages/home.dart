@@ -12,9 +12,12 @@ import 'package:Annujoom/src/interfaces/onboarding/create_user.dart';
 import 'package:Annujoom/src/interfaces/main_pages/campaign_pages/category_campaign_detail.dart';
 import 'package:Annujoom/src/interfaces/main_pages/news_bookmark/news_page.dart';
 import 'package:Annujoom/src/interfaces/main_pages/notifications_page.dart';
+import 'package:Annujoom/src/interfaces/main_pages/completed_campaigns_page.dart';
+import 'package:Annujoom/src/interfaces/main_pages/videos_page.dart';
 import 'package:Annujoom/src/data/router/nav_router.dart';
 import 'package:Annujoom/src/data/utils/launch_url.dart';
 import 'package:Annujoom/src/data/services/notification_service/get_fcm.dart';
+import 'package:Annujoom/src/interfaces/components/primaryButton.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
@@ -84,6 +87,79 @@ class _HomePageState extends ConsumerState<HomePage> {
     _completedCampaignController.dispose();
     _videoController.dispose();
     super.dispose();
+  }
+
+  void _showCallSupportModal(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(20),
+          topRight: Radius.circular(20),
+        ),
+      ),
+      backgroundColor: kWhite,
+      builder: (context) => Padding(
+        padding: const EdgeInsets.only(left: 16, right: 16, bottom: 16, top: 8),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              width: 40,
+              height: 4,
+              decoration: BoxDecoration(
+                color: kGrey,
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
+            const SizedBox(height: 20),
+            Row(
+              children: [
+                Text(
+                  'Call Support Team',
+                  style: kBodyTitleSB,
+                  textAlign: TextAlign.start,
+                ),
+              ],
+            ),
+            const SizedBox(height: 16),
+            Text(
+              'Do you want to call the Annujoom Support Team? You\'re about to make a phone call.',
+              style: kBodyTitleL.copyWith(color: kSecondaryTextColor),
+              textAlign: TextAlign.start,
+            ),
+            const SizedBox(height: 32),
+            Row(
+              children: [
+                Expanded(
+                  child: primaryButton(
+                    label: 'Cancel',
+                    onPressed: () => Navigator.pop(context),
+                    buttonColor: kWhite,
+                    labelColor: kTextColor,
+                    sideColor: kStrokeColor,
+                    buttonHeight: 48,
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: primaryButton(
+                    label: 'Call',
+                    onPressed: () {
+                      Navigator.pop(context);
+                      launchPhone('+918891646431');
+                    },
+                    buttonColor: kPrimaryColor,
+                    labelColor: kWhite,
+                    buttonHeight: 48,
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
   }
 
   @override
@@ -316,7 +392,7 @@ class _HomePageState extends ConsumerState<HomePage> {
                         ),
                         IconButton(
                           onPressed: () {
-                            launchPhone('+918891646431');
+                            _showCallSupportModal(context);
                           },
                           icon: SvgPicture.asset(
                             'assets/svg/call.svg',
@@ -669,10 +745,23 @@ class _HomePageState extends ConsumerState<HomePage> {
               if (homeData.posterPromotions.isNotEmpty)
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 16),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text('Completed Campaigns', style: kBodyTitleM),
+                      GestureDetector(
+                        onTap: () {
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (context) =>
+                                  const CompletedCampaignsPage(),
+                            ),
+                          );
+                        },
+                        child: Text('See All >',
+                            style:
+                                kSmallTitleM.copyWith(color: kThirdTextColor)),
+                      ),
                     ],
                   ),
                 ),
@@ -822,6 +911,30 @@ class _HomePageState extends ConsumerState<HomePage> {
                   }).toList(),
                 ),
               const SizedBox(height: 24),
+              if (homeData.videoPromotions.isNotEmpty)
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text('Latest Videos', style: kBodyTitleM),
+                      GestureDetector(
+                        onTap: () {
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (context) => const VideosPage(),
+                            ),
+                          );
+                        },
+                        child: Text('See All >',
+                            style:
+                                kSmallTitleM.copyWith(color: kThirdTextColor)),
+                      ),
+                    ],
+                  ),
+                ),
+              if (homeData.videoPromotions.isNotEmpty)
+                const SizedBox(height: 12),
               if (homeData.videoPromotions.isNotEmpty)
                 SizedBox(
                   height: 200,

@@ -587,8 +587,8 @@ class HomeGradientCampaignCard extends StatelessWidget {
                   children: [
                     Text(
                       "₹$raised",
-                      style: kSmallTitleM.copyWith(
-                          color: const Color(0xFFFFD400)),
+                      style:
+                          kSmallTitleM.copyWith(color: const Color(0xFFFFD400)),
                     ),
                     const SizedBox(width: 4),
                     Text(

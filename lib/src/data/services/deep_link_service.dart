@@ -67,7 +67,7 @@ class DeepLinkService {
       if (!isAppForeground) {
         debugPrint('App is not in foreground, navigating to mainpage first');
         NavigationService.navigatorKey.currentState?.pushNamedAndRemoveUntil(
-          'MainPage',
+          'navbar',
           (route) => false,
         );
 
@@ -80,7 +80,7 @@ class DeepLinkService {
             if (NavigationService.navigatorKey.currentState != null) {
               NavigationService.navigatorKey.currentState
                   ?.pushNamedAndRemoveUntil(
-                'MainPage',
+                'navbar',
                 (route) => false,
               );
               await Future.delayed(Duration(milliseconds: 500));
@@ -98,14 +98,15 @@ class DeepLinkService {
             if (NavigationService.navigatorKey.currentState != null) {
               NavigationService.navigatorKey.currentState
                   ?.pushNamedAndRemoveUntil(
-                'MainPage',
+                'navbar',
                 (route) => false,
               );
               await Future.delayed(Duration(milliseconds: 500));
               _ref.read(selectedIndexProvider.notifier).updateIndex(3);
-              
+
               // Navigate to notifications page
-              NavigationService.navigatorKey.currentState?.pushNamed('Notifications');
+              NavigationService.navigatorKey.currentState
+                  ?.pushNamed('Notifications');
             }
           } catch (e) {
             debugPrint('Error navigating to notifications: $e');

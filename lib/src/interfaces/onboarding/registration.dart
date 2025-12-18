@@ -9,6 +9,8 @@ import 'package:Annujoom/src/data/services/snackbar_service.dart';
 import 'package:Annujoom/src/data/services/image_upload.dart';
 import 'package:Annujoom/src/data/providers/user_provider.dart';
 import 'package:Annujoom/src/data/providers/location_provider.dart';
+import 'package:Annujoom/src/data/providers/auth_login_provider.dart';
+import 'package:Annujoom/src/data/providers/auth_provider.dart';
 import 'package:Annujoom/src/data/models/user_model.dart';
 import 'package:Annujoom/src/interfaces/components/input_field.dart';
 import 'package:Annujoom/src/interfaces/components/dropdown.dart';
@@ -16,6 +18,7 @@ import 'package:Annujoom/src/interfaces/components/loading_indicator.dart';
 import 'package:Annujoom/src/interfaces/components/searchable_dropdown.dart';
 import 'package:Annujoom/src/interfaces/components/modal_sheet.dart';
 import 'package:Annujoom/src/interfaces/components/primaryButton.dart';
+import 'package:Annujoom/src/interfaces/components/confirmation_dialog.dart';
 import 'package:Annujoom/src/interfaces/animations/index.dart' as anim;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -161,6 +164,58 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
     }
   }
 
+  void _handleLogout(BuildContext context, WidgetRef ref) {
+    showDialog(
+      context: context,
+      builder: (dialogContext) => ConfirmationDialog(
+        title: 'Logout',
+        message: 'Are you sure you want to logout?',
+        confirmButtonText: 'Logout',
+        onConfirm: () {
+          _performLogout(context, ref);
+        },
+      ),
+    );
+  }
+
+  Future<void> _performLogout(BuildContext context, WidgetRef ref) async {
+    try {
+      final authLoginApi = ref.read(authLoginApiProvider);
+      final authProvider = ref.read(authProviderProvider);
+
+      // Call logout API
+      await authLoginApi.logout();
+
+      // Clear local storage regardless of API response
+      await authProvider.clearAllData();
+
+      if (context.mounted) {
+        // Navigate to Phone screen and remove all previous routes
+        Navigator.of(context).pushNamedAndRemoveUntil(
+          'Phone',
+          (route) => false,
+        );
+      }
+    } catch (e) {
+      // Clear local storage even if API fails
+      try {
+        final authProvider = ref.read(authProviderProvider);
+        await authProvider.clearAllData();
+      } catch (_) {}
+
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Logout failed: $e')),
+        );
+        // Still navigate to login even if there was an error
+        Navigator.of(context).pushNamedAndRemoveUntil(
+          'Phone',
+          (route) => false,
+        );
+      }
+    }
+  }
+
   Future<void> _handleRegistration() async {
     try {
       ref.read(loadingProvider.notifier).startLoading();
@@ -267,6 +322,28 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
   Widget build(BuildContext context) {
     return Scaffold(
         backgroundColor: Colors.white,
+        appBar: AppBar(
+          scrolledUnderElevation: 0,
+          backgroundColor: Colors.white,
+          elevation: 0,
+          actions: [
+            Padding(
+              padding: const EdgeInsets.only(right: 16),
+              child: Consumer(
+                builder: (context, ref, _) {
+                  return TextButton.icon(
+                    onPressed: () => _handleLogout(context, ref),
+                    icon: const Icon(Icons.logout, size: 20, color: kTextColor),
+                    label: const Text(
+                      'Logout',
+                      style: TextStyle(color: kTextColor, fontSize: 14),
+                    ),
+                  );
+                },
+              ),
+            ),
+          ],
+        ),
         body: GestureDetector(
           onTap: () {
             FocusScope.of(context).requestFocus(_unfocusNode);
@@ -283,7 +360,7 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const SizedBox(height: 70),
+                      const SizedBox(height: 20),
                       anim.AnimatedWidgetWrapper(
                         animationType: anim.AnimationType.scaleUp,
                         duration: anim.AnimationDuration.normal,

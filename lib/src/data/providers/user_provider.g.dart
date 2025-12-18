@@ -87,7 +87,7 @@ final class FetchUserProfileProvider extends $FunctionalProvider<
   }
 }
 
-String _$fetchUserProfileHash() => r'b63fa7c5c81e3585c56d5e0f4b7b2c222acde13b';
+String _$fetchUserProfileHash() => r'54b61c5b31e68e0fa3ea329365611814a2729398';
 
 @ProviderFor(updateUserProfile)
 const updateUserProfileProvider = UpdateUserProfileFamily._();
@@ -173,7 +173,7 @@ final class UpdateUserProfileProvider extends $FunctionalProvider<
   }
 }
 
-String _$updateUserProfileHash() => r'2e1cd930f527118dae42a100c2c591122cb5c4ce';
+String _$updateUserProfileHash() => r'ae76aa2fc5e595dddedc0e89f2759cf80b44ddee';
 
 final class UpdateUserProfileFamily extends $Family
     with
@@ -371,7 +371,7 @@ final class FetchUsersByRoleProvider extends $FunctionalProvider<
   }
 }
 
-String _$fetchUsersByRoleHash() => r'2e748c373f1eb2b877f1955d1d2ecb7342c0eaff';
+String _$fetchUsersByRoleHash() => r'25ce2d128b1b528371d7af4d35da6e2069834438';
 
 final class FetchUsersByRoleFamily extends $Family
     with $FunctionalFamilyOverride<FutureOr<List<UserModel>>, UsersListParams> {

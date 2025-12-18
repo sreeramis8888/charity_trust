@@ -170,7 +170,7 @@ final class GeneralCampaignsNotifierProvider extends $AsyncNotifierProvider<
 }
 
 String _$generalCampaignsNotifierHash() =>
-    r'529a4b8dfb58bb97c984f288046ce621909a6a05';
+    r'ddfa1345044a538afcd33764c9acb98ab7875cc9';
 
 abstract class _$GeneralCampaignsNotifier
     extends $AsyncNotifier<CampaignPaginationState> {
@@ -216,7 +216,7 @@ final class CreatedCampaignsNotifierProvider extends $AsyncNotifierProvider<
 }
 
 String _$createdCampaignsNotifierHash() =>
-    r'2157e0cc49fed3bdac88ffeff6eeaad32105888e';
+    r'7bab92204964078b757dc2f268bfe9f07ce43772';
 
 abstract class _$CreatedCampaignsNotifier
     extends $AsyncNotifier<CampaignPaginationState> {
@@ -263,7 +263,7 @@ final class ParticipatedCampaignsNotifierProvider
 }
 
 String _$participatedCampaignsNotifierHash() =>
-    r'b1590637a6a4770da72d77556a8026ab5482eca4';
+    r'd7f9ec0cb28b659e516e122f92daedaad0cd6c27';
 
 abstract class _$ParticipatedCampaignsNotifier
     extends $AsyncNotifier<DonationPaginationState> {
@@ -309,7 +309,7 @@ final class MemberDonationsNotifierProvider extends $AsyncNotifierProvider<
 }
 
 String _$memberDonationsNotifierHash() =>
-    r'bccbfa82b2750d09ae0d14ffd227a4a107d674b0';
+    r'15ed3564f5fa0531afb71dd734276ec5bba84b5e';
 
 abstract class _$MemberDonationsNotifier
     extends $AsyncNotifier<DonationPaginationState> {
@@ -435,7 +435,7 @@ final class PendingApprovalCampaignsNotifierProvider
 }
 
 String _$pendingApprovalCampaignsNotifierHash() =>
-    r'8380b115570d24cf0be41d37053c2648fc1b0de8';
+    r'6d4995507bbfe4775a84831287f5b06372ff2ec6';
 
 abstract class _$PendingApprovalCampaignsNotifier
     extends $AsyncNotifier<CampaignPaginationState> {
