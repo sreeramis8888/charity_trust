@@ -72,7 +72,7 @@ Future<HomePageData> homePageData(Ref ref) async {
   if (response.success && response.data != null) {
     final data = response.data!['data'] as Map<String, dynamic>?;
 
-    final endingCampaigns = (data?['ending_campaigns'] as List<dynamic>?)
+    final endingCampaigns = (data?['ending_campaign'] as List<dynamic>?)
             ?.map((item) => CampaignModel.fromJson(item as Map<String, dynamic>))
             .toList() ??
         [];

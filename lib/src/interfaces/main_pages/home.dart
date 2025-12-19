@@ -76,7 +76,7 @@ class _HomePageState extends ConsumerState<HomePage> {
   void _handleCategoryTap(BuildContext context, String category) {
     print('=== _handleCategoryTap called ===');
     print('Category: $category');
-    
+
     if (category == 'General Campaign') {
       print('Navigating to Campaign with arguments: {category: $category}');
       Navigator.of(context).pushNamed(
@@ -472,8 +472,10 @@ class _HomePageState extends ConsumerState<HomePage> {
                           padEnds: false,
                           onPageChanged: (index, reason) {
                             // Reset to beginning when reaching the end
-                            if (index == 5) { // 5 is the last index (0-5 = 6 items)
-                              Future.delayed(const Duration(milliseconds: 800), () {
+                            if (index == 5) {
+                              // 5 is the last index (0-5 = 6 items)
+                              Future.delayed(const Duration(milliseconds: 800),
+                                  () {
                                 _categoryCarouselController.jumpToPage(0);
                               });
                             }
@@ -715,10 +717,10 @@ class _HomePageState extends ConsumerState<HomePage> {
                       ),
                       const SizedBox(height: 12),
                       SizedBox(
-                        height: 280,
+                        height: 450,
                         child: CarouselSlider(
                           options: CarouselOptions(
-                            height: 280,
+                            height: 450,
                             viewportFraction: 1,
                             enableInfiniteScroll: true,
                             autoPlay: false,
@@ -753,7 +755,8 @@ class _HomePageState extends ConsumerState<HomePage> {
                                               .split(' ')[0] ??
                                           '',
                                       'image': campaign.coverImage,
-                                      'raised': campaign.collectedAmount.toInt(),
+                                      'raised':
+                                          campaign.collectedAmount.toInt(),
                                       'goal': campaign.targetAmount.toInt(),
                                     },
                                   );
