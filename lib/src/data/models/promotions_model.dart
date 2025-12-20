@@ -40,7 +40,8 @@ class Promotions {
       endDate: json['end_date'] != null
           ? DateTime.tryParse(json['end_date'].toString())
           : null,
-      media: json['media']?.toString(),
+media: json['media']?.toString() ?? json['cover_image']?.toString(),
+
       link: json['link']?.toString(),
       status: json['status']?.toString(),
       createdAt: json['createdAt'] != null
