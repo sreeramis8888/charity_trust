@@ -10,6 +10,7 @@ import 'package:Annujoom/src/interfaces/main_pages/navbar.dart';
 import 'package:Annujoom/src/interfaces/main_pages/referrals/my_referrals_page.dart';
 import 'package:Annujoom/src/interfaces/onboarding/login.dart';
 import 'package:Annujoom/src/interfaces/onboarding/registration.dart';
+import 'package:Annujoom/src/interfaces/onboarding/language_selection_page.dart';
 import 'package:Annujoom/src/interfaces/onboarding/create_user.dart';
 import 'package:Annujoom/src/interfaces/onboarding/charity_member_otp_verification.dart';
 import 'package:Annujoom/src/interfaces/onboarding/request_rejected_state.dart';
@@ -130,6 +131,11 @@ Route<dynamic> generateRoute(RouteSettings? settings) {
 
     case 'registration':
       page = RegistrationPage();
+      transitionToUse = TransitionType.fade;
+      transitionDuration = const Duration(milliseconds: 500);
+      break;
+    case 'languageSelection':
+      page = const LanguageSelectionPage();
       transitionToUse = TransitionType.fade;
       transitionDuration = const Duration(milliseconds: 500);
       break;

@@ -12,6 +12,7 @@ import 'package:Annujoom/src/data/providers/location_provider.dart';
 import 'package:Annujoom/src/data/providers/auth_login_provider.dart';
 import 'package:Annujoom/src/data/providers/auth_provider.dart';
 import 'package:Annujoom/src/data/models/user_model.dart';
+import 'package:Annujoom/src/data/constants/global_variables.dart';
 import 'package:Annujoom/src/interfaces/components/input_field.dart';
 import 'package:Annujoom/src/interfaces/components/dropdown.dart';
 import 'package:Annujoom/src/interfaces/components/loading_indicator.dart';
@@ -54,7 +55,7 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
   String? selectedDistrictCode;
   String? selectedDistrictName;
   String? selectedGender;
-  String? selectedPreferredLanguage = 'en';
+  // String? selectedPreferredLanguage = 'en'; // Removed as per request
   XFile? profileImage;
   String? recommendedByType = 'trustee';
   UserModel? selectedRecommendedBy;
@@ -75,7 +76,7 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
     'aadharNumber': GlobalKey(),
     'dob': GlobalKey(),
     'gender': GlobalKey(),
-    'preferredLanguage': GlobalKey(),
+    // 'preferredLanguage': GlobalKey(),
     'whatsapp': GlobalKey(),
     'recommendedBy': GlobalKey(),
   };
@@ -269,7 +270,7 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
           'aadhar_number': int.parse(aadharNumberController.text.trim()),
         'image': profilePictureUrl,
         'gender': selectedGender,
-        'preferred_language': selectedPreferredLanguage,
+        'preferred_language': GlobalVariables.preferredLanguage,
         'whatsapp_number': whatsappNumber,
         'dob': formattedDob,
         'recommended_by':
@@ -501,31 +502,6 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
                       //   ),
                       // ),
                       const SizedBox(height: 18),
-                      anim.AnimatedWidgetWrapper(
-                        animationType: anim.AnimationType.fadeSlideInFromLeft,
-                        duration: anim.AnimationDuration.normal,
-                        delayMilliseconds: 1500,
-                        child: Text("language".tr() + " *", style: kSmallTitleR),
-                      ),
-                      const SizedBox(height: 6),
-                      anim.AnimatedWidgetWrapper(
-                        animationType: anim.AnimationType.fadeSlideInFromBottom,
-                        duration: anim.AnimationDuration.normal,
-                        delayMilliseconds: 1550,
-                        child: AnimatedDropdown<String>(
-                          key: _fieldKeys['preferredLanguage'],
-                          hint: "selectLanguage".tr(),
-                          value: selectedPreferredLanguage,
-                          items: const ['en', 'ml'],
-                          itemLabel: (value) =>
-                              value == 'en' ? 'English' : 'Malayalam',
-                          onChanged: (v) {
-                            setState(() {
-                              selectedPreferredLanguage = v;
-                            });
-                          },
-                        ),
-                      ),
                       const SizedBox(height: 18),
                       // anim.AnimatedWidgetWrapper(
                       //   animationType: anim.AnimationType.fadeSlideInFromLeft,

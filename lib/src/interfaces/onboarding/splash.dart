@@ -433,7 +433,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
             log('_checkAuthenticationAndLoadUser: No user data in secure storage either, navigating to Phone',
                 name: 'SplashScreen');
             if (mounted) {
-              NavigationService().pushNamedAndRemoveUntil('Phone');
+              NavigationService().pushNamedAndRemoveUntil('languageSelection');
             }
           }
         }
@@ -491,9 +491,9 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
         NavigationService().pushNamedAndRemoveUntil('accountSuspended');
         break;
       default:
-        log('_navigateBasedOnUserStatus: Unknown status, navigating to Phone',
+        log('_navigateBasedOnUserStatus: Unknown status, navigating to languageSelection',
             name: 'SplashScreen');
-        NavigationService().pushNamedAndRemoveUntil('Phone');
+        NavigationService().pushNamedAndRemoveUntil('languageSelection');
     }
   }
 
@@ -502,9 +502,9 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
         name: 'SplashScreen');
     Future.delayed(const Duration(seconds: 2, milliseconds: 500), () {
       if (mounted) {
-        log('_startNavigationTimer: Timer completed, navigating to Phone',
+        log('_startNavigationTimer: Timer completed, navigating to languageSelection',
             name: 'SplashScreen');
-        NavigationService().pushNamedAndRemoveUntil('Phone');
+        NavigationService().pushNamedAndRemoveUntil('languageSelection');
       } else {
         log('_startNavigationTimer: Widget not mounted when timer completed',
             name: 'SplashScreen');
