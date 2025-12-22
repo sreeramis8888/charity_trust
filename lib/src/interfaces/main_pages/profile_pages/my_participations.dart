@@ -1,3 +1,4 @@
+import 'package:Annujoom/src/data/constants/global_variables.dart';
 import 'package:Annujoom/src/data/utils/date_formatter.dart';
 import 'package:Annujoom/src/interfaces/components/cards/campaing_card.dart';
 import 'package:Annujoom/src/interfaces/components/cards/transaction_card.dart';
@@ -79,15 +80,11 @@ class _MyParticipationsPageState extends ConsumerState<MyParticipationsPage>
   @override
   Widget build(BuildContext context) {
     final secureStorage = ref.watch(secureStorageServiceProvider);
+    final userRole = GlobalVariables.getUserRole();
+    final isNonMember = userRole != 'member';
+    final pageTitle = isNonMember ? "My Campaigns" : "My Participations";
 
-    return FutureBuilder<String?>(
-      future: secureStorage.getUserData().then((user) => user?.role),
-      builder: (context, roleSnapshot) {
-        final userRole = roleSnapshot.data;
-        final isNonMember = userRole != null && userRole != 'member';
-        final pageTitle = isNonMember ? "My Campaigns" : "My Participations";
-
-        return Scaffold(
+    return Scaffold(
           backgroundColor: kBackgroundColor,
           appBar: AppBar(
             backgroundColor: kWhite,
@@ -105,11 +102,10 @@ class _MyParticipationsPageState extends ConsumerState<MyParticipationsPage>
               Padding(
                 padding: const EdgeInsets.only(right: 16),
                 child: Center(
-                  child: FutureBuilder<String?>(
-                    future:
-                        secureStorage.getUserData().then((user) => user?.role),
-                    builder: (context, snapshot) {
-                      final isAdmin = snapshot.data != 'member';
+                  child: Builder(
+                    builder: (context) {
+                      final userRole = GlobalVariables.getUserRole();
+                      final isAdmin = userRole != 'member';
                       if (!isAdmin) {
                         return const SizedBox.shrink();
                       }
@@ -131,7 +127,7 @@ class _MyParticipationsPageState extends ConsumerState<MyParticipationsPage>
                           ],
                         ),
                       );
-                    },
+                    }
                   ),
                 ),
               ),
@@ -180,24 +176,18 @@ class _MyParticipationsPageState extends ConsumerState<MyParticipationsPage>
             ],
           ),
         );
-      },
-    );
   }
 
   // Transactions Tab
   Widget _yourTransactionsTab() {
     final secureStorage = ref.watch(secureStorageServiceProvider);
     final currentFilter = ref.watch(transactionsFilterProvider);
+    final userRole = GlobalVariables.getUserRole();
+    final isNonMember = userRole != 'member';
 
-    return FutureBuilder<String?>(
-      future: secureStorage.getUserData().then((user) => user?.role),
-      builder: (context, snapshot) {
-        final userRole = snapshot.data;
-        final isNonMember = userRole != null && userRole != 'member';
-
-        return Column(
-          children: [
-            if (isNonMember)
+    return Column(
+      children: [
+        if (isNonMember)
               FutureBuilder<String?>(
                 future: secureStorage.getUserData().then((user) => user?.name),
                 builder: (context, nameSnapshot) {
@@ -221,8 +211,6 @@ class _MyParticipationsPageState extends ConsumerState<MyParticipationsPage>
             ),
           ],
         );
-      },
-    );
   }
 
   Widget _buildUserTransactionsView() {
@@ -336,7 +324,8 @@ class _MyParticipationsPageState extends ConsumerState<MyParticipationsPage>
   // My Campaigns Tab
   Widget _myCampaignsTab() {
     final donationsState = ref.watch(participatedCampaignsProvider);
-
+      final preferredLanguage =
+                        GlobalVariables.getPreferredLanguage();
     return donationsState.when(
       data: (paginationState) {
         final campaigns = paginationState.donations
@@ -366,8 +355,8 @@ class _MyParticipationsPageState extends ConsumerState<MyParticipationsPage>
                 delayMilliseconds: index * 50,
                 child: CampaignCard(
                   id: campaign.id ?? '',
-                  description: campaign.description ?? '',
-                  title: campaign.title ?? '',
+                  description: campaign.getDescription(preferredLanguage) ?? '',
+                  title: campaign.getTitle(preferredLanguage) ?? '',
                   category: campaign.category ?? '',
                   date: formatDate(campaign.targetDate) ?? '',
                   image: campaign.coverImage ?? '',

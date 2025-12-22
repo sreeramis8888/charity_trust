@@ -1,8 +1,9 @@
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:Annujoom/src/data/providers/api_provider.dart';
 
 part 'promotions_provider.g.dart';
+
+
 
 class PromotionsApi {
   static const String _endpoint = '/promotions/user';

@@ -9,6 +9,7 @@ import 'package:package_info_plus/package_info_plus.dart';
 
 import '../../data/constants/color_constants.dart';
 import '../../data/constants/style_constants.dart';
+import '../../data/constants/global_variables.dart';
 import '../../data/services/navigation_service.dart';
 import '../../data/providers/auth_provider.dart';
 import '../../data/providers/user_provider.dart';
@@ -376,6 +377,20 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
           await secureStorage.saveUserData(user);
           log('_checkAuthenticationAndLoadUser: User data saved to secure storage',
               name: 'SplashScreen');
+          
+          // Set language preference in global variables
+          if (user.preferredLanguage != null) {
+            GlobalVariables.setPreferredLanguage(user.preferredLanguage!);
+            log('_checkAuthenticationAndLoadUser: Language set in global variables - ${user.preferredLanguage}',
+                name: 'SplashScreen');
+          }
+
+          // Set user role in global variables
+          if (user.role != null) {
+            GlobalVariables.setUserRole(user.role!);
+            log('_checkAuthenticationAndLoadUser: User role set in global variables - ${user.role}',
+                name: 'SplashScreen');
+          }
 
           if (mounted) {
             log('_checkAuthenticationAndLoadUser: Widget mounted, navigating based on API status: ${user.status}',
@@ -393,6 +408,20 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
                 name: 'SplashScreen');
             log('WARNING: Using cached user data from secure storage instead of fresh API data',
                 name: 'SplashScreen');
+            
+            // Set language preference in global variables
+            if (user.preferredLanguage != null) {
+              GlobalVariables.setPreferredLanguage(user.preferredLanguage!);
+              log('_checkAuthenticationAndLoadUser: Language set in global variables from cached data - ${user.preferredLanguage}',
+                  name: 'SplashScreen');
+            }
+
+            // Set user role in global variables
+            if (user.role != null) {
+              GlobalVariables.setUserRole(user.role!);
+              log('_checkAuthenticationAndLoadUser: User role set in global variables from cached data - ${user.role}',
+                  name: 'SplashScreen');
+            }
 
             if (mounted) {
               log('_checkAuthenticationAndLoadUser: Widget mounted, navigating based on local storage status: ${user.status}',

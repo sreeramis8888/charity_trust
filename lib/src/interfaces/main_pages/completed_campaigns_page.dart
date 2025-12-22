@@ -1,3 +1,4 @@
+import 'package:Annujoom/src/data/constants/global_variables.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:Annujoom/src/data/constants/color_constants.dart';
@@ -15,7 +16,8 @@ class CompletedCampaignsPage extends ConsumerWidget {
     final promotionsAsync = ref.watch(
       promotionsListProvider(),
     );
-
+      final preferredLanguage =
+                        GlobalVariables.getPreferredLanguage();
     return Scaffold(
       backgroundColor: const Color(0xFFF2F2F2),
       appBar: AppBar(
@@ -50,8 +52,8 @@ class CompletedCampaignsPage extends ConsumerWidget {
               return Padding(
                 padding: const EdgeInsets.only(bottom: 20),
                 child: HomeCompletedCampaignCard(
-                  heading: promotion.title ?? '',
-                  subtitle: promotion.description ?? '',
+                  heading: promotion.getTitle(preferredLanguage) ?? '',
+                  subtitle: promotion.getDescription(preferredLanguage) ?? '',
                   goal: 0,
                   collected: 0,
                   posterImage: promotion.media ?? '',

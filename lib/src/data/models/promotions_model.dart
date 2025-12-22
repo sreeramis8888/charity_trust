@@ -1,7 +1,7 @@
 class Promotions {
   final String? id;
-  final String? title;
-  final String? description;
+  final Map<String, String> title; // {"en": "...", "ml": "..."}
+  final Map<String, String> description; // {"en": "...", "ml": "..."}
   final String? type;
   final String? campaign;
   final DateTime? startDate;
@@ -14,8 +14,8 @@ class Promotions {
 
   Promotions({
     this.id,
-    this.title,
-    this.description,
+    required this.title,
+    required this.description,
     this.type,
     this.campaign,
     this.startDate,
@@ -27,11 +27,43 @@ class Promotions {
     this.updatedAt,
   });
 
+  /// Get title in specified language, fallback to English, then first available
+  String getTitle(String languageCode) {
+    return title[languageCode] ?? title['en'] ?? title.values.firstOrNull ?? '';
+  }
+
+  /// Get description in specified language, fallback to English, then first available
+  String getDescription(String languageCode) {
+    return description[languageCode] ?? description['en'] ?? description.values.firstOrNull ?? '';
+  }
+
   factory Promotions.fromJson(Map<String, dynamic> json) {
+    // Handle title - can be string or map
+    Map<String, String> titleMap = {};
+    final titleData = json['title'];
+    if (titleData is Map) {
+      titleMap = Map<String, String>.from(
+        titleData.map((k, v) => MapEntry(k.toString(), v.toString())),
+      );
+    } else if (titleData is String) {
+      titleMap = {'en': titleData};
+    }
+
+    // Handle description - can be string or map
+    Map<String, String> descriptionMap = {};
+    final descriptionData = json['description'];
+    if (descriptionData is Map) {
+      descriptionMap = Map<String, String>.from(
+        descriptionData.map((k, v) => MapEntry(k.toString(), v.toString())),
+      );
+    } else if (descriptionData is String) {
+      descriptionMap = {'en': descriptionData};
+    }
+
     return Promotions(
       id: json['_id']?.toString(),
-      title: json['title']?.toString(),
-      description: json['description']?.toString(),
+      title: titleMap.isNotEmpty ? titleMap : {'en': ''},
+      description: descriptionMap.isNotEmpty ? descriptionMap : {'en': ''},
       type: json['type']?.toString(),
       campaign: json['campaign']?.toString(),
       startDate: json['start_date'] != null
@@ -40,8 +72,7 @@ class Promotions {
       endDate: json['end_date'] != null
           ? DateTime.tryParse(json['end_date'].toString())
           : null,
-media: json['media']?.toString() ?? json['cover_image']?.toString(),
-
+      media: json['media']?.toString() ?? json['cover_image']?.toString(),
       link: json['link']?.toString(),
       status: json['status']?.toString(),
       createdAt: json['createdAt'] != null
@@ -72,8 +103,8 @@ media: json['media']?.toString() ?? json['cover_image']?.toString(),
 
   Promotions copyWith({
     String? id,
-    String? title,
-    String? description,
+    Map<String, String>? title,
+    Map<String, String>? description,
     String? type,
     String? campaign,
     DateTime? startDate,

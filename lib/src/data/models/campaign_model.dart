@@ -1,7 +1,8 @@
 class CampaignModel {
   final String? id;
-  final String title;
-  final String description;
+  final Map<String, String> title; // {"en": "...", "ml": "..."}
+  final Map<String, String> subtitle; // {"en": "...", "ml": "..."}
+  final Map<String, String> description; // {"en": "...", "ml": "..."}
   final String coverImage;
   final String category;
   final DateTime? startDate;
@@ -20,6 +21,7 @@ class CampaignModel {
   CampaignModel({
     this.id,
     required this.title,
+    required this.subtitle,
     required this.description,
     required this.coverImage,
     required this.category,
@@ -37,12 +39,61 @@ class CampaignModel {
     this.updatedAt,
   });
 
+  /// Get title in specified language, fallback to English, then first available
+  String getTitle(String languageCode) {
+    return title[languageCode] ?? title['en'] ?? title.values.firstOrNull ?? '';
+  }
+
+  /// Get subtitle in specified language, fallback to English, then first available
+  String getSubtitle(String languageCode) {
+    return subtitle[languageCode] ?? subtitle['en'] ?? subtitle.values.firstOrNull ?? '';
+  }
+
+  /// Get description in specified language, fallback to English, then first available
+  String getDescription(String languageCode) {
+    return description[languageCode] ?? description['en'] ?? description.values.firstOrNull ?? '';
+  }
+
   /// ✅ FROM JSON
   factory CampaignModel.fromJson(Map<String, dynamic> json) {
+    // Handle title - can be string or map
+    Map<String, String> titleMap = {};
+    final titleData = json['title'];
+    if (titleData is Map) {
+      titleMap = Map<String, String>.from(
+        titleData.map((k, v) => MapEntry(k.toString(), v.toString())),
+      );
+    } else if (titleData is String) {
+      titleMap = {'en': titleData};
+    }
+
+    // Handle subtitle - can be string or map
+    Map<String, String> subtitleMap = {};
+    final subtitleData = json['subtitle'];
+    if (subtitleData is Map) {
+      subtitleMap = Map<String, String>.from(
+        subtitleData.map((k, v) => MapEntry(k.toString(), v.toString())),
+      );
+    } else if (subtitleData is String) {
+      subtitleMap = {'en': subtitleData};
+    }
+
+    // Handle description - can be string or map
+    Map<String, String> descriptionMap = {};
+    final descriptionData = json['description'];
+    if (descriptionData is Map) {
+      descriptionMap = Map<String, String>.from(
+        descriptionData.map((k, v) => MapEntry(k.toString(), v.toString())),
+      );
+    } else if (descriptionData is String) {
+      descriptionMap = {'en': descriptionData};
+    }
+
     return CampaignModel(
       id: json['_id'],
-      title: json['title'] ?? '',
-      description: json['description'] ?? '',
+      title: titleMap.isNotEmpty ? titleMap : {'en': ''},
+      subtitle: subtitleMap.isNotEmpty ? subtitleMap : {'en': ''},
+      description: descriptionMap.isNotEmpty ? descriptionMap : {'en': ''},
       coverImage: json['cover_image'] ?? '',
       category: json['category'] ?? '',
       startDate:
@@ -69,6 +120,7 @@ class CampaignModel {
     return {
       '_id': id,
       'title': title,
+      'subtitle': subtitle,
       'description': description,
       'cover_image': coverImage,
       'category': category,
@@ -90,8 +142,9 @@ class CampaignModel {
   /// ✅ COPYWITH (Optional but Recommended)
   CampaignModel copyWith({
     String? id,
-    String? title,
-    String? description,
+    Map<String, String>? title,
+    Map<String, String>? subtitle,
+    Map<String, String>? description,
     String? coverImage,
     String? category,
     DateTime? startDate,
@@ -110,6 +163,7 @@ class CampaignModel {
     return CampaignModel(
       id: id ?? this.id,
       title: title ?? this.title,
+      subtitle: subtitle ?? this.subtitle,
       description: description ?? this.description,
       coverImage: coverImage ?? this.coverImage,
       category: category ?? this.category,

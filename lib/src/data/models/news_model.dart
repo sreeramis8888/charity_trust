@@ -1,9 +1,9 @@
 class NewsModel {
   final String? id;
   final String? category;
-  final String? title;
-  final String? subTitle;
-  final String? content;
+  final Map<String, String> title; // {"en": "...", "ml": "..."}
+  final Map<String, String> subtitle; // {"en": "...", "ml": "..."}
+  final Map<String, String> content; // {"en": "...", "ml": "..."}
   final String? media;
   final String? status;
   final String? link;
@@ -14,9 +14,9 @@ class NewsModel {
   NewsModel({
     this.id,
     this.category,
-    this.title,
-    this.subTitle,
-    this.content,
+    required this.title,
+    required this.subtitle,
+    required this.content,
     this.media,
     this.status,
     this.link,
@@ -25,13 +25,61 @@ class NewsModel {
     this.updatedAt,
   });
 
+  /// Get title in specified language, fallback to English, then first available
+  String getTitle(String languageCode) {
+    return title[languageCode] ?? title['en'] ?? title.values.firstOrNull ?? '';
+  }
+
+  /// Get subtitle in specified language, fallback to English, then first available
+  String getSubtitle(String languageCode) {
+    return subtitle[languageCode] ?? subtitle['en'] ?? subtitle.values.firstOrNull ?? '';
+  }
+
+  /// Get content in specified language, fallback to English, then first available
+  String getContent(String languageCode) {
+    return content[languageCode] ?? content['en'] ?? content.values.firstOrNull ?? '';
+  }
+
   factory NewsModel.fromJson(Map<String, dynamic> json) {
+    // Handle title - can be string or map
+    Map<String, String> titleMap = {};
+    final titleData = json['title'];
+    if (titleData is Map) {
+      titleMap = Map<String, String>.from(
+        titleData.map((k, v) => MapEntry(k.toString(), v.toString())),
+      );
+    } else if (titleData is String) {
+      titleMap = {'en': titleData};
+    }
+
+    // Handle subtitle - can be string or map
+    Map<String, String> subtitleMap = {};
+    final subtitleData = json['sub_title'];
+    if (subtitleData is Map) {
+      subtitleMap = Map<String, String>.from(
+        subtitleData.map((k, v) => MapEntry(k.toString(), v.toString())),
+      );
+    } else if (subtitleData is String) {
+      subtitleMap = {'en': subtitleData};
+    }
+
+    // Handle content - can be string or map
+    Map<String, String> contentMap = {};
+    final contentData = json['content'];
+    if (contentData is Map) {
+      contentMap = Map<String, String>.from(
+        contentData.map((k, v) => MapEntry(k.toString(), v.toString())),
+      );
+    } else if (contentData is String) {
+      contentMap = {'en': contentData};
+    }
+
     return NewsModel(
       id: json["_id"]?.toString(),
       category: json["category"]?.toString(),
-      title: json["title"]?.toString(),
-      subTitle: json["sub_title"]?.toString(),
-      content: json["content"]?.toString(),
+      title: titleMap.isNotEmpty ? titleMap : {'en': ''},
+      subtitle: subtitleMap.isNotEmpty ? subtitleMap : {'en': ''},
+      content: contentMap.isNotEmpty ? contentMap : {'en': ''},
       media: json["media"]?.toString(),
       status: json["status"]?.toString(),
       link: json["link"]?.toString(),
@@ -53,7 +101,7 @@ class NewsModel {
       "_id": id,
       "category": category,
       "title": title,
-      "sub_title": subTitle,
+      "sub_title": subtitle,
       "content": content,
       "media": media,
       "status": status,
@@ -67,9 +115,9 @@ class NewsModel {
   NewsModel copyWith({
     String? id,
     String? category,
-    String? title,
-    String? subTitle,
-    String? content,
+    Map<String, String>? title,
+    Map<String, String>? subtitle,
+    Map<String, String>? content,
     String? media,
     String? status,
     String? link,
@@ -81,7 +129,7 @@ class NewsModel {
       id: id ?? this.id,
       category: category ?? this.category,
       title: title ?? this.title,
-      subTitle: subTitle ?? this.subTitle,
+      subtitle: subtitle ?? this.subtitle,
       content: content ?? this.content,
       media: media ?? this.media,
       status: status ?? this.status,

@@ -1,3 +1,4 @@
+import 'package:Annujoom/src/data/constants/global_variables.dart';
 import 'package:Annujoom/src/data/utils/date_formatter.dart';
 import 'package:Annujoom/src/interfaces/components/cards/campaing_card.dart';
 import 'package:Annujoom/src/interfaces/components/cards/transaction_card.dart';
@@ -127,11 +128,10 @@ class _CampaignPageState extends ConsumerState<CampaignPage>
   }
 
   Future<void> _loadUserRole() async {
-    final secureStorage = ref.read(secureStorageServiceProvider);
-    final user = await secureStorage.getUserData();
+    final userRole = GlobalVariables.getUserRole();
     if (mounted) {
       setState(() {
-        _isPresident = user?.role == 'president';
+        _isPresident = userRole == 'president';
         final tabCount = _isPresident ? 4 : 3;
         if (_controller.length != tabCount) {
           _controller.dispose();
@@ -178,10 +178,10 @@ class _CampaignPageState extends ConsumerState<CampaignPage>
           Padding(
             padding: const EdgeInsets.only(right: 16),
             child: Center(
-              child: FutureBuilder<String?>(
-                future: secureStorage.getUserData().then((user) => user?.role),
-                builder: (context, snapshot) {
-                  final isAdmin = snapshot.data != 'member';
+              child: Builder(
+                builder: (context) {
+                  final userRole = GlobalVariables.getUserRole();
+                  final isAdmin = userRole != 'member';
                   if (!isAdmin) {
                     return const SizedBox.shrink();
                   }
@@ -203,7 +203,7 @@ class _CampaignPageState extends ConsumerState<CampaignPage>
                       ],
                     ),
                   );
-                },
+                }
               ),
             ),
           ),
@@ -280,7 +280,8 @@ class _CampaignPageState extends ConsumerState<CampaignPage>
   Widget _generalCampaignTab() {
     final campaignsState = ref.watch(generalCampaignsProvider);
     final selectedCategory = ref.watch(campaignCategoryFilterProvider);
-
+      final preferredLanguage =
+                        GlobalVariables.getPreferredLanguage();
     print('=== _generalCampaignTab rebuild ===');
     print('selectedCategory from provider: $selectedCategory');
 
@@ -322,8 +323,8 @@ class _CampaignPageState extends ConsumerState<CampaignPage>
                       delayMilliseconds: index * 50,
                       child: CampaignCard(
                         id: campaign.id ?? '',
-                        description: campaign.description ?? '',
-                        title: campaign.title ?? '',
+                        description: campaign.getDescription(preferredLanguage) ?? '',
+                        title: campaign.getTitle(preferredLanguage) ?? '',
                         category: campaign.category ?? '',
                         date: formatDate(campaign.targetDate) ?? '',
                         image: campaign.coverImage ?? '',
@@ -377,16 +378,12 @@ class _CampaignPageState extends ConsumerState<CampaignPage>
   Widget _yourTransactionsTab() {
     final secureStorage = ref.watch(secureStorageServiceProvider);
     final currentFilter = ref.watch(transactionsFilterProvider);
+    final userRole = GlobalVariables.getUserRole();
+    final isNonMember = userRole != 'member';
 
-    return FutureBuilder<String?>(
-      future: secureStorage.getUserData().then((user) => user?.role),
-      builder: (context, snapshot) {
-        final userRole = snapshot.data;
-        final isNonMember = userRole != null && userRole != 'member';
-
-        return Column(
-          children: [
-            if (isNonMember)
+    return Column(
+      children: [
+        if (isNonMember)
               FutureBuilder<String?>(
                 future: secureStorage.getUserData().then((user) => user?.name),
                 builder: (context, nameSnapshot) {
@@ -462,8 +459,6 @@ class _CampaignPageState extends ConsumerState<CampaignPage>
             ),
           ],
         );
-      },
-    );
   }
 
   void _showFilterBottomSheet(BuildContext context) {
@@ -689,16 +684,12 @@ class _CampaignPageState extends ConsumerState<CampaignPage>
   Widget _myCampaignsTab() {
     final secureStorage = ref.watch(secureStorageServiceProvider);
     final currentFilter = ref.watch(myCampaignsFilterProvider);
+    final userRole = GlobalVariables.getUserRole();
+    final isNonMember = userRole != 'member';
 
-    return FutureBuilder<String?>(
-      future: secureStorage.getUserData().then((user) => user?.role),
-      builder: (context, snapshot) {
-        final userRole = snapshot.data;
-        final isNonMember = userRole != null && userRole != 'member';
-
-        return Column(
-          children: [
-            if (isNonMember)
+    return Column(
+      children: [
+        if (isNonMember)
               ChoiceChipFilter(
                 options: const ['Joined', 'Created'],
                 selectedOption: currentFilter ? 'Created' : 'Joined',
@@ -715,13 +706,12 @@ class _CampaignPageState extends ConsumerState<CampaignPage>
             ),
           ],
         );
-      },
-    );
   }
 
   Widget _buildCreatedCampaignsView() {
     final campaignsState = ref.watch(createdCampaignsProvider);
-
+      final preferredLanguage =
+                        GlobalVariables.getPreferredLanguage();
     return campaignsState.when(
       data: (paginationState) {
         if (paginationState.campaigns.isEmpty) {
@@ -746,8 +736,8 @@ class _CampaignPageState extends ConsumerState<CampaignPage>
                 delayMilliseconds: index * 50,
                 child: CampaignCard(
                   id: campaign.id ?? '',
-                  description: campaign.description ?? '',
-                  title: campaign.title ?? '',
+                  description: campaign.getDescription(preferredLanguage) ?? '',
+                  title: campaign.getTitle(preferredLanguage) ?? '',
                   category: campaign.category ?? '',
                   date: formatDate(campaign.targetDate) ?? '',
                   image: campaign.coverImage ?? '',
@@ -796,7 +786,8 @@ class _CampaignPageState extends ConsumerState<CampaignPage>
 
   Widget _buildJoinedCampaignsView() {
     final donationsState = ref.watch(participatedCampaignsProvider);
-
+      final preferredLanguage =
+                        GlobalVariables.getPreferredLanguage();
     return donationsState.when(
       data: (paginationState) {
         final campaigns = paginationState.donations
@@ -826,8 +817,8 @@ class _CampaignPageState extends ConsumerState<CampaignPage>
                 delayMilliseconds: index * 50,
                 child: CampaignCard(
                   id: campaign.id ?? '',
-                  description: campaign.description ?? '',
-                  title: campaign.title ?? '',
+                  description: campaign.getDescription(preferredLanguage) ?? '',
+                  title: campaign.getTitle(preferredLanguage) ?? '',
                   category: campaign.category ?? '',
                   date: formatDate(campaign.targetDate) ?? '',
                   image: campaign.coverImage ?? '',
@@ -877,7 +868,8 @@ class _CampaignPageState extends ConsumerState<CampaignPage>
   // ---------------- TAB 4 (APPROVALS) ---------------- //
   Widget _approvalsTab() {
     final approvalsState = ref.watch(pendingApprovalCampaignsProvider);
-
+      final preferredLanguage =
+                        GlobalVariables.getPreferredLanguage();
     return approvalsState.when(
       data: (paginationState) {
         if (paginationState.campaigns.isEmpty) {
@@ -899,8 +891,8 @@ class _CampaignPageState extends ConsumerState<CampaignPage>
                 delayMilliseconds: index * 50,
                 child: CampaignCard(
                   id: campaign.id ?? '',
-                  description: campaign.description ?? '',
-                  title: campaign.title ?? '',
+                  description: campaign.getDescription(preferredLanguage) ?? '',
+                  title: campaign.getTitle(preferredLanguage) ?? '',
                   category: campaign.category ?? '',
                   date: formatDate(campaign.targetDate) ?? '',
                   startDate: formatDate(campaign.startDate),
@@ -934,7 +926,7 @@ class _CampaignPageState extends ConsumerState<CampaignPage>
                   },
                   onReject: () {
                     _showRejectDialog(
-                        context, campaign.id ?? '', campaign.title ?? '');
+                        context, campaign.id ?? '', campaign.getTitle(preferredLanguage) ?? '');
                   },
                 ),
               ),

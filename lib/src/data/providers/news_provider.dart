@@ -6,6 +6,7 @@ import 'package:Annujoom/src/data/services/secure_storage_service.dart';
 
 part 'news_provider.g.dart';
 
+
 class NewsApi {
   static const String _endpoint = '/news';
 

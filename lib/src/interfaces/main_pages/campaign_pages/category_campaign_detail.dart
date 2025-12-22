@@ -1,3 +1,4 @@
+import 'package:Annujoom/src/data/constants/global_variables.dart';
 import 'package:Annujoom/src/interfaces/components/loading_indicator.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -17,7 +18,8 @@ class CategoryCampaignDetailPage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final campaignsAsync = ref.watch(categoryCampaignsProvider(category));
-
+      final preferredLanguage =
+                        GlobalVariables.getPreferredLanguage();
     return campaignsAsync.when(
       data: (paginationState) {
         if (paginationState.campaigns.isEmpty) {
@@ -50,8 +52,8 @@ class CategoryCampaignDetailPage extends ConsumerWidget {
 
         return CampaignDetailPage(
           id: campaign.id,
-          title: campaign.title,
-          description: campaign.description,
+          title: campaign.getTitle(preferredLanguage),
+          description: campaign.getDescription(preferredLanguage),
           category: campaign.category,
           date: campaign.targetDate?.toString().split(' ')[0],
           image: campaign.coverImage,

@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'dart:developer';
 import 'package:Annujoom/src/data/constants/color_constants.dart';
+import 'package:Annujoom/src/data/constants/global_variables.dart';
 import 'package:Annujoom/src/data/constants/style_constants.dart';
 import 'package:Annujoom/src/data/utils/media_picker.dart';
 import 'package:Annujoom/src/data/providers/loading_provider.dart';
@@ -247,8 +248,8 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
 
   @override
   Widget build(BuildContext context) {
-    final user = ref.watch(userProvider);
-    final isTrustee = user?.role == 'trustee';
+    final userRole = GlobalVariables.getUserRole();
+    final isTrustee = userRole == 'trustee';
 
     return Scaffold(
       backgroundColor: Colors.white,

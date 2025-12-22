@@ -53,7 +53,7 @@ class VideosPage extends ConsumerWidget {
                 child: videoId != null
                     ? YoutubeVideoCard(
                         videoId: videoId,
-                        title: video.title ?? '',
+
                       )
                     : Container(
                         decoration: BoxDecoration(

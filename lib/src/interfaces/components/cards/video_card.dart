@@ -3,12 +3,11 @@ import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 
 class YoutubeVideoCard extends StatefulWidget {
   final String videoId;
-  final String title;
+
 
   const YoutubeVideoCard({
     super.key,
     required this.videoId,
-    required this.title,
   });
 
   @override

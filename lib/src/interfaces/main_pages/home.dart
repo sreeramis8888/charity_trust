@@ -1,6 +1,8 @@
+import 'package:Annujoom/src/data/providers/campaigns_provider.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:Annujoom/src/data/constants/color_constants.dart';
 import 'package:Annujoom/src/data/constants/style_constants.dart';
+import 'package:Annujoom/src/data/constants/global_variables.dart';
 import 'package:Annujoom/src/interfaces/components/cards/index.dart';
 import 'package:Annujoom/src/data/providers/home_provider.dart';
 import 'package:Annujoom/src/data/providers/notifications_provider.dart';
@@ -18,6 +20,7 @@ import 'package:Annujoom/src/data/router/nav_router.dart';
 import 'package:Annujoom/src/data/utils/launch_url.dart';
 import 'package:Annujoom/src/data/services/notification_service/get_fcm.dart';
 import 'package:Annujoom/src/interfaces/components/primaryButton.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
@@ -126,7 +129,7 @@ class _HomePageState extends ConsumerState<HomePage> {
             Row(
               children: [
                 Text(
-                  'Call Support Team',
+                  'callSupportTeam'.tr(),
                   style: kBodyTitleSB,
                   textAlign: TextAlign.start,
                 ),
@@ -134,7 +137,7 @@ class _HomePageState extends ConsumerState<HomePage> {
             ),
             const SizedBox(height: 16),
             Text(
-              'Do you want to call the Annujoom Support Team? You\'re about to make a phone call.',
+              'callSupportMessage'.tr(),
               style: kBodyTitleL.copyWith(color: kSecondaryTextColor),
               textAlign: TextAlign.start,
             ),
@@ -143,7 +146,7 @@ class _HomePageState extends ConsumerState<HomePage> {
               children: [
                 Expanded(
                   child: primaryButton(
-                    label: 'Cancel',
+                    label: 'cancel'.tr(),
                     onPressed: () => Navigator.pop(context),
                     buttonColor: kWhite,
                     labelColor: kTextColor,
@@ -154,7 +157,7 @@ class _HomePageState extends ConsumerState<HomePage> {
                 const SizedBox(width: 12),
                 Expanded(
                   child: primaryButton(
-                    label: 'Call',
+                    label: 'call'.tr(),
                     onPressed: () {
                       Navigator.pop(context);
                       launchPhone('+918891646431');
@@ -187,13 +190,13 @@ class _HomePageState extends ConsumerState<HomePage> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Text('Error loading home data'),
+              Text('errorLoadingHomeData'.tr()),
               SizedBox(height: 16),
               ElevatedButton(
                 onPressed: () {
                   ref.read(homePageProvider.notifier).refresh();
                 },
-                child: Text('Retry'),
+                child: Text('retry'.tr()),
               ),
             ],
           ),
@@ -205,87 +208,80 @@ class _HomePageState extends ConsumerState<HomePage> {
   }
 
   Widget? _buildFloatingActionButton(BuildContext context, WidgetRef ref) {
-    return FutureBuilder<String?>(
-      future: ref.read(secureStorageServiceProvider).getUserData().then(
-            (userData) => userData?.role,
-          ),
-      builder: (context, snapshot) {
-        final userRole = snapshot.data ?? '';
-        final isAdmin = userRole != 'member';
+    final userRole = GlobalVariables.getUserRole();
+    final isAdmin = userRole != 'member';
 
-        if (isAdmin) {
-          return ExpandableFab(
-            type: ExpandableFabType.up,
-            distance: 70,
-            openButtonBuilder: DefaultFloatingActionButtonBuilder(
-              child: const Icon(Icons.menu, size: 20),
-              fabSize: ExpandableFabSize.regular,
-              foregroundColor: Colors.white,
-              backgroundColor: const Color(0xFFED3C5F),
-              shape: const CircleBorder(), // 👈 force round
-            ),
-            closeButtonBuilder: DefaultFloatingActionButtonBuilder(
-              child: const Icon(Icons.close, size: 20),
-              fabSize: ExpandableFabSize.regular,
-              foregroundColor: Colors.white,
-              backgroundColor: const Color(0xFFED3C5F),
-              shape: const CircleBorder(), // 👈 force round
-            ),
-            children: [
-              FloatingActionButton(
-                heroTag: null,
-                shape: const CircleBorder(), // 👈 force round
-                backgroundColor: const Color(0xFFED3C5F),
-                onPressed: () {
-                  Navigator.of(context).pushNamed('CreateUser');
-                },
-                child: SvgPicture.asset(
-                  'assets/svg/add.svg',
-                  height: 20,
-                  width: 20,
-                  colorFilter:
-                      const ColorFilter.mode(Colors.white, BlendMode.srcIn),
-                ),
-              ),
-              FloatingActionButton(
-                heroTag: null,
-                shape: const CircleBorder(), // 👈 force round
-                backgroundColor: const Color(0xFFED3C5F),
-                onPressed: () {
-                  Navigator.of(context).pushNamed('DonationCategories');
-                },
-                child: SvgPicture.asset(
-                  'assets/svg/donation.svg',
-                  height: 20,
-                  width: 20,
-                  colorFilter:
-                      const ColorFilter.mode(Colors.white, BlendMode.srcIn),
-                ),
-              ),
-            ],
-          );
-        }
-
-        return Align(
-          alignment: Alignment.bottomRight,
-          child: Padding(
-            padding: const EdgeInsets.only(right: 16, bottom: 16),
-            child: FloatingActionButton(
-              heroTag: 'memberDonateButton',
-              onPressed: () {
-                Navigator.of(context).pushNamed('DonationCategories');
-              },
-              backgroundColor: const Color(0xFFED3C5F),
-              child: SvgPicture.asset(
-                'assets/svg/donation.svg',
-                height: 24,
-                width: 24,
-                colorFilter: ColorFilter.mode(kWhite, BlendMode.srcIn),
-              ),
+    if (isAdmin) {
+      return ExpandableFab(
+        type: ExpandableFabType.up,
+        distance: 70,
+        openButtonBuilder: DefaultFloatingActionButtonBuilder(
+          child: const Icon(Icons.menu, size: 20),
+          fabSize: ExpandableFabSize.regular,
+          foregroundColor: Colors.white,
+          backgroundColor: const Color(0xFFED3C5F),
+          shape: const CircleBorder(), // 👈 force round
+        ),
+        closeButtonBuilder: DefaultFloatingActionButtonBuilder(
+          child: const Icon(Icons.close, size: 20),
+          fabSize: ExpandableFabSize.regular,
+          foregroundColor: Colors.white,
+          backgroundColor: const Color(0xFFED3C5F),
+          shape: const CircleBorder(), // 👈 force round
+        ),
+        children: [
+          FloatingActionButton(
+            heroTag: null,
+            shape: const CircleBorder(), // 👈 force round
+            backgroundColor: const Color(0xFFED3C5F),
+            onPressed: () {
+              Navigator.of(context).pushNamed('CreateUser');
+            },
+            child: SvgPicture.asset(
+              'assets/svg/add.svg',
+              height: 20,
+              width: 20,
+              colorFilter:
+                  const ColorFilter.mode(Colors.white, BlendMode.srcIn),
             ),
           ),
-        );
-      },
+          FloatingActionButton(
+            heroTag: null,
+            shape: const CircleBorder(), // 👈 force round
+            backgroundColor: const Color(0xFFED3C5F),
+            onPressed: () {
+              Navigator.of(context).pushNamed('DonationCategories');
+            },
+            child: SvgPicture.asset(
+              'assets/svg/donation.svg',
+              height: 20,
+              width: 20,
+              colorFilter:
+                  const ColorFilter.mode(Colors.white, BlendMode.srcIn),
+            ),
+          ),
+        ],
+      );
+    }
+
+    return Align(
+      alignment: Alignment.bottomRight,
+      child: Padding(
+        padding: const EdgeInsets.only(right: 16, bottom: 16),
+        child: FloatingActionButton(
+          heroTag: 'memberDonateButton',
+          onPressed: () {
+            Navigator.of(context).pushNamed('DonationCategories');
+          },
+          backgroundColor: const Color(0xFFED3C5F),
+          child: SvgPicture.asset(
+            'assets/svg/donation.svg',
+            height: 24,
+            width: 24,
+            colorFilter: ColorFilter.mode(kWhite, BlendMode.srcIn),
+          ),
+        ),
+      ),
     );
   }
 
@@ -438,12 +434,12 @@ class _HomePageState extends ConsumerState<HomePage> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Assalamualaikkum, $userName!',
+                          '${'greeting'.tr()}, $userName!',
                           style: kHeadTitleSB.copyWith(
                               fontSize: 20, color: kThirdTextColor),
                         ),
                         Text(
-                          "Connect, Contribute, Make a Difference",
+                          'tagline'.tr(),
                           style: kSmallTitleL.copyWith(color: kThirdTextColor),
                         ),
                       ],
@@ -630,7 +626,7 @@ class _HomePageState extends ConsumerState<HomePage> {
                                             color: kThirdTextColor),
                                       ),
                                       const SizedBox(height: 4),
-                                      Text('Referrals Received',
+                                      Text('referralsReceived'.tr(),
                                           style: kSmallerTitleR),
                                     ],
                                   ),
@@ -668,7 +664,7 @@ class _HomePageState extends ConsumerState<HomePage> {
                                                     .pushNamed('MyReferrals');
                                               },
                                               child: Text(
-                                                'Review Now',
+                                                'reviewNow'.tr(),
                                                 style: kSmallerTitleM.copyWith(
                                                   color: kThirdTextColor,
                                                   decoration:
@@ -679,7 +675,7 @@ class _HomePageState extends ConsumerState<HomePage> {
                                           ],
                                         ),
                                         const SizedBox(height: 4),
-                                        Text('Pending Approvals',
+                                        Text('pendingApprovals'.tr(),
                                             style: kSmallerTitleR),
                                       ],
                                     ),
@@ -701,7 +697,7 @@ class _HomePageState extends ConsumerState<HomePage> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Text('Funding Campaigns', style: kBodyTitleM),
+                          Text('fundingCampaigns'.tr(), style: kBodyTitleM),
                           GestureDetector(
                             onTap: () {
                               Navigator.of(context).pushNamed(
@@ -709,7 +705,7 @@ class _HomePageState extends ConsumerState<HomePage> {
                                 arguments: {'category': 'All'},
                               );
                             },
-                            child: Text('See All >',
+                            child: Text('seeAll'.tr(),
                                 style: kSmallTitleM.copyWith(
                                     color: kThirdTextColor)),
                           ),
@@ -725,17 +721,25 @@ class _HomePageState extends ConsumerState<HomePage> {
                             enableInfiniteScroll: true,
                             autoPlay: false,
                             onPageChanged: (index, reason) {
-                              setState(() => _endingCampaignIndex = index);
+                              setState(
+                                  () => _endingCampaignIndex = index);
                             },
                           ),
                           items: homeData.endingCampaigns.map((campaign) {
+                            final preferredLanguage =
+                                GlobalVariables.getPreferredLanguage();
                             return Padding(
-                              padding: const EdgeInsets.only(bottom: 16),
+                              padding:
+                                  const EdgeInsets.only(bottom: 16),
                               child: HomeGradientCampaignCard(
-                                title: campaign.title,
-                                description: campaign.description,
+                                title: campaign
+                                    .getTitle(preferredLanguage),
+                                description: campaign
+                                    .getDescription(
+                                        preferredLanguage),
                                 image: campaign.coverImage,
-                                raised: campaign.collectedAmount.toInt(),
+                                raised:
+                                    campaign.collectedAmount.toInt(),
                                 goal: campaign.targetAmount.toInt(),
                                 dueDate: campaign.targetDate
                                         ?.toString()
@@ -747,17 +751,23 @@ class _HomePageState extends ConsumerState<HomePage> {
                                     'CampaignDetail',
                                     arguments: {
                                       '_id': campaign.id ?? '',
-                                      'title': campaign.title,
-                                      'description': campaign.description,
+                                      'title': campaign
+                                          .getTitle(
+                                              preferredLanguage),
+                                      'description': campaign
+                                          .getDescription(
+                                              preferredLanguage),
                                       'category': campaign.category,
                                       'date': campaign.targetDate
                                               ?.toString()
                                               .split(' ')[0] ??
                                           '',
                                       'image': campaign.coverImage,
-                                      'raised':
-                                          campaign.collectedAmount.toInt(),
-                                      'goal': campaign.targetAmount.toInt(),
+                                      'raised': campaign
+                                          .collectedAmount
+                                          .toInt(),
+                                      'goal': campaign.targetAmount
+                                          .toInt(),
                                     },
                                   );
                                 },
@@ -787,7 +797,7 @@ class _HomePageState extends ConsumerState<HomePage> {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text('Completed Campaigns', style: kBodyTitleM),
+                      Text('completedCampaigns'.tr(), style: kBodyTitleM),
                       GestureDetector(
                         onTap: () {
                           Navigator.of(context).push(
@@ -797,7 +807,7 @@ class _HomePageState extends ConsumerState<HomePage> {
                             ),
                           );
                         },
-                        child: Text('See All >',
+                        child: Text('seeAll'.tr(),
                             style:
                                 kSmallTitleM.copyWith(color: kThirdTextColor)),
                       ),
@@ -825,7 +835,7 @@ class _HomePageState extends ConsumerState<HomePage> {
                               left: 16.0, right: 16, top: 16),
                           child: Row(
                             children: [
-                              Text('Together, We Made It Happen!',
+                              Text('togetherWeDidIt'.tr(),
                                   style: kBodyTitleSB),
                             ],
                           ),
@@ -844,12 +854,14 @@ class _HomePageState extends ConsumerState<HomePage> {
                               },
                             ),
                             items: homeData.posterPromotions.map((promotion) {
+                              final preferredLanguage =
+                                  GlobalVariables.getPreferredLanguage();
                               return Padding(
                                 padding: const EdgeInsets.symmetric(
                                     horizontal: 16.0),
                                 child: HomeCompletedCampaignCard(
-                                  heading: promotion.title ?? '',
-                                  subtitle: promotion.description ?? '',
+                                  heading: promotion.getTitle(preferredLanguage),
+                                  subtitle: promotion.getDescription(preferredLanguage),
                                   goal: 0,
                                   collected: 0,
                                   posterImage: promotion.media ?? '',
@@ -890,7 +902,7 @@ class _HomePageState extends ConsumerState<HomePage> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Text('Latest News',
+                          Text('latestNews'.tr(),
                               style: kHeadTitleM.copyWith(fontSize: 18)),
                           GestureDetector(
                             onTap: () {
@@ -898,7 +910,7 @@ class _HomePageState extends ConsumerState<HomePage> {
                                   .read(selectedIndexProvider.notifier)
                                   .updateIndex(2);
                             },
-                            child: Text('See All >',
+                            child: Text('seeAll'.tr(),
                                 style: kSmallTitleM.copyWith(
                                     color: kThirdTextColor)),
                           ),
@@ -926,11 +938,13 @@ class _HomePageState extends ConsumerState<HomePage> {
                   items: homeData.latestNews.asMap().entries.map((entry) {
                     int index = entry.key;
                     var news = entry.value;
+                    final preferredLanguage =
+                        GlobalVariables.getPreferredLanguage();
                     return Padding(
                       padding: const EdgeInsets.only(left: 16.0),
                       child: HomeNewsCard(
-                        title: news.title ?? '',
-                        subtitle: news.subTitle ?? '',
+                        title: news.getTitle(preferredLanguage),
+                        subtitle: news.getSubtitle(preferredLanguage),
                         image: news.media ?? '',
                         onTap: () {
                           Navigator.of(context).push(
@@ -956,7 +970,7 @@ class _HomePageState extends ConsumerState<HomePage> {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text('Latest Videos', style: kBodyTitleM),
+                      Text('latestVideos'.tr(), style: kBodyTitleM),
                       GestureDetector(
                         onTap: () {
                           Navigator.of(context).push(
@@ -965,7 +979,7 @@ class _HomePageState extends ConsumerState<HomePage> {
                             ),
                           );
                         },
-                        child: Text('See All >',
+                        child: Text('seeAll'.tr(),
                             style:
                                 kSmallTitleM.copyWith(color: kThirdTextColor)),
                       ),
@@ -989,7 +1003,6 @@ class _HomePageState extends ConsumerState<HomePage> {
                         child: videoId != null
                             ? YoutubeVideoCard(
                                 videoId: videoId,
-                                title: video.title ?? '',
                               )
                             : Center(
                                 child: Text('Something went Wrong'),

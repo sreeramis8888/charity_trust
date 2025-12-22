@@ -1,4 +1,5 @@
 import 'package:Annujoom/src/data/constants/color_constants.dart';
+import 'package:Annujoom/src/data/constants/global_variables.dart';
 import 'package:Annujoom/src/data/constants/style_constants.dart';
 import 'package:Annujoom/src/data/models/news_model.dart';
 import 'package:Annujoom/src/data/utils/date_formatter.dart';
@@ -15,7 +16,8 @@ class NewsCard extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final formattedDate = formatDate(news.updatedAt);
-
+      final preferredLanguage =
+                        GlobalVariables.getPreferredLanguage();
     return GestureDetector(
       onTap: () {
         final index = allNews.indexOf(news);
@@ -75,14 +77,14 @@ class NewsCard extends ConsumerWidget {
                   ),
                   const SizedBox(height: 6),
                   Text(
-                    news.title ?? '',
+                    news.getTitle(preferredLanguage) ?? '',
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                     style: kSmallTitleM.copyWith(fontSize: 14),
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    news.subTitle ?? '',
+                    news.getSubtitle(preferredLanguage) ?? '',
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: kSmallerTitleL.copyWith(

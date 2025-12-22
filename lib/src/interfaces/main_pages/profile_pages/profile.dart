@@ -1,5 +1,6 @@
 import 'package:Annujoom/src/data/constants/color_constants.dart';
 import 'package:Annujoom/src/data/constants/style_constants.dart';
+import 'package:Annujoom/src/data/constants/global_variables.dart';
 import 'package:Annujoom/src/interfaces/animations/index.dart' as anim;
 import 'package:Annujoom/src/interfaces/components/loading_indicator.dart';
 import 'package:Annujoom/src/interfaces/main_pages/profile_pages/my_participations.dart';
@@ -262,6 +263,11 @@ class ProfilePage extends ConsumerWidget {
                       ),
                       _divider(),
                       GestureDetector(
+                        onTap: () => _handleLanguageChange(context, ref),
+                        child: _tile(Icons.language, "Language"),
+                      ),
+                      _divider(),
+                      GestureDetector(
                         onTap: () => _handleLogout(context, ref),
                         child: _tile(Icons.logout, "Logout"),
                       ),
@@ -357,6 +363,156 @@ class ProfilePage extends ConsumerWidget {
         color: Color(0xFFDADADA),
         thickness: 1,
         height: 0,
+      ),
+    );
+  }
+
+  void _handleLanguageChange(BuildContext context, WidgetRef ref) {
+    final currentLanguage = GlobalVariables.preferredLanguage;
+
+    showDialog(
+      context: context,
+      builder: (dialogContext) => Dialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+        ),
+        backgroundColor: kWhite,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 28),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                'Language',
+                style: kHeadTitleSB.copyWith(
+                  fontSize: 18,
+                  color: kTextColor,
+                ),
+              ),
+              const SizedBox(height: 20),
+              _languageOption(
+                context,
+                ref,
+                'English',
+                'en',
+                isSelected: currentLanguage == 'en',
+              ),
+              const SizedBox(height: 10),
+              _languageOption(
+                context,
+                ref,
+                'Malayalam',
+                'ml',
+                isSelected: currentLanguage == 'ml',
+              ),
+              const SizedBox(height: 20),
+              SizedBox(
+                width: double.infinity,
+                child: TextButton(
+                  onPressed: () => Navigator.of(dialogContext).pop(),
+                  style: TextButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(vertical: 10),
+                  ),
+                  child: Text(
+                    'Close',
+                    style: kSmallerTitleL.copyWith(
+                      color: kSecondaryTextColor,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _languageOption(
+    BuildContext context,
+    WidgetRef ref,
+    String languageName,
+    String languageCode, {
+    bool isSelected = false,
+  }) {
+    return GestureDetector(
+      onTap: () async {
+        // If already selected, just close the dialog
+        if (isSelected) {
+          if (context.mounted) {
+            Navigator.of(context).pop();
+          }
+          return;
+        }
+
+        try {
+          // Update global language
+          GlobalVariables.setPreferredLanguage(languageCode);
+
+          // Update language in user profile via API
+          await ref.read(updateUserProfileProvider(
+            {'preferred_language': languageCode},
+          ).future);
+
+          if (context.mounted) {
+            Navigator.of(context).pop();
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text('Language changed to $languageName'),
+                duration: const Duration(seconds: 2),
+              ),
+            );
+          }
+        } catch (e) {
+          if (context.mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text('Error changing language: $e'),
+                duration: const Duration(seconds: 2),
+              ),
+            );
+          }
+        }
+      },
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        decoration: BoxDecoration(
+          color: isSelected
+              ? const Color(0xFF0601B4).withOpacity(0.08)
+              : kBackgroundColor,
+          borderRadius: BorderRadius.circular(10),
+          border: Border.all(
+            color: isSelected
+                ? const Color(0xFF0601B4).withOpacity(0.3)
+                : kStrokeColor.withOpacity(0.15),
+            width: isSelected ? 1.5 : 1,
+          ),
+        ),
+        child: Row(
+          children: [
+            Text(
+              languageName,
+              style: kSmallerTitleL.copyWith(
+                color: isSelected ? const Color(0xFF0601B4) : kTextColor,
+                fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
+              ),
+            ),
+            const Spacer(),
+            if (isSelected)
+              const Icon(
+                Icons.check_circle,
+                size: 18,
+                color: Color(0xFF0601B4),
+              )
+            else
+              Icon(
+                Icons.arrow_forward_ios_rounded,
+                size: 14,
+                color: kSecondaryTextColor,
+              ),
+          ],
+        ),
       ),
     );
   }

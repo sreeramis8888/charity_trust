@@ -15,7 +15,6 @@ import 'package:Annujoom/src/data/models/user_model.dart';
 import 'package:Annujoom/src/interfaces/components/input_field.dart';
 import 'package:Annujoom/src/interfaces/components/dropdown.dart';
 import 'package:Annujoom/src/interfaces/components/loading_indicator.dart';
-import 'package:Annujoom/src/interfaces/components/searchable_dropdown.dart';
 import 'package:Annujoom/src/interfaces/components/modal_sheet.dart';
 import 'package:Annujoom/src/interfaces/components/primaryButton.dart';
 import 'package:Annujoom/src/interfaces/components/confirmation_dialog.dart';
@@ -54,6 +53,7 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
   String? selectedDistrictCode;
   String? selectedDistrictName;
   String? selectedGender;
+  String? selectedPreferredLanguage = 'en';
   XFile? profileImage;
   String? recommendedByType = 'trustee';
   UserModel? selectedRecommendedBy;
@@ -74,6 +74,7 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
     'aadharNumber': GlobalKey(),
     'dob': GlobalKey(),
     'gender': GlobalKey(),
+    'preferredLanguage': GlobalKey(),
     'whatsapp': GlobalKey(),
     'recommendedBy': GlobalKey(),
   };
@@ -267,6 +268,7 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
           'aadhar_number': int.parse(aadharNumberController.text.trim()),
         'image': profilePictureUrl,
         'gender': selectedGender,
+        'preferred_language': selectedPreferredLanguage,
         'whatsapp_number': whatsappNumber,
         'dob': formattedDob,
         'recommended_by':
@@ -497,6 +499,32 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
                       //     ),
                       //   ),
                       // ),
+                      const SizedBox(height: 18),
+                      anim.AnimatedWidgetWrapper(
+                        animationType: anim.AnimationType.fadeSlideInFromLeft,
+                        duration: anim.AnimationDuration.normal,
+                        delayMilliseconds: 1500,
+                        child: Text("Language *", style: kSmallTitleR),
+                      ),
+                      const SizedBox(height: 6),
+                      anim.AnimatedWidgetWrapper(
+                        animationType: anim.AnimationType.fadeSlideInFromBottom,
+                        duration: anim.AnimationDuration.normal,
+                        delayMilliseconds: 1550,
+                        child: AnimatedDropdown<String>(
+                          key: _fieldKeys['preferredLanguage'],
+                          hint: "Select language",
+                          value: selectedPreferredLanguage,
+                          items: const ['en', 'ml'],
+                          itemLabel: (value) =>
+                              value == 'en' ? 'English' : 'Malayalam',
+                          onChanged: (v) {
+                            setState(() {
+                              selectedPreferredLanguage = v;
+                            });
+                          },
+                        ),
+                      ),
                       const SizedBox(height: 18),
                       // anim.AnimatedWidgetWrapper(
                       //   animationType: anim.AnimationType.fadeSlideInFromLeft,
@@ -774,7 +802,7 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
                                     child: SizedBox(
                                       height: 20,
                                       width: 20,
-                                      child: LoadingAnimation( ),
+                                      child: LoadingAnimation(),
                                     ),
                                   ),
                                 ),
@@ -895,7 +923,7 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
                                     child: SizedBox(
                                       height: 20,
                                       width: 20,
-                                      child: LoadingAnimation( ),
+                                      child: LoadingAnimation(),
                                     ),
                                   ),
                                 ),
@@ -942,7 +970,7 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
                         animationType: anim.AnimationType.fadeSlideInFromLeft,
                         duration: anim.AnimationDuration.normal,
                         delayMilliseconds: 1000,
-                        child: Text("Aadhar Number *", style: kSmallTitleR),
+                        child: Text("Aadhar Number", style: kSmallTitleR),
                       ),
                       const SizedBox(height: 6),
                       anim.AnimatedWidgetWrapper(
@@ -1014,17 +1042,18 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
                         ),
                       ),
                       const SizedBox(height: 20),
+
                       anim.AnimatedWidgetWrapper(
                         animationType: anim.AnimationType.fadeSlideInFromLeft,
                         duration: anim.AnimationDuration.normal,
-                        delayMilliseconds: 1500,
+                        delayMilliseconds: 1600,
                         child: Text("WhatsApp Number *", style: kSmallTitleR),
                       ),
                       const SizedBox(height: 12),
                       anim.AnimatedWidgetWrapper(
                         animationType: anim.AnimationType.fadeSlideInFromBottom,
                         duration: anim.AnimationDuration.normal,
-                        delayMilliseconds: 1550,
+                        delayMilliseconds: 1650,
                         child: Row(
                           children: [
                             Checkbox(
@@ -1053,7 +1082,7 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
                           animationType:
                               anim.AnimationType.fadeSlideInFromBottom,
                           duration: anim.AnimationDuration.normal,
-                          delayMilliseconds: 1600,
+                          delayMilliseconds: 1700,
                           child: IntlPhoneField(
                             key: _fieldKeys['whatsapp'],
                             validator: (phone) {
@@ -1128,14 +1157,14 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
                       anim.AnimatedWidgetWrapper(
                         animationType: anim.AnimationType.fadeSlideInFromLeft,
                         duration: anim.AnimationDuration.normal,
-                        delayMilliseconds: 1650,
+                        delayMilliseconds: 1750,
                         child: Text("Recommended By *", style: kSmallTitleR),
                       ),
                       const SizedBox(height: 12),
                       anim.AnimatedWidgetWrapper(
                         animationType: anim.AnimationType.fadeSlideInFromBottom,
                         duration: anim.AnimationDuration.normal,
-                        delayMilliseconds: 1700,
+                        delayMilliseconds: 1800,
                         child: Row(
                           children: [
                             Row(
@@ -1177,7 +1206,7 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
                       anim.AnimatedWidgetWrapper(
                         animationType: anim.AnimationType.fadeSlideInFromBottom,
                         duration: anim.AnimationDuration.normal,
-                        delayMilliseconds: 1750,
+                        delayMilliseconds: 1850,
                         child: FormField<UserModel>(
                           key: _fieldKeys['recommendedBy'],
                           validator: (value) {
@@ -1196,19 +1225,8 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
                                 style: kSmallTitleR,
                               ),
                               const SizedBox(height: 6),
-                              SearchableDropdown<UserModel>(
-                                hint: recommendedByType == 'trustee'
-                                    ? "Search trustee"
-                                    : "Search charity member",
-                                value: selectedRecommendedBy,
-                                itemLabel: (user) => user.name ?? 'Unknown',
-                                onChanged: (user) {
-                                  setState(() {
-                                    selectedRecommendedBy = user;
-                                    field.didChange(user);
-                                  });
-                                },
-                                onFetch: (search, page) async {
+                              GestureDetector(
+                                onTap: () async {
                                   final params = UsersListParams(
                                     roles: recommendedByType == 'trustee'
                                         ? [
@@ -1218,13 +1236,69 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
                                             'treasurer'
                                           ]
                                         : ['member'],
-                                    pageNo: page,
-                                    search: search.isEmpty ? null : search,
+                                    pageNo: 1,
+                                    search: null,
                                   );
-                                  return ref.read(
+                                  final users = await ref.read(
                                     fetchUsersByRoleProvider(params).future,
                                   );
+
+                                  if (mounted) {
+                                    ModalSheet<UserModel>(
+                                      context: context,
+                                      title: recommendedByType == 'trustee'
+                                          ? 'Select Trustee'
+                                          : 'Select Charity Member',
+                                      items: users,
+                                      itemLabel: (user) =>
+                                          user.name ?? 'Unknown',
+                                      onItemSelected: (user) {
+                                        setState(() {
+                                          selectedRecommendedBy = user;
+                                          field.didChange(user);
+                                        });
+                                      },
+                                      searchFilter: (user, query) {
+                                        return (user.name ?? '')
+                                            .toLowerCase()
+                                            .contains(query.toLowerCase());
+                                      },
+                                    ).show();
+                                  }
                                 },
+                                child: Container(
+                                  height: 52,
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 14),
+                                  decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    borderRadius: BorderRadius.circular(12),
+                                    border:
+                                        Border.all(color: Colors.grey.shade300),
+                                  ),
+                                  child: Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text(
+                                        selectedRecommendedBy?.name ??
+                                            (recommendedByType == 'trustee'
+                                                ? 'Search trustee'
+                                                : 'Search charity member'),
+                                        style: TextStyle(
+                                          color: selectedRecommendedBy == null
+                                              ? Colors.grey.shade600
+                                              : Colors.black,
+                                          fontSize: 14,
+                                        ),
+                                      ),
+                                      Icon(
+                                        Icons.keyboard_arrow_down,
+                                        color: Colors.grey.shade600,
+                                      ),
+                                    ],
+                                  ),
+                                ),
                               ),
                               if (field.hasError)
                                 Padding(
@@ -1246,7 +1320,7 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
                       anim.AnimatedWidgetWrapper(
                         animationType: anim.AnimationType.fadeScaleUp,
                         duration: anim.AnimationDuration.normal,
-                        delayMilliseconds: 1750,
+                        delayMilliseconds: 1900,
                         child: SizedBox(
                           height: 50,
                           width: double.infinity,

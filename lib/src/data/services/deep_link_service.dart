@@ -4,8 +4,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:Annujoom/src/data/router/nav_router.dart';
 import 'package:Annujoom/src/data/services/navigation_service.dart';
 import 'package:Annujoom/src/data/services/secure_storage_service.dart';
-import 'package:Annujoom/src/data/utils/globals.dart';
-
 // Create a provider for DeepLinkService
 final deepLinkServiceProvider = Provider<DeepLinkService>((ref) {
   return DeepLinkService(ref);

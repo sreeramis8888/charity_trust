@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'dart:developer';
 import 'package:Annujoom/src/data/constants/color_constants.dart';
+import 'package:Annujoom/src/data/constants/global_variables.dart';
 import 'package:Annujoom/src/data/constants/style_constants.dart';
 import 'package:Annujoom/src/data/utils/media_picker.dart';
 import 'package:Annujoom/src/data/providers/loading_provider.dart';
@@ -162,10 +163,7 @@ class _AddCampaignPageState extends ConsumerState<AddCampaignPage> {
           return;
         }
       }
-
-      final secureStorage = ref.read(secureStorageServiceProvider);
-      final user = await secureStorage.getUserData();
-      final userRole = user?.role ?? '';
+      final userRole = GlobalVariables.getUserRole();
       final approvalStatus = userRole == 'president' ? 'approved' : 'pending';
 
       final campaignData = <String, dynamic>{

@@ -1,3 +1,4 @@
+import 'package:Annujoom/src/data/constants/global_variables.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
@@ -184,8 +185,9 @@ class NewsContent extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final formattedDate = DateFormat('MMM dd, yyyy, hh:mm a')
         .format(newsItem.updatedAt!.toLocal());
-
-    final minsToRead = calculateReadingTimeAndWordCount(newsItem.content ?? '');
+      final preferredLanguage =
+                        GlobalVariables.getPreferredLanguage();
+    final minsToRead = calculateReadingTimeAndWordCount(newsItem.getContent(preferredLanguage) ?? '');
 
     return Stack(
       children: [
@@ -197,7 +199,7 @@ class NewsContent extends ConsumerWidget {
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 child: Text(
-                  newsItem.title ?? '',
+                  newsItem.getTitle(preferredLanguage) ?? '',
                   style: kBodyTitleB,
                 ),
               ),
@@ -260,11 +262,11 @@ class NewsContent extends ConsumerWidget {
                     SizedBox(
                       height: 10,
                     ),
-                    Text(newsItem.subTitle ?? '',
+                    Text(newsItem.getSubtitle(preferredLanguage) ?? '',
                         style:
                             kSmallTitleL.copyWith(color: kSecondaryTextColor)),
                     const SizedBox(height: 16),
-                    Text(newsItem.content ?? '',
+                    Text(newsItem.getContent(preferredLanguage) ?? '',
                         style:
                             kSmallTitleR.copyWith(color: kSecondaryTextColor)),
                   ],

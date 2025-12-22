@@ -1,4 +1,5 @@
 import 'package:Annujoom/src/data/constants/color_constants.dart';
+import 'package:Annujoom/src/data/constants/global_variables.dart' show GlobalVariables;
 import 'package:Annujoom/src/data/constants/style_constants.dart';
 import 'package:Annujoom/src/data/providers/notifications_provider.dart';
 import 'package:Annujoom/src/data/providers/user_provider.dart';
@@ -198,10 +199,10 @@ class _NotificationsPageState extends ConsumerState<NotificationsPage> {
     );
   }
 
-  List<Widget> _buildNotificationCard(dynamic notification) {
-    final currentUser = ref.watch(userProvider);
+  List<Widget> _buildNotificationCard(dynamic notification) {;
+    final userRole = GlobalVariables.getUserRole();
     final isApprovalNotification = notification.tag == 'approval';
-    final isNotPresident = currentUser?.role != 'president';
+    final isNotPresident = userRole != 'president';
     final shouldShowReviewButton = isApprovalNotification && isNotPresident;
 
     return [

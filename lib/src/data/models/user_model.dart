@@ -34,6 +34,7 @@ class UserModel {
   final int? totalAmountDonated;
   final int? totalReferrals;
   final int? activeReferrals;
+  final String? preferredLanguage;
 
   UserModel({
     this.id,
@@ -71,6 +72,7 @@ class UserModel {
     this.totalAmountDonated,
     this.totalReferrals,
     this.activeReferrals,
+    this.preferredLanguage,
   });
 
   // -------------------------
@@ -119,6 +121,7 @@ class UserModel {
       totalAmountDonated: json["total_amount_donated"],
       totalReferrals: json["total_referrals"],
       activeReferrals: json["active_referrals"],
+      preferredLanguage: json["preferred_language"],
     );
   }
 
@@ -162,6 +165,7 @@ class UserModel {
       "total_amount_donated": totalAmountDonated,
       "total_referrals": totalReferrals,
       "active_referrals": activeReferrals,
+      "preferred_language": preferredLanguage,
     };
   }
 
@@ -204,6 +208,7 @@ class UserModel {
     int? totalAmountDonated,
     int? totalReferrals,
     int? activeReferrals,
+    String? preferredLanguage,
   }) {
     return UserModel(
       id: id ?? this.id,
@@ -242,6 +247,7 @@ class UserModel {
       totalAmountDonated: totalAmountDonated ?? this.totalAmountDonated,
       totalReferrals: totalReferrals ?? this.totalReferrals,
       activeReferrals: activeReferrals ?? this.activeReferrals,
+      preferredLanguage: preferredLanguage ?? this.preferredLanguage,
     );
   }
 }
