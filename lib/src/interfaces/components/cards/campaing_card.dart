@@ -60,7 +60,7 @@ class CampaignCard extends StatelessWidget {
             children: [
               if (!isApprovalCard)
                 TextPill(
-                  text: category,
+                  text: _getLocalizedCategory(category),
                   color: const Color(0xFFFF6900),
                   textStyle: kSmallerTitleR.copyWith(fontSize: 10, color: kWhite),
                 ),
@@ -217,5 +217,27 @@ class CampaignCard extends StatelessWidget {
         ],
       ),
     );
+  }
+  String _getLocalizedCategory(String category) {
+    switch (category) {
+      case 'General Campaign':
+        return 'generalCampaign'.tr();
+      case 'General Funding':
+        return 'generalFunding'.tr();
+      case 'Zakat':
+        return 'zakat'.tr();
+      case 'Orphan':
+        return 'orphan'.tr();
+      case 'Widow':
+        return 'widow'.tr();
+      case 'Ghusl Mayyit':
+        return 'ghusalMayyit'.tr();
+      case 'Patient Relief':
+        return 'patientRelief'.tr();
+      case 'Food Kit':
+        return 'foodKit'.tr();
+      default:
+        return category;
+    }
   }
 }

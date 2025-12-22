@@ -6,6 +6,7 @@ import 'package:Annujoom/src/data/providers/user_provider.dart';
 import 'package:Annujoom/src/interfaces/components/cards/notification_card.dart';
 import 'package:Annujoom/src/interfaces/components/loading_indicator.dart';
 import 'package:Annujoom/src/interfaces/components/primaryButton.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
@@ -45,13 +46,13 @@ class _NotificationsPageState extends ConsumerState<NotificationsPage> {
     final difference = now.difference(dateTime);
 
     if (difference.inMinutes < 1) {
-      return 'just now';
+      return 'justNow'.tr();
     } else if (difference.inMinutes < 60) {
-      return '${difference.inMinutes}m ago';
+      return 'minutesAgo'.tr(args: ['${difference.inMinutes}']);
     } else if (difference.inHours < 24) {
-      return '${difference.inHours}h ago';
+      return 'hoursAgo'.tr(args: ['${difference.inHours}']);
     } else if (difference.inDays < 7) {
-      return '${difference.inDays}d ago';
+      return 'daysAgo'.tr(args: ['${difference.inDays}']);
     } else {
       return DateFormat('MMM d').format(dateTime);
     }
@@ -65,9 +66,9 @@ class _NotificationsPageState extends ConsumerState<NotificationsPage> {
         DateTime(dateTime.year, dateTime.month, dateTime.day);
 
     if (notificationDate == today) {
-      return 'Today';
+      return 'today'.tr();
     } else if (notificationDate == yesterday) {
-      return 'Yesterday';
+      return 'yesterday'.tr();
     } else {
       return DateFormat('MMMM d, yyyy').format(dateTime);
     }
@@ -91,7 +92,7 @@ class _NotificationsPageState extends ConsumerState<NotificationsPage> {
           ),
           onPressed: () => Navigator.pop(context),
         ),
-        title: Text('Notifications', style: kBodyTitleM),
+        title: Text('notifications'.tr(), style: kBodyTitleM),
         actions: [
           notificationsAsync.when(
             data: (state) {
@@ -105,7 +106,7 @@ class _NotificationsPageState extends ConsumerState<NotificationsPage> {
                             .markAllAsRead();
                       },
                       child: Text(
-                        'Mark all read',
+                        'markAllRead'.tr(),
                         style: kSmallTitleM.copyWith(color: kThirdTextColor),
                       ),
                     )
@@ -130,7 +131,7 @@ class _NotificationsPageState extends ConsumerState<NotificationsPage> {
                   ),
                   const SizedBox(height: 16),
                   Text(
-                    'No notifications yet',
+                    'noNotificationsYet'.tr(),
                     style: kBodyTitleM.copyWith(color: kSecondaryTextColor),
                   ),
                 ],
@@ -184,13 +185,13 @@ class _NotificationsPageState extends ConsumerState<NotificationsPage> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Text('Error loading notifications'),
+              Text('errorLoadingNotifications'.tr()),
               const SizedBox(height: 16),
               ElevatedButton(
                 onPressed: () {
                   ref.read(notificationsProvider.notifier).refresh();
                 },
-                child: Text('Retry'),
+                child: Text('retry'.tr()),
               ),
             ],
           ),
@@ -199,11 +200,11 @@ class _NotificationsPageState extends ConsumerState<NotificationsPage> {
     );
   }
 
-  List<Widget> _buildNotificationCard(dynamic notification) {;
+  List<Widget> _buildNotificationCard(dynamic notification) {
     final userRole = GlobalVariables.getUserRole();
     final isApprovalNotification = notification.tag == 'approval';
-    final isNotPresident = userRole != 'president';
-    final shouldShowReviewButton = isApprovalNotification && isNotPresident;
+    final isNotMember = userRole != 'member';
+    final shouldShowReviewButton = isApprovalNotification && isNotMember;
 
     return [
       NotificationCard(
@@ -222,7 +223,7 @@ class _NotificationsPageState extends ConsumerState<NotificationsPage> {
           child: SizedBox(
             width: 120,
             child: primaryButton(
-              label: 'Review Now',
+              label: 'reviewNow'.tr(),
               onPressed: () {
                 Navigator.of(context).pushNamed('MyReferrals');
               },

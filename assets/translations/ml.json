@@ -29,6 +29,8 @@
   "orphan": "അനാഥ",
   "widow": "വിധവ",
   "ghusalMayyit": "ഗുസ്ൽ മയ്യിത്",
+  "patientRelief": "രോഗി സഹായം",
+  "foodKit": "ഭക്ഷ്യ കിറ്റ്",
   "viewDetails": "വിശദാംശങ്ങൾ കാണുക",
   "phoneNumber": "ഫോൺ നമ്പർ",
   "pleaseEnterMobileNumber": "ദയവായി നിങ്ങളുടെ മൊബൈൽ നമ്പർ നൽകുക",
@@ -233,5 +235,16 @@
   "camera": "ക്യാമറ",
   "gallery": "ഗാലറി",
   "document": "രേഖ",
-  "cropImage": "ഇമേജ് ക്രോപ്പ് ചെയ്യുക"
+  "cropImage": "ഇമേജ് ക്രോപ്പ് ചെയ്യുക",
+  "notifications": "അറിയിപ്പുകൾ",
+  "noNotificationsYet": "ഇതുവരെ അറിയിപ്പുകളൊന്നുമില്ല",
+  "errorLoadingNotifications": "അറിയിപ്പുകൾ ലോഡുചെയ്യുന്നതിൽ പിശക്",
+  "markAllRead": "എല്ലാം വായിച്ചതായി അടയാളപ്പെടുത്തുക",
+  "today": "ഇന്ന്",
+  "yesterday": "ഇന്നലെ",
+  "justNow": "ഇപ്പോൾ",
+  "minutesAgo": "{}m മുമ്പ്",
+  "hoursAgo": "{}h മുമ്പ്",
+  "daysAgo": "{}d മുമ്പ്",
+  "recommended": "ശുപാർശ ചെയ്യുന്നത്"
 }

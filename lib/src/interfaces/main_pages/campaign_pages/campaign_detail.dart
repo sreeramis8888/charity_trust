@@ -1,5 +1,6 @@
 import 'dart:developer';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:intl/intl.dart';
 import 'package:Annujoom/src/interfaces/components/loading_indicator.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -166,7 +167,7 @@ class _CampaignDetailPageState extends ConsumerState<CampaignDetailPage> {
                 // Invalidate campaign providers to refresh data
                 ref.invalidate(generalCampaignsProvider);
                 ref.invalidate(participatedCampaignsProvider);
-                
+
                 Navigator.of(context).pushReplacement(
                   MaterialPageRoute(
                     builder: (_) => PaymentSuccessPage(
@@ -188,7 +189,8 @@ class _CampaignDetailPageState extends ConsumerState<CampaignDetailPage> {
             }
           } catch (e) {
             log("Verification error: $e");
-            _showSnackBar('${'verificationError'.tr()}: $e', type: SnackbarType.error);
+            _showSnackBar('${'verificationError'.tr()}: $e',
+                type: SnackbarType.error);
             if (mounted) {
               setState(() => _isProcessing = false);
             }
@@ -425,16 +427,6 @@ class _CampaignDetailPageState extends ConsumerState<CampaignDetailPage> {
             style: kSmallerTitleR.copyWith(color: kSecondaryTextColor),
           ),
         ),
-      const SizedBox(height: 20),
-      anim.AnimatedWidgetWrapper(
-        animationType: anim.AnimationType.fadeSlideInFromLeft,
-        duration: anim.AnimationDuration.normal,
-        delayMilliseconds: 350,
-        child: Text(
-          'Lorem ipsum dolor sit amet consectetur. Vestibulum arcu nec dolor gravida vel diam nulla. Diam nullam tincidunt interdum aliquet porta risus amet. Neque ipsum iaculis suspendisse lacus dictumst. Lectus mauris dapibus velit ultrices amet in at. Sit purus leo turpis ac malesuada in eu platea quam. Sagittis vestibulum placerat et vel vel. Diam id et nisl lectus elementum duis vel. U',
-          style: kSmallerTitleR.copyWith(color: kSecondaryTextColor),
-        ),
-      ),
       const SizedBox(height: 28),
       anim.AnimatedWidgetWrapper(
         animationType: anim.AnimationType.fadeSlideInFromLeft,
@@ -461,6 +453,74 @@ class _CampaignDetailPageState extends ConsumerState<CampaignDetailPage> {
             }
             return null;
           },
+        ),
+      ),
+      const SizedBox(height: 20),
+      anim.AnimatedWidgetWrapper(
+        animationType: anim.AnimationType.fadeSlideInFromBottom,
+        duration: anim.AnimationDuration.normal,
+        delayMilliseconds: 475,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'recommended'.tr(),
+              style: kSmallerTitleL.copyWith(
+                  color: kSecondaryTextColor, fontSize: 16),
+            ),
+            const SizedBox(height: 12),
+            ValueListenableBuilder<TextEditingValue>(
+              valueListenable: _donationController,
+              builder: (context, value, child) {
+                final amounts = [1000, 2500, 5000];
+                return Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: amounts.asMap().entries.map((entry) {
+                    final idx = entry.key;
+                    final amount = entry.value;
+                    final isSelected = value.text == amount.toString();
+
+                    return Padding(
+                      padding: EdgeInsets.only(
+                        right: idx == amounts.length - 1 ? 0 : 10,
+                      ),
+                      child: InkWell(
+                        onTap: () {
+                          _donationController.text = amount.toString();
+                          _donationController.selection =
+                              TextSelection.fromPosition(
+                            TextPosition(
+                                offset: _donationController.text.length),
+                          );
+                        },
+                        borderRadius: BorderRadius.circular(10),
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 14, 
+                            vertical: 8,
+                          ),
+                          decoration: BoxDecoration(
+                            color: isSelected
+                                ? kPrimaryColor.withOpacity(0.05)
+                                : Colors.transparent,
+                            borderRadius: BorderRadius.circular(10),
+                            border: Border.all(color: kPrimaryColor),
+                          ),
+                          child: Text(
+                            '₹ ${NumberFormat.decimalPattern('en_IN').format(amount)}',
+                            style: kSmallTitleL.copyWith(
+                              color: kPrimaryColor,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                      ),
+                    );
+                  }).toList(),
+                );
+              },
+            ),
+          ],
         ),
       ),
       const SizedBox(height: 24),

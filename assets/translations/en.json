@@ -29,6 +29,8 @@
   "orphan": "Orphan",
   "widow": "Widow",
   "ghusalMayyit": "Ghusl Mayyit",
+  "patientRelief": "Patient Relief",
+  "foodKit": "Food Kit",
   "viewDetails": "View details",
   "phoneNumber": "Phone Number",
   "pleaseEnterMobileNumber": "Please enter your mobile number",
@@ -233,5 +235,16 @@
   "camera": "Camera",
   "gallery": "Gallery",
   "document": "Document",
-  "cropImage": "Crop Image"
+  "cropImage": "Crop Image",
+  "notifications": "Notifications",
+  "noNotificationsYet": "No notifications yet",
+  "errorLoadingNotifications": "Error loading notifications",
+  "markAllRead": "Mark all read",
+  "today": "Today",
+  "yesterday": "Yesterday",
+  "justNow": "just now",
+  "minutesAgo": "{}m ago",
+  "hoursAgo": "{}h ago",
+  "daysAgo": "{}d ago",
+  "recommended": "Recommended"
 }

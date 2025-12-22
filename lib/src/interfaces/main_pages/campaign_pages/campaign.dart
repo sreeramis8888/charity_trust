@@ -295,6 +295,8 @@ class _CampaignPageState extends ConsumerState<CampaignPage>
       'Orphan',
       'Widow',
       'Ghusl Mayyit',
+      'Patient Relief',
+      'Food Kit',
     ];
 
     String getLocalized(String key) {
@@ -313,6 +315,10 @@ class _CampaignPageState extends ConsumerState<CampaignPage>
           return 'widow'.tr();
         case 'Ghusl Mayyit':
           return 'ghusalMayyit'.tr();
+        case 'Patient Relief':
+          return 'patientRelief'.tr();
+        case 'Food Kit':
+          return 'foodKit'.tr();
         default:
           return key;
       }

@@ -508,6 +508,16 @@ class _HomePageState extends ConsumerState<HomePage> {
                             'image': 'assets/png/ghusal_mayyt.png',
                             'category': 'Ghusl Mayyit'
                           },
+                          {
+                            'title': 'patientRelief'.tr(),
+                            'image': 'assets/png/patient_relief.png',
+                            'category': 'Patient Relief'
+                          },
+                          {
+                            'title': 'foodKit'.tr(),
+                            'image': 'assets/png/food_kit.png',
+                            'category': 'Food Kit'
+                          },
                         ].map((category) {
                           return AnimatedWidgetWrapper(
                             animationType: AnimationType.fadeScaleUp,
@@ -580,109 +590,68 @@ class _HomePageState extends ConsumerState<HomePage> {
                   ],
                 ),
               ),
-              FutureBuilder<String?>(
-                future:
-                    ref.read(secureStorageServiceProvider).getUserData().then(
-                          (userData) => userData?.role,
-                        ),
-                builder: (context, snapshot) {
-                  final userRole = snapshot.data ?? '';
-                  final isAdmin = userRole != 'member';
-
-                  if (!isAdmin) {
-                    return SizedBox.shrink();
-                  }
-
-                  return Padding(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 16, vertical: 16),
-                    child: GestureDetector(
-                      onTap: () {
-                        Navigator.of(context).pushNamed('MyReferrals');
-                      },
-                      child: Container(
-                        decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                              colors: [Color(0xFFFFFFFF), Color(0xFFCEE8F8)],
-                              begin: AlignmentGeometry.topCenter,
-                              end: AlignmentGeometry.bottomCenter),
-                          borderRadius: BorderRadius.circular(22),
-                        ),
-                        child: Padding(
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 16, vertical: 20),
-                            child: Row(
-                              children: [
-                                Expanded(
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        homeData.referralsReceived.toString(),
-                                        style: kHeadTitleSB.copyWith(
-                                            fontSize: 22,
-                                            color: kThirdTextColor),
-                                      ),
-                                      const SizedBox(height: 4),
-                                      Text('referralsReceived'.tr(),
-                                          style: kSmallerTitleR),
-                                    ],
+              if (GlobalVariables.getUserRole() != 'member')
+                Padding(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                  child: GestureDetector(
+                    onTap: () {
+                      Navigator.of(context).pushNamed('MyReferrals');
+                    },
+                    child: Container(
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                            colors: [Color(0xFFFFFFFF), Color(0xFFCEE8F8)],
+                            begin: AlignmentGeometry.topCenter,
+                            end: AlignmentGeometry.bottomCenter),
+                        borderRadius: BorderRadius.circular(22),
+                      ),
+                      child: Padding(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 16, vertical: 20),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                homeData.pendingReferrals.toString(),
+                                style: kHeadTitleSB.copyWith(
+                                  fontSize: 22,
+                                  color: kThirdTextColor,
+                                ),
+                                softWrap: true,
+                              ),
+                              const SizedBox(height: 4),
+                              Wrap(
+                                crossAxisAlignment: WrapCrossAlignment.center,
+                                spacing: 8,
+                                runSpacing: 4,
+                                children: [
+                                  Text(
+                                    'pendingApprovals'.tr(),
+                                    style: kSmallerTitleR,
+                                    softWrap: true,
                                   ),
-                                ),
-                                Container(
-                                  width: 1,
-                                  height: 60,
-                                  color: Color(0xFFCFDBFF),
-                                ),
-                                Expanded(
-                                  child: Padding(
-                                    padding: const EdgeInsets.only(left: 16),
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.spaceBetween,
-                                          children: [
-                                            Text(
-                                              homeData.pendingReferrals
-                                                  .toString(),
-                                              style: kHeadTitleSB.copyWith(
-                                                  fontSize: 22,
-                                                  color: kThirdTextColor),
-                                            ),
-                                            GestureDetector(
-                                              onTap: () {
-                                                Navigator.of(context)
-                                                    .pushNamed('MyReferrals');
-                                              },
-                                              child: Text(
-                                                'reviewNow'.tr(),
-                                                style: kSmallerTitleM.copyWith(
-                                                  color: kThirdTextColor,
-                                                  decoration:
-                                                      TextDecoration.underline,
-                                                ),
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                        const SizedBox(height: 4),
-                                        Text('pendingApprovals'.tr(),
-                                            style: kSmallerTitleR),
-                                      ],
+                                  GestureDetector(
+                                    onTap: () {
+                                      Navigator.of(context)
+                                          .pushNamed('MyReferrals');
+                                    },
+                                    child: Text(
+                                      'reviewNow'.tr(),
+                                      style: kSmallerTitleM.copyWith(
+                                        color: kThirdTextColor,
+                                        decoration: TextDecoration.underline,
+                                      ),
+                                      softWrap: true,
                                     ),
                                   ),
-                                ),
-                              ],
-                            )),
-                      ),
+                                ],
+                              ),
+                            ],
+                          )),
                     ),
-                  );
-                },
-              ),
+                  ),
+                ),
               if (homeData.endingCampaigns.isNotEmpty)
                 Padding(
                   padding: const EdgeInsets.all(16),
@@ -717,10 +686,10 @@ class _HomePageState extends ConsumerState<HomePage> {
                       ),
                       const SizedBox(height: 12),
                       SizedBox(
-                        height: 450,
+                        height: 480,
                         child: CarouselSlider(
                           options: CarouselOptions(
-                            height: 450,
+                            height: 480,
                             viewportFraction: 1,
                             enableInfiniteScroll: true,
                             autoPlay: false,
@@ -935,7 +904,7 @@ class _HomePageState extends ConsumerState<HomePage> {
               if (homeData.latestNews.isNotEmpty)
                 CarouselSlider(
                   options: CarouselOptions(
-                      height: 200,
+                      height: 208,
                       viewportFraction: 0.55,
                       enableInfiniteScroll: true,
                       autoPlay: true,
