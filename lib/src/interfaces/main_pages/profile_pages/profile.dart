@@ -11,6 +11,7 @@ import 'package:Annujoom/src/data/services/secure_storage_service.dart';
 import 'package:Annujoom/src/data/providers/auth_login_provider.dart';
 import 'package:Annujoom/src/data/providers/auth_provider.dart';
 import 'package:Annujoom/src/data/providers/user_provider.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -449,6 +450,13 @@ class ProfilePage extends ConsumerWidget {
         try {
           // Update global language
           GlobalVariables.setPreferredLanguage(languageCode);
+          
+          // Update easy_localization locale
+          await context.setLocale(Locale(languageCode));
+
+          // Save to secure storage
+          final secureStorage = SecureStorageService();
+          await secureStorage.setPreferredLanguage(languageCode);
 
           // Update language in user profile via API
           await ref.read(updateUserProfileProvider(

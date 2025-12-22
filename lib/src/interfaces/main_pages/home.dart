@@ -613,7 +613,6 @@ class _HomePageState extends ConsumerState<HomePage> {
                                 horizontal: 16, vertical: 20),
                             child: Row(
                               children: [
-                                // LEFT SIDE
                                 Expanded(
                                   child: Column(
                                     crossAxisAlignment:
@@ -631,15 +630,11 @@ class _HomePageState extends ConsumerState<HomePage> {
                                     ],
                                   ),
                                 ),
-
-                                // CENTER DIVIDER (PERFECT CENTER)
                                 Container(
                                   width: 1,
                                   height: 60,
                                   color: Color(0xFFCFDBFF),
                                 ),
-
-                                // RIGHT SIDE
                                 Expanded(
                                   child: Padding(
                                     padding: const EdgeInsets.only(left: 16),
@@ -695,9 +690,16 @@ class _HomePageState extends ConsumerState<HomePage> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text('fundingCampaigns'.tr(), style: kBodyTitleM),
+                          Expanded(
+                            child: Text(
+                              'fundingCampaigns'.tr(),
+                              style: kBodyTitleM,
+                              softWrap: true,
+                            ),
+                          ),
+                          const SizedBox(width: 8),
                           GestureDetector(
                             onTap: () {
                               Navigator.of(context).pushNamed(
@@ -705,9 +707,11 @@ class _HomePageState extends ConsumerState<HomePage> {
                                 arguments: {'category': 'All'},
                               );
                             },
-                            child: Text('seeAll'.tr(),
-                                style: kSmallTitleM.copyWith(
-                                    color: kThirdTextColor)),
+                            child: Text(
+                              'seeAll'.tr(),
+                              style:
+                                  kSmallTitleM.copyWith(color: kThirdTextColor),
+                            ),
                           ),
                         ],
                       ),
@@ -721,25 +725,20 @@ class _HomePageState extends ConsumerState<HomePage> {
                             enableInfiniteScroll: true,
                             autoPlay: false,
                             onPageChanged: (index, reason) {
-                              setState(
-                                  () => _endingCampaignIndex = index);
+                              setState(() => _endingCampaignIndex = index);
                             },
                           ),
                           items: homeData.endingCampaigns.map((campaign) {
                             final preferredLanguage =
                                 GlobalVariables.getPreferredLanguage();
                             return Padding(
-                              padding:
-                                  const EdgeInsets.only(bottom: 16),
+                              padding: const EdgeInsets.only(bottom: 16),
                               child: HomeGradientCampaignCard(
-                                title: campaign
-                                    .getTitle(preferredLanguage),
-                                description: campaign
-                                    .getDescription(
-                                        preferredLanguage),
+                                title: campaign.getTitle(preferredLanguage),
+                                description:
+                                    campaign.getDescription(preferredLanguage),
                                 image: campaign.coverImage,
-                                raised:
-                                    campaign.collectedAmount.toInt(),
+                                raised: campaign.collectedAmount.toInt(),
                                 goal: campaign.targetAmount.toInt(),
                                 dueDate: campaign.targetDate
                                         ?.toString()
@@ -751,23 +750,19 @@ class _HomePageState extends ConsumerState<HomePage> {
                                     'CampaignDetail',
                                     arguments: {
                                       '_id': campaign.id ?? '',
-                                      'title': campaign
-                                          .getTitle(
-                                              preferredLanguage),
+                                      'title':
+                                          campaign.getTitle(preferredLanguage),
                                       'description': campaign
-                                          .getDescription(
-                                              preferredLanguage),
+                                          .getDescription(preferredLanguage),
                                       'category': campaign.category,
                                       'date': campaign.targetDate
                                               ?.toString()
                                               .split(' ')[0] ??
                                           '',
                                       'image': campaign.coverImage,
-                                      'raised': campaign
-                                          .collectedAmount
-                                          .toInt(),
-                                      'goal': campaign.targetAmount
-                                          .toInt(),
+                                      'raised':
+                                          campaign.collectedAmount.toInt(),
+                                      'goal': campaign.targetAmount.toInt(),
                                     },
                                   );
                                 },
@@ -793,27 +788,35 @@ class _HomePageState extends ConsumerState<HomePage> {
                 ),
               if (homeData.posterPromotions.isNotEmpty)
                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text('completedCampaigns'.tr(), style: kBodyTitleM),
-                      GestureDetector(
-                        onTap: () {
-                          Navigator.of(context).push(
-                            MaterialPageRoute(
-                              builder: (context) =>
-                                  const CompletedCampaignsPage(),
-                            ),
-                          );
-                        },
-                        child: Text('seeAll'.tr(),
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Expanded(
+                          child: Text(
+                            'completedCampaigns'.tr(),
+                            style: kBodyTitleM,
+                            softWrap: true,
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        GestureDetector(
+                          onTap: () {
+                            Navigator.of(context).push(
+                              MaterialPageRoute(
+                                builder: (context) =>
+                                    const CompletedCampaignsPage(),
+                              ),
+                            );
+                          },
+                          child: Text(
+                            'seeAll'.tr(),
                             style:
-                                kSmallTitleM.copyWith(color: kThirdTextColor)),
-                      ),
-                    ],
-                  ),
-                ),
+                                kSmallTitleM.copyWith(color: kThirdTextColor),
+                          ),
+                        ),
+                      ],
+                    )),
               if (homeData.posterPromotions.isNotEmpty)
                 const SizedBox(height: 12),
               if (homeData.posterPromotions.isNotEmpty)
@@ -835,8 +838,7 @@ class _HomePageState extends ConsumerState<HomePage> {
                               left: 16.0, right: 16, top: 16),
                           child: Row(
                             children: [
-                              Text('togetherWeDidIt'.tr(),
-                                  style: kBodyTitleSB),
+                              Text('togetherWeDidIt'.tr(), style: kBodyTitleSB),
                             ],
                           ),
                         ),
@@ -860,8 +862,10 @@ class _HomePageState extends ConsumerState<HomePage> {
                                 padding: const EdgeInsets.symmetric(
                                     horizontal: 16.0),
                                 child: HomeCompletedCampaignCard(
-                                  heading: promotion.getTitle(preferredLanguage),
-                                  subtitle: promotion.getDescription(preferredLanguage),
+                                  heading:
+                                      promotion.getTitle(preferredLanguage),
+                                  subtitle: promotion
+                                      .getDescription(preferredLanguage),
                                   goal: 0,
                                   collected: 0,
                                   posterImage: promotion.media ?? '',
@@ -900,19 +904,27 @@ class _HomePageState extends ConsumerState<HomePage> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text('latestNews'.tr(),
-                              style: kHeadTitleM.copyWith(fontSize: 18)),
+                          Expanded(
+                            child: Text(
+                              'latestNews'.tr(),
+                              style: kHeadTitleM.copyWith(fontSize: 18),
+                              softWrap: true, // allows next line
+                            ),
+                          ),
+                          const SizedBox(width: 8),
                           GestureDetector(
                             onTap: () {
                               ref
                                   .read(selectedIndexProvider.notifier)
                                   .updateIndex(2);
                             },
-                            child: Text('seeAll'.tr(),
-                                style: kSmallTitleM.copyWith(
-                                    color: kThirdTextColor)),
+                            child: Text(
+                              'seeAll'.tr(),
+                              style:
+                                  kSmallTitleM.copyWith(color: kThirdTextColor),
+                            ),
                           ),
                         ],
                       ),

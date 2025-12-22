@@ -17,6 +17,7 @@ import 'package:Annujoom/src/interfaces/components/loading_indicator.dart';
 import 'package:Annujoom/src/interfaces/components/modal_sheet.dart';
 import 'package:Annujoom/src/interfaces/components/primaryButton.dart';
 import 'package:Annujoom/src/interfaces/animations/index.dart' as anim;
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_cropper/image_cropper.dart';
@@ -110,7 +111,7 @@ class _CreateUserPageState extends ConsumerState<CreateUserPage> {
           if (mounted) {
             ref.read(loadingProvider.notifier).stopLoading();
           }
-          SnackbarService().showSnackBar('Failed to upload profile picture');
+          SnackbarService().showSnackBar('failedToUploadProfilePicture'.tr());
           return;
         }
       }
@@ -136,7 +137,7 @@ class _CreateUserPageState extends ConsumerState<CreateUserPage> {
         if (mounted) {
           ref.read(loadingProvider.notifier).stopLoading();
         }
-        SnackbarService().showSnackBar('Error: Current user ID not found');
+        SnackbarService().showSnackBar('errorCurrentUserIDNotFound'.tr());
         return;
       }
 
@@ -165,12 +166,12 @@ class _CreateUserPageState extends ConsumerState<CreateUserPage> {
       ref.read(loadingProvider.notifier).stopLoading();
 
       if (result.user != null) {
-        SnackbarService().showSnackBar('User created successfully');
+        SnackbarService().showSnackBar('userCreatedSuccessfully'.tr());
         if (mounted) {
           Navigator.of(context).pop(true);
         }
       } else {
-        final errorMessage = result.error ?? 'Failed to create user';
+        final errorMessage = result.error ?? 'failedToCreateUser'.tr();
         SnackbarService().showSnackBar(errorMessage, type: SnackbarType.error);
       }
     } catch (e) {
@@ -194,7 +195,7 @@ class _CreateUserPageState extends ConsumerState<CreateUserPage> {
           icon: const Icon(Icons.arrow_back, color: kTextColor),
           onPressed: () => Navigator.of(context).pop(),
         ),
-        title: Text('Add Member', style: kBodyTitleM),
+        title: Text('addMember'.tr(), style: kBodyTitleM),
       ),
       body: _buildForm(),
     );
@@ -307,7 +308,7 @@ class _CreateUserPageState extends ConsumerState<CreateUserPage> {
           animationType: anim.AnimationType.fadeSlideInFromLeft,
           duration: anim.AnimationDuration.normal,
           delayMilliseconds: 100,
-          child: Text("Full Name *", style: kSmallTitleR),
+          child: Text("fullName".tr() + " *", style: kSmallTitleR),
         ),
         const SizedBox(height: 6),
         anim.AnimatedWidgetWrapper(
@@ -317,9 +318,9 @@ class _CreateUserPageState extends ConsumerState<CreateUserPage> {
           child: InputField(
             key: _fieldKeys['name'],
             type: CustomFieldType.text,
-            hint: "Enter full name",
+            hint: "enterFullName".tr(),
             controller: nameController,
-            validator: (v) => v!.isEmpty ? "Required" : null,
+            validator: (v) => v!.isEmpty ? "required".tr() : null,
           ),
         ),
       ],
@@ -334,7 +335,7 @@ class _CreateUserPageState extends ConsumerState<CreateUserPage> {
           animationType: anim.AnimationType.fadeSlideInFromLeft,
           duration: anim.AnimationDuration.normal,
           delayMilliseconds: 200,
-          child: Text("Mobile Number *", style: kSmallTitleR),
+          child: Text("mobileNumber".tr() + " *", style: kSmallTitleR),
         ),
         const SizedBox(height: 6),
         anim.AnimatedWidgetWrapper(
@@ -345,10 +346,10 @@ class _CreateUserPageState extends ConsumerState<CreateUserPage> {
             key: _fieldKeys['mobile'],
             validator: (phone) {
               if (phone == null || phone.number.isEmpty) {
-                return 'Required';
+                return 'required'.tr();
               }
               if (phone.number.length > 10) {
-                return 'Phone number cannot exceed 10 digits';
+                return 'phoneNumberCannotExceed'.tr();
               }
               return null;
             },
@@ -364,7 +365,7 @@ class _CreateUserPageState extends ConsumerState<CreateUserPage> {
             cursorColor: kBlack,
             decoration: InputDecoration(
               fillColor: kWhite,
-              hintText: 'Enter phone number',
+              hintText: 'enterYourPhoneNumber'.tr(),
               hintStyle: TextStyle(
                 fontSize: 14,
                 letterSpacing: .2,
@@ -415,7 +416,7 @@ class _CreateUserPageState extends ConsumerState<CreateUserPage> {
           animationType: anim.AnimationType.fadeSlideInFromLeft,
           duration: anim.AnimationDuration.normal,
           delayMilliseconds: 400,
-          child: Text("Address", style: kSmallTitleR),
+          child: Text("address".tr(), style: kSmallTitleR),
         ),
         const SizedBox(height: 6),
         anim.AnimatedWidgetWrapper(
@@ -425,7 +426,7 @@ class _CreateUserPageState extends ConsumerState<CreateUserPage> {
           child: InputField(
             key: _fieldKeys['address'],
             type: CustomFieldType.text,
-            hint: "Enter address",
+            hint: "enterAddress".tr(),
             controller: addressController,
           ),
         ),
@@ -441,7 +442,7 @@ class _CreateUserPageState extends ConsumerState<CreateUserPage> {
           animationType: anim.AnimationType.fadeSlideInFromLeft,
           duration: anim.AnimationDuration.normal,
           delayMilliseconds: 500,
-          child: Text("Area", style: kSmallTitleR),
+          child: Text("area".tr(), style: kSmallTitleR),
         ),
         const SizedBox(height: 6),
         anim.AnimatedWidgetWrapper(
@@ -451,7 +452,7 @@ class _CreateUserPageState extends ConsumerState<CreateUserPage> {
           child: InputField(
             key: _fieldKeys['area'],
             type: CustomFieldType.text,
-            hint: "Enter area",
+            hint: "enterArea".tr(),
             controller: areaController,
           ),
         ),
@@ -557,14 +558,14 @@ class _CreateUserPageState extends ConsumerState<CreateUserPage> {
               for (var c in countries) c.iso2 ?? '': c.name ?? ''
             };
             return _buildModalSheetField(
-              label: "Country *",
+              label: "country".tr() + " *",
               selectedValue: selectedCountryName,
-              hintText: 'Select country',
+              hintText: 'selectCountry'.tr(),
               delayMilliseconds: 600,
               onTap: () {
                 ModalSheet<String>(
                   context: context,
-                  title: 'Select Country',
+                  title: 'selectCountry'.tr(),
                   items: countries
                       .map((c) => c.iso2 ?? '')
                       .where((code) => code.isNotEmpty)
@@ -590,17 +591,17 @@ class _CreateUserPageState extends ConsumerState<CreateUserPage> {
             );
           },
           loading: () => _buildModalSheetField(
-            label: "Country *",
+            label: "country".tr() + " *",
             selectedValue: selectedCountryName,
-            hintText: 'Select country',
+            hintText: 'selectCountry'.tr(),
             delayMilliseconds: 600,
             onTap: () {},
             isLoading: true,
           ),
           error: (err, stack) => _buildModalSheetField(
-            label: "Country *",
+            label: "country".tr() + " *",
             selectedValue: selectedCountryName,
-            hintText: 'Select country',
+            hintText: 'selectCountry'.tr(),
             delayMilliseconds: 600,
             onTap: () {},
             error: err.toString(),
@@ -622,14 +623,14 @@ class _CreateUserPageState extends ConsumerState<CreateUserPage> {
               for (var s in states) s.stateCode.toString(): s.name ?? ''
             };
             return _buildModalSheetField(
-              label: "State *",
+              label: "state".tr() + " *",
               selectedValue: selectedStateName,
-              hintText: 'Select state',
+              hintText: 'selectState'.tr(),
               delayMilliseconds: 700,
               onTap: () {
                 ModalSheet<String>(
                   context: context,
-                  title: 'Select State',
+                  title: 'selectState'.tr(),
                   items: states.map((s) => s.stateCode.toString()).toList(),
                   itemLabel: (code) => stateMap[code] ?? code,
                   onItemSelected: (code) {
@@ -650,17 +651,17 @@ class _CreateUserPageState extends ConsumerState<CreateUserPage> {
             );
           },
           loading: () => _buildModalSheetField(
-            label: "State *",
+            label: "state".tr() + " *",
             selectedValue: selectedStateName,
-            hintText: 'Select state',
+            hintText: 'selectState'.tr(),
             delayMilliseconds: 700,
             onTap: () {},
             isLoading: true,
           ),
           error: (err, stack) => _buildModalSheetField(
-            label: "State *",
+            label: "state".tr() + " *",
             selectedValue: selectedStateName,
-            hintText: 'Select state',
+            hintText: 'selectState'.tr(),
             delayMilliseconds: 700,
             onTap: () {},
             error: err.toString(),
@@ -682,14 +683,14 @@ class _CreateUserPageState extends ConsumerState<CreateUserPage> {
               for (var c in cities) c.id.toString(): c.name ?? ''
             };
             return _buildModalSheetField(
-              label: "District *",
+              label: "district".tr() + " *",
               selectedValue: selectedDistrictName,
-              hintText: 'Select district / city',
+              hintText: 'selectDistrict'.tr(),
               delayMilliseconds: 800,
               onTap: () {
                 ModalSheet<String>(
                   context: context,
-                  title: 'Select District',
+                  title: 'selectDistrict'.tr(),
                   items: cities.map((c) => c.id.toString()).toList(),
                   itemLabel: (id) => districtMap[id] ?? id,
                   onItemSelected: (id) {
@@ -707,17 +708,17 @@ class _CreateUserPageState extends ConsumerState<CreateUserPage> {
             );
           },
           loading: () => _buildModalSheetField(
-            label: "District *",
+            label: "district".tr() + " *",
             selectedValue: selectedDistrictName,
-            hintText: 'Select district / city',
+            hintText: 'selectDistrict'.tr(),
             delayMilliseconds: 800,
             onTap: () {},
             isLoading: true,
           ),
           error: (err, stack) => _buildModalSheetField(
-            label: "District *",
+            label: "district".tr() + " *",
             selectedValue: selectedDistrictName,
-            hintText: 'Select district / city',
+            hintText: 'selectDistrict'.tr(),
             delayMilliseconds: 800,
             onTap: () {},
             error: err.toString(),
@@ -735,7 +736,7 @@ class _CreateUserPageState extends ConsumerState<CreateUserPage> {
           animationType: anim.AnimationType.fadeSlideInFromLeft,
           duration: anim.AnimationDuration.normal,
           delayMilliseconds: 900,
-          child: Text("Pincode *", style: kSmallTitleR),
+          child: Text("pincode".tr() + " *", style: kSmallTitleR),
         ),
         const SizedBox(height: 6),
         anim.AnimatedWidgetWrapper(
@@ -745,9 +746,9 @@ class _CreateUserPageState extends ConsumerState<CreateUserPage> {
           child: InputField(
             key: _fieldKeys['pincode'],
             type: CustomFieldType.text,
-            hint: "Enter pincode",
+            hint: "enterPincode".tr(),
             controller: pincodeController,
-            validator: (v) => v!.isEmpty ? "Required" : null,
+            validator: (v) => v!.isEmpty ? "required".tr() : null,
           ),
         ),
       ],
@@ -762,7 +763,7 @@ class _CreateUserPageState extends ConsumerState<CreateUserPage> {
           animationType: anim.AnimationType.fadeSlideInFromLeft,
           duration: anim.AnimationDuration.normal,
           delayMilliseconds: 1000,
-          child: Text("Aadhar Number", style: kSmallTitleR),
+          child: Text("aadharNumber".tr(), style: kSmallTitleR),
         ),
         const SizedBox(height: 6),
         anim.AnimatedWidgetWrapper(
@@ -772,17 +773,17 @@ class _CreateUserPageState extends ConsumerState<CreateUserPage> {
           child: InputField(
             key: _fieldKeys['aadharNumber'],
             type: CustomFieldType.number,
-            hint: "Enter Aadhar number",
+            hint: "enterAadharNumber".tr(),
             controller: aadharNumberController,
             validator: (v) {
               if (v == null || v.isEmpty) {
                 return null; // Optional field
               }
               if (v.length != 12) {
-                return 'Aadhar number must be 12 digits';
+                return 'aadharNumberMustBe12Digits'.tr();
               }
               if (!RegExp(r'^\d{12}$').hasMatch(v)) {
-                return 'Aadhar number must contain only digits';
+                return 'aadharNumberMustContainOnlyDigits'.tr();
               }
               return null;
             },
@@ -800,7 +801,7 @@ class _CreateUserPageState extends ConsumerState<CreateUserPage> {
           animationType: anim.AnimationType.fadeSlideInFromLeft,
           duration: anim.AnimationDuration.normal,
           delayMilliseconds: 1100,
-          child: Text("Date of Birth *", style: kSmallTitleR),
+          child: Text("dateOfBirth".tr() + " *", style: kSmallTitleR),
         ),
         const SizedBox(height: 6),
         anim.AnimatedWidgetWrapper(
@@ -810,9 +811,9 @@ class _CreateUserPageState extends ConsumerState<CreateUserPage> {
           child: InputField(
             key: _fieldKeys['dob'],
             type: CustomFieldType.date,
-            hint: "dd/mm/yyyy",
+            hint: "ddmmyyyy".tr(),
             controller: dobController,
-            validator: (v) => v!.isEmpty ? "Required" : null,
+            validator: (v) => v!.isEmpty ? "required".tr() : null,
           ),
         ),
       ],
@@ -827,7 +828,7 @@ class _CreateUserPageState extends ConsumerState<CreateUserPage> {
           animationType: anim.AnimationType.fadeSlideInFromLeft,
           duration: anim.AnimationDuration.normal,
           delayMilliseconds: 1200,
-          child: Text("Gender *", style: kSmallTitleR),
+          child: Text("gender".tr() + " *", style: kSmallTitleR),
         ),
         const SizedBox(height: 6),
         anim.AnimatedWidgetWrapper(
@@ -836,7 +837,7 @@ class _CreateUserPageState extends ConsumerState<CreateUserPage> {
           delayMilliseconds: 1250,
           child: AnimatedDropdown<String>(
             key: _fieldKeys['gender'],
-            hint: "Select gender",
+            hint: "selectGender".tr(),
             value: selectedGender,
             items: const ['Male', 'Female', 'Other'],
             itemLabel: (value) => value,
@@ -860,7 +861,7 @@ class _CreateUserPageState extends ConsumerState<CreateUserPage> {
         height: 50,
         width: double.infinity,
         child: primaryButton(
-          label: "Create User",
+          label: "createUser".tr(),
           onPressed: () {
             if (_formKey.currentState!.validate()) {
               _handleCreateUser();

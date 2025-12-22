@@ -19,6 +19,7 @@ import 'package:Annujoom/src/interfaces/components/modal_sheet.dart';
 import 'package:Annujoom/src/interfaces/components/primaryButton.dart';
 import 'package:Annujoom/src/interfaces/components/confirmation_dialog.dart';
 import 'package:Annujoom/src/interfaces/animations/index.dart' as anim;
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_cropper/image_cropper.dart';
@@ -169,9 +170,9 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
     showDialog(
       context: context,
       builder: (dialogContext) => ConfirmationDialog(
-        title: 'Logout',
+        title: 'logout'.tr(),
         message: 'Are you sure you want to logout?',
-        confirmButtonText: 'Logout',
+        confirmButtonText: 'logout'.tr(),
         onConfirm: () {
           _performLogout(context, ref);
         },
@@ -232,7 +233,7 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
           if (mounted) {
             ref.read(loadingProvider.notifier).stopLoading();
           }
-          SnackbarService().showSnackBar('Failed to upload profile picture');
+          SnackbarService().showSnackBar('failedToUploadProfilePicture'.tr());
           log('Error uploading profile picture: $e', name: 'RegistrationPage');
           return;
         }
@@ -289,7 +290,7 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
 
       if (result.user != null) {
         log('User registration successful', name: 'RegistrationPage');
-        SnackbarService().showSnackBar('Registration submitted successfully');
+        SnackbarService().showSnackBar('registrationSubmittedSuccessfully'.tr());
 
         if (mounted) {
           // If recommended by charity member, navigate to OTP verification
@@ -307,7 +308,7 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
           }
         }
       } else {
-        final errorMessage = result.error ?? 'Failed to submit registration';
+        final errorMessage = result.error ?? 'failedToSubmitRegistration'.tr();
         SnackbarService().showSnackBar(errorMessage, type: SnackbarType.error);
       }
     } catch (e) {
@@ -336,9 +337,9 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
                   return TextButton.icon(
                     onPressed: () => _handleLogout(context, ref),
                     icon: const Icon(Icons.logout, size: 20, color: kTextColor),
-                    label: const Text(
-                      'Logout',
-                      style: TextStyle(color: kTextColor, fontSize: 14),
+                    label: Text(
+                      'logout'.tr(),
+                      style: const TextStyle(color: kTextColor, fontSize: 14),
                     ),
                   );
                 },
@@ -410,7 +411,7 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
                         animationType: anim.AnimationType.fadeSlideInFromLeft,
                         duration: anim.AnimationDuration.normal,
                         delayMilliseconds: 100,
-                        child: Text("Full Name *", style: kSmallTitleR),
+                        child: Text("fullName".tr() + " *", style: kSmallTitleR),
                       ),
                       const SizedBox(height: 6),
                       anim.AnimatedWidgetWrapper(
@@ -420,9 +421,9 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
                         child: InputField(
                           key: _fieldKeys['name'],
                           type: CustomFieldType.text,
-                          hint: "Enter full name",
+                          hint: "enterFullName".tr(),
                           controller: nameController,
-                          validator: (v) => v!.isEmpty ? "Required" : null,
+                          validator: (v) => v!.isEmpty ? "required".tr() : null,
                         ),
                       ),
                       // const SizedBox(height: 18),
@@ -504,7 +505,7 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
                         animationType: anim.AnimationType.fadeSlideInFromLeft,
                         duration: anim.AnimationDuration.normal,
                         delayMilliseconds: 1500,
-                        child: Text("Language *", style: kSmallTitleR),
+                        child: Text("language".tr() + " *", style: kSmallTitleR),
                       ),
                       const SizedBox(height: 6),
                       anim.AnimatedWidgetWrapper(
@@ -513,7 +514,7 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
                         delayMilliseconds: 1550,
                         child: AnimatedDropdown<String>(
                           key: _fieldKeys['preferredLanguage'],
-                          hint: "Select language",
+                          hint: "selectLanguage".tr(),
                           value: selectedPreferredLanguage,
                           items: const ['en', 'ml'],
                           itemLabel: (value) =>
@@ -550,7 +551,7 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
                         animationType: anim.AnimationType.fadeSlideInFromLeft,
                         duration: anim.AnimationDuration.normal,
                         delayMilliseconds: 400,
-                        child: Text("Address", style: kSmallTitleR),
+                        child: Text("address".tr(), style: kSmallTitleR),
                       ),
                       const SizedBox(height: 6),
                       anim.AnimatedWidgetWrapper(
@@ -560,7 +561,7 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
                         child: InputField(
                           key: _fieldKeys['address'],
                           type: CustomFieldType.text,
-                          hint: "Enter address",
+                          hint: "enterAddress".tr(),
                           controller: addressController,
                         ),
                       ),
@@ -569,7 +570,7 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
                         animationType: anim.AnimationType.fadeSlideInFromLeft,
                         duration: anim.AnimationDuration.normal,
                         delayMilliseconds: 500,
-                        child: Text("Area", style: kSmallTitleR),
+                        child: Text("area".tr(), style: kSmallTitleR),
                       ),
                       const SizedBox(height: 6),
                       anim.AnimatedWidgetWrapper(
@@ -579,7 +580,7 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
                         child: InputField(
                           key: _fieldKeys['area'],
                           type: CustomFieldType.text,
-                          hint: "Enter area",
+                          hint: "enterArea".tr(),
                           controller: areaController,
                         ),
                       ),
@@ -588,7 +589,7 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
                         animationType: anim.AnimationType.fadeSlideInFromLeft,
                         duration: anim.AnimationDuration.normal,
                         delayMilliseconds: 600,
-                        child: Text("Country *", style: kSmallTitleR),
+                        child: Text("country".tr() + " *", style: kSmallTitleR),
                       ),
                       const SizedBox(height: 6),
                       anim.AnimatedWidgetWrapper(
@@ -609,7 +610,7 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
                                   onTap: () {
                                     ModalSheet<String>(
                                       context: context,
-                                      title: 'Select Country',
+                                      title: 'selectCountry'.tr(),
                                       items: countries
                                           .map((c) => c.iso2 ?? '')
                                           .where((code) => code.isNotEmpty)
@@ -653,7 +654,7 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
                                       children: [
                                         Text(
                                           selectedCountryName ??
-                                              'Search country',
+                                              'selectCountry'.tr(),
                                           style: TextStyle(
                                             color: selectedCountryName == null
                                                 ? Colors.grey.shade600
@@ -710,7 +711,7 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
                           animationType: anim.AnimationType.fadeSlideInFromLeft,
                           duration: anim.AnimationDuration.normal,
                           delayMilliseconds: 700,
-                          child: Text("State *", style: kSmallTitleR),
+                          child: Text("state".tr() + " *", style: kSmallTitleR),
                         ),
                       if (selectedCountryCode != null)
                         const SizedBox(height: 6),
@@ -735,7 +736,7 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
                                     onTap: () {
                                       ModalSheet<String>(
                                         context: context,
-                                        title: 'Select State',
+                                        title: 'selectState'.tr(),
                                         items: states
                                             .map((s) => s.stateCode.toString())
                                             .toList(),
@@ -773,7 +774,7 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
                                             MainAxisAlignment.spaceBetween,
                                         children: [
                                           Text(
-                                            selectedStateName ?? 'Search state',
+                                            selectedStateName ?? 'selectState'.tr(),
                                             style: TextStyle(
                                               color: selectedStateName == null
                                                   ? Colors.grey.shade600
@@ -831,7 +832,7 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
                           animationType: anim.AnimationType.fadeSlideInFromLeft,
                           duration: anim.AnimationDuration.normal,
                           delayMilliseconds: 800,
-                          child: Text("District *", style: kSmallTitleR),
+                          child: Text("district".tr() + " *", style: kSmallTitleR),
                         ),
                       if (selectedStateCode != null) const SizedBox(height: 6),
                       if (selectedStateCode != null)
@@ -856,7 +857,7 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
                                     onTap: () {
                                       ModalSheet<String>(
                                         context: context,
-                                        title: 'Select District',
+                                        title: 'selectDistrict'.tr(),
                                         items: cities
                                             .map((c) => c.id.toString())
                                             .toList(),
@@ -893,7 +894,7 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
                                         children: [
                                           Text(
                                             selectedDistrictName ??
-                                                'Search district / city',
+                                                'selectDistrict'.tr(),
                                             style: TextStyle(
                                               color:
                                                   selectedDistrictName == null
@@ -950,7 +951,7 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
                         animationType: anim.AnimationType.fadeSlideInFromLeft,
                         duration: anim.AnimationDuration.normal,
                         delayMilliseconds: 900,
-                        child: Text("Pincode *", style: kSmallTitleR),
+                        child: Text("pincode".tr() + " *", style: kSmallTitleR),
                       ),
                       const SizedBox(height: 6),
                       anim.AnimatedWidgetWrapper(
@@ -960,9 +961,9 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
                         child: InputField(
                           key: _fieldKeys['pincode'],
                           type: CustomFieldType.text,
-                          hint: "Enter pincode",
+                          hint: "enterPincode".tr(),
                           controller: pincodeController,
-                          validator: (v) => v!.isEmpty ? "Required" : null,
+                          validator: (v) => v!.isEmpty ? "required".tr() : null,
                         ),
                       ),
                       const SizedBox(height: 20),
@@ -970,7 +971,7 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
                         animationType: anim.AnimationType.fadeSlideInFromLeft,
                         duration: anim.AnimationDuration.normal,
                         delayMilliseconds: 1000,
-                        child: Text("Aadhar Number", style: kSmallTitleR),
+                        child: Text("aadharNumber".tr(), style: kSmallTitleR),
                       ),
                       const SizedBox(height: 6),
                       anim.AnimatedWidgetWrapper(
@@ -980,17 +981,17 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
                         child: InputField(
                           key: _fieldKeys['aadharNumber'],
                           type: CustomFieldType.number,
-                          hint: "Enter Aadhar number",
+                          hint: "enterAadharNumber".tr(),
                           controller: aadharNumberController,
                           validator: (v) {
                             if (v == null || v.isEmpty) {
                               return null; // Optional field
                             }
                             if (v.length != 12) {
-                              return 'Aadhar number must be 12 digits';
+                              return 'aadharNumberMustBe12Digits'.tr();
                             }
                             if (!RegExp(r'^\d{12}$').hasMatch(v)) {
-                              return 'Aadhar number must contain only digits';
+                              return 'aadharNumberMustContainOnlyDigits'.tr();
                             }
                             return null;
                           },
@@ -1001,7 +1002,7 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
                         animationType: anim.AnimationType.fadeSlideInFromLeft,
                         duration: anim.AnimationDuration.normal,
                         delayMilliseconds: 1300,
-                        child: Text("Date of Birth *", style: kSmallTitleR),
+                        child: Text("dateOfBirth".tr() + " *", style: kSmallTitleR),
                       ),
                       const SizedBox(height: 6),
                       anim.AnimatedWidgetWrapper(
@@ -1011,9 +1012,9 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
                         child: InputField(
                           key: _fieldKeys['dob'],
                           type: CustomFieldType.date,
-                          hint: "dd/mm/yyyy",
+                          hint: "ddmmyyyy".tr(),
                           controller: dobController,
-                          validator: (v) => v!.isEmpty ? "Required" : null,
+                          validator: (v) => v!.isEmpty ? "required".tr() : null,
                         ),
                       ),
                       const SizedBox(height: 20),
@@ -1021,7 +1022,7 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
                         animationType: anim.AnimationType.fadeSlideInFromLeft,
                         duration: anim.AnimationDuration.normal,
                         delayMilliseconds: 1400,
-                        child: Text("Gender *", style: kSmallTitleR),
+                        child: Text("gender".tr() + " *", style: kSmallTitleR),
                       ),
                       const SizedBox(height: 6),
                       anim.AnimatedWidgetWrapper(
@@ -1030,7 +1031,7 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
                         delayMilliseconds: 1450,
                         child: AnimatedDropdown<String>(
                           key: _fieldKeys['gender'],
-                          hint: "Select gender",
+                          hint: "selectGender".tr(),
                           value: selectedGender,
                           items: const ['Male', 'Female', 'Other'],
                           itemLabel: (value) => value,
@@ -1047,7 +1048,7 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
                         animationType: anim.AnimationType.fadeSlideInFromLeft,
                         duration: anim.AnimationDuration.normal,
                         delayMilliseconds: 1600,
-                        child: Text("WhatsApp Number *", style: kSmallTitleR),
+                        child: Text("whatsappNumber".tr() + " *", style: kSmallTitleR),
                       ),
                       const SizedBox(height: 12),
                       anim.AnimatedWidgetWrapper(
@@ -1067,10 +1068,10 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
                                 });
                               },
                             ),
-                            const Expanded(
+                            Expanded(
                               child: Text(
-                                "Same as phone number",
-                                style: TextStyle(fontSize: 14),
+                                "sameAsPhoneNumber".tr(),
+                                style: const TextStyle(fontSize: 14),
                               ),
                             ),
                           ],
@@ -1090,10 +1091,10 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
                                 if (phone == null ||
                                     phone.number.isEmpty ||
                                     phone.number.length < 9) {
-                                  return 'Please enter a valid phone number';
+                                  return 'pleaseEnterValidPhoneNumber'.tr();
                                 }
                                 if (phone.number.length > 10) {
-                                  return 'Phone number cannot exceed 10 digits';
+                                  return 'phoneNumberCannotExceed'.tr();
                                 }
                               }
                               return null;
@@ -1110,7 +1111,7 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
                             cursorColor: kBlack,
                             decoration: InputDecoration(
                               fillColor: kWhite,
-                              hintText: 'Enter WhatsApp number',
+                              hintText: 'enterWhatsappNumber'.tr(),
                               hintStyle: TextStyle(
                                 fontSize: 14,
                                 letterSpacing: .2,
@@ -1158,7 +1159,7 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
                         animationType: anim.AnimationType.fadeSlideInFromLeft,
                         duration: anim.AnimationDuration.normal,
                         delayMilliseconds: 1750,
-                        child: Text("Recommended By *", style: kSmallTitleR),
+                        child: Text("recommendedBy".tr() + " *", style: kSmallTitleR),
                       ),
                       const SizedBox(height: 12),
                       anim.AnimatedWidgetWrapper(
@@ -1179,7 +1180,7 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
                                     });
                                   },
                                 ),
-                                const Text("Trustee"),
+                                Text("trustee".tr()),
                               ],
                             ),
                             // Charity Member radio button hidden for now
@@ -1196,7 +1197,7 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
                                       });
                                     },
                                   ),
-                                  const Text("Charity Member"),
+                                  Text("charityMember".tr()),
                                 ],
                               ),
                           ],
@@ -1211,7 +1212,7 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
                           key: _fieldKeys['recommendedBy'],
                           validator: (value) {
                             if (value == null) {
-                              return 'Required';
+                              return 'required'.tr();
                             }
                             return null;
                           },
@@ -1220,8 +1221,8 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
                             children: [
                               Text(
                                 recommendedByType == 'trustee'
-                                    ? "Choose Trustee *"
-                                    : "Choose Charity Member *",
+                                    ? "chooseTrustee".tr() + " *"
+                                    : "chooseCharityMember".tr() + " *",
                                 style: kSmallTitleR,
                               ),
                               const SizedBox(height: 6),
@@ -1247,8 +1248,8 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
                                     ModalSheet<UserModel>(
                                       context: context,
                                       title: recommendedByType == 'trustee'
-                                          ? 'Select Trustee'
-                                          : 'Select Charity Member',
+                                          ? 'chooseTrustee'.tr()
+                                          : 'chooseCharityMember'.tr(),
                                       items: users,
                                       itemLabel: (user) =>
                                           user.name ?? 'Unknown',
@@ -1283,8 +1284,8 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
                                       Text(
                                         selectedRecommendedBy?.name ??
                                             (recommendedByType == 'trustee'
-                                                ? 'Search trustee'
-                                                : 'Search charity member'),
+                                                ? 'searchTrustee'.tr()
+                                                : 'searchCharityMember'.tr()),
                                         style: TextStyle(
                                           color: selectedRecommendedBy == null
                                               ? Colors.grey.shade600
@@ -1325,7 +1326,7 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
                           height: 50,
                           width: double.infinity,
                           child: primaryButton(
-                            label: "Register",
+                            label: "register".tr(),
                             onPressed: () {
                               // Log userData regardless of validation
                               final debugUserData = <String, dynamic>{

@@ -1,9 +1,9 @@
 import 'dart:ui';
-
 import 'package:Annujoom/firebase_options.dart';
 import 'package:Annujoom/src/data/services/crashlytics_service.dart';
+import 'package:Annujoom/src/data/constants/global_variables.dart';
+import 'package:Annujoom/src/data/services/secure_storage_service.dart';
 import 'package:easy_localization/easy_localization.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/material.dart';
@@ -17,7 +17,6 @@ import 'package:Annujoom/src/data/router/router.dart' as router;
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await EasyLocalization.ensureInitialized();
   
   final checker = InstallChecker();
   await checker.checkFirstInstall();
@@ -32,12 +31,26 @@ Future<void> main() async {
   await CrashlyticsService.setCrashlyticsCollectionEnabled(true);
 
   await dotenv.load(fileName: ".env");
+  
+  await EasyLocalization.ensureInitialized();
+  
+  // Load preferred language from secure storage
+  final secureStorage = SecureStorageService();
+  final userData = await secureStorage.getUserData();
+  final preferredLanguage = userData?.preferredLanguage ?? 'en';
+  
+  // Set in GlobalVariables for use throughout the app
+  GlobalVariables.setPreferredLanguage(preferredLanguage);
+  
+  final startLocale = Locale(preferredLanguage);
+  
   runApp(
     EasyLocalization(
       supportedLocales: const [Locale('en'), Locale('ml')],
       path: 'assets/translations',
       fallbackLocale: const Locale('en'),
-      child: ProviderScope(child: MyApp()),
+      startLocale: startLocale,
+      child: ProviderScope(child: const MyApp()),
     ),
   );
 }
@@ -60,6 +73,9 @@ class MyApp extends ConsumerWidget {
       onGenerateRoute: router.generateRoute,
       initialRoute: 'Splash',
       title: 'ANNUJOOM',
+      localizationsDelegates: context.localizationDelegates,
+      supportedLocales: context.supportedLocales,
+      locale: context.locale,
       theme: ThemeData(
         brightness: Brightness.light,
         colorScheme: ColorScheme.fromSeed(

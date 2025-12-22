@@ -3,6 +3,7 @@ import 'package:Annujoom/src/data/constants/style_constants.dart';
 import 'package:Annujoom/src/data/utils/currency_formatter.dart';
 import 'package:Annujoom/src/interfaces/components/primaryButton.dart';
 import 'package:Annujoom/src/interfaces/components/text_pill.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 
 class HomeCampaignCard extends StatelessWidget {
@@ -45,7 +46,7 @@ class HomeCampaignCard extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               TextPill(
-                text: "DUE DATE",
+                text: "dueDate".tr(),
                 color: const Color(0xFF1E3C72),
                 textStyle: kSmallerTitleSB.copyWith(
                   fontSize: 10,
@@ -100,7 +101,7 @@ class HomeCampaignCard extends StatelessWidget {
               ),
               const SizedBox(width: 4),
               Text(
-                "raised of",
+                "raisedOf".tr(),
                 style: kSmallTitleR,
               ),
               const SizedBox(width: 4),
@@ -110,7 +111,7 @@ class HomeCampaignCard extends StatelessWidget {
               ),
               const SizedBox(width: 4),
               Text(
-                "goal",
+                "goal".tr(),
                 style: kSmallTitleR,
               ),
               const Spacer(),
@@ -125,7 +126,7 @@ class HomeCampaignCard extends StatelessWidget {
             children: [
               Expanded(
                 child: primaryButton(
-                  label: "View details",
+                  label: "viewDetails".tr(),
                   onPressed: onViewDetails,
                   buttonColor: kCardBackgroundColor,
                   labelColor: kTextColor,
@@ -268,13 +269,13 @@ class HomeCompletedCampaignCard extends StatelessWidget {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
-                          "Goal: ${formatCurrency(goal)}",
+                          "goalLabel".tr() + ": ${formatCurrency(goal)}",
                           style: kSmallTitleM.copyWith(
                             color: kWhite,
                           ),
                         ),
                         Text(
-                          "Collected: ${formatCurrency(collected)} ✅",
+                          "collectedLabel".tr() + ": ${formatCurrency(collected)} ✅",
                           style: kSmallTitleM.copyWith(
                             color: kWhite,
                           ),
@@ -513,7 +514,7 @@ class HomeGradientCampaignCard extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                "DUE DATE",
+                "dueDate".tr(),
                 style: kSmallerTitleSB.copyWith(
                   fontSize: 10,
                   color: kWhite,
@@ -592,7 +593,7 @@ class HomeGradientCampaignCard extends StatelessWidget {
                     ),
                     const SizedBox(width: 4),
                     Text(
-                      "raised of",
+                      "raisedOf".tr(),
                       style: kSmallTitleR.copyWith(color: kWhite),
                     ),
                     const SizedBox(width: 4),
@@ -602,7 +603,7 @@ class HomeGradientCampaignCard extends StatelessWidget {
                     ),
                     const SizedBox(width: 4),
                     Text(
-                      "goal",
+                      "goal".tr(),
                       style: kSmallTitleR.copyWith(color: kWhite),
                     ),
                     const Spacer(),
@@ -619,7 +620,7 @@ class HomeGradientCampaignCard extends StatelessWidget {
             children: [
               Expanded(
                 child: primaryButton(
-                  label: "View details",
+                  label: "viewDetails".tr(),
                   onPressed: onViewDetails,
                   buttonColor: kWhite.withOpacity(0.2),
                   labelColor: kWhite,

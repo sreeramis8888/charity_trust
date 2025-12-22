@@ -13,6 +13,7 @@ import 'package:Annujoom/src/data/models/user_model.dart';
 import 'package:Annujoom/src/interfaces/components/primaryButton.dart';
 import 'package:Annujoom/src/interfaces/animations/index.dart' as anim;
 import 'package:Annujoom/src/data/services/notification_service/get_fcm.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
@@ -65,7 +66,7 @@ class _PhoneNumberScreenState extends ConsumerState<PhoneNumberScreen> {
                   animationType: anim.AnimationType.fadeSlideInFromLeft,
                   duration: anim.AnimationDuration.normal,
                   child: Text(
-                    'Phone Number',
+                    'phoneNumber'.tr(),
                     style: kHeadTitleM.copyWith(fontSize: 25),
                   ),
                 ),
@@ -81,7 +82,7 @@ class _PhoneNumberScreenState extends ConsumerState<PhoneNumberScreen> {
                                 anim.AnimationType.fadeSlideInFromLeft,
                             duration: anim.AnimationDuration.normal,
                             delayMilliseconds: 100,
-                            child: Text('Please enter your mobile number',
+                            child: Text('pleaseEnterMobileNumber'.tr(),
                                 style: kSmallTitleR.copyWith(
                                     color: kSecondaryTextColor)),
                           ),
@@ -95,7 +96,7 @@ class _PhoneNumberScreenState extends ConsumerState<PhoneNumberScreen> {
                               validator: (phone) {
                                 if (phone!.number.length > 9) {
                                   if (phone.number.length > 10) {
-                                    return 'Phone number cannot exceed 10 digits';
+                                    return 'phoneNumberCannotExceed'.tr();
                                   }
                                 }
                                 return null;
@@ -113,7 +114,7 @@ class _PhoneNumberScreenState extends ConsumerState<PhoneNumberScreen> {
                               decoration: InputDecoration(
                                 filled: true,
                                 fillColor: kWhite,
-                                hintText: 'Enter your phone number',
+                                hintText: 'enterYourPhoneNumber'.tr(),
                                 hintStyle: TextStyle(
                                   fontSize: 14,
                                   letterSpacing: .2,
@@ -167,7 +168,7 @@ class _PhoneNumberScreenState extends ConsumerState<PhoneNumberScreen> {
                             duration: anim.AnimationDuration.normal,
                             delayMilliseconds: 300,
                             child: Text(
-                                'A 6 digit verification code will be sent',
+                                'aVerificationCodeWillBeSent'.tr(),
                                 style: TextStyle(
                                     color: kSecondaryTextColor,
                                     fontWeight: FontWeight.w300)),
@@ -182,7 +183,7 @@ class _PhoneNumberScreenState extends ConsumerState<PhoneNumberScreen> {
                                 height: 50,
                                 width: double.infinity,
                                 child: primaryButton(
-                                  label: 'Send OTP',
+                                  label: 'sendOTP'.tr(),
                                   onPressed: isLoading
                                       ? null
                                       : () =>
@@ -208,7 +209,7 @@ class _PhoneNumberScreenState extends ConsumerState<PhoneNumberScreen> {
     final phoneNumber = _mobileController.text;
 
     if (phoneNumber.isEmpty) {
-      SnackbarService().showSnackBar('Please enter a phone number');
+      SnackbarService().showSnackBar('pleaseEnterPhoneNumber'.tr());
       return;
     }
 
@@ -232,7 +233,7 @@ class _PhoneNumberScreenState extends ConsumerState<PhoneNumberScreen> {
       ref.read(loadingProvider.notifier).stopLoading();
 
       if (verificationId.isEmpty) {
-        SnackbarService().showSnackBar('Failed to send OTP. Please try again.');
+        SnackbarService().showSnackBar('failedToSendOTP'.tr());
         return;
       }
 
@@ -365,7 +366,7 @@ class _OTPScreenState extends ConsumerState<OTPScreen> {
                 animationType: anim.AnimationType.fadeSlideInFromLeft,
                 duration: anim.AnimationDuration.normal,
                 child: Text(
-                  'Enter Code',
+                  'enterCode'.tr(),
                   style: kHeadTitleM.copyWith(fontSize: 25),
                 ),
               ),
@@ -381,7 +382,7 @@ class _OTPScreenState extends ConsumerState<OTPScreen> {
                           duration: anim.AnimationDuration.normal,
                           delayMilliseconds: 100,
                           child: Text(
-                              'Enter the 6-digit code sent to ${widget.fullPhone}',
+                              'enterThe6DigitCode'.tr() + ' ${widget.fullPhone}',
                               style: kSmallTitleR.copyWith(
                                   color: kSecondaryTextColor)),
                         ),
@@ -432,8 +433,8 @@ class _OTPScreenState extends ConsumerState<OTPScreen> {
                             children: [
                               Text(
                                 _isButtonDisabled
-                                    ? 'Resend OTP in $_start seconds'
-                                    : 'Didn\'t receive code?',
+                                    ? 'resendOTPIn'.tr() + ' $_start ' + 'seconds'.tr()
+                                    : 'didntReceiveCode'.tr(),
                                 style: TextStyle(
                                     fontWeight: FontWeight.w500,
                                     fontSize: 14,
@@ -444,7 +445,7 @@ class _OTPScreenState extends ConsumerState<OTPScreen> {
                               GestureDetector(
                                 onTap: _isButtonDisabled ? null : resendCode,
                                 child: Text(
-                                  _isButtonDisabled ? '' : 'Resend Code',
+                                  _isButtonDisabled ? '' : 'resendCode'.tr(),
                                   style: TextStyle(
                                       fontWeight: FontWeight.w500,
                                       fontSize: 14,
@@ -466,7 +467,7 @@ class _OTPScreenState extends ConsumerState<OTPScreen> {
                               height: 50,
                               width: double.infinity,
                               child: primaryButton(
-                                label: 'Verify',
+                                label: 'verify'.tr(),
                                 onPressed: isLoading
                                     ? null
                                     : () =>
@@ -493,7 +494,7 @@ class _OTPScreenState extends ConsumerState<OTPScreen> {
     final otp = _otpController.text;
 
     if (otp.isEmpty || otp.length != 6) {
-      SnackbarService().showSnackBar('Please enter a valid 6-digit OTP');
+      SnackbarService().showSnackBar('pleaseEnterValid6DigitOTP'.tr());
       return;
     }
 
@@ -567,12 +568,12 @@ class _OTPScreenState extends ConsumerState<OTPScreen> {
               );
             }
           } else {
-            SnackbarService().showSnackBar('Invalid response data');
+            SnackbarService().showSnackBar('invalidResponseData'.tr());
           }
         }
       } else {
         SnackbarService().showSnackBar(
-          response.message ?? 'Failed to verify OTP',
+          response.message ?? 'failedToSendOTP'.tr(),
         );
       }
     } catch (e) {

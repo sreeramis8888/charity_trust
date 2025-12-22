@@ -10,6 +10,7 @@ class SecureStorageService {
   static const String _userIdKey = 'user_id';
   static const String _userDataKey = 'user_data';
   static const String _fcmTokenKey = 'fcm_token';
+  static const String _preferredLanguageKey = 'preferred_language';
 
   final FlutterSecureStorage _storage;
 
@@ -104,6 +105,16 @@ class SecureStorageService {
   /// Clear registration data after successful registration
   Future<void> clearRegistrationData() async {
     await _storage.delete(key: 'registration_data');
+  }
+
+  /// Save preferred language
+  Future<void> setPreferredLanguage(String languageCode) async {
+    await _storage.write(key: _preferredLanguageKey, value: languageCode);
+  }
+
+  /// Retrieve preferred language
+  Future<String?> getPreferredLanguage() async {
+    return await _storage.read(key: _preferredLanguageKey);
   }
 }
 
