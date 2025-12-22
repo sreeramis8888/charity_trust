@@ -160,57 +160,64 @@ class ProfilePage extends ConsumerWidget {
                 const SizedBox(height: 22),
                 Text("accountStatistics".tr(), style: kBodyTitleM),
                 const SizedBox(height: 10),
-                Container(
-                  padding: const EdgeInsets.all(18),
-                  decoration: BoxDecoration(
-                    gradient: const LinearGradient(
-                      colors: [Color(0xFFFFFFFF), Color(0xFFEEEDFF)],
-                      begin: Alignment.topCenter,
-                      end: Alignment.bottomCenter,
-                    ),
-                    borderRadius: BorderRadius.circular(22),
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          _statItem(
-                            "${userData.totalCampaignsParticipated ?? 0}",
-                            "myParticipations".tr(),
-                          ),
-                          _statItem(
-                            "₹${userData.totalAmountDonated ?? 0}",
-                            "amountDonated".tr(),
-                          ),
-                        ],
-                      ),
-                      if (userData.role != null &&
-                          userData.role != 'member') ...[
-                        const SizedBox(height: 18),
-                        Container(
-                          height: 2,
-                          color: kStrokeColor.withOpacity(0.06),
-                        ),
-                        const SizedBox(height: 18),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            _statItem(
-                              "${userData.totalReferrals ?? 0}",
-                              "totalReferrals".tr(),
-                            ),
-                            _statItem(
-                              "${userData.activeReferrals ?? 0}",
-                              "activeReferrals".tr(),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ],
-                  ),
-                ),
+         Container(
+  padding: const EdgeInsets.all(18),
+  decoration: BoxDecoration(
+    gradient: const LinearGradient(
+      colors: [Color(0xFFFFFFFF), Color(0xFFEEEDFF)],
+      begin: Alignment.topCenter,
+      end: Alignment.bottomCenter,
+    ),
+    borderRadius: BorderRadius.circular(22),
+  ),
+  child: Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      Row(
+        children:  [
+          Expanded(
+            child: _StatItem(
+              value: "${userData.totalCampaignsParticipated ?? 0}",
+              label: "myParticipations",
+            ),
+          ),
+          SizedBox(width: 12),
+          Expanded(
+            child: _StatItem(
+              value: "₹${userData.totalAmountDonated ?? 0}",
+              label: "amountDonated",
+            ),
+          ),
+        ],
+      ),
+
+      if (userData.role != null && userData.role != 'member') ...[
+        const SizedBox(height: 18),
+        Divider(height: 1, color: kStrokeColor),
+        const SizedBox(height: 18),
+
+        Row(
+          children:  [
+            Expanded(
+              child: _StatItem(
+                value: "${userData.totalReferrals ?? 0}",
+                label: "totalReferrals",
+              ),
+            ),
+            SizedBox(width: 12),
+            Expanded(
+              child: _StatItem(
+                value: "${userData.activeReferrals ?? 0}",
+                label: "activeReferrals",
+              ),
+            ),
+          ],
+        ),
+      ],
+    ],
+  ),
+),
+
                 const SizedBox(height: 26),
                 Container(
                   padding: const EdgeInsets.symmetric(vertical: 8),
@@ -292,25 +299,6 @@ class ProfilePage extends ConsumerWidget {
           child: Text('Error loading profile: $error'),
         ),
       ),
-    );
-  }
-
-  Widget _statItem(String value, String label) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          value,
-          style: kBodyTitleSB.copyWith(
-            color: kThirdTextColor,
-          ),
-        ),
-        const SizedBox(height: 15),
-        Text(
-          label,
-          style: kSmallTitleM,
-        ),
-      ],
     );
   }
 
@@ -630,5 +618,38 @@ class ProfilePage extends ConsumerWidget {
         );
       }
     }
+  }
+}
+
+
+class _StatItem extends StatelessWidget {
+  final String value;
+  final String label;
+
+  const _StatItem({
+    required this.value,
+    required this.label,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          value,
+          softWrap: true,
+          style: kBodyTitleSB.copyWith(
+            color: kThirdTextColor,
+          ),
+        ),
+        const SizedBox(height: 12),
+        Text(
+          label.tr(),
+          softWrap: true,
+          style: kSmallTitleM,
+        ),
+      ],
+    );
   }
 }

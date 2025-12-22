@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:Annujoom/src/interfaces/components/confirmation_dialog.dart';
 import 'package:Annujoom/src/interfaces/components/loading_indicator.dart';
 import 'package:Annujoom/src/interfaces/components/primaryButton.dart';
@@ -31,11 +32,11 @@ class _ReferralDetailsPageState extends ConsumerState<ReferralDetailsPage> {
     showDialog(
       context: context,
       builder: (context) => ConfirmationDialog(
-        title: 'Approve Membership',
-        message: 'Are you sure you want to approve this member\'s application?',
-        confirmButtonText: 'Approve',
+        title: 'approveMembership'.tr(),
+        message: 'approveMembershipConfirmation'.tr(),
+        confirmButtonText: 'approve'.tr(),
         onConfirm: _handleApprove,
-        cancelButtonText: 'Cancel',
+        cancelButtonText: 'cancel'.tr(),
       ),
     );
   }
@@ -53,13 +54,13 @@ class _ReferralDetailsPageState extends ConsumerState<ReferralDetailsPage> {
             mainAxisSize: MainAxisSize.min,
             children: [
               Text(
-                'Reject Membership',
+                'rejectMembership'.tr(),
                 style: kHeadTitleR,
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 12),
               Text(
-                'Please provide a reason for rejection',
+                'rejectMembershipReasonPrompt'.tr(),
                 style: kBodyTitleR.copyWith(color: kSecondaryTextColor),
                 textAlign: TextAlign.center,
               ),
@@ -68,7 +69,7 @@ class _ReferralDetailsPageState extends ConsumerState<ReferralDetailsPage> {
                 controller: reasonController,
                 maxLines: 4,
                 decoration: InputDecoration(
-                  hintText: 'Enter rejection reason...',
+                  hintText: 'enterRejectionReasonHint'.tr(),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
                   ),
@@ -89,7 +90,7 @@ class _ReferralDetailsPageState extends ConsumerState<ReferralDetailsPage> {
                         padding: const EdgeInsets.symmetric(vertical: 12),
                       ),
                       child: Text(
-                        'Cancel',
+                        'cancel'.tr(),
                         style: kSmallerTitleL.copyWith(color: kTextColor),
                       ),
                     ),
@@ -103,8 +104,8 @@ class _ReferralDetailsPageState extends ConsumerState<ReferralDetailsPage> {
                           _showRejectConfirmation(reasonController.text.trim());
                         } else {
                           ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text('Please provide a rejection reason'),
+                             SnackBar(
+                              content: Text('provideRejectionReasonError'.tr()),
                             ),
                           );
                         }
@@ -117,7 +118,7 @@ class _ReferralDetailsPageState extends ConsumerState<ReferralDetailsPage> {
                         padding: const EdgeInsets.symmetric(vertical: 12),
                       ),
                       child: Text(
-                        'Continue',
+                        'continue'.tr(),
                         style: kSmallerTitleL.copyWith(color: kWhite),
                       ),
                     ),
@@ -135,11 +136,11 @@ class _ReferralDetailsPageState extends ConsumerState<ReferralDetailsPage> {
     showDialog(
       context: context,
       builder: (context) => ConfirmationDialog(
-        title: 'Confirm Rejection',
-        message: 'Are you sure you want to reject this member\'s application?',
-        confirmButtonText: 'Reject',
+        title: 'confirmRejection'.tr(),
+        message: 'rejectMembershipConfirmation'.tr(),
+        confirmButtonText: 'reject'.tr(),
         onConfirm: () => _handleReject(reason),
-        cancelButtonText: 'Cancel',
+        cancelButtonText: 'cancel'.tr(),
       ),
     );
   }
@@ -154,7 +155,7 @@ class _ReferralDetailsPageState extends ConsumerState<ReferralDetailsPage> {
       Navigator.pop(context, true);
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Failed to approve user')),
+        SnackBar(content: Text('failedToApproveUser'.tr())),
       );
     }
   }
@@ -168,12 +169,12 @@ class _ReferralDetailsPageState extends ConsumerState<ReferralDetailsPage> {
 
     if (success) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('User rejected successfully')),
+        SnackBar(content: Text('userRejectedSuccessfully'.tr())),
       );
       Navigator.pop(context, true);
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Failed to reject user')),
+        SnackBar(content: Text('failedToRejectUser'.tr())),
       );
     }
   }
@@ -210,7 +211,7 @@ class _ReferralDetailsPageState extends ConsumerState<ReferralDetailsPage> {
           ),
         ),
         title: Text(
-          'Referral Details',
+          'referralDetails'.tr(),
           style: kBodyTitleR,
         ),
         centerTitle: false,
@@ -271,8 +272,8 @@ class _ReferralDetailsPageState extends ConsumerState<ReferralDetailsPage> {
                                 color: const Color(0xFFFF9800),
                                 borderRadius: BorderRadius.circular(20),
                               ),
-                              child: const Text(
-                                'Pending',
+                              child:  Text(
+                                'pendingLabel'.tr(),
                                 style: TextStyle(
                                   color: Colors.white,
                                   fontSize: 12,
@@ -291,7 +292,7 @@ class _ReferralDetailsPageState extends ConsumerState<ReferralDetailsPage> {
                                 borderRadius: BorderRadius.circular(20),
                               ),
                               child: Text(
-                                widget.user.status?.toUpperCase() ?? 'UNKNOWN',
+                                (widget.user.status?.toLowerCase() == 'pending' ? 'pendingLabel'.tr() : (widget.user.status?.toLowerCase() == 'active' ? 'active'.tr() : (widget.user.status?.toLowerCase() == 'rejected' ? 'rejectedLabel'.tr() : (widget.user.status?.toUpperCase() ?? 'unknownStatus'.tr())))),
                                 style: const TextStyle(
                                   color: Colors.white,
                                   fontSize: 12,
@@ -303,20 +304,20 @@ class _ReferralDetailsPageState extends ConsumerState<ReferralDetailsPage> {
                       ),
                     ),
                     const SizedBox(height: 24),
-                    _buildDetailRow('Full Name', widget.user.name ?? 'N/A'),
+                    _buildDetailRow('fullName'.tr(), widget.user.name ?? 'N/A'),
                     const SizedBox(height: 16),
                     _buildDetailRow(
-                        'Mobile Number', widget.user.phone ?? 'N/A'),
+                        'mobileNumber'.tr(), widget.user.phone ?? 'N/A'),
                     const SizedBox(height: 16),
                     // _buildDetailRow(
                     //     'Email Address', widget.user.email ?? 'N/A'),
                     // const SizedBox(height: 16),
                     _buildDetailRow(
-                      'Address',
+                      'address'.tr(),
                       '${widget.user.area ?? ''}, ${widget.user.district ?? ''}\n${widget.user.state ?? ''}\n${widget.user.country ?? ''}',
                     ),
                     const SizedBox(height: 16),
-                    _buildDetailRow('Date of Birth', dob),
+                    _buildDetailRow('dateOfBirth'.tr(), dob),
                   ],
                 ),
               ),
@@ -326,7 +327,7 @@ class _ReferralDetailsPageState extends ConsumerState<ReferralDetailsPage> {
                   children: [
                     Expanded(
                       child: primaryButton(
-                        label: 'Reject',
+                        label: 'reject'.tr(),
                         onPressed: _isProcessing ? null : _showRejectDialog,
                         buttonColor: Colors.transparent,
                         labelColor: kTextColor,
@@ -339,7 +340,7 @@ class _ReferralDetailsPageState extends ConsumerState<ReferralDetailsPage> {
                     const SizedBox(width: 12),
                     Expanded(
                       child: primaryButton(
-                        label: 'Accept',
+                        label: 'accept'.tr(),
                         onPressed: _isProcessing ? null : _showApproveConfirmation,
                         buttonColor: const Color(0xFF009B0A),
                         isLoading: _isProcessing,

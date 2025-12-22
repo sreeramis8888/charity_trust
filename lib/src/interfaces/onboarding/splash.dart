@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:developer';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:Annujoom/src/data/models/user_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -157,7 +158,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
       log('Error checking version: $e', name: 'SplashScreen');
       setState(() {
         hasVersionCheckError = true;
-        errorMessage = 'Server is down. Please try again later.';
+        errorMessage = 'serverDownMessage'.tr();
         isAppUpdateRequired = true;
       });
     }
@@ -191,7 +192,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
               ),
               const SizedBox(height: 16),
               Text(
-                'Update Required',
+                'updateRequired'.tr(),
                 style: kHeadTitleB.copyWith(color: kTextColor),
                 textAlign: TextAlign.center,
               ),
@@ -218,7 +219,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
                     ),
                   ),
                   child: Text(
-                    'Update Now',
+                    'updateNow'.tr(),
                     style: kBodyTitleM.copyWith(color: kWhite),
                   ),
                 ),
@@ -258,7 +259,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
               ),
               const SizedBox(height: 16),
               Text(
-                'Update Available',
+                'updateAvailable'.tr(),
                 style: kHeadTitleB.copyWith(color: kTextColor),
                 textAlign: TextAlign.center,
               ),
@@ -285,7 +286,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
                     ),
                   ),
                   child: Text(
-                    'Update',
+                    'update'.tr(),
                     style: kBodyTitleM.copyWith(color: kWhite),
                   ),
                 ),
@@ -307,7 +308,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
                     ),
                   ),
                   child: Text(
-                    'Later',
+                    'later'.tr(),
                     style: kBodyTitleM.copyWith(color: kTextColor),
                   ),
                 ),
@@ -610,7 +611,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
                                 ),
                               ),
                               child: Text(
-                                'Retry',
+                                'retry'.tr(),
                                 style: TextStyle(
                                   color: kWhite,
                                   fontWeight: FontWeight.w600,

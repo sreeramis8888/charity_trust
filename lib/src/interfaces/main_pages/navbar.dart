@@ -19,14 +19,7 @@ class NavBar extends ConsumerWidget {
     NewsListPage(),
     ProfilePage(),
   ];
-
-  static final List<String> _labels = [
-    'home'.tr(),
-    'campaigns'.tr(),
-    'news'.tr(),
-    'profile'.tr(),
-  ];
-
+  
   static const List<String> _inactiveIcons = [
     'assets/svg/inactive_home.svg',
     'assets/svg/inactive_campaign.svg',
@@ -43,7 +36,16 @@ class NavBar extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    // Watch for locale changes to trigger rebuild
+    context.locale; 
     final selectedIndex = ref.watch(selectedIndexProvider);
+
+    final List<String> labels = [
+      'home'.tr(),
+      'campaigns'.tr(),
+      'news'.tr(),
+      'profile'.tr(),
+    ];
 
     return PopScope(
       canPop: selectedIndex == 0,
@@ -106,7 +108,7 @@ class NavBar extends ConsumerWidget {
                               ),
                               const SizedBox(height: 4),
                               Text(
-                                _labels[index],
+                                labels[index],
                                 style: TextStyle(
                                   color: isSelected
                                       ? kPrimaryColor

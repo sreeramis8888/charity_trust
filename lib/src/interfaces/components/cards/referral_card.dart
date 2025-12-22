@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:Annujoom/src/data/constants/color_constants.dart';
 import 'package:Annujoom/src/data/constants/style_constants.dart';
@@ -74,9 +75,9 @@ class ReferralCard extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(user.name ?? 'Unknown', style: kBodyTitleM),
+                  Text(user.name ?? 'unknown'.tr(), style: kBodyTitleM),
                   const SizedBox(height: 4),
-                  Text(user.area ?? 'Unkown Area',
+                  Text(user.area ?? 'unknownArea'.tr(),
                       style: kSmallTitleL.copyWith(color: kSecondaryTextColor)),
                   const SizedBox(height: 2),
                   Text(user.phone ?? 'N/A',
@@ -91,7 +92,7 @@ class ReferralCard extends StatelessWidget {
                   GestureDetector(
                     onTap: onViewDetails,
                     child: Text(
-                      'View details',
+                      'viewDetails'.tr(),
                       style: kSmallTitleM.copyWith(
                         color: kThirdTextColor,
                       ),
@@ -99,7 +100,7 @@ class ReferralCard extends StatelessWidget {
                   ),
                 if (onViewDetails != null) const SizedBox(height: 8),
                 TextPill(
-                  text: (user.status ?? 'pending').toUpperCase(),
+                  text: (user.status ?? 'pending') == 'pending' ? 'pendingLabel'.tr() : (user.status == 'active' ? 'active'.tr() : (user.status == 'rejected' ? 'rejectedLabel'.tr() : (user.status ?? 'unknown').toUpperCase())),
                   color: _getStatusBgColor(user.status ?? 'pending'),
                   padding:
                       const EdgeInsets.symmetric(horizontal: 12, vertical: 6),

@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:Annujoom/src/data/constants/color_constants.dart';
 import 'package:Annujoom/src/data/constants/style_constants.dart';
 import 'package:Annujoom/src/interfaces/components/text_pill.dart';
@@ -42,7 +43,7 @@ class TransactionCard extends ConsumerWidget {
             children: [
               TextPill(
                 color: Color(0xFFDBDBDB),
-                text: "Transaction ID: $id",
+                text: "transactionId".tr(args: [id]),
                 textStyle: kSmallerTitleR.copyWith(
                   fontSize: 10,
                 ),
@@ -56,7 +57,7 @@ class TransactionCard extends ConsumerWidget {
                       await ref.read(openPdfProvider(filePath).future);
                     } catch (e) {
                       SnackbarService().showSnackBar(
-                        'Failed to open receipt: $e',
+                        'failedToOpenReceipt'.tr(args: [e.toString()]),
                         type: SnackbarType.error,
                       );
                     }
@@ -78,16 +79,16 @@ class TransactionCard extends ConsumerWidget {
           ),
           const SizedBox(height: 12),
           if (donorName.isNotEmpty) ...[
-            _row("Name", donorName),
+            _row("name".tr(), donorName),
             const Divider(),
           ],
-          _row("Type", type),
+          _row("type".tr(), type),
           const Divider(),
-          _row("Date & time", date),
+          _row("dateTime".tr(), date),
           const Divider(),
-          _row("Amount paid", amount),
+          _row("amountPaid".tr(), amount),
           const Divider(),
-          _row("Status", status, isStatus: true),
+          _row("statusLabel".tr(), status, isStatus: true),
         ],
       ),
     );

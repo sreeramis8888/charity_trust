@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:Annujoom/src/interfaces/components/loading_indicator.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -34,7 +35,7 @@ class _MyReferralsPageState extends ConsumerState<MyReferralsPage> {
           ),
         ),
         title: Text(
-          'My Referrals',
+          'myReferrals'.tr(),
           style: kBodyTitleR,
         ),
         centerTitle: false,
@@ -45,7 +46,7 @@ class _MyReferralsPageState extends ConsumerState<MyReferralsPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text('Referrals Summary', style: kBodyTitleM),
+              Text('referralsSummary'.tr(), style: kBodyTitleM),
               const SizedBox(height: 12),
               anim.AnimatedWidgetWrapper(
                 animationType: anim.AnimationType.fadeSlideInFromBottom,
@@ -81,7 +82,7 @@ class _MyReferralsPageState extends ConsumerState<MyReferralsPage> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text('Referrals', style: kBodyTitleM),
+                  Text('referrals'.tr(), style: kBodyTitleM),
                   ElevatedButton.icon(
                     onPressed: () {
                       Navigator.of(context).pushNamed('CreateUser');
@@ -92,7 +93,7 @@ class _MyReferralsPageState extends ConsumerState<MyReferralsPage> {
                       color: kWhite,
                     ),
                     label: Text(
-                      'Add New Member',
+                      'addNewMember'.tr(),
                       style: kSmallTitleM.copyWith(color: kWhite),
                     ),
                     style: ElevatedButton.styleFrom(
@@ -121,7 +122,7 @@ class _MyReferralsPageState extends ConsumerState<MyReferralsPage> {
                           child: Padding(
                             padding: const EdgeInsets.symmetric(vertical: 32),
                             child: Text(
-                              'No referrals yet',
+                              'noReferralsYet'.tr(),
                               style: kSmallTitleR.copyWith(
                                 color: kSecondaryTextColor,
                               ),
@@ -193,7 +194,7 @@ class _MyReferralsPageState extends ConsumerState<MyReferralsPage> {
                       child: LoadingAnimation(),
                     ),
                     error: (error, stack) => Center(
-                      child: Text('Error loading referrals: $error'),
+                      child: Text('errorLoadingReferrals'.tr() + ': $error'),
                     ),
                   );
                 },
@@ -201,7 +202,7 @@ class _MyReferralsPageState extends ConsumerState<MyReferralsPage> {
                   child: LoadingAnimation(),
                 ),
                 error: (error, stack) => Center(
-                  child: Text('Error loading approvals: $error'),
+                  child: Text('errorLoadingApprovals'.tr() + ': $error'),
                 ),
               ),
             ],
@@ -237,7 +238,7 @@ class _MyReferralsPageState extends ConsumerState<MyReferralsPage> {
         Row(
           children: [
             Expanded(
-              child: _buildStatItem(total.toString(), 'Total'),
+              child: _buildStatItem(total.toString(), 'totalLabel'.tr()),
             ),
             Container(
               width: 1,
@@ -247,7 +248,7 @@ class _MyReferralsPageState extends ConsumerState<MyReferralsPage> {
             Expanded(
               child: Padding(
                 padding: const EdgeInsets.only(left: 18),
-                child: _buildStatItem(approved.toString(), 'Approved'),
+                child: _buildStatItem(approved.toString(), 'approvedLabel'.tr()),
               ),
             ),
           ],
@@ -261,7 +262,7 @@ class _MyReferralsPageState extends ConsumerState<MyReferralsPage> {
         Row(
           children: [
             Expanded(
-              child: _buildStatItem(pending.toString(), 'Pending'),
+              child: _buildStatItem(pending.toString(), 'pendingLabel'.tr()),
             ),
             Container(
               width: 1,
@@ -271,7 +272,7 @@ class _MyReferralsPageState extends ConsumerState<MyReferralsPage> {
             Expanded(
               child: Padding(
                 padding: const EdgeInsets.only(left: 18),
-                child: _buildStatItem(rejected.toString(), 'Rejected'),
+                child: _buildStatItem(rejected.toString(), 'rejectedLabel'.tr()),
               ),
             ),
           ],
