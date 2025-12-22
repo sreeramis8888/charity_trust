@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -70,7 +71,7 @@ class RequestSentState extends ConsumerWidget {
                       width: 5,
                     ),
                     Text(
-                      'Refresh',
+                      'refresh'.tr(),
                       style: kBodyTitleM.copyWith(color: kPrimaryColor),
                     )
                   ],
@@ -92,13 +93,13 @@ class RequestSentState extends ConsumerWidget {
               ),
               const SizedBox(height: 40),
               Text(
-                'Your request to join has been sent',
+                'requestSentTitle'.tr(),
                 style: kHeadTitleSB,
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 12),
               Text(
-                'Our team will review your details and enable your access shortly. Please stay tuned.',
+                'requestSentDescription'.tr(),
                 style: kSmallTitleR.copyWith(
                   color: kSecondaryTextColor,
                   height: 1.5,
@@ -124,8 +125,8 @@ class RequestSentState extends ConsumerWidget {
                     borderRadius: BorderRadius.circular(8),
                   ),
                 ),
-                child: const Text(
-                  'Logout',
+                child:  Text(
+                  'logout'.tr(),
                   style: TextStyle(
                     color: Colors.white,
                     fontSize: 16,

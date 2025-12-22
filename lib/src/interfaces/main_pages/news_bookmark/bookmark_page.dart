@@ -1,5 +1,6 @@
 import 'package:Annujoom/src/interfaces/components/cards/news_card.dart';
 import 'package:Annujoom/src/data/services/secure_storage_service.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
@@ -53,7 +54,7 @@ class _BookmarkPageState extends ConsumerState<BookmarkPage> {
       appBar: AppBar(
         centerTitle: true,
         title: Text(
-          "Bookmarks",
+          "bookmarks".tr(),
           style: TextStyle(fontSize: 17),
         ),
         backgroundColor: kWhite,
@@ -87,7 +88,7 @@ class _BookmarkPageState extends ConsumerState<BookmarkPage> {
                         ),
                         SizedBox(height: 16),
                         Text(
-                          'No bookmarked news yet',
+                          'noBookmarks'.tr(),
                           style: TextStyle(
                             fontSize: 16,
                             color: Colors.grey[600],
@@ -151,7 +152,7 @@ class _BookmarkPageState extends ConsumerState<BookmarkPage> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(
-                      'Error loading bookmarks',
+                      'errorLoadingBookmarks'.tr(),
                       style: kBodyTitleB,
                     ),
                     SizedBox(height: 16),
@@ -161,7 +162,7 @@ class _BookmarkPageState extends ConsumerState<BookmarkPage> {
                             .read(bookmarkedNewsListProvider.notifier)
                             .refresh();
                       },
-                      child: Text('Retry'),
+                      child: Text('retry'.tr()),
                     ),
                   ],
                 ),

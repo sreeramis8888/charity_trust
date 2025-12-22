@@ -1,4 +1,5 @@
 import 'dart:developer';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:Annujoom/src/interfaces/components/loading_indicator.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -91,7 +92,7 @@ class _CampaignDetailPageState extends ConsumerState<CampaignDetailPage> {
     final amount = double.tryParse(amountText);
 
     if (amount == null || amount <= 0) {
-      _showSnackBar('Please enter a valid amount', type: SnackbarType.warning);
+      _showSnackBar('pleaseEnterValidAmount'.tr(), type: SnackbarType.warning);
       return;
     }
 
@@ -111,7 +112,7 @@ class _CampaignDetailPageState extends ConsumerState<CampaignDetailPage> {
 
       if (!response.success || response.data == null) {
         log("Donation creation failed: ${response.message}");
-        _showSnackBar('Failed to create donation', type: SnackbarType.error);
+        _showSnackBar('failedToCreateDonation'.tr(), type: SnackbarType.error);
         if (mounted) {
           setState(() => _isProcessing = false);
         }
@@ -126,7 +127,7 @@ class _CampaignDetailPageState extends ConsumerState<CampaignDetailPage> {
 
       if (orderId == null) {
         log("Order ID is null");
-        _showSnackBar('Failed to get order ID', type: SnackbarType.error);
+        _showSnackBar('failedToGetOrderId'.tr(), type: SnackbarType.error);
         if (mounted) {
           setState(() => _isProcessing = false);
         }
@@ -179,7 +180,7 @@ class _CampaignDetailPageState extends ConsumerState<CampaignDetailPage> {
               }
             } else {
               log("Payment verification failed: ${verifyResponse.message}");
-              _showSnackBar('Payment verification failed',
+              _showSnackBar('paymentVerificationFailed'.tr(),
                   type: SnackbarType.error);
               if (mounted) {
                 setState(() => _isProcessing = false);
@@ -187,7 +188,7 @@ class _CampaignDetailPageState extends ConsumerState<CampaignDetailPage> {
             }
           } catch (e) {
             log("Verification error: $e");
-            _showSnackBar('Verification error: $e', type: SnackbarType.error);
+            _showSnackBar('${'verificationError'.tr()}: $e', type: SnackbarType.error);
             if (mounted) {
               setState(() => _isProcessing = false);
             }
@@ -205,7 +206,7 @@ class _CampaignDetailPageState extends ConsumerState<CampaignDetailPage> {
         onExternalWallet: (ExternalWalletResponse response) {
           log("EXTERNAL WALLET CALLBACK: ${response.walletName}");
           _showSnackBar(
-            'External wallet selected: ${response.walletName}',
+            '${'externalWalletSelected'.tr()}: ${response.walletName}',
             type: SnackbarType.info,
           );
           if (mounted) {
@@ -257,7 +258,7 @@ class _CampaignDetailPageState extends ConsumerState<CampaignDetailPage> {
             size: 20,
           ),
         ),
-        title: Text('Campaign Details', style: kBodyTitleM),
+        title: Text('campaignDetails'.tr(), style: kBodyTitleM),
       ),
       backgroundColor: kBackgroundColor,
       body: FutureBuilder<void>(
@@ -293,7 +294,7 @@ class _CampaignDetailPageState extends ConsumerState<CampaignDetailPage> {
           ),
           onPressed: () => Navigator.pop(context),
         ),
-        title: Text('Campaign Details', style: kBodyTitleM),
+        title: Text('campaignDetails'.tr(), style: kBodyTitleM),
       ),
       backgroundColor: kBackgroundColor,
       body: SingleChildScrollView(
@@ -314,7 +315,7 @@ class _CampaignDetailPageState extends ConsumerState<CampaignDetailPage> {
         animationType: anim.AnimationType.fadeSlideInFromLeft,
         duration: anim.AnimationDuration.normal,
         child: Text(
-          widget.title ?? 'Campaign',
+          widget.title ?? 'campaignDetails'.tr(),
           style: kHeadTitleSB,
         ),
       ),
@@ -365,7 +366,7 @@ class _CampaignDetailPageState extends ConsumerState<CampaignDetailPage> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                '₹${widget.raised} raised of ₹${widget.goal} goal',
+                '₹${widget.raised} ${'raisedOf'.tr()} ₹${widget.goal} ${'goal'.tr()}',
                 style: kBodyTitleM.copyWith(color: const Color(0xFF009000)),
               ),
               Text(
@@ -386,7 +387,7 @@ class _CampaignDetailPageState extends ConsumerState<CampaignDetailPage> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                'DUE DATE',
+                'dueDate'.tr(),
                 style: kSmallerTitleB.copyWith(
                   color: kSecondaryTextColor,
                   fontSize: 10,
@@ -439,7 +440,7 @@ class _CampaignDetailPageState extends ConsumerState<CampaignDetailPage> {
         animationType: anim.AnimationType.fadeSlideInFromLeft,
         duration: anim.AnimationDuration.normal,
         delayMilliseconds: 400,
-        child: Text('Enter Donation Amount', style: kSmallTitleB),
+        child: Text('enterDonationAmount'.tr(), style: kSmallTitleB),
       ),
       const SizedBox(height: 12),
       anim.AnimatedWidgetWrapper(
@@ -448,15 +449,15 @@ class _CampaignDetailPageState extends ConsumerState<CampaignDetailPage> {
         delayMilliseconds: 450,
         child: InputField(
           type: CustomFieldType.number,
-          hint: '₹ Enter amount',
+          hint: 'enterAmount'.tr(),
           controller: _donationController,
           validator: (value) {
             if (value == null || value.isEmpty) {
-              return 'Please enter an amount';
+              return 'pleaseEnterAmount'.tr();
             }
             final amount = double.tryParse(value);
             if (amount == null || amount <= 0) {
-              return 'Please enter a valid amount';
+              return 'pleaseEnterValidAmount'.tr();
             }
             return null;
           },
@@ -483,7 +484,7 @@ class _CampaignDetailPageState extends ConsumerState<CampaignDetailPage> {
             // const SizedBox(width: 12),
             Expanded(
               child: primaryButton(
-                label: _isProcessing ? "Processing..." : "Donate Now",
+                label: _isProcessing ? "processing".tr() : "donateNow".tr(),
                 onPressed: _isProcessing ? null : _handleDonation,
                 buttonColor: kPrimaryColor,
               ),
@@ -509,7 +510,7 @@ class _CampaignDetailPageState extends ConsumerState<CampaignDetailPage> {
           ),
           onPressed: () => Navigator.pop(context),
         ),
-        title: Text('Campaign Details', style: kBodyTitleM),
+        title: Text('campaignDetails'.tr(), style: kBodyTitleM),
       ),
       backgroundColor: kBackgroundColor,
       body: Center(
@@ -525,19 +526,19 @@ class _CampaignDetailPageState extends ConsumerState<CampaignDetailPage> {
               ),
               const SizedBox(height: 24),
               Text(
-                'Donations via App',
+                'donationsViaApp'.tr(),
                 style: kHeadTitleR,
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 12),
               Text(
-                'To support our campaigns and make a donation, please visit our website.',
+                'donationWebsiteMessage'.tr(),
                 style: kBodyTitleR.copyWith(color: kSecondaryTextColor),
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 32),
               primaryButton(
-                label: 'Donate on Website',
+                label: 'donateOnWebsite'.tr(),
                 onPressed: () async {
                   const url = 'https://annujoomcharitabletrust.com/';
                   if (await canLaunchUrl(Uri.parse(url))) {

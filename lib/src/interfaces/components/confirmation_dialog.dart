@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:Annujoom/src/data/constants/color_constants.dart';
 import 'package:Annujoom/src/data/constants/style_constants.dart';
 import 'package:flutter/material.dart';
@@ -58,7 +59,7 @@ class ConfirmationDialog extends StatelessWidget {
                       padding: const EdgeInsets.symmetric(vertical: 12),
                     ),
                     child: Text(
-                      cancelButtonText ?? 'Cancel',
+                      cancelButtonText ?? "cancel".tr(),
                       style: kSmallerTitleL.copyWith(color: kTextColor),
                     ),
                   ),

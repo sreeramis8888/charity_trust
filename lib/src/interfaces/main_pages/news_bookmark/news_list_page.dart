@@ -1,4 +1,5 @@
 import 'package:Annujoom/src/data/providers/news_provider.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:Annujoom/src/data/services/secure_storage_service.dart';
 import 'package:Annujoom/src/interfaces/components/cards/news_card.dart';
 import 'package:Annujoom/src/interfaces/components/loading_indicator.dart';
@@ -133,7 +134,7 @@ class _NewsListPageState extends ConsumerState<NewsListPage> {
             child: Row(
               children: [
                 Text(
-                  "News",
+                  "news".tr(),
                   style: kSubHeadingM,
                 ),
               ],
@@ -271,7 +272,7 @@ class _NewsListPageState extends ConsumerState<NewsListPage> {
             } else {
               return Center(
                 child: Text(
-                  'No News',
+                  'noNews'.tr(),
                   style: kBodyTitleB,
                 ),
               );
@@ -283,7 +284,7 @@ class _NewsListPageState extends ConsumerState<NewsListPage> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Text(
-                  'Error loading news',
+                  'errorLoadingNews'.tr(),
                   style: kBodyTitleB,
                 ),
                 SizedBox(height: 16),
@@ -291,7 +292,7 @@ class _NewsListPageState extends ConsumerState<NewsListPage> {
                   onPressed: () {
                     ref.read(newsListProvider.notifier).refresh();
                   },
-                  child: Text('Retry'),
+                  child: Text('retry'.tr()),
                 ),
               ],
             ),

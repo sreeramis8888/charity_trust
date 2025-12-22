@@ -2,49 +2,50 @@ import 'package:Annujoom/src/data/constants/color_constants.dart';
 import 'package:Annujoom/src/data/constants/style_constants.dart';
 import 'package:Annujoom/src/interfaces/animations/index.dart';
 import 'package:Annujoom/src/interfaces/main_pages/campaign_pages/category_campaign_detail.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 
 class DonationCategoriesPage extends StatelessWidget {
   const DonationCategoriesPage({super.key});
 
-  static const List<Map<String, String>> categories = [
-    {
-      'title': 'General Campaign',
-      'subtitle': 'Donate for community initiatives and development',
-      'image': 'assets/png/general_campaign.png',
-      'category': 'General Campaign'
-    },
-    {
-      'title': 'General Funding',
-      'subtitle': 'Support overall social and welfare activities',
-      'image': 'assets/jpg/general_funding.jpg',
-      'category': 'General Funding'
-    },
-    {
-      'title': 'Zakat',
-      'subtitle': 'Fulfill religious duty by helping eligible people',
-      'image': 'assets/png/zakat.png',
-      'category': 'Zakat'
-    },
-    {
-      'title': 'Orphan',
-      'subtitle': 'Help children live, learn & grow',
-      'image': 'assets/jpg/orphan.jpg',
-      'category': 'Orphan'
-    },
-    {
-      'title': 'Widow',
-      'subtitle': 'Support widows with essential needs',
-      'image': 'assets/png/widow.png',
-      'category': 'Widow'
-    },
-    {
-      'title': 'Ghusal Mayyit',
-      'subtitle': 'Provide burial support for needy families',
-      'image': 'assets/png/ghusal_mayyt.png',
-      'category': 'Ghusl Mayyit'
-    },
-  ];
+  List<Map<String, String>> get categories => [
+        {
+          'title': 'generalCampaign'.tr(),
+          'subtitle': 'generalCampaignSubtitle'.tr(),
+          'image': 'assets/png/general_campaign.png',
+          'category': 'General Campaign'
+        },
+        {
+          'title': 'generalFunding'.tr(),
+          'subtitle': 'generalFundingSubtitle'.tr(),
+          'image': 'assets/jpg/general_funding.jpg',
+          'category': 'General Funding'
+        },
+        {
+          'title': 'zakat'.tr(),
+          'subtitle': 'zakatSubtitle'.tr(),
+          'image': 'assets/png/zakat.png',
+          'category': 'Zakat'
+        },
+        {
+          'title': 'orphan'.tr(),
+          'subtitle': 'orphanSubtitle'.tr(),
+          'image': 'assets/jpg/orphan.jpg',
+          'category': 'Orphan'
+        },
+        {
+          'title': 'widow'.tr(),
+          'subtitle': 'widowSubtitle'.tr(),
+          'image': 'assets/png/widow.png',
+          'category': 'Widow'
+        },
+        {
+          'title': 'ghusalMayyit'.tr(),
+          'subtitle': 'ghusalMayyitSubtitle'.tr(),
+          'image': 'assets/png/ghusal_mayyt.png',
+          'category': 'Ghusl Mayyit'
+        },
+      ];
 
   void _handleCategoryTap(BuildContext context, String category) {
     if (category == 'General Campaign') {
@@ -78,7 +79,7 @@ class DonationCategoriesPage extends StatelessWidget {
           onPressed: () => Navigator.of(context).pop(),
         ),
         title: Text(
-          'Donations',
+          'donations'.tr(),
           style: kBodyTitleM,
         ),
         centerTitle: false,
@@ -93,12 +94,12 @@ class DonationCategoriesPage extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Donate & Support Our Community',
+                    'donateSupportCommunity'.tr(),
                     style: kSubHeadingM.copyWith(fontSize: 18),
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    'Your contribution can change someone\'s life today.',
+                    'contributionMessage'.tr(),
                     style: kSmallTitleL,
                   ),
                 ],

@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:easy_localization/easy_localization.dart';
 import 'dart:developer';
 import 'package:Annujoom/src/data/constants/color_constants.dart';
 import 'package:Annujoom/src/data/constants/global_variables.dart';
@@ -203,7 +204,7 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
           }
         } catch (e) {
           log('Error uploading profile image: $e', name: 'EditProfilePage');
-          SnackbarService().showSnackBar('Failed to upload profile image',
+          SnackbarService().showSnackBar('failedToUploadProfilePicture'.tr(),
               type: SnackbarType.error);
           ref.read(loadingProvider.notifier).stopLoading();
           return;
@@ -229,14 +230,14 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
         // Update local secure storage with complete user data
         await ref.read(secureStorageServiceProvider).saveUserData(updatedUser);
 
-        SnackbarService().showSnackBar('Profile updated successfully');
+        SnackbarService().showSnackBar('profileUpdated'.tr());
 
         if (mounted) {
           Navigator.of(context).pop();
         }
       } else {
         SnackbarService().showSnackBar(
-            result.error ?? 'Failed to update profile',
+            result.error ?? 'failedToUpdateProfile'.tr(),
             type: SnackbarType.error);
       }
     } catch (e) {
@@ -339,7 +340,7 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
                       animationType: anim.AnimationType.fadeSlideInFromLeft,
                       duration: anim.AnimationDuration.normal,
                       delayMilliseconds: 100,
-                      child: Text("Full Name", style: kSmallTitleR),
+                      child: Text("fullName".tr(), style: kSmallTitleR),
                     ),
                     const SizedBox(height: 6),
                     anim.AnimatedWidgetWrapper(
@@ -349,9 +350,9 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
                       child: InputField(
                         key: _fieldKeys['name'],
                         type: CustomFieldType.text,
-                        hint: "Enter full name",
+                        hint: "enterFullName".tr(),
                         controller: nameController,
-                        validator: (v) => v!.isEmpty ? "Required" : null,
+                        validator: (v) => v!.isEmpty ? "required".tr() : null,
                       ),
                     ),
                     const SizedBox(height: 18),
@@ -379,7 +380,7 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
                       animationType: anim.AnimationType.fadeSlideInFromLeft,
                       duration: anim.AnimationDuration.normal,
                       delayMilliseconds: 300,
-                      child: Text("Address", style: kSmallTitleR),
+                      child: Text("address".tr(), style: kSmallTitleR),
                     ),
                     const SizedBox(height: 6),
                     anim.AnimatedWidgetWrapper(
@@ -389,9 +390,9 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
                       child: InputField(
                         key: _fieldKeys['address'],
                         type: CustomFieldType.text,
-                        hint: "Enter address",
+                        hint: "enterAddress".tr(),
                         controller: addressController,
-                        validator: (v) => v!.isEmpty ? "Required" : null,
+                        validator: (v) => v!.isEmpty ? "required".tr() : null,
                       ),
                     ),
                     const SizedBox(height: 18),
@@ -399,7 +400,7 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
                       animationType: anim.AnimationType.fadeSlideInFromLeft,
                       duration: anim.AnimationDuration.normal,
                       delayMilliseconds: 400,
-                      child: Text("Date of Birth", style: kSmallTitleR),
+                      child: Text("dateOfBirth".tr(), style: kSmallTitleR),
                     ),
                     const SizedBox(height: 6),
                     anim.AnimatedWidgetWrapper(
@@ -409,10 +410,10 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
                       child: InputField(
                         key: _fieldKeys['dob'],
                         type: CustomFieldType.date,
-                        hint: "dd/mm/yyyy",
+                        hint: "ddmmyyyy".tr(),
                         controller: dobController,
                         validator: (v) =>
-                            v?.isEmpty ?? true ? "Required" : null,
+                            v?.isEmpty ?? true ? "required".tr() : null,
                       ),
                     ),
                     if (!isTrustee) ...[
@@ -421,7 +422,7 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
                         animationType: anim.AnimationType.fadeSlideInFromLeft,
                         duration: anim.AnimationDuration.normal,
                         delayMilliseconds: 500,
-                        child: Text("Recommended By", style: kSmallTitleR),
+                        child: Text("recommendedBy".tr(), style: kSmallTitleR),
                       ),
                       const SizedBox(height: 6),
                       anim.AnimatedWidgetWrapper(
@@ -431,7 +432,7 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
                         child: InputField(
                           key: _fieldKeys['recommendedBy'],
                           type: CustomFieldType.text,
-                          hint: "Recommended by",
+                          hint: "recommendedBy".tr(),
                           controller: recommendedByController,
                           readOnly: true,
                         ),
@@ -446,7 +447,7 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
                         height: 50,
                         width: double.infinity,
                         child: primaryButton(
-                          label: "Save",
+                          label: "save".tr(),
                           onPressed: () {
                             if (_formKey.currentState!.validate()) {
                               _handleSaveProfile();

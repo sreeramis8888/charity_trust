@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:Annujoom/src/data/constants/global_variables.dart';
 import 'package:Annujoom/src/data/utils/date_formatter.dart';
 import 'package:Annujoom/src/interfaces/components/cards/campaing_card.dart';
@@ -421,7 +422,7 @@ class _CampaignPageState extends ConsumerState<CampaignPage>
                               .setSearch(value);
                         },
                         decoration: InputDecoration(
-                          hintText: 'Search',
+                          hintText: 'search'.tr(),
                           hintStyle: kSmallTitleL.copyWith(color: kGrey),
                           prefixIcon: const Icon(Icons.search, color: kGrey),
                           border: InputBorder.none,
@@ -510,9 +511,9 @@ class _CampaignPageState extends ConsumerState<CampaignPage>
                 ),
               ),
               const SizedBox(height: 20),
-              Text('Filter', style: kBodyTitleSB),
+              Text('filter'.tr(), style: kBodyTitleSB),
               const SizedBox(height: 24),
-              Text('Start Date', style: kSmallTitleM),
+              Text("startDate".tr(), style: kSmallTitleM),
               const SizedBox(height: 8),
               InputField(
                 type: CustomFieldType.date,
@@ -520,7 +521,7 @@ class _CampaignPageState extends ConsumerState<CampaignPage>
                 controller: startDateController,
               ),
               const SizedBox(height: 20),
-              Text('End Date', style: kSmallTitleM),
+              Text("endDate".tr(), style: kSmallTitleM),
               const SizedBox(height: 8),
               InputField(
                 type: CustomFieldType.date,
@@ -529,7 +530,7 @@ class _CampaignPageState extends ConsumerState<CampaignPage>
               ),
               const SizedBox(height: 32),
               primaryButton(
-                label: 'Apply',
+                label: 'apply'.tr(),
                 onPressed: () {
                   String? formattedStart;
                   String? formattedEnd;
@@ -559,7 +560,7 @@ class _CampaignPageState extends ConsumerState<CampaignPage>
                       Navigator.pop(context);
                     },
                     child: Text(
-                      'Clear Filters',
+                      'clearFilters'.tr(),
                       style: kSmallTitleM.copyWith(color: Colors.red),
                     ),
                   ),
@@ -630,7 +631,7 @@ class _CampaignPageState extends ConsumerState<CampaignPage>
         if (paginationState.donations.isEmpty) {
           return Center(
             child: Text(
-              'No member transactions',
+              'noMemberTransactions'.tr(),
               style: kBodyTitleR.copyWith(color: kSecondaryTextColor),
             ),
           );
@@ -798,7 +799,7 @@ class _CampaignPageState extends ConsumerState<CampaignPage>
         if (campaigns.isEmpty) {
           return Center(
             child: Text(
-              'No joined campaigns',
+              'noJoinedCampaigns'.tr(),
               style: kBodyTitleR.copyWith(color: kSecondaryTextColor),
             ),
           );
@@ -873,8 +874,8 @@ class _CampaignPageState extends ConsumerState<CampaignPage>
     return approvalsState.when(
       data: (paginationState) {
         if (paginationState.campaigns.isEmpty) {
-          return const Center(
-            child: Text('No campaigns pending approval'),
+          return Center(
+            child: Text('noCampaignsPending'.tr()),
           );
         }
         return ListView.builder(
@@ -905,22 +906,22 @@ class _CampaignPageState extends ConsumerState<CampaignPage>
                     showDialog(
                       context: context,
                       builder: (context) => ConfirmationDialog(
-                        title: 'Approve Campaign',
+                        title: 'approveCampaign'.tr(),
                         message:
-                            'Are you sure you want to approve "${campaign.title}"?',
-                        confirmButtonText: 'Approve',
+                            "approveCampaignConfirmation".tr(args: [campaign.getTitle(preferredLanguage) ?? '']),
+                        confirmButtonText: 'approve'.tr(),
                         onConfirm: () async {
                           final approved = await ref
                               .read(pendingApprovalCampaignsProvider.notifier)
                               .approveCampaign(campaign.id ?? '');
                           if (approved) {
                             SnackbarService().showSnackBar(
-                              'Campaign approved successfully',
+                              'campaignApproved'.tr(),
                               type: SnackbarType.success,
                             );
                           }
                         },
-                        cancelButtonText: 'Cancel',
+                        cancelButtonText: 'cancel'.tr(),
                       ),
                     );
                   },
@@ -967,13 +968,13 @@ class _CampaignPageState extends ConsumerState<CampaignPage>
             mainAxisSize: MainAxisSize.min,
             children: [
               Text(
-                'Reject Campaign',
+                'rejectCampaign'.tr(),
                 style: kHeadTitleR,
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 12),
               Text(
-                'Are you sure you want to reject "$campaignTitle"?',
+                "rejectCampaignConfirmation".tr(args: [campaignTitle]),
                 style: kBodyTitleR.copyWith(color: kSecondaryTextColor),
                 textAlign: TextAlign.center,
               ),
@@ -981,7 +982,7 @@ class _CampaignPageState extends ConsumerState<CampaignPage>
               TextField(
                 controller: reasonController,
                 decoration: InputDecoration(
-                  hintText: 'Enter rejection reason',
+                  hintText: 'enterRejectionReason'.tr(),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
                   ),
@@ -1006,7 +1007,7 @@ class _CampaignPageState extends ConsumerState<CampaignPage>
                         padding: const EdgeInsets.symmetric(vertical: 12),
                       ),
                       child: Text(
-                        'Cancel',
+                        'cancel'.tr(),
                         style: kSmallerTitleL.copyWith(color: kTextColor),
                       ),
                     ),
@@ -1021,7 +1022,7 @@ class _CampaignPageState extends ConsumerState<CampaignPage>
                             .rejectCampaign(campaignId, reasonController.text);
                         if (rejected) {
                           SnackbarService().showSnackBar(
-                            'Campaign rejected successfully',
+                            'campaignRejected'.tr(),
                             type: SnackbarType.success,
                           );
                         }
@@ -1034,7 +1035,7 @@ class _CampaignPageState extends ConsumerState<CampaignPage>
                         padding: const EdgeInsets.symmetric(vertical: 12),
                       ),
                       child: Text(
-                        'Reject',
+                        'reject'.tr(),
                         style: kSmallerTitleL.copyWith(color: kWhite),
                       ),
                     ),

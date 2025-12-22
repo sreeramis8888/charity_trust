@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:Annujoom/src/data/constants/color_constants.dart';
 import 'package:Annujoom/src/data/constants/style_constants.dart';
@@ -21,7 +22,7 @@ class AboutUsPage extends StatelessWidget {
           ),
           onPressed: () => Navigator.of(context).pop(),
         ),
-        title: Text("About Us", style: kBodyTitleM),
+        title: Text("aboutUs".tr(), style: kBodyTitleM),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
@@ -46,13 +47,13 @@ class AboutUsPage extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   Text(
-                    "Dignity in the Final Moments",
+                    "dignityMoments".tr(),
                     style: kSmallTitleM,
                     textAlign: TextAlign.center,
                   ),
                   const SizedBox(height: 12),
                   Text(
-                    "When a soul leaves this world alone or unsupported, we step in with compassion, faith, and complete islamic rites ensuring every life is honored with the respect it deserves.",
+                    "aboutUsDescription".tr(),
                     style: kSmallTitleR.copyWith(color: kSecondaryTextColor),
                     textAlign: TextAlign.center,
                   ),
@@ -72,17 +73,17 @@ class AboutUsPage extends StatelessWidget {
                     members: [
                       _TeamMember(
                         name: "Shafeeda K M",
-                        role: "Chairperson",
+                        role: "chairperson".tr(),
                         image: "assets/png/member_1.png",
                       ),
                       _TeamMember(
                         name: "Thasneem Junaid",
-                        role: "Treasurer",
+                        role: "treasurer".tr(),
                         image: "assets/png/member_2.png",
                       ),
                       _TeamMember(
                         name: "Sameena Bai",
-                        role: "Secretary",
+                        role: "secretary".tr(),
                         image: "assets/png/member_3.png",
                       ),
                     ],
@@ -102,7 +103,7 @@ class AboutUsPage extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Text(
-                        "Board of Trustees",
+                        "boardOfTrustees".tr(),
                         style: kSubHeadingM,
                       ),
                     ],

@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:Annujoom/src/data/constants/style_constants.dart';
@@ -22,13 +23,13 @@ class AccountSuspendedState extends StatelessWidget {
               ),
               const SizedBox(height: 40),
               Text(
-                'Account Suspended',
+                'accountSuspendedTitle'.tr(),
                 style: kHeadTitleSB,
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 12),
               Text(
-                'Your account has been suspended. Please contact support for more information.',
+                'accountSuspendedDescription'.tr(),
                 style: kSmallTitleR.copyWith(
                   color: kSecondaryTextColor,
                   height: 1.5,

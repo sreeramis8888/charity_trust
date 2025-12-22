@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:Annujoom/src/data/constants/global_variables.dart';
 import 'package:Annujoom/src/data/utils/date_formatter.dart';
 import 'package:Annujoom/src/interfaces/components/cards/campaing_card.dart';
@@ -82,7 +83,7 @@ class _MyParticipationsPageState extends ConsumerState<MyParticipationsPage>
     final secureStorage = ref.watch(secureStorageServiceProvider);
     final userRole = GlobalVariables.getUserRole();
     final isNonMember = userRole != 'member';
-    final pageTitle = isNonMember ? "My Campaigns" : "My Participations";
+    final pageTitle = isNonMember ? "myCampaigns".tr() : "myParticipations".tr();
 
     return Scaffold(
           backgroundColor: kBackgroundColor,
@@ -161,8 +162,8 @@ class _MyParticipationsPageState extends ConsumerState<MyParticipationsPage>
                   tabs: [
                     Tab(
                         text:
-                            isNonMember ? "Transactions" : "Your Transactions"),
-                    Tab(text: isNonMember ? "My Campaigns" : "My Campaigns"),
+                            isNonMember ? "transactions".tr() : "yourTransactions".tr()),
+                    Tab(text: isNonMember ? "myCampaigns".tr() : "myCampaigns".tr()),
                   ],
                 ),
               ),
@@ -193,13 +194,13 @@ class _MyParticipationsPageState extends ConsumerState<MyParticipationsPage>
                 builder: (context, nameSnapshot) {
                   final userName = nameSnapshot.data ?? 'User';
                   return ChoiceChipFilter(
-                    options: [userName, 'Member Transactions'],
+                    options: [userName, 'memberTransactions'.tr()],
                     selectedOption:
-                        currentFilter ? 'Member Transactions' : userName,
+                        currentFilter ? 'memberTransactions'.tr() : userName,
                     onSelectionChanged: (selected) {
                       ref
                           .read(transactionsFilterProvider.notifier)
-                          .setFilter(selected == 'Member Transactions');
+                          .setFilter(selected == 'memberTransactions'.tr());
                     },
                   );
                 },
@@ -271,7 +272,7 @@ class _MyParticipationsPageState extends ConsumerState<MyParticipationsPage>
         if (paginationState.donations.isEmpty) {
           return Center(
             child: Text(
-              'No member transactions',
+              'noMemberTransactions'.tr(),
               style: kBodyTitleR.copyWith(color: kSecondaryTextColor),
             ),
           );
@@ -336,7 +337,7 @@ class _MyParticipationsPageState extends ConsumerState<MyParticipationsPage>
         if (campaigns.isEmpty) {
           return Center(
             child: Text(
-              'No joined campaigns',
+              'noJoinedCampaigns'.tr(),
               style: kBodyTitleR.copyWith(color: kSecondaryTextColor),
             ),
           );

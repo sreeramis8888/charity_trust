@@ -479,32 +479,32 @@ class _HomePageState extends ConsumerState<HomePage> {
                         ),
                         items: [
                           {
-                            'title': 'General\nCampaign',
+                            'title': 'generalCampaign'.tr(),
                             'image': 'assets/png/general_campaign.png',
                             'category': 'General Campaign'
                           },
                           {
-                            'title': 'General\nFunding',
+                            'title': 'generalFunding'.tr(),
                             'image': 'assets/jpg/general_funding.jpg',
                             'category': 'General Funding'
                           },
                           {
-                            'title': 'Zakat',
+                            'title': 'zakat'.tr(),
                             'image': 'assets/png/zakat.png',
                             'category': 'Zakat'
                           },
                           {
-                            'title': 'Orphan',
+                            'title': 'orphan'.tr(),
                             'image': 'assets/jpg/orphan.jpg',
                             'category': 'Orphan'
                           },
                           {
-                            'title': 'Widow',
+                            'title': 'widow'.tr(),
                             'image': 'assets/png/widow.png',
                             'category': 'Widow'
                           },
                           {
-                            'title': 'Ghusl\nMayyit',
+                            'title': 'ghusalMayyit'.tr(),
                             'image': 'assets/png/ghusal_mayyt.png',
                             'category': 'Ghusl Mayyit'
                           },

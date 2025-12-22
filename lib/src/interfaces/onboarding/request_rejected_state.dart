@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -24,13 +25,13 @@ class RequestRejectedState extends ConsumerWidget {
               ),
               const SizedBox(height: 40),
               Text(
-                'Request not approved',
+                'requestRejectedTitle'.tr(),
                 style: kHeadTitleSB,
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 12),
               Text(
-                'Unfortunately, your request to join Annujoom could not be approved at this time.',
+                'requestRejectedDescription'.tr(),
                 style: kSmallTitleR.copyWith(
                   color: kSecondaryTextColor,
                   height: 1.5,
@@ -56,8 +57,8 @@ class RequestRejectedState extends ConsumerWidget {
                     borderRadius: BorderRadius.circular(8),
                   ),
                 ),
-                child: const Text(
-                  'Logout',
+                child:  Text(
+                  'logout'.tr(),
                   style: TextStyle(
                     color: Colors.white,
                     fontSize: 16,

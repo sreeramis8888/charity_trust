@@ -5,6 +5,7 @@ import 'package:Annujoom/src/interfaces/main_pages/home.dart';
 import 'package:Annujoom/src/interfaces/main_pages/campaign_pages/campaign.dart';
 import 'package:Annujoom/src/interfaces/main_pages/news_bookmark/news_list_page.dart';
 import 'package:Annujoom/src/interfaces/main_pages/profile_pages/profile.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -19,7 +20,12 @@ class NavBar extends ConsumerWidget {
     ProfilePage(),
   ];
 
-  static const List<String> _labels = ['Home', 'Campaigns', 'News', 'Profile'];
+  static final List<String> _labels = [
+    'home'.tr(),
+    'campaigns'.tr(),
+    'news'.tr(),
+    'profile'.tr(),
+  ];
 
   static const List<String> _inactiveIcons = [
     'assets/svg/inactive_home.svg',

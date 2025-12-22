@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:Annujoom/src/data/constants/color_constants.dart';
 import 'package:Annujoom/src/data/constants/style_constants.dart';
 import 'package:Annujoom/src/interfaces/components/primaryButton.dart';
@@ -65,19 +66,19 @@ class CampaignCard extends StatelessWidget {
                 ),
               if (isApprovalCard && startDate != null)
                 TextPill(
-                  text: "START: $startDate",
+                  text: "${'start'.tr()}: $startDate",
                   color: const Color(0xFFDBDBDB),
                   textStyle: kSmallerTitleR.copyWith(fontSize: 10),
                 ),
               if (isGeneralCampaign && !isApprovalCard)
                 TextPill(
-                  text: "DUE DATE:  $date",
+                  text: "${'dueDate'.tr()}:  $date",
                   color: const Color(0xFFDBDBDB),
                   textStyle: kSmallerTitleR.copyWith(fontSize: 10),
                 ),
               if (isApprovalCard)
                 TextPill(
-                  text: "DUE DATE: $date",
+                  text: "${'dueDate'.tr()}: $date",
                   color: const Color(0xFFDBDBDB),
                   textStyle: kSmallerTitleR.copyWith(fontSize: 10),
                 ),
@@ -138,7 +139,7 @@ class CampaignCard extends StatelessWidget {
                   maxLines: 3,
                 ),
                 Text(
-                  "raised of",
+                  "raisedOf".tr(),
                   style: kBodyTitleR,
                   maxLines: 3,
                 ),
@@ -148,7 +149,7 @@ class CampaignCard extends StatelessWidget {
                   maxLines: 3,
                 ),
                 Text(
-                  "goal",
+                  "goal".tr(),
                   style: kBodyTitleR,
                   maxLines: 3,
                 ),
@@ -167,7 +168,7 @@ class CampaignCard extends StatelessWidget {
               children: [
                 Expanded(
                   child: primaryButton(
-                    label: "Reject",
+                    label: "reject".tr(),
                     onPressed: onReject,
                     buttonColor: kCardBackgroundColor,
                     labelColor: const Color(0xFFC62828),
@@ -177,7 +178,7 @@ class CampaignCard extends StatelessWidget {
                 const SizedBox(width: 12),
                 Expanded(
                   child: primaryButton(
-                    label: "Accept",
+                    label: "accept".tr(),
                     onPressed: onApprove,
                     buttonColor: const Color(0xFF009B0A),
                     labelColor: kWhite,
@@ -190,7 +191,7 @@ class CampaignCard extends StatelessWidget {
               children: [
                 Expanded(
                   child: primaryButton(
-                    label: "View details",
+                    label: "viewDetails".tr(),
                     onPressed: () {
                       Navigator.of(context).pushNamed(
                         'CampaignDetail',

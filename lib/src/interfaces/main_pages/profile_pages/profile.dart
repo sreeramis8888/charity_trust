@@ -28,7 +28,7 @@ class ProfilePage extends ConsumerWidget {
         scrolledUnderElevation: 0,
         backgroundColor: kWhite,
         elevation: 0,
-        title: Text("Profile", style: kSubHeadingM),
+        title: Text("profile".tr(), style: kSubHeadingM),
       ),
       body: userDataAsync.when(
         data: (userData) {
@@ -158,7 +158,7 @@ class ProfilePage extends ConsumerWidget {
                   ),
                 ),
                 const SizedBox(height: 22),
-                Text("Account Statistics", style: kBodyTitleM),
+                Text("accountStatistics".tr(), style: kBodyTitleM),
                 const SizedBox(height: 10),
                 Container(
                   padding: const EdgeInsets.all(18),
@@ -178,11 +178,11 @@ class ProfilePage extends ConsumerWidget {
                         children: [
                           _statItem(
                             "${userData.totalCampaignsParticipated ?? 0}",
-                            "My Participations",
+                            "myParticipations".tr(),
                           ),
                           _statItem(
                             "₹${userData.totalAmountDonated ?? 0}",
-                            "Amount Donated",
+                            "amountDonated".tr(),
                           ),
                         ],
                       ),
@@ -199,11 +199,11 @@ class ProfilePage extends ConsumerWidget {
                           children: [
                             _statItem(
                               "${userData.totalReferrals ?? 0}",
-                              "Total Referrals",
+                              "totalReferrals".tr(),
                             ),
                             _statItem(
                               "${userData.activeReferrals ?? 0}",
-                              "Active Referrals",
+                              "activeReferrals".tr(),
                             ),
                           ],
                         ),
@@ -233,8 +233,8 @@ class ProfilePage extends ConsumerWidget {
                         child: _tile(
                           Icons.volunteer_activism,
                           userData.role != null && userData.role != 'member'
-                              ? "My Campaigns"
-                              : "My Participations",
+                              ? "myCampaigns".tr()
+                              : "myParticipations".tr(),
                         ),
                       ),
                       if (userData.role != null &&
@@ -248,7 +248,7 @@ class ProfilePage extends ConsumerWidget {
                               ),
                             );
                           },
-                          child: _tile(Icons.people, "Referrals"),
+                          child: _tile(Icons.people, "referrals".tr()),
                         ),
                       ],
                       _divider(),
@@ -260,22 +260,22 @@ class ProfilePage extends ConsumerWidget {
                             ),
                           );
                         },
-                        child: _tile(Icons.info_outline, "About Us"),
+                        child: _tile(Icons.info_outline, "aboutUs".tr()),
                       ),
                       _divider(),
                       GestureDetector(
                         onTap: () => _handleLanguageChange(context, ref),
-                        child: _tile(Icons.language, "Language"),
+                        child: _tile(Icons.language, "language".tr()),
                       ),
                       _divider(),
                       GestureDetector(
                         onTap: () => _handleLogout(context, ref),
-                        child: _tile(Icons.logout, "Logout"),
+                        child: _tile(Icons.logout, "logout".tr()),
                       ),
                       _divider(),
                       GestureDetector(
                         onTap: () => _handleDeleteAccount(context, ref),
-                        child: _tile(Icons.delete_outline, "Delete Account",
+                        child: _tile(Icons.delete_outline, "deleteAccount".tr(),
                             isDestructive: true),
                       ),
                     ],
@@ -384,7 +384,7 @@ class ProfilePage extends ConsumerWidget {
             mainAxisSize: MainAxisSize.min,
             children: [
               Text(
-                'Language',
+                'language'.tr(),
                 style: kHeadTitleSB.copyWith(
                   fontSize: 18,
                   color: kTextColor,
@@ -394,7 +394,7 @@ class ProfilePage extends ConsumerWidget {
               _languageOption(
                 context,
                 ref,
-                'English',
+                'english'.tr(),
                 'en',
                 isSelected: currentLanguage == 'en',
               ),
@@ -402,7 +402,7 @@ class ProfilePage extends ConsumerWidget {
               _languageOption(
                 context,
                 ref,
-                'Malayalam',
+                'malayalam'.tr(),
                 'ml',
                 isSelected: currentLanguage == 'ml',
               ),
@@ -415,7 +415,7 @@ class ProfilePage extends ConsumerWidget {
                     padding: const EdgeInsets.symmetric(vertical: 10),
                   ),
                   child: Text(
-                    'Close',
+                    'close'.tr(),
                     style: kSmallerTitleL.copyWith(
                       color: kSecondaryTextColor,
                       fontWeight: FontWeight.w500,
@@ -467,7 +467,7 @@ class ProfilePage extends ConsumerWidget {
             Navigator.of(context).pop();
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
-                content: Text('Language changed to $languageName'),
+                content: Text('${'languageChanged'.tr()} $languageName'),
                 duration: const Duration(seconds: 2),
               ),
             );
@@ -476,7 +476,7 @@ class ProfilePage extends ConsumerWidget {
           if (context.mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
-                content: Text('Error changing language: $e'),
+                content: Text('${'errorChangingLanguage'.tr()} $e'),
                 duration: const Duration(seconds: 2),
               ),
             );
@@ -529,9 +529,9 @@ class ProfilePage extends ConsumerWidget {
     showDialog(
       context: context,
       builder: (dialogContext) => ConfirmationDialog(
-        title: 'Logout',
-        message: 'Are you sure you want to logout?',
-        confirmButtonText: 'Logout',
+        title: 'logout'.tr(),
+        message: 'logoutConfirmation'.tr(),
+        confirmButtonText: 'logout'.tr(),
         onConfirm: () {
           _performLogout(context, ref);
         },
@@ -566,7 +566,7 @@ class ProfilePage extends ConsumerWidget {
 
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Logout failed: $e')),
+          SnackBar(content: Text('${'logoutFailed'.tr()}: $e')),
         );
         // Still navigate to login even if there was an error
         Navigator.of(context).pushNamedAndRemoveUntil(
@@ -581,10 +581,10 @@ class ProfilePage extends ConsumerWidget {
     showDialog(
       context: context,
       builder: (dialogContext) => ConfirmationDialog(
-        title: 'Delete Account',
+        title: 'deleteAccount'.tr(),
         message:
-            'Are you sure you want to delete your account? This action cannot be undone.',
-        confirmButtonText: 'Delete',
+            'deleteAccountConfirmation'.tr(),
+        confirmButtonText: 'delete'.tr(),
         onConfirm: () {
           Navigator.of(dialogContext).pop();
           _performDeleteAccount(context, ref);
@@ -621,7 +621,7 @@ class ProfilePage extends ConsumerWidget {
 
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Delete account failed: $e')),
+          SnackBar(content: Text('${'deleteAccountFailed'.tr()}: $e')),
         );
         // Still navigate to login even if there was an error
         Navigator.of(context).pushNamedAndRemoveUntil(
