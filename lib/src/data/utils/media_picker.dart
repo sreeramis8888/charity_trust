@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:file_picker/file_picker.dart';
@@ -58,20 +59,20 @@ class _PickSourceDialog extends StatelessWidget {
           const SizedBox(height: 10),
           _option(
             context,
-            "Camera",
+            "camera".tr(),
             Icons.camera_alt_rounded,
             () => _pickFromCamera(context),
           ),
           _option(
             context,
-            "Gallery",
+            "gallery".tr(),
             Icons.photo_library_rounded,
             () => _pickFromGallery(context),
           ),
           if (showDocument)
             _option(
               context,
-              "Document",
+              "document".tr(),
               Icons.insert_drive_file_rounded,
               () => _pickDocument(context),
             ),
@@ -196,11 +197,11 @@ class _PickSourceDialog extends StatelessWidget {
       compressQuality: 95,
       uiSettings: [
         AndroidUiSettings(
-          toolbarTitle: "Crop Image",
+          toolbarTitle: "cropImage".tr(),
           hideBottomControls: false,
           lockAspectRatio: cropRatio != null,
         ),
-        IOSUiSettings(title: "Crop Image"),
+        IOSUiSettings(title: "cropImage".tr()),
       ],
     );
 

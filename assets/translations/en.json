@@ -229,5 +229,9 @@
   "update": "Update",
   "later": "Later",
   "serverDownMessage": "Server is down. Please try again later.",
-  "unknownStatus": "UNKNOWN"
+  "unknownStatus": "UNKNOWN",
+  "camera": "Camera",
+  "gallery": "Gallery",
+  "document": "Document",
+  "cropImage": "Crop Image"
 }

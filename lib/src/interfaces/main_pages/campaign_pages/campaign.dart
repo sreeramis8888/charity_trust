@@ -158,6 +158,7 @@ class _CampaignPageState extends ConsumerState<CampaignPage>
   @override
   Widget build(BuildContext context) {
     final secureStorage = ref.watch(secureStorageServiceProvider);
+    context.locale; // Force rebuild on language change
 
     return Scaffold(
       backgroundColor: kBackgroundColor,
@@ -174,7 +175,7 @@ class _CampaignPageState extends ConsumerState<CampaignPage>
             : null,
         backgroundColor: kWhite,
         elevation: 0,
-        title: Text("Campaign", style: kBodyTitleM),
+        title: Text("campaigns".tr(), style: kBodyTitleM),
         actions: [
           Padding(
             padding: const EdgeInsets.only(right: 16),
@@ -238,11 +239,11 @@ class _CampaignPageState extends ConsumerState<CampaignPage>
               ),
               tabs: [
                 Tab(
-                  child: _buildMarqueeTab("Campaign"),
+                  child: _buildMarqueeTab("campaigns".tr()),
                 ),
-                Tab(child: _buildMarqueeTab("Transactions")),
-                Tab(child: _buildMarqueeTab("My Campaigns")),
-                if (_isPresident) Tab(child: _buildMarqueeTab("Approvals")),
+                Tab(child: _buildMarqueeTab("transactions".tr())),
+                Tab(child: _buildMarqueeTab("myCampaigns".tr())),
+                if (_isPresident) Tab(child: _buildMarqueeTab("approvals".tr())),
               ],
             ),
           ),
@@ -286,24 +287,55 @@ class _CampaignPageState extends ConsumerState<CampaignPage>
     print('=== _generalCampaignTab rebuild ===');
     print('selectedCategory from provider: $selectedCategory');
 
+    final categoryKeys = const [
+      'All',
+      'General Campaign',
+      'General Funding',
+      'Zakat',
+      'Orphan',
+      'Widow',
+      'Ghusl Mayyit',
+    ];
+
+    String getLocalized(String key) {
+      switch (key) {
+        case 'All':
+          return 'all'.tr();
+        case 'General Campaign':
+          return 'generalCampaign'.tr();
+        case 'General Funding':
+          return 'generalFunding'.tr();
+        case 'Zakat':
+          return 'zakat'.tr();
+        case 'Orphan':
+          return 'orphan'.tr();
+        case 'Widow':
+          return 'widow'.tr();
+        case 'Ghusl Mayyit':
+          return 'ghusalMayyit'.tr();
+        default:
+          return key;
+      }
+    }
+
+    final displayOptions =
+        categoryKeys.map((key) => getLocalized(key)).toList();
+
     return Column(
       children: [
         ChoiceChipFilter(
-          options: const [
-            'All',
-            'General Campaign',
-            'General Funding',
-            'Zakat',
-            'Orphan',
-            'Widow',
-            'Ghusl Mayyit',
-          ],
-          selectedOption: selectedCategory,
-          onSelectionChanged: (selected) {
-            print('Filter changed to: $selected');
+          options: displayOptions,
+          selectedOption: getLocalized(
+              selectedCategory.isEmpty ? 'All' : selectedCategory),
+          onSelectionChanged: (selectedDisplay) {
+            print('Filter changed to: $selectedDisplay');
+            final selectedKey = categoryKeys.firstWhere(
+              (key) => getLocalized(key) == selectedDisplay,
+              orElse: () => 'All',
+            );
             ref
                 .read(campaignCategoryFilterProvider.notifier)
-                .setCategory(selected == 'All' ? '' : selected);
+                .setCategory(selectedKey == 'All' ? '' : selectedKey);
           },
           isScrollable: true,
         ),
@@ -389,14 +421,15 @@ class _CampaignPageState extends ConsumerState<CampaignPage>
                 future: secureStorage.getUserData().then((user) => user?.name),
                 builder: (context, nameSnapshot) {
                   final userName = nameSnapshot.data ?? 'User';
+                  final memberTransText = 'memberTransactions'.tr();
                   return ChoiceChipFilter(
-                    options: [userName, 'Member Transactions'],
+                    options: [userName, memberTransText],
                     selectedOption:
-                        currentFilter ? 'Member Transactions' : userName,
+                        currentFilter ? memberTransText : userName,
                     onSelectionChanged: (selected) {
                       ref
                           .read(transactionsFilterProvider.notifier)
-                          .setFilter(selected == 'Member Transactions');
+                          .setFilter(selected == memberTransText);
                     },
                   );
                 },
@@ -692,12 +725,12 @@ class _CampaignPageState extends ConsumerState<CampaignPage>
       children: [
         if (isNonMember)
               ChoiceChipFilter(
-                options: const ['Joined', 'Created'],
-                selectedOption: currentFilter ? 'Created' : 'Joined',
+                options: ['joined'.tr(), 'created'.tr()],
+                selectedOption: currentFilter ? 'created'.tr() : 'joined'.tr(),
                 onSelectionChanged: (selected) {
                   ref
                       .read(myCampaignsFilterProvider.notifier)
-                      .setFilter(selected == 'Created');
+                      .setFilter(selected == 'created'.tr());
                 },
               ),
             Expanded(
