@@ -17,7 +17,7 @@ import 'package:Annujoom/src/data/router/router.dart' as router;
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  
+
   final checker = InstallChecker();
   await checker.checkFirstInstall();
   await Firebase.initializeApp(
@@ -31,19 +31,17 @@ Future<void> main() async {
   await CrashlyticsService.setCrashlyticsCollectionEnabled(true);
 
   await dotenv.load(fileName: ".env");
-  
+
   await EasyLocalization.ensureInitialized();
-  
-  // Load preferred language from secure storage
+
   final secureStorage = SecureStorageService();
   final userData = await secureStorage.getUserData();
   final preferredLanguage = userData?.preferredLanguage ?? 'en';
-  
-  // Set in GlobalVariables for use throughout the app
+
   GlobalVariables.setPreferredLanguage(preferredLanguage);
-  
+
   final startLocale = Locale(preferredLanguage);
-  
+
   runApp(
     EasyLocalization(
       supportedLocales: const [Locale('en'), Locale('ml')],
