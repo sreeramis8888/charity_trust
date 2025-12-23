@@ -22,6 +22,7 @@
   "pendingApprovals": "അംഗീകാരത്തിനായി കാത്തിരിക്കുന്നത്",
   "reviewNow": "ഇപ്പോൾ അവലോകനം ചെയ്യുക",
   "errorLoadingHomeData": "ഹോം ഡാറ്റ ലോഡ് ചെയ്യുന്നതിൽ പിശക്",
+  "unableToLoadProfileData": "പ്രൊഫൈൽ ഡാറ്റ ലോഡ് ചെയ്യാൻ കഴിയില്ല",
   "retry": "വീണ്ടും ശ്രമിക്കുക",
   "generalCampaign": "സാധാരണ കാമ്പെയ്ൻ",
   "generalFunding": "സാധാരണ ധനസഹായം",

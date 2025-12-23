@@ -22,6 +22,7 @@
   "pendingApprovals": "Pending Approvals",
   "reviewNow": "Review Now",
   "errorLoadingHomeData": "Error loading home data",
+  "unableToLoadProfileData": "Unable to load profile data",
   "retry": "Retry",
   "generalCampaign": "General Campaign",
   "generalFunding": "General Funding",

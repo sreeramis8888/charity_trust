@@ -20,6 +20,9 @@ import 'package:Annujoom/src/data/router/nav_router.dart';
 import 'package:Annujoom/src/data/utils/launch_url.dart';
 import 'package:Annujoom/src/data/services/notification_service/get_fcm.dart';
 import 'package:Annujoom/src/interfaces/components/primaryButton.dart';
+import 'package:Annujoom/src/interfaces/components/confirmation_dialog.dart';
+import 'package:Annujoom/src/data/providers/auth_login_provider.dart';
+import 'package:Annujoom/src/data/providers/auth_provider.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -100,6 +103,58 @@ class _HomePageState extends ConsumerState<HomePage> {
     _completedCampaignController.dispose();
     _videoController.dispose();
     super.dispose();
+  }
+
+  void _handleLogout(BuildContext context, WidgetRef ref) {
+    showDialog(
+      context: context,
+      builder: (dialogContext) => ConfirmationDialog(
+        title: 'logout'.tr(),
+        message: 'logoutConfirmation'.tr(),
+        confirmButtonText: 'logout'.tr(),
+        onConfirm: () {
+          _performLogout(context, ref);
+        },
+      ),
+    );
+  }
+
+  Future<void> _performLogout(BuildContext context, WidgetRef ref) async {
+    try {
+      final authLoginApi = ref.read(authLoginApiProvider);
+      final authProvider = ref.read(authProviderProvider);
+
+      // Call logout API
+      await authLoginApi.logout();
+
+      // Clear local storage regardless of API response
+      await authProvider.clearAllData();
+
+      if (context.mounted) {
+        // Navigate to Phone screen and remove all previous routes
+        Navigator.of(context).pushNamedAndRemoveUntil(
+          'Phone',
+          (route) => false,
+        );
+      }
+    } catch (e) {
+      // Clear local storage even if API fails
+      try {
+        final authProvider = ref.read(authProviderProvider);
+        await authProvider.clearAllData();
+      } catch (_) {}
+
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('${'logoutFailed'.tr()}: $e')),
+        );
+        // Still navigate to login even if there was an error
+        Navigator.of(context).pushNamedAndRemoveUntil(
+          'Phone',
+          (route) => false,
+        );
+      }
+    }
   }
 
   void _showCallSupportModal(BuildContext context) {
@@ -197,6 +252,16 @@ class _HomePageState extends ConsumerState<HomePage> {
                   ref.read(homePageProvider.notifier).refresh();
                 },
                 child: Text('retry'.tr()),
+              ),
+              SizedBox(height: 24),
+              ElevatedButton.icon(
+                onPressed: () => _handleLogout(context, ref),
+                icon: Icon(Icons.logout),
+                label: Text('logout'.tr()),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: kPrimaryColor,
+                  foregroundColor: kWhite,
+                ),
               ),
             ],
           ),
