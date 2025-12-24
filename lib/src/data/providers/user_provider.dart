@@ -180,7 +180,7 @@ Future<List<UserModel>> fetchUsersByRole(
       queryParts.add('role[]=${Uri.encodeComponent(role)}');
     }
     queryParts.add('page_no=${params.pageNo}');
-    queryParts.add('limit=10');
+    queryParts.add('limit=15');
 
     final search = params.search;
     if (search != null && search.isNotEmpty) {
