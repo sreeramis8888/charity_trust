@@ -531,8 +531,23 @@ class _OTPScreenState extends ConsumerState<OTPScreen> {
 
       if (response.success && response.data != null) {
         final data = response.data!;
-        final token = data['token'] as String?;
-        final userData = data['user'] as Map<String, dynamic>?;
+        log('Response data received: $data', name: 'OTPScreen');
+
+        // Extract the nested data object (backend wraps response in data key)
+        final nestedData = data['data'] as Map<String, dynamic>?;
+        if (nestedData == null) {
+          log('No nested data found', name: 'OTPScreen');
+          SnackbarService().showSnackBar('invalidResponseData'.tr());
+          return;
+        }
+
+        final token = nestedData['token'] as String?;
+        final userData = nestedData['user'] as Map<String, dynamic>?;
+
+        log('Token extracted: ${token != null ? "YES" : "NO"}',
+            name: 'OTPScreen');
+        log('User data extracted: ${userData != null ? "YES" : "NO"}',
+            name: 'OTPScreen');
 
         if (token != null && userData != null) {
           final user = UserModel.fromJson(userData);
@@ -550,9 +565,10 @@ class _OTPScreenState extends ConsumerState<OTPScreen> {
           log('OTP verified and login successful', name: 'OTPScreen');
 
           if (context.mounted) {
-            // Navigate based on user status, removing all previous routes
+            // Navigate based on user status from API response, removing all previous routes
+            final userStatus = userData['status'] as String?;
             String routeName;
-            switch (user.status) {
+            switch (userStatus) {
               case 'active':
                 routeName = 'navbar';
                 break;
