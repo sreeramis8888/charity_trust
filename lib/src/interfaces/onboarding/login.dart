@@ -5,9 +5,9 @@ import 'package:Annujoom/src/data/constants/style_constants.dart';
 import 'package:Annujoom/src/data/providers/loading_provider.dart';
 import 'package:Annujoom/src/data/services/secure_storage_service.dart';
 import 'package:Annujoom/src/data/services/snackbar_service.dart';
-import 'package:Annujoom/src/data/services/firebase_auth_service.dart';
+// import 'package:Annujoom/src/data/services/firebase_auth_service.dart'; // TODO: Not needed for backend OTP
 import 'package:Annujoom/src/data/providers/auth_login_provider.dart';
-import 'package:Annujoom/src/data/providers/firebase_auth_provider.dart';
+// import 'package:Annujoom/src/data/providers/firebase_auth_provider.dart'; // TODO: Not needed for backend OTP
 import 'package:Annujoom/src/data/providers/user_provider.dart';
 import 'package:Annujoom/src/data/models/user_model.dart';
 import 'package:Annujoom/src/interfaces/components/primaryButton.dart';
@@ -167,8 +167,7 @@ class _PhoneNumberScreenState extends ConsumerState<PhoneNumberScreen> {
                                 anim.AnimationType.fadeSlideInFromLeft,
                             duration: anim.AnimationDuration.normal,
                             delayMilliseconds: 300,
-                            child: Text(
-                                'aVerificationCodeWillBeSent'.tr(),
+                            child: Text('aVerificationCodeWillBeSent'.tr(),
                                 style: TextStyle(
                                     color: kSecondaryTextColor,
                                     fontWeight: FontWeight.w300)),
@@ -218,22 +217,28 @@ class _PhoneNumberScreenState extends ConsumerState<PhoneNumberScreen> {
 
       // Request FCM token only if not already saved
       final secureStorage = ref.read(secureStorageServiceProvider);
+      String? fcmToken;
       final existingFcmToken = await secureStorage.getFcmToken();
       if (existingFcmToken == null || existingFcmToken.isEmpty) {
         await getFcmToken(context, ref);
+        fcmToken = await secureStorage.getFcmToken();
+      } else {
+        fcmToken = existingFcmToken;
       }
 
-      final firebaseAuthService = ref.read(firebaseAuthServiceProvider);
+      // TODO: Using backend API for OTP generation instead of Firebase
+      // final firebaseAuthService = ref.read(firebaseAuthServiceProvider);
       final fullPhone = "+$countryCode$phoneNumber";
 
-      final result = await firebaseAuthService.sendOtp(fullPhone);
-      final verificationId = result['verificationId'] ?? '';
-      final resendToken = result['resendToken'] ?? '';
+      // Call backend Login function to generate OTP
+      final authLoginApi = ref.read(authLoginApiProvider);
+      final response = await authLoginApi.Login(fullPhone, fcmToken ?? '');
 
       ref.read(loadingProvider.notifier).stopLoading();
 
-      if (verificationId.isEmpty) {
-        SnackbarService().showSnackBar('failedToSendOTP'.tr());
+      if (!response.success) {
+        SnackbarService()
+            .showSnackBar(response.message ?? 'failedToSendOTP'.tr());
         return;
       }
 
@@ -245,8 +250,8 @@ class _PhoneNumberScreenState extends ConsumerState<PhoneNumberScreen> {
             builder: (context) => OTPScreen(
               fullPhone: fullPhone,
               countryCode: countryCode ?? '91',
-              verificationId: verificationId,
-              resendToken: resendToken,
+              // verificationId: verificationId, // Not needed for backend OTP
+              // resendToken: resendToken, // Not needed for backend OTP
             ),
           ),
         );
@@ -262,14 +267,14 @@ class _PhoneNumberScreenState extends ConsumerState<PhoneNumberScreen> {
 class OTPScreen extends ConsumerStatefulWidget {
   final String fullPhone;
   final String countryCode;
-  final String verificationId;
-  final String resendToken;
+  // final String verificationId; // Not needed for backend OTP
+  // final String resendToken; // Not needed for backend OTP
 
   const OTPScreen({
     required this.fullPhone,
     required this.countryCode,
-    required this.verificationId,
-    required this.resendToken,
+    // this.verificationId, // Not needed for backend OTP
+    // this.resendToken, // Not needed for backend OTP
     super.key,
   });
 
@@ -279,21 +284,15 @@ class OTPScreen extends ConsumerStatefulWidget {
 
 class _OTPScreenState extends ConsumerState<OTPScreen> {
   Timer? _timer;
-
   int _start = 59;
-
   bool _isButtonDisabled = true;
 
   late TextEditingController _otpController;
-  late String _currentVerificationId;
-  late String _currentResendToken;
 
   @override
   void initState() {
     super.initState();
     _otpController = TextEditingController();
-    _currentVerificationId = widget.verificationId;
-    _currentResendToken = widget.resendToken;
     startTimer();
   }
 
@@ -328,19 +327,30 @@ class _OTPScreenState extends ConsumerState<OTPScreen> {
 
   Future<void> _resendOtp() async {
     try {
-      final firebaseAuthService = ref.read(firebaseAuthServiceProvider);
-      final result = await firebaseAuthService.resendOtp(
-        widget.fullPhone,
-        _currentResendToken,
-      );
+      // TODO: Using backend API for OTP resend instead of Firebase
+      final secureStorage = ref.read(secureStorageServiceProvider);
+      String? fcmToken;
+      final existingFcmToken = await secureStorage.getFcmToken();
+      if (existingFcmToken == null || existingFcmToken.isEmpty) {
+        await getFcmToken(context, ref);
+        fcmToken = await secureStorage.getFcmToken();
+      } else {
+        fcmToken = existingFcmToken;
+      }
 
-      setState(() {
-        _currentVerificationId = result['verificationId'] ?? '';
-        _currentResendToken = result['resendToken'] ?? '';
-      });
+      // Call backend Login function to resend OTP
+      final authLoginApi = ref.read(authLoginApiProvider);
+      final response =
+          await authLoginApi.Login(widget.fullPhone, fcmToken ?? '');
 
-      SnackbarService().showSnackBar('OTP resent successfully');
-      log('OTP resent successfully', name: 'OTPScreen');
+      if (response.success) {
+        SnackbarService().showSnackBar('OTP resent successfully');
+        log('OTP resent successfully', name: 'OTPScreen');
+      } else {
+        SnackbarService()
+            .showSnackBar(response.message ?? 'Failed to resend OTP');
+        log('Error resending OTP: ${response.message}', name: 'OTPScreen');
+      }
     } catch (e) {
       SnackbarService().showSnackBar('Error: $e');
       log('Error resending OTP: $e', name: 'OTPScreen');
@@ -382,7 +392,8 @@ class _OTPScreenState extends ConsumerState<OTPScreen> {
                           duration: anim.AnimationDuration.normal,
                           delayMilliseconds: 100,
                           child: Text(
-                              'enterThe6DigitCode'.tr() + ' ${widget.fullPhone}',
+                              'enterThe6DigitCode'.tr() +
+                                  ' ${widget.fullPhone}',
                               style: kSmallTitleR.copyWith(
                                   color: kSecondaryTextColor)),
                         ),
@@ -433,7 +444,9 @@ class _OTPScreenState extends ConsumerState<OTPScreen> {
                             children: [
                               Text(
                                 _isButtonDisabled
-                                    ? 'resendOTPIn'.tr() + ' $_start ' + 'seconds'.tr()
+                                    ? 'resendOTPIn'.tr() +
+                                        ' $_start ' +
+                                        'seconds'.tr()
                                     : 'didntReceiveCode'.tr(),
                                 style: TextStyle(
                                     fontWeight: FontWeight.w500,
@@ -501,75 +514,70 @@ class _OTPScreenState extends ConsumerState<OTPScreen> {
     try {
       ref.read(loadingProvider.notifier).startLoading();
 
-      // Step 1: Verify OTP with Firebase and get ID token
-      final firebaseAuthService = ref.read(firebaseAuthServiceProvider);
-      final clientToken = await firebaseAuthService.verifyOtp(
-        verificationId: _currentVerificationId,
-        smsCode: otp,
-      );
-
-      // Step 2: Get FCM token using the notification service
-      await getFcmToken(context, ref);
-      final secureStorage = SecureStorageService();
-      final fcmToken = await secureStorage.getFcmToken();
-
-      // Step 3: Call backend firebase-login endpoint
+      // Step 1: Verify OTP with backend API
       final authLoginApi = ref.read(authLoginApiProvider);
-      final response = await authLoginApi.firebaseLogin(clientToken, fcmToken ?? '');
+
+      // Debug: Log the request data
+      log('Sending verifyOtp request with data:', name: 'OTPScreen');
+      log('Phone: ${widget.fullPhone}', name: 'OTPScreen');
+      log('OTP: $otp', name: 'OTPScreen');
+
+      final response = await authLoginApi.verifyOtp(
+        widget.fullPhone,
+        otp,
+      );
 
       ref.read(loadingProvider.notifier).stopLoading();
 
       if (response.success && response.data != null) {
-        final data = response.data!['data'] as Map<String, dynamic>?;
-        if (data != null) {
-          final token = data['token'] as String?;
-          final userData = data['user'] ?? data['new_user'] as Map<String, dynamic>?;
-          
-          if (token != null && userData != null) {
-            final user = UserModel.fromJson(userData);
-            final secureStorage = SecureStorageService();
+        final data = response.data!;
+        final token = data['token'] as String?;
+        final userData = data['user'] as Map<String, dynamic>?;
 
-            // Save bearer token to secure storage
-            await secureStorage.saveBearerToken(token);
-            if (user.id != null) {
-              await secureStorage.saveUserId(user.id!);
-            }
+        if (token != null && userData != null) {
+          final user = UserModel.fromJson(userData);
+          final secureStorage = SecureStorageService();
 
-            // Store user in provider
-            ref.read(userProvider.notifier).setUser(user);
-
-            log('OTP verified and login successful', name: 'OTPScreen');
-
-            if (context.mounted) {
-              // Navigate based on user status, removing all previous routes
-              String routeName;
-              switch (user.status) {
-                case 'active':
-                  routeName = 'navbar';
-                  break;
-                case 'inactive':
-                  routeName = 'registration';
-                  break;
-                case 'pending':
-                  routeName = 'requestSent';
-                  break;
-                case 'rejected':
-                  routeName = 'requestRejected';
-                  break;
-                case 'suspended':
-                  routeName = 'accountSuspended';
-                  break;
-                default:
-                  routeName = 'navbar';
-              }
-              Navigator.of(context).pushNamedAndRemoveUntil(
-                routeName,
-                (route) => false,
-              );
-            }
-          } else {
-            SnackbarService().showSnackBar('invalidResponseData'.tr());
+          // Save bearer token to secure storage
+          await secureStorage.saveBearerToken(token);
+          if (user.id != null) {
+            await secureStorage.saveUserId(user.id!);
           }
+
+          // Store user in provider
+          ref.read(userProvider.notifier).setUser(user);
+
+          log('OTP verified and login successful', name: 'OTPScreen');
+
+          if (context.mounted) {
+            // Navigate based on user status, removing all previous routes
+            String routeName;
+            switch (user.status) {
+              case 'active':
+                routeName = 'navbar';
+                break;
+              case 'inactive':
+                routeName = 'registration';
+                break;
+              case 'pending':
+                routeName = 'requestSent';
+                break;
+              case 'rejected':
+                routeName = 'requestRejected';
+                break;
+              case 'suspended':
+                routeName = 'accountSuspended';
+                break;
+              default:
+                routeName = 'navbar';
+            }
+            Navigator.of(context).pushNamedAndRemoveUntil(
+              routeName,
+              (route) => false,
+            );
+          }
+        } else {
+          SnackbarService().showSnackBar('invalidResponseData'.tr());
         }
       } else {
         SnackbarService().showSnackBar(

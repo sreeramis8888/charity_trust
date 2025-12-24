@@ -19,13 +19,47 @@ class AuthLoginApi {
   })  : _apiProvider = apiProvider,
         _authProvider = authProvider;
 
-  Future<ApiResponse<Map<String, dynamic>>> firebaseLogin(
-    String clientToken,
+  // Future<ApiResponse<Map<String, dynamic>>> firebaseLogin(
+  //   String clientToken,
+  //   String fcmToken,
+  // ) async {
+  //   return await _apiProvider.post(
+  //     '$_endpoint/firebase-login',
+  //     {'client_token': clientToken, 'fcm': fcmToken},
+  //     requireAuth: false,
+  //   );
+  // }
+
+  Future<ApiResponse<Map<String, dynamic>>> Login(
+    String phone,
     String fcmToken,
   ) async {
     return await _apiProvider.post(
-      '$_endpoint/firebase-login',
-      {'client_token': clientToken, 'fcm': fcmToken},
+      '$_endpoint/login',
+      {'phone': phone, 'fcm': fcmToken},
+      requireAuth: false,
+    );
+  }
+
+  Future<ApiResponse<Map<String, dynamic>>> verifyOtp(
+    String phone,
+    String otp,
+  ) async {
+    // Debug: Log the request data
+    print('verifyOtp called with:');
+    print('phone: $phone');
+    print('otp: $otp');
+
+    final requestData = {
+      'phone': phone,
+      'otp': otp,
+    };
+
+    print('Request data: $requestData');
+
+    return await _apiProvider.post(
+      '$_endpoint/verify',
+      requestData,
       requireAuth: false,
     );
   }
