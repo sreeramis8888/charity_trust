@@ -11,6 +11,8 @@ class Promotions {
   final String? status;
   final DateTime? createdAt;
   final DateTime? updatedAt;
+  final int? targetAmount;
+  final int? collectedAmount;
 
   Promotions({
     this.id,
@@ -25,6 +27,8 @@ class Promotions {
     this.status,
     this.createdAt,
     this.updatedAt,
+    this.targetAmount,
+    this.collectedAmount,
   });
 
   /// Get title in specified language, fallback to English, then first available
@@ -34,7 +38,10 @@ class Promotions {
 
   /// Get description in specified language, fallback to English, then first available
   String getDescription(String languageCode) {
-    return description[languageCode] ?? description['en'] ?? description.values.firstOrNull ?? '';
+    return description[languageCode] ??
+        description['en'] ??
+        description.values.firstOrNull ??
+        '';
   }
 
   factory Promotions.fromJson(Map<String, dynamic> json) {
@@ -81,6 +88,12 @@ class Promotions {
       updatedAt: json['updatedAt'] != null
           ? DateTime.tryParse(json['updatedAt'].toString())
           : null,
+      targetAmount: json['target_amount'] != null
+          ? int.tryParse(json['target_amount'].toString())
+          : null,
+      collectedAmount: json['collected_amount'] != null
+          ? int.tryParse(json['collected_amount'].toString())
+          : null,
     );
   }
 
@@ -98,6 +111,8 @@ class Promotions {
       'status': status,
       'createdAt': createdAt?.toIso8601String(),
       'updatedAt': updatedAt?.toIso8601String(),
+      'target_amount': targetAmount,
+      'collected_amount':collectedAmount,
     };
   }
 
@@ -114,6 +129,8 @@ class Promotions {
     String? status,
     DateTime? createdAt,
     DateTime? updatedAt,
+    int? targetAmount,
+    int? collectedAmount,
   }) {
     return Promotions(
       id: id ?? this.id,
@@ -128,6 +145,8 @@ class Promotions {
       status: status ?? this.status,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
+      targetAmount: targetAmount ?? this.targetAmount,
+      collectedAmount: collectedAmount ?? this.collectedAmount,
     );
   }
 }

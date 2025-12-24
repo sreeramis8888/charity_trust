@@ -900,8 +900,8 @@ class _HomePageState extends ConsumerState<HomePage> {
                                       promotion.getTitle(preferredLanguage),
                                   subtitle: promotion
                                       .getDescription(preferredLanguage),
-                                  goal: 100,
-                                  collected: 10,
+                                  goal: promotion.targetAmount,
+                                  collected:promotion.collectedAmount,
                                   posterImage: promotion.media ?? '',
                                   isImagePoster: true,
                                   onTap: () {},
