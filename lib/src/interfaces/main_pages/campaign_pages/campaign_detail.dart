@@ -456,73 +456,73 @@ class _CampaignDetailPageState extends ConsumerState<CampaignDetailPage> {
         ),
       ),
       const SizedBox(height: 20),
-      anim.AnimatedWidgetWrapper(
-        animationType: anim.AnimationType.fadeSlideInFromBottom,
-        duration: anim.AnimationDuration.normal,
-        delayMilliseconds: 475,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'recommended'.tr(),
-              style: kSmallerTitleL.copyWith(
-                  color: kSecondaryTextColor, fontSize: 16),
-            ),
-            const SizedBox(height: 12),
-            ValueListenableBuilder<TextEditingValue>(
-              valueListenable: _donationController,
-              builder: (context, value, child) {
-                final amounts = [1000, 2500, 5000];
-                return Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: amounts.asMap().entries.map((entry) {
-                    final idx = entry.key;
-                    final amount = entry.value;
-                    final isSelected = value.text == amount.toString();
+      // anim.AnimatedWidgetWrapper(
+      //   animationType: anim.AnimationType.fadeSlideInFromBottom,
+      //   duration: anim.AnimationDuration.normal,
+      //   delayMilliseconds: 475,
+        // child: Column(
+        //   crossAxisAlignment: CrossAxisAlignment.start,
+        //   children: [
+            // Text(
+            //   'recommended'.tr(),
+            //   style: kSmallerTitleL.copyWith(
+            //       color: kSecondaryTextColor, fontSize: 16),
+            // ),
+            // const SizedBox(height: 12),
+            // ValueListenableBuilder<TextEditingValue>(
+            //   valueListenable: _donationController,
+            //   builder: (context, value, child) {
+            //     final amounts = [1000, 2500, 5000];
+            //     return Row(
+            //       mainAxisAlignment: MainAxisAlignment.start,
+            //       children: amounts.asMap().entries.map((entry) {
+            //         final idx = entry.key;
+            //         final amount = entry.value;
+            //         final isSelected = value.text == amount.toString();
 
-                    return Padding(
-                      padding: EdgeInsets.only(
-                        right: idx == amounts.length - 1 ? 0 : 10,
-                      ),
-                      child: InkWell(
-                        onTap: () {
-                          _donationController.text = amount.toString();
-                          _donationController.selection =
-                              TextSelection.fromPosition(
-                            TextPosition(
-                                offset: _donationController.text.length),
-                          );
-                        },
-                        borderRadius: BorderRadius.circular(10),
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 14, 
-                            vertical: 8,
-                          ),
-                          decoration: BoxDecoration(
-                            color: isSelected
-                                ? kPrimaryColor.withOpacity(0.05)
-                                : Colors.transparent,
-                            borderRadius: BorderRadius.circular(10),
-                            border: Border.all(color: kPrimaryColor),
-                          ),
-                          child: Text(
-                            '₹ ${NumberFormat.decimalPattern('en_IN').format(amount)}',
-                            style: kSmallTitleL.copyWith(
-                              color: kPrimaryColor,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ),
-                      ),
-                    );
-                  }).toList(),
-                );
-              },
-            ),
-          ],
-        ),
-      ),
+            //         return Padding(
+            //           padding: EdgeInsets.only(
+            //             right: idx == amounts.length - 1 ? 0 : 10,
+            //           ),
+            //           child: InkWell(
+            //             onTap: () {
+            //               _donationController.text = amount.toString();
+            //               _donationController.selection =
+            //                   TextSelection.fromPosition(
+            //                 TextPosition(
+            //                     offset: _donationController.text.length),
+            //               );
+            //             },
+            //             borderRadius: BorderRadius.circular(10),
+            //             child: Container(
+            //               padding: const EdgeInsets.symmetric(
+            //                 horizontal: 14, 
+            //                 vertical: 8,
+            //               ),
+            //               decoration: BoxDecoration(
+            //                 color: isSelected
+            //                     ? kPrimaryColor.withOpacity(0.05)
+            //                     : Colors.transparent,
+            //                 borderRadius: BorderRadius.circular(10),
+            //                 border: Border.all(color: kPrimaryColor),
+            //               ),
+            //               child: Text(
+            //                 '₹ ${NumberFormat.decimalPattern('en_IN').format(amount)}',
+            //                 style: kSmallTitleL.copyWith(
+            //                   color: kPrimaryColor,
+            //                   fontWeight: FontWeight.bold,
+            //                 ),
+            //               ),
+            //             ),
+            //           ),
+            //         );
+            //       }).toList(),
+            //     );
+            //   },
+            // ),
+        //   ],
+        // ),
+      // ),
       const SizedBox(height: 24),
       anim.AnimatedWidgetWrapper(
         animationType: anim.AnimationType.fadeSlideInFromBottom,
