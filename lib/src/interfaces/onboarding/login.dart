@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:developer';
 import 'package:Annujoom/src/data/constants/color_constants.dart';
 import 'package:Annujoom/src/data/constants/style_constants.dart';
+import 'package:Annujoom/src/data/constants/global_variables.dart';
 import 'package:Annujoom/src/data/providers/loading_provider.dart';
 import 'package:Annujoom/src/data/services/secure_storage_service.dart';
 import 'package:Annujoom/src/data/services/snackbar_service.dart';
@@ -558,6 +559,10 @@ class _OTPScreenState extends ConsumerState<OTPScreen> {
           if (user.id != null) {
             await secureStorage.saveUserId(user.id!);
           }
+
+          // Set user role in GlobalVariables
+          final userRole = userData['role'] as String? ?? 'member';
+          GlobalVariables.setUserRole(userRole);
 
           // Store user in provider
           ref.read(userProvider.notifier).setUser(user);
