@@ -160,64 +160,63 @@ class ProfilePage extends ConsumerWidget {
                 const SizedBox(height: 22),
                 Text("accountStatistics".tr(), style: kBodyTitleM),
                 const SizedBox(height: 10),
-         Container(
-  padding: const EdgeInsets.all(18),
-  decoration: BoxDecoration(
-    gradient: const LinearGradient(
-      colors: [Color(0xFFFFFFFF), Color(0xFFEEEDFF)],
-      begin: Alignment.topCenter,
-      end: Alignment.bottomCenter,
-    ),
-    borderRadius: BorderRadius.circular(22),
-  ),
-  child: Column(
-    crossAxisAlignment: CrossAxisAlignment.start,
-    children: [
-      Row(
-        children:  [
-          Expanded(
-            child: _StatItem(
-              value: "${userData.totalCampaignsParticipated ?? 0}",
-              label: "myParticipations",
-            ),
-          ),
-          SizedBox(width: 12),
-          Expanded(
-            child: _StatItem(
-              value: "₹${userData.totalAmountDonated ?? 0}",
-              label: "amountDonated",
-            ),
-          ),
-        ],
-      ),
-
-      if (userData.role != null && userData.role != 'member') ...[
-        const SizedBox(height: 18),
-        Divider(height: 1, color: kStrokeColor),
-        const SizedBox(height: 18),
-
-        Row(
-          children:  [
-            Expanded(
-              child: _StatItem(
-                value: "${userData.totalReferrals ?? 0}",
-                label: "totalReferrals",
-              ),
-            ),
-            SizedBox(width: 12),
-            Expanded(
-              child: _StatItem(
-                value: "${userData.activeReferrals ?? 0}",
-                label: "activeReferrals",
-              ),
-            ),
-          ],
-        ),
-      ],
-    ],
-  ),
-),
-
+                Container(
+                  padding: const EdgeInsets.all(18),
+                  decoration: BoxDecoration(
+                    gradient: const LinearGradient(
+                      colors: [Color(0xFFFFFFFF), Color(0xFFEEEDFF)],
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                    ),
+                    borderRadius: BorderRadius.circular(22),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Expanded(
+                            child: _StatItem(
+                              value:
+                                  "${userData.totalCampaignsParticipated ?? 0}",
+                              label: "myParticipations",
+                            ),
+                          ),
+                          SizedBox(width: 12),
+                          Expanded(
+                            child: _StatItem(
+                              value: "₹${userData.totalAmountDonated ?? 0}",
+                              label: "amountDonated",
+                            ),
+                          ),
+                        ],
+                      ),
+                      if (userData.role != null &&
+                          userData.role != 'member') ...[
+                        const SizedBox(height: 18),
+                        Divider(height: 1, color: Color(0xFFCEE8F8)),
+                        const SizedBox(height: 18),
+                        Row(
+                          children: [
+                            Expanded(
+                              child: _StatItem(
+                                value: "${userData.totalReferrals ?? 0}",
+                                label: "totalReferrals",
+                              ),
+                            ),
+                            SizedBox(width: 12),
+                            Expanded(
+                              child: _StatItem(
+                                value: "${userData.activeReferrals ?? 0}",
+                                label: "activeReferrals",
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ],
+                  ),
+                ),
                 const SizedBox(height: 26),
                 Container(
                   padding: const EdgeInsets.symmetric(vertical: 8),
@@ -438,7 +437,7 @@ class ProfilePage extends ConsumerWidget {
         try {
           // Update global language
           GlobalVariables.setPreferredLanguage(languageCode);
-          
+
           // Update easy_localization locale
           await context.setLocale(Locale(languageCode));
 
@@ -570,8 +569,7 @@ class ProfilePage extends ConsumerWidget {
       context: context,
       builder: (dialogContext) => ConfirmationDialog(
         title: 'deleteAccount'.tr(),
-        message:
-            'deleteAccountConfirmation'.tr(),
+        message: 'deleteAccountConfirmation'.tr(),
         confirmButtonText: 'delete'.tr(),
         onConfirm: () {
           Navigator.of(dialogContext).pop();
@@ -620,7 +618,6 @@ class ProfilePage extends ConsumerWidget {
     }
   }
 }
-
 
 class _StatItem extends StatelessWidget {
   final String value;
