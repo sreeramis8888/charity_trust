@@ -665,55 +665,89 @@ class _HomePageState extends ConsumerState<HomePage> {
                     },
                     child: Container(
                       decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                            colors: [Color(0xFFFFFFFF), Color(0xFFCEE8F8)],
-                            begin: AlignmentGeometry.topCenter,
-                            end: AlignmentGeometry.bottomCenter),
+                        gradient: const LinearGradient(
+                          colors: [Color(0xFFFFFFFF), Color(0xFFCEE8F8)],
+                          begin: Alignment.topCenter,
+                          end: Alignment.bottomCenter,
+                        ),
                         borderRadius: BorderRadius.circular(22),
                       ),
-                      child: Padding(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 16, vertical: 20),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                homeData.pendingReferrals.toString(),
-                                style: kHeadTitleSB.copyWith(
-                                  fontSize: 22,
-                                  color: kThirdTextColor,
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 16, vertical: 20),
+                      child: Row(
+                        children: [
+                          /// 🔹 LEFT : Referrals Received
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  homeData.referralsReceived.toString(),
+                                  style: kHeadTitleSB.copyWith(
+                                    fontSize: 22,
+                                    color: kThirdTextColor,
+                                  ),
                                 ),
-                                softWrap: true,
-                              ),
-                              const SizedBox(height: 4),
-                              Wrap(
-                                crossAxisAlignment: WrapCrossAlignment.center,
-                                spacing: 8,
-                                runSpacing: 4,
-                                children: [
-                                  Text(
-                                    'pendingApprovals'.tr(),
-                                    style: kSmallerTitleR,
-                                    softWrap: true,
+                                const SizedBox(height: 4),
+                                Text(
+                                  'referralsReceived'.tr(),
+                                  style: kSmallerTitleR,
+                                  maxLines: 2,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ],
+                            ),
+                          ),
+
+                          /// 🔸 Divider
+                          Container(
+                            width: 1,
+                            height: 48,
+                            margin: const EdgeInsets.symmetric(horizontal: 12),
+                            color: kThirdTextColor.withOpacity(0.2),
+                          ),
+
+                          /// 🔹 RIGHT : Pending Approvals + Review Now
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  homeData.pendingReferrals.toString(),
+                                  style: kHeadTitleSB.copyWith(
+                                    fontSize: 22,
+                                    color: kThirdTextColor,
                                   ),
-                                  GestureDetector(
-                                    onTap: () {
-                                      Navigator.of(context)
-                                          .pushNamed('MyReferrals');
-                                    },
-                                    child: Text(
-                                      'reviewNow'.tr(),
-                                      style: kSmallerTitleM.copyWith(
-                                        color: kThirdTextColor,
-                                        decoration: TextDecoration.underline,
-                                      ),
-                                      softWrap: true,
+                                ),
+                                const SizedBox(height: 4),
+                                Wrap(
+                                  crossAxisAlignment: WrapCrossAlignment.center,
+                                  spacing: 6,
+                                  children: [
+                                    Text(
+                                      'pendingApprovals'.tr(),
+                                      style: kSmallerTitleR,
                                     ),
-                                  ),
-                                ],
-                              ),
-                            ],
-                          )),
+                                    GestureDetector(
+                                      onTap: () {
+                                        Navigator.of(context)
+                                            .pushNamed('MyReferrals');
+                                      },
+                                      child: Text(
+                                        'reviewNow'.tr(),
+                                        style: kSmallerTitleM.copyWith(
+                                          color: kThirdTextColor,
+                                          decoration: TextDecoration.underline,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ),
@@ -901,7 +935,7 @@ class _HomePageState extends ConsumerState<HomePage> {
                                   subtitle: promotion
                                       .getDescription(preferredLanguage),
                                   goal: promotion.targetAmount,
-                                  collected:promotion.collectedAmount,
+                                  collected: promotion.collectedAmount,
                                   posterImage: promotion.media ?? '',
                                   isImagePoster: true,
                                   onTap: () {},

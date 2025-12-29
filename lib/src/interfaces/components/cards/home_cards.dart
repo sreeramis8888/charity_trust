@@ -275,7 +275,8 @@ class HomeCompletedCampaignCard extends StatelessWidget {
                           ),
                         ),
                         Text(
-                          "collectedLabel".tr() + ": ${formatCurrency(collected)} ✅",
+                          "collectedLabel".tr() +
+                              ": ${formatCurrency(collected)} ✅",
                           style: kSmallTitleM.copyWith(
                             color: kWhite,
                           ),
@@ -511,45 +512,40 @@ class HomeGradientCampaignCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          if (isGeneralCampaign)
-            Column(
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                "dueDate".tr(),
+                style: kSmallerTitleSB.copyWith(
+                  fontSize: 10,
+                  color: kWhite,
+                ),
+              ),
+              Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                decoration: BoxDecoration(
+                  color: Colors.black.withOpacity(0.3),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Row(
                   children: [
+                    const Icon(Icons.calendar_today, color: kWhite, size: 14),
+                    const SizedBox(width: 6),
                     Text(
-                      "dueDate".tr(),
-                      style: kSmallerTitleSB.copyWith(
+                      isGeneralCampaign ? dueDate : "noDueDate".tr(),
+                      style: kSmallerTitleM.copyWith(
                         fontSize: 10,
                         color: kWhite,
                       ),
                     ),
-                    Container(
-                      padding:
-                          const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                      decoration: BoxDecoration(
-                        color: Colors.black.withOpacity(0.3),
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: Row(
-                        children: [
-                          const Icon(Icons.calendar_today, color: kWhite, size: 14),
-                          const SizedBox(width: 6),
-                          Text(
-                            dueDate,
-                            style: kSmallerTitleM.copyWith(
-                              fontSize: 10,
-                              color: kWhite,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
                   ],
                 ),
-                const SizedBox(height: 16),
-              ],
-            ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
           ClipRRect(
             borderRadius: BorderRadius.circular(12),
             child: Image.network(
