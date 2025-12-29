@@ -17,6 +17,7 @@ import '../../data/providers/user_provider.dart';
 import '../../data/services/version_check_service.dart';
 import '../../data/services/secure_storage_service.dart';
 import '../../data/services/notification_service/get_fcm.dart';
+import '../../data/services/deep_link_service.dart';
 
 class SplashScreen extends ConsumerStatefulWidget {
   @override
@@ -397,6 +398,10 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
             log('_checkAuthenticationAndLoadUser: Widget mounted, navigating based on API status: ${user.status}',
                 name: 'SplashScreen');
             _navigateBasedOnUserStatus(user.status);
+            
+            // Handle pending deep link after navigation
+            await Future.delayed(const Duration(milliseconds: 500));
+            _handlePendingDeepLink();
           }
         } else {
           log('_checkAuthenticationAndLoadUser: Failed to fetch user profile from API, trying local storage',
@@ -428,6 +433,10 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
               log('_checkAuthenticationAndLoadUser: Widget mounted, navigating based on local storage status: ${user.status}',
                   name: 'SplashScreen');
               _navigateBasedOnUserStatus(user.status);
+              
+              // Handle pending deep link after navigation
+              await Future.delayed(const Duration(milliseconds: 500));
+              _handlePendingDeepLink();
             }
           } else {
             log('_checkAuthenticationAndLoadUser: No user data in secure storage either, navigating to Phone',
@@ -510,6 +519,25 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
             name: 'SplashScreen');
       }
     });
+  }
+
+  void _handlePendingDeepLink() {
+    try {
+      final deepLinkService = ref.read(deepLinkServiceProvider);
+      final pendingLink = deepLinkService.pendingDeepLink;
+      
+      if (pendingLink != null) {
+        log('_handlePendingDeepLink: Processing pending deep link: ${pendingLink.toString()}',
+            name: 'SplashScreen');
+        deepLinkService.handleDeepLink(pendingLink);
+        deepLinkService.clearPendingDeepLink();
+      } else {
+        log('_handlePendingDeepLink: No pending deep link to process',
+            name: 'SplashScreen');
+      }
+    } catch (e) {
+      log('Error handling pending deep link: $e', name: 'SplashScreen');
+    }
   }
 
   @override

@@ -30,13 +30,18 @@ class DeepLinkService {
       final appLink = await _appLinks.getInitialLink();
       if (appLink != null) {
         _pendingDeepLink = appLink;
-        await Future.delayed(const Duration(milliseconds: 500));
-        await handleDeepLink(appLink);
+        debugPrint('🔗 Initial deep link stored as pending: ${appLink.toString()}');
+        debugPrint('🔗 Initial link path segments: ${appLink.pathSegments}');
+        // Don't handle immediately - let splash screen handle it
+      } else {
+        debugPrint('🔗 No initial deep link found');
       }
 
       // Handle deep links when app is in background/foreground
       _appLinks.uriLinkStream.listen((uri) {
         _pendingDeepLink = uri;
+        debugPrint('🔗 Deep link received while app is running: ${uri.toString()}');
+        debugPrint('🔗 Link path segments: ${uri.pathSegments}');
         handleDeepLink(uri);
       });
     } catch (e) {
@@ -50,6 +55,13 @@ class DeepLinkService {
       debugPrint('🔗 Deep link received: ${uri.toString()}');
       debugPrint('🔗 Path segments: ${uri.pathSegments}');
       debugPrint('🔗 Query parameters: ${uri.queryParameters}');
+
+      // Filter out empty segments
+      final pathSegments = uri.pathSegments
+          .where((segment) => segment.isNotEmpty)
+          .toList();
+
+      debugPrint('🔗 Filtered segments: $pathSegments');
 
       // Verify user is authenticated
       final secureStorage = _ref.read(secureStorageServiceProvider);
@@ -67,9 +79,10 @@ class DeepLinkService {
         await Future.delayed(const Duration(milliseconds: 500));
       }
 
-      final pathSegments = uri.pathSegments;
+      // If no valid route segments, redirect to home
       if (pathSegments.isEmpty) {
-        _navigateToHome();
+        debugPrint('🔗 No valid route in deep link, redirecting to home');
+        await _navigateToHome();
         return;
       }
 
@@ -214,7 +227,7 @@ class DeepLinkService {
   /// Use HTTPS links for WhatsApp/social media compatibility
   String generateDeepLink(String route, {String? id}) {
     // Use HTTPS for clickable links in WhatsApp, Gmail, etc.
-    const baseUrl = 'https://app.annujoomcharitabletrust.com/app';
+    const baseUrl = 'https://app.annujoomcharitabletrust.com';
     
     switch (route) {
       case 'campaign':

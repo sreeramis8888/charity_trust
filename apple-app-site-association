@@ -1,0 +1,14 @@
+{
+  "applinks": {
+    "apps": [],
+    "details": [
+      {
+        "appID": "4MKPKAGTT6.com.annujoomconnect",
+        "paths": ["/*"]
+      }
+    ]
+  },
+  "webcredentials": {
+    "apps": ["4MKPKAGTT6.com.annujoomconnect"]
+  }
+}

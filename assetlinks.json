@@ -1,0 +1,14 @@
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.annujoomconnect",
+      "sha256_cert_fingerprints": [
+        "02:B6:01:A2:C5:D4:C0:6E:19:F0:FF:13:FD:FD:43:6D:76:77:84:85:72:04:F2:6A:D7:A8:BA:82:33:ED:FB:65"
+        ,
+        "EB:AD:12:05:1B:F4:8A:C7:B4:A0:17:AB:91:F1:EC:71:34:45:B4:3F:E6:68:D3:46:EC:4B:E6:D1:EF:C4:02:3D"
+      ]
+    }
+  }
+]
