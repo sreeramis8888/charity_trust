@@ -51,6 +51,10 @@
 			</array>
 		</dict>
 	</array>
+	<key>com.apple.developer.associated-domains</key>
+	<array>
+		<string>applinks:app.annujoomcharitabletrust.com</string>
+	</array>
 	<key>CFBundleVersion</key>
 	<string>21</string>
 	<key>LSRequiresIPhoneOS</key>

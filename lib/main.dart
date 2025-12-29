@@ -13,6 +13,7 @@ import 'package:Annujoom/src/data/services/navigation_service.dart';
 import 'package:Annujoom/src/data/services/notification_service/notification_service.dart';
 import 'package:Annujoom/src/data/utils/install_checker.dart';
 import 'package:Annujoom/src/data/services/snackbar_service.dart';
+import 'package:Annujoom/src/data/services/deep_link_service.dart';
 import 'package:Annujoom/src/data/router/router.dart' as router;
 
 Future<void> main() async {
@@ -59,9 +60,12 @@ class MyApp extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final notificationService = ref.watch(notificationServiceProvider);
+    final deepLinkService = ref.watch(deepLinkServiceProvider);
 
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       notificationService.initialize();
+      // Initialize deep links after navigation is ready
+      await deepLinkService.initialize();
     });
 
     return MaterialApp(

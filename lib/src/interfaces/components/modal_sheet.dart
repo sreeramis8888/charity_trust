@@ -155,6 +155,8 @@ class _ModalSheetContentState<T> extends State<_ModalSheetContent<T>> {
 
   @override
   Widget build(BuildContext context) {
+    final keyboardHeight = MediaQuery.of(context).viewInsets.bottom;
+    
     return DraggableScrollableSheet(
       initialChildSize: widget.initialChildSize,
       minChildSize: widget.minChildSize,
@@ -272,63 +274,66 @@ class _ModalSheetContentState<T> extends State<_ModalSheetContent<T>> {
                 ),
               // Items list
               Expanded(
-                child: _filteredItems.isEmpty
-                    ? Center(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(
-                              Icons.search_off,
-                              size: 48,
-                              color: Colors.grey.shade400,
-                            ),
-                            const SizedBox(height: 12),
-                            Text(
-                              'No results found',
-                              style: TextStyle(
-                                color: Colors.grey.shade600,
-                                fontSize: 16,
-                                fontWeight: FontWeight.w500,
+                child: Padding(
+                  padding: EdgeInsets.only(bottom: keyboardHeight),
+                  child: _filteredItems.isEmpty
+                      ? Center(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(
+                                Icons.search_off,
+                                size: 48,
+                                color: Colors.grey.shade400,
                               ),
-                            ),
-                          ],
-                        ),
-                      )
-                    : ListView.builder(
-                        controller: scrollController,
-                        padding: widget.contentPadding.copyWith(top: 8),
-                        itemCount: _filteredItems.length,
-                        itemBuilder: (context, index) {
-                          final item = _filteredItems[index];
-                          return GestureDetector(
-                            onTap: () {
-                              widget.onItemSelected(item);
-                              Navigator.pop(context);
-                            },
-                            child: Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 12,
-                                vertical: 14,
+                              const SizedBox(height: 12),
+                              Text(
+                                'No results found',
+                                style: TextStyle(
+                                  color: Colors.grey.shade600,
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w500,
+                                ),
                               ),
-                              margin: const EdgeInsets.only(bottom: 4),
-                              decoration: BoxDecoration(
-                                color: Colors.transparent,
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              child: widget.itemBuilder != null
-                                  ? widget.itemBuilder!(item)
-                                  : Text(
-                                      widget.itemLabel(item),
-                                      style: const TextStyle(
-                                        fontSize: 14,
-                                        color: Colors.black,
-                                        fontWeight: FontWeight.w400,
+                            ],
+                          ),
+                        )
+                      : ListView.builder(
+                          controller: scrollController,
+                          padding: widget.contentPadding.copyWith(top: 8),
+                          itemCount: _filteredItems.length,
+                          itemBuilder: (context, index) {
+                            final item = _filteredItems[index];
+                            return GestureDetector(
+                              onTap: () {
+                                widget.onItemSelected(item);
+                                Navigator.pop(context);
+                              },
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 12,
+                                  vertical: 14,
+                                ),
+                                margin: const EdgeInsets.only(bottom: 4),
+                                decoration: BoxDecoration(
+                                  color: Colors.transparent,
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                child: widget.itemBuilder != null
+                                    ? widget.itemBuilder!(item)
+                                    : Text(
+                                        widget.itemLabel(item),
+                                        style: const TextStyle(
+                                          fontSize: 14,
+                                          color: Colors.black,
+                                          fontWeight: FontWeight.w400,
+                                        ),
                                       ),
-                                    ),
-                            ),
-                          );
-                        },
-                      ),
+                              ),
+                            );
+                          },
+                        ),
+                ),
               ),
             ],
           ),

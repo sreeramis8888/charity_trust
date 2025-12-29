@@ -5,8 +5,10 @@ import 'package:Annujoom/src/interfaces/animations/index.dart' as anim;
 import 'package:Annujoom/src/interfaces/components/loading_indicator.dart';
 import 'package:Annujoom/src/interfaces/main_pages/profile_pages/my_participations.dart';
 import 'package:Annujoom/src/interfaces/main_pages/profile_pages/about_us.dart';
+import 'package:Annujoom/src/interfaces/main_pages/profile_pages/refer_friend_page.dart';
 import 'package:Annujoom/src/interfaces/main_pages/referrals/my_referrals_page.dart';
 import 'package:Annujoom/src/interfaces/components/confirmation_dialog.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:Annujoom/src/data/services/secure_storage_service.dart';
 import 'package:Annujoom/src/data/providers/auth_login_provider.dart';
 import 'package:Annujoom/src/data/providers/auth_provider.dart';
@@ -270,6 +272,22 @@ class ProfilePage extends ConsumerWidget {
                       ),
                       _divider(),
                       GestureDetector(
+                        onTap: () {
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (context) => const ReferFriendPage(),
+                            ),
+                          );
+                        },
+                        child: _tile(Icons.card_giftcard, "referAFriend".tr()),
+                      ),
+                      _divider(),
+                      GestureDetector(
+                        onTap: () => _handleRateApp(context),
+                        child: _tile(Icons.star_outline, "rateApp".tr()),
+                      ),
+                      _divider(),
+                      GestureDetector(
                         onTap: () => _handleLanguageChange(context, ref),
                         child: _tile(Icons.language, "language".tr()),
                       ),
@@ -510,6 +528,38 @@ class ProfilePage extends ConsumerWidget {
         ),
       ),
     );
+  }
+
+  Future<void> _handleRateApp(BuildContext context) async {
+    try {
+      // Replace with your actual Play Store app ID
+      const playStoreUrl =
+          'https://play.google.com/store/apps/details?id=com.annujoomconnect';
+      if (await canLaunchUrl(Uri.parse(playStoreUrl))) {
+        await launchUrl(
+          Uri.parse(playStoreUrl),
+          mode: LaunchMode.externalApplication,
+        );
+      } else {
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('couldNotOpenPlayStore'.tr()),
+              duration: const Duration(seconds: 2),
+            ),
+          );
+        }
+      }
+    } catch (e) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('${'errorOpeningPlayStore'.tr()}: $e'),
+            duration: const Duration(seconds: 2),
+          ),
+        );
+      }
+    }
   }
 
   void _handleLogout(BuildContext context, WidgetRef ref) {

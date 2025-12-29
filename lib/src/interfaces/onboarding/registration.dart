@@ -291,7 +291,8 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
 
       if (result.user != null) {
         log('User registration successful', name: 'RegistrationPage');
-        SnackbarService().showSnackBar('registrationSubmittedSuccessfully'.tr());
+        SnackbarService()
+            .showSnackBar('registrationSubmittedSuccessfully'.tr());
 
         if (mounted) {
           // If recommended by charity member, navigate to OTP verification
@@ -412,7 +413,8 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
                         animationType: anim.AnimationType.fadeSlideInFromLeft,
                         duration: anim.AnimationDuration.normal,
                         delayMilliseconds: 100,
-                        child: Text("fullName".tr() + " *", style: kSmallTitleR),
+                        child:
+                            Text("fullName".tr() + " *", style: kSmallTitleR),
                       ),
                       const SizedBox(height: 6),
                       anim.AnimatedWidgetWrapper(
@@ -750,7 +752,8 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
                                             MainAxisAlignment.spaceBetween,
                                         children: [
                                           Text(
-                                            selectedStateName ?? 'selectState'.tr(),
+                                            selectedStateName ??
+                                                'selectState'.tr(),
                                             style: TextStyle(
                                               color: selectedStateName == null
                                                   ? Colors.grey.shade600
@@ -808,7 +811,8 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
                           animationType: anim.AnimationType.fadeSlideInFromLeft,
                           duration: anim.AnimationDuration.normal,
                           delayMilliseconds: 800,
-                          child: Text("district".tr() + " *", style: kSmallTitleR),
+                          child:
+                              Text("district".tr() + " *", style: kSmallTitleR),
                         ),
                       if (selectedStateCode != null) const SizedBox(height: 6),
                       if (selectedStateCode != null)
@@ -978,7 +982,8 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
                         animationType: anim.AnimationType.fadeSlideInFromLeft,
                         duration: anim.AnimationDuration.normal,
                         delayMilliseconds: 1300,
-                        child: Text("dateOfBirth".tr() + " *", style: kSmallTitleR),
+                        child: Text("dateOfBirth".tr() + " *",
+                            style: kSmallTitleR),
                       ),
                       const SizedBox(height: 6),
                       anim.AnimatedWidgetWrapper(
@@ -1024,7 +1029,8 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
                         animationType: anim.AnimationType.fadeSlideInFromLeft,
                         duration: anim.AnimationDuration.normal,
                         delayMilliseconds: 1600,
-                        child: Text("whatsappNumber".tr() + " *", style: kSmallTitleR),
+                        child: Text("whatsappNumber".tr() + " *",
+                            style: kSmallTitleR),
                       ),
                       const SizedBox(height: 12),
                       anim.AnimatedWidgetWrapper(
@@ -1135,7 +1141,8 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
                         animationType: anim.AnimationType.fadeSlideInFromLeft,
                         duration: anim.AnimationDuration.normal,
                         delayMilliseconds: 1750,
-                        child: Text("recommendedBy".tr() + " *", style: kSmallTitleR),
+                        child: Text("recommendedBy".tr() + " *",
+                            style: kSmallTitleR),
                       ),
                       const SizedBox(height: 12),
                       anim.AnimatedWidgetWrapper(
@@ -1159,23 +1166,21 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
                                 Text("trustee".tr()),
                               ],
                             ),
-                            // Charity Member radio button hidden for now
-                            if (false)
-                              Row(
-                                children: [
-                                  Radio<String>(
-                                    value: 'charity_member',
-                                    groupValue: recommendedByType,
-                                    onChanged: (value) {
-                                      setState(() {
-                                        recommendedByType = value;
-                                        selectedRecommendedBy = null;
-                                      });
-                                    },
-                                  ),
-                                  Text("charityMember".tr()),
-                                ],
-                              ),
+                            Row(
+                              children: [
+                                Radio<String>(
+                                  value: 'charity_member',
+                                  groupValue: recommendedByType,
+                                  onChanged: (value) {
+                                    setState(() {
+                                      recommendedByType = value;
+                                      selectedRecommendedBy = null;
+                                    });
+                                  },
+                                ),
+                                Text("charityMember".tr()),
+                              ],
+                            ),
                           ],
                         ),
                       ),

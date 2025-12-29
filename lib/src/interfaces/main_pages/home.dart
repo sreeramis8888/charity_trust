@@ -44,6 +44,7 @@ class _HomePageState extends ConsumerState<HomePage> {
   int _completedCampaignIndex = 0;
   int _videoIndex = 0;
   int _endingCampaignIndex = 0;
+  int _categoryIndex = 0;
   bool _imagesPrecached = false;
   final _expandableFabKey = GlobalKey<ExpandableFabState>();
 
@@ -532,14 +533,7 @@ class _HomePageState extends ConsumerState<HomePage> {
                           initialPage: 0,
                           padEnds: false,
                           onPageChanged: (index, reason) {
-                            // Reset to beginning when reaching the end
-                            if (index == 5) {
-                              // 5 is the last index (0-5 = 6 items)
-                              Future.delayed(const Duration(milliseconds: 800),
-                                  () {
-                                _categoryCarouselController.jumpToPage(0);
-                              });
-                            }
+                            setState(() => _categoryIndex = index);
                           },
                         ),
                         items: [
@@ -650,6 +644,17 @@ class _HomePageState extends ConsumerState<HomePage> {
                             ),
                           );
                         }).toList(),
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    Center(
+                      child: PageViewDotIndicator(
+                        size: Size(8, 8),
+                        unselectedSize: Size(7, 7),
+                        currentItem: _categoryIndex,
+                        count: 5,
+                        unselectedColor: Color(0xFFAEB9E1),
+                        selectedColor: Color(0xFF0D74BC),
                       ),
                     ),
                   ],
@@ -1046,26 +1051,38 @@ class _HomePageState extends ConsumerState<HomePage> {
               const SizedBox(height: 24),
               if (homeData.videoPromotions.isNotEmpty)
                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text('latestVideos'.tr(), style: kBodyTitleM),
-                      GestureDetector(
-                        onTap: () {
-                          Navigator.of(context).push(
-                            MaterialPageRoute(
-                              builder: (context) => const VideosPage(),
-                            ),
-                          );
-                        },
-                        child: Text('seeAll'.tr(),
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Expanded(
+                          child: Text(
+                            'latestVideos'.tr(),
+                            style: kBodyTitleM,
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        GestureDetector(
+                          onTap: () {
+                            Navigator.of(context).push(
+                              MaterialPageRoute(
+                                builder: (context) => const VideosPage(),
+                              ),
+                            );
+                          },
+                          child: Text(
+                            'seeAll'.tr(),
                             style:
-                                kSmallTitleM.copyWith(color: kThirdTextColor)),
-                      ),
-                    ],
-                  ),
-                ),
+                                kSmallTitleM.copyWith(color: kThirdTextColor),
+                            maxLines: 1,
+                            overflow: TextOverflow.fade,
+                            softWrap: false,
+                          ),
+                        ),
+                      ],
+                    )),
               if (homeData.videoPromotions.isNotEmpty)
                 const SizedBox(height: 12),
               if (homeData.videoPromotions.isNotEmpty)

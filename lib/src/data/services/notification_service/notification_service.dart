@@ -77,16 +77,14 @@ class NotificationService {
       if (message.notification != null && Platform.isAndroid) {
         String? deepLink;
         if (message.data.containsKey('screen')) {
+          final screen = message.data['screen'];
           final id = message.data['id'];
-          deepLink = _deepLinkService.getDeepLinkPath(
-            message.data['screen'],
-            id: id,
-          );
+          deepLink = _deepLinkService.generateDeepLink(screen, id: id);
         }
 
         const androidDetails = AndroidNotificationDetails(
-          'your_channel_id',
-          'your_channel_name',
+          '1',
+          'channel_annujoom',
           importance: Importance.max,
           priority: Priority.high,
         );
@@ -110,9 +108,9 @@ class NotificationService {
     try {
       String? deepLink;
       if (message.data.containsKey('screen')) {
+        final screen = message.data['screen'];
         final id = message.data['id'];
-        deepLink =
-            _deepLinkService.getDeepLinkPath(message.data['screen'], id: id);
+        deepLink = _deepLinkService.generateDeepLink(screen, id: id);
       }
 
       if (deepLink != null) {
