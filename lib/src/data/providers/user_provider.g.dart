@@ -371,7 +371,7 @@ final class FetchUsersByRoleProvider extends $FunctionalProvider<
   }
 }
 
-String _$fetchUsersByRoleHash() => r'25ce2d128b1b528371d7af4d35da6e2069834438';
+String _$fetchUsersByRoleHash() => r'3427d0697b704f8a1ea7d470f2e7be91c32d216b';
 
 final class FetchUsersByRoleFamily extends $Family
     with $FunctionalFamilyOverride<FutureOr<List<UserModel>>, UsersListParams> {

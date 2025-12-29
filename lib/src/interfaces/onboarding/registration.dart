@@ -12,6 +12,7 @@ import 'package:Annujoom/src/data/providers/location_provider.dart';
 import 'package:Annujoom/src/data/providers/auth_login_provider.dart';
 import 'package:Annujoom/src/data/providers/auth_provider.dart';
 import 'package:Annujoom/src/data/models/user_model.dart';
+import 'package:Annujoom/src/data/models/paginated_response.dart';
 import 'package:Annujoom/src/data/constants/global_variables.dart';
 import 'package:Annujoom/src/interfaces/components/input_field.dart';
 import 'package:Annujoom/src/interfaces/components/dropdown.dart';
@@ -1209,44 +1210,61 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
                               const SizedBox(height: 6),
                               GestureDetector(
                                 onTap: () async {
-                                  final params = UsersListParams(
-                                    roles: recommendedByType == 'trustee'
-                                        ? [
-                                            'trustee',
-                                            'president',
-                                            'secretary',
-                                            'treasurer'
-                                          ]
-                                        : ['member'],
-                                    pageNo: 1,
-                                    search: null,
-                                  );
-                                  final users = await ref.read(
-                                    fetchUsersByRoleProvider(params).future,
-                                  );
+                                  await ModalSheet.showPaginated<UserModel>(
+                                    context: context,
+                                    title: recommendedByType == 'trustee'
+                                        ? 'chooseTrustee'.tr()
+                                        : 'chooseCharityMember'.tr(),
+                                    searchHint: recommendedByType == 'trustee'
+                                        ? 'searchTrustee'.tr()
+                                        : 'searchCharityMember'.tr(),
+                                    onFetchPage: (pageNo, query) async {
+                                      final params = UsersListParams(
+                                        roles: recommendedByType == 'trustee'
+                                            ? [
+                                                'trustee',
+                                                'president',
+                                                'secretary',
+                                                'treasurer'
+                                              ]
+                                            : ['member'],
+                                        pageNo: pageNo,
+                                        search: query.isEmpty ? null : query,
+                                      );
+                                      final users = await ref.read(
+                                        fetchUsersByRoleProvider(params).future,
+                                      );
 
-                                  if (mounted) {
-                                    ModalSheet<UserModel>(
-                                      context: context,
-                                      title: recommendedByType == 'trustee'
-                                          ? 'chooseTrustee'.tr()
-                                          : 'chooseCharityMember'.tr(),
-                                      items: users,
-                                      itemLabel: (user) =>
-                                          user.name ?? 'Unknown',
-                                      onItemSelected: (user) {
-                                        setState(() {
-                                          selectedRecommendedBy = user;
-                                          field.didChange(user);
-                                        });
-                                      },
-                                      searchFilter: (user, query) {
-                                        return (user.name ?? '')
-                                            .toLowerCase()
-                                            .contains(query.toLowerCase());
-                                      },
-                                    ).show();
-                                  }
+                                      // Get total count from API response
+                                      // For now, we'll estimate based on page size
+                                      final totalCount = users.length < 15
+                                          ? (pageNo - 1) * 15 + users.length
+                                          : pageNo * 15 + 1;
+
+                                      return PaginatedResponse(
+                                        items: users,
+                                        totalCount: totalCount,
+                                        currentPage: pageNo,
+                                        limit: 15,
+                                      );
+                                    },
+                                    itemLabel: (user) =>
+                                        user.name ?? 'Unknown',
+                                    onItemSelected: (user) {
+                                      setState(() {
+                                        selectedRecommendedBy = user;
+                                        field.didChange(user);
+                                      });
+                                    },
+                                    itemBuilder: (user) => Text(
+                                      user.name ?? 'Unknown',
+                                      style: const TextStyle(
+                                        fontSize: 14,
+                                        color: Colors.black,
+                                        fontWeight: FontWeight.w400,
+                                      ),
+                                    ),
+                                  );
                                 },
                                 child: Container(
                                   height: 52,
