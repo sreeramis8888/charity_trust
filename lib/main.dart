@@ -36,8 +36,15 @@ Future<void> main() async {
   await EasyLocalization.ensureInitialized();
 
   final secureStorage = SecureStorageService();
-  final userData = await secureStorage.getUserData();
-  final preferredLanguage = userData?.preferredLanguage ?? 'en';
+  String preferredLanguage = 'en';
+  
+  try {
+    final userData = await secureStorage.getUserData();
+    preferredLanguage = userData?.preferredLanguage ?? 'en';
+  } catch (e) {
+    // Handle decryption errors - clear corrupted data and use default
+    await secureStorage.clearAll();
+  }
 
   GlobalVariables.setPreferredLanguage(preferredLanguage);
 

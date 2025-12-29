@@ -56,9 +56,9 @@ class DeepLinkService {
       debugPrint('🔗 Path segments: ${uri.pathSegments}');
       debugPrint('🔗 Query parameters: ${uri.queryParameters}');
 
-      // Filter out empty segments
+      // Filter out empty segments and 'app' prefix
       final pathSegments = uri.pathSegments
-          .where((segment) => segment.isNotEmpty)
+          .where((segment) => segment.isNotEmpty && segment != 'app')
           .toList();
 
       debugPrint('🔗 Filtered segments: $pathSegments');
@@ -69,7 +69,18 @@ class DeepLinkService {
       final savedId = await secureStorage.getUserId();
 
       if (savedToken == null || savedToken.isEmpty || savedId == null) {
-        _showError('Please login to access this content');
+        debugPrint('Authentication required for deep link. Redirecting to login.');
+        
+        // Ensure navigator is ready
+        if (NavigationService.navigatorKey.currentState == null) {
+          debugPrint('Navigator not ready, retrying...');
+          await Future.delayed(const Duration(milliseconds: 500));
+        }
+
+        NavigationService.navigatorKey.currentState?.pushNamedAndRemoveUntil(
+          'Phone',
+          (route) => false,
+        );
         return;
       }
 
@@ -104,8 +115,11 @@ class DeepLinkService {
           await _navigateToProfile();
           break;
         case 'general':
-        default:
           await _navigateToHome();
+          break;
+        default:
+           debugPrint('🔗 Unknown deep link route: $route. Staying on current page.');
+           break;
       }
     } catch (e) {
       debugPrint('❌ Deep link handling error: $e');
@@ -140,10 +154,10 @@ class DeepLinkService {
       // If campaign ID provided, navigate to campaign details
       if (campaignId != null && campaignId.isNotEmpty) {
         NavigationService.navigatorKey.currentState?.pushNamed(
-          'CampaignDetails',
-          arguments: {'id': campaignId},
+          'CampaignDetail',
+          arguments: {'_id': campaignId},
         );
-        debugPrint('✅ Navigated to Campaign Details: $campaignId');
+        debugPrint('✅ Navigated to Campaign Detail: $campaignId');
       } else {
         debugPrint('✅ Navigated to Campaigns');
       }
@@ -186,7 +200,7 @@ class DeepLinkService {
         (route) => false,
       );
       await Future.delayed(const Duration(milliseconds: 300));
-      _ref.read(selectedIndexProvider.notifier).updateIndex(3);
+      _ref.read(selectedIndexProvider.notifier).updateIndex(0); // Use Home as base
       NavigationService.navigatorKey.currentState?.pushNamed('Notifications');
       debugPrint('✅ Navigated to Notifications');
     } catch (e) {
@@ -203,7 +217,7 @@ class DeepLinkService {
         (route) => false,
       );
       await Future.delayed(const Duration(milliseconds: 300));
-      _ref.read(selectedIndexProvider.notifier).updateIndex(4);
+      _ref.read(selectedIndexProvider.notifier).updateIndex(3); // Profile is index 3
       debugPrint('✅ Navigated to Profile');
     } catch (e) {
       debugPrint('Error navigating to profile: $e');
@@ -227,7 +241,7 @@ class DeepLinkService {
   /// Use HTTPS links for WhatsApp/social media compatibility
   String generateDeepLink(String route, {String? id}) {
     // Use HTTPS for clickable links in WhatsApp, Gmail, etc.
-    const baseUrl = 'https://app.annujoomcharitabletrust.com';
+    const baseUrl = 'https://app.annujoomcharitabletrust.com/app';
     
     switch (route) {
       case 'campaign':

@@ -43,14 +43,16 @@ class SecureStorageService {
 
   /// Retrieve user data from local storage
   Future<UserModel?> getUserData() async {
-    final jsonString = await _storage.read(key: _userDataKey);
-    if (jsonString != null) {
-      try {
+    try {
+      final jsonString = await _storage.read(key: _userDataKey);
+      if (jsonString != null) {
         final jsonMap = json.decode(jsonString) as Map<String, dynamic>;
         return UserModel.fromJson(jsonMap);
-      } catch (e) {
-        return null;
       }
+    } catch (e) {
+      // Log the error for debugging
+      print('Error reading user data: $e');
+      rethrow; // Re-throw to let caller handle it
     }
     return null;
   }

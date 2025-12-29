@@ -1,3 +1,4 @@
+import 'package:Annujoom/src/interfaces/components/loading_indicator.dart';
 import 'package:Annujoom/src/interfaces/main_pages/campaign_pages/campaign.dart';
 import 'package:Annujoom/src/interfaces/main_pages/campaign_pages/campaign_detail.dart';
 import 'package:Annujoom/src/interfaces/main_pages/home.dart';
@@ -17,6 +18,7 @@ import 'package:Annujoom/src/interfaces/onboarding/request_rejected_state.dart';
 import 'package:Annujoom/src/interfaces/onboarding/request_sent_state.dart';
 import 'package:Annujoom/src/interfaces/onboarding/account_suspended_state.dart';
 import 'package:Annujoom/src/interfaces/onboarding/splash.dart';
+import 'package:Annujoom/src/interfaces/main_pages/notifications_page.dart';
 import 'package:flutter/material.dart';
 
 /// Usage:
@@ -216,7 +218,28 @@ Route<dynamic> generateRoute(RouteSettings? settings) {
       transitionDuration = const Duration(milliseconds: 500);
       break;
 
+    case 'Notifications':
+      page = const NotificationsPage();
+      transitionToUse = TransitionType.slideFromRight;
+      break;
+
     default:
+      if (settings?.name?.startsWith('/app') == true) {
+        return PageRouteBuilder(
+          opaque: false,
+          settings: settings,
+          pageBuilder: (context, _, __) {
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              if (Navigator.of(context).canPop()) {
+                Navigator.of(context).pop();
+              }
+            });
+            return const SizedBox();
+          },
+          transitionDuration: Duration.zero,
+          reverseTransitionDuration: Duration.zero,
+        );
+      }
       return MaterialPageRoute(
         settings: settings,
         builder: (context) => Scaffold(
