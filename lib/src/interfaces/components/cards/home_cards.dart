@@ -496,6 +496,7 @@ class HomeGradientCampaignCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final percent = (raised / goal).clamp(0.0, 1.0);
+    final isGeneralCampaign = category == 'General Campaign';
 
     return Container(
       decoration: BoxDecoration(
@@ -510,40 +511,45 @@ class HomeGradientCampaignCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                "dueDate".tr(),
-                style: kSmallerTitleSB.copyWith(
-                  fontSize: 10,
-                  color: kWhite,
-                ),
-              ),
-              Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                decoration: BoxDecoration(
-                  color: Colors.black.withOpacity(0.3),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Row(
+          if (isGeneralCampaign)
+            Column(
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const Icon(Icons.calendar_today, color: kWhite, size: 14),
-                    const SizedBox(width: 6),
                     Text(
-                      dueDate,
-                      style: kSmallerTitleM.copyWith(
+                      "dueDate".tr(),
+                      style: kSmallerTitleSB.copyWith(
                         fontSize: 10,
                         color: kWhite,
                       ),
                     ),
+                    Container(
+                      padding:
+                          const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                      decoration: BoxDecoration(
+                        color: Colors.black.withOpacity(0.3),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Row(
+                        children: [
+                          const Icon(Icons.calendar_today, color: kWhite, size: 14),
+                          const SizedBox(width: 6),
+                          Text(
+                            dueDate,
+                            style: kSmallerTitleM.copyWith(
+                              fontSize: 10,
+                              color: kWhite,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
                   ],
                 ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 16),
+                const SizedBox(height: 16),
+              ],
+            ),
           ClipRRect(
             borderRadius: BorderRadius.circular(12),
             child: Image.network(
@@ -573,7 +579,7 @@ class HomeGradientCampaignCard extends StatelessWidget {
             overflow: TextOverflow.ellipsis,
           ),
           const SizedBox(height: 12),
-          if (category != 'General Campaign')
+          if (isGeneralCampaign)
             Column(
               children: [
                 LinearProgressIndicator(
@@ -613,9 +619,29 @@ class HomeGradientCampaignCard extends StatelessWidget {
                     ),
                   ],
                 ),
+                const SizedBox(height: 12),
+              ],
+            )
+          else
+            Column(
+              children: [
+                Row(
+                  children: [
+                    Text(
+                      "₹$raised",
+                      style:
+                          kSmallTitleM.copyWith(color: const Color(0xFFFFD400)),
+                    ),
+                    const SizedBox(width: 4),
+                    Text(
+                      "raised".tr(),
+                      style: kSmallTitleR.copyWith(color: kWhite),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 12),
               ],
             ),
-          const SizedBox(height: 12),
           Row(
             children: [
               Expanded(

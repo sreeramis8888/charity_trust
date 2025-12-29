@@ -751,10 +751,10 @@ class _HomePageState extends ConsumerState<HomePage> {
                       ),
                       const SizedBox(height: 12),
                       SizedBox(
-                        height: 480,
+                        height: 470,
                         child: CarouselSlider(
                           options: CarouselOptions(
-                            height: 480,
+                            height: 470,
                             viewportFraction: 1,
                             enableInfiniteScroll: true,
                             autoPlay: false,
