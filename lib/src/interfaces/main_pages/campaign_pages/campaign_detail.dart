@@ -50,6 +50,7 @@ class CampaignDetailPage extends ConsumerStatefulWidget {
 
 class _CampaignDetailPageState extends ConsumerState<CampaignDetailPage> {
   final TextEditingController _donationController = TextEditingController();
+  late FocusNode _donationFocusNode;
   bool _isProcessing = false;
   bool _isDemoAccount = false;
   late Future<void> _campaignLoadFuture;
@@ -57,6 +58,7 @@ class _CampaignDetailPageState extends ConsumerState<CampaignDetailPage> {
   @override
   void initState() {
     super.initState();
+    _donationFocusNode = FocusNode();
     _checkDemoAccount();
     if (widget.isDirectCategory && widget.category != null) {
       _campaignLoadFuture = _loadCategoryCampaign();
@@ -80,6 +82,7 @@ class _CampaignDetailPageState extends ConsumerState<CampaignDetailPage> {
   @override
   void dispose() {
     _donationController.dispose();
+    _donationFocusNode.dispose();
     super.dispose();
   }
 
@@ -98,6 +101,7 @@ class _CampaignDetailPageState extends ConsumerState<CampaignDetailPage> {
     }
 
     setState(() => _isProcessing = true);
+    _donationFocusNode.unfocus();
 
     try {
       final razorpayService = ref.read(razorpayServiceProvider);
@@ -162,6 +166,7 @@ class _CampaignDetailPageState extends ConsumerState<CampaignDetailPage> {
               final receipt = receiptData?['data']?['receipt'] as String?;
 
               _donationController.clear();
+              _donationFocusNode.unfocus();
 
               if (mounted) {
                 // Invalidate campaign providers to refresh data
@@ -198,6 +203,7 @@ class _CampaignDetailPageState extends ConsumerState<CampaignDetailPage> {
         },
         onError: (PaymentFailureResponse response) {
           log("ERROR CALLBACK: Payment error - code=${response.code}, message=${response.message}");
+          _donationFocusNode.unfocus();
 
           if (mounted) {
             Navigator.of(context).pushReplacement(
@@ -443,6 +449,7 @@ class _CampaignDetailPageState extends ConsumerState<CampaignDetailPage> {
           type: CustomFieldType.number,
           hint: 'enterAmount'.tr(),
           controller: _donationController,
+          focusNode: _donationFocusNode,
           validator: (value) {
             if (value == null || value.isEmpty) {
               return 'pleaseEnterAmount'.tr();

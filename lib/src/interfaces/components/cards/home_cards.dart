@@ -5,6 +5,7 @@ import 'package:Annujoom/src/interfaces/components/primaryButton.dart';
 import 'package:Annujoom/src/interfaces/components/text_pill.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 class HomeCampaignCard extends StatelessWidget {
   final String title;
@@ -161,6 +162,7 @@ class HomeCompletedCampaignCard extends StatelessWidget {
   final String? posterImage;
   final bool isImagePoster;
   final VoidCallback? onTap;
+  final DateTime? completionDate;
 
   const HomeCompletedCampaignCard({
     super.key,
@@ -171,6 +173,7 @@ class HomeCompletedCampaignCard extends StatelessWidget {
     this.posterImage,
     this.isImagePoster = true,
     this.onTap,
+    this.completionDate,
   });
 
   @override
@@ -257,7 +260,9 @@ class HomeCompletedCampaignCard extends StatelessWidget {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      subtitle,
+                      completionDate != null
+                          ? "Successfully Completed on ${DateFormat('dd MMM yyyy').format(completionDate!)}"
+                          : subtitle,
                       style: kSmallTitleL.copyWith(
                         color: kWhite.withOpacity(0.8),
                       ),

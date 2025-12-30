@@ -4,7 +4,17 @@
     "details": [
       {
         "appID": "4MKPKAGTT6.com.annujoomconnect",
-        "paths": ["/app/*"]
+        "paths": [
+          "/app/*",
+          "/notifications",
+          "/notifications/*",
+          "/campaign/*",
+          "/news/*",
+          "/profile",
+          "/profile/*",
+          "/general",
+          "/"
+        ]
       }
     ]
   },

@@ -15,6 +15,7 @@ class InputField extends StatelessWidget {
   final CustomFieldType type;
   final String hint;
   final TextEditingController controller;
+  final FocusNode? focusNode;
   final void Function()? onUpload;
   final void Function(DateTime)? onDateSelected;
   final bool readOnly;
@@ -27,6 +28,7 @@ class InputField extends StatelessWidget {
     required this.type,
     required this.hint,
     required this.controller,
+    this.focusNode,
     this.onUpload,
     this.onDateSelected,
     this.readOnly = false,
@@ -42,6 +44,7 @@ class InputField extends StatelessWidget {
 
     return TextFormField(
       controller: controller,
+      focusNode: focusNode,
       maxLines: isText ? maxLines : 1,
       readOnly: readOnly ||
           type == CustomFieldType.date ||

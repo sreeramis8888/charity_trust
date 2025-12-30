@@ -5,6 +5,7 @@ class Promotions {
   final String? type;
   final String? campaign;
   final DateTime? startDate;
+  final DateTime? targetDate;
   final DateTime? endDate;
   final String? media;
   final String? link;
@@ -21,6 +22,7 @@ class Promotions {
     this.type,
     this.campaign,
     this.startDate,
+    this.targetDate,
     this.endDate,
     this.media,
     this.link,
@@ -76,6 +78,9 @@ class Promotions {
       startDate: json['start_date'] != null
           ? DateTime.tryParse(json['start_date'].toString())
           : null,
+      targetDate: json['target_date'] != null
+          ? DateTime.tryParse(json['start_date'].toString())
+          : null,
       endDate: json['end_date'] != null
           ? DateTime.tryParse(json['end_date'].toString())
           : null,
@@ -105,6 +110,7 @@ class Promotions {
       'type': type,
       'campaign': campaign,
       'start_date': startDate?.toIso8601String(),
+      'target_date': targetDate?.toIso8601String(),
       'end_date': endDate?.toIso8601String(),
       'media': media,
       'link': link,
@@ -123,6 +129,7 @@ class Promotions {
     String? type,
     String? campaign,
     DateTime? startDate,
+    DateTime? targetDate,
     DateTime? endDate,
     String? media,
     String? link,
@@ -139,6 +146,7 @@ class Promotions {
       type: type ?? this.type,
       campaign: campaign ?? this.campaign,
       startDate: startDate ?? this.startDate,
+      targetDate: targetDate ?? this.targetDate,
       endDate: endDate ?? this.endDate,
       media: media ?? this.media,
       link: link ?? this.link,

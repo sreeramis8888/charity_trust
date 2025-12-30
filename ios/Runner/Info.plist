@@ -55,6 +55,10 @@
 	<array>
 		<string>applinks:app.annujoomcharitabletrust.com</string>
 	</array>
+	<key>LSApplicationQueriesSchemes</key> 
+	<array> 
+	<string>tez</string> <string>phonepe</string> <string>paytmmp</string> <string>credpay</string> <string>mobikwik</string> <string>in.fampay.app</string> <string>bhim</string> <string>amazonpay</string> <string>navi</string> <string>kiwi</string> <string>payzapp</string> <string>jupiter</string> <string>omnicard</string> <string>icici</string> <string>popclubapp</string> <string>sbiyono</string> <string>myjio</string> <string>slice-upi</string> <string>bobupi</string> <string>shriramone</string> <string>indusmobile</string> <string>whatsapp</string> <string>kotakbank</string>
+	</array>
 	<key>CFBundleVersion</key>
 	<string>21</string>
 	<key>LSRequiresIPhoneOS</key>

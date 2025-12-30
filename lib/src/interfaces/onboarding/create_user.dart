@@ -43,6 +43,7 @@ class _CreateUserPageState extends ConsumerState<CreateUserPage> {
   final pincodeController = TextEditingController();
   final aadharNumberController = TextEditingController();
   final dobController = TextEditingController();
+  final whatsappController = TextEditingController();
 
   String? selectedCountryCode;
   String? selectedCountryName;
@@ -52,6 +53,8 @@ class _CreateUserPageState extends ConsumerState<CreateUserPage> {
   String? selectedDistrictName;
   String? selectedGender;
   XFile? profileImage;
+  bool isSameAsPhone = true;
+  String? whatsappCountryCode;
 
   final Map<String, GlobalKey> _fieldKeys = {
     'name': GlobalKey(),
@@ -66,6 +69,7 @@ class _CreateUserPageState extends ConsumerState<CreateUserPage> {
     'aadharNumber': GlobalKey(),
     'dob': GlobalKey(),
     'gender': GlobalKey(),
+    'whatsapp': GlobalKey(),
   };
 
   @override
@@ -80,6 +84,7 @@ class _CreateUserPageState extends ConsumerState<CreateUserPage> {
     pincodeController.dispose();
     aadharNumberController.dispose();
     dobController.dispose();
+    whatsappController.dispose();
     super.dispose();
   }
 
@@ -158,6 +163,9 @@ class _CreateUserPageState extends ConsumerState<CreateUserPage> {
         'dob': formattedDob,
         'recommended_by': 'trustee',
         'under_trustee': currentUserId,
+        'whatsapp_number': isSameAsPhone
+            ? mobileController.text.trim()
+            : whatsappController.text.trim(),
       };
 
       final result = await ref.read(createNewUserProvider(userData).future);
@@ -244,6 +252,8 @@ class _CreateUserPageState extends ConsumerState<CreateUserPage> {
                   _buildDobField(),
                   const SizedBox(height: 20),
                   _buildGenderField(),
+                  const SizedBox(height: 20),
+                  _buildWhatsappField(),
                   const SizedBox(height: 30),
                   _buildSubmitButton(),
                   const SizedBox(height: 30),
@@ -852,11 +862,127 @@ class _CreateUserPageState extends ConsumerState<CreateUserPage> {
     );
   }
 
+  Widget _buildWhatsappField() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        anim.AnimatedWidgetWrapper(
+          animationType: anim.AnimationType.fadeSlideInFromLeft,
+          duration: anim.AnimationDuration.normal,
+          delayMilliseconds: 1300,
+          child: Text("whatsappNumber".tr() + " *", style: kSmallTitleR),
+        ),
+        const SizedBox(height: 12),
+        anim.AnimatedWidgetWrapper(
+          animationType: anim.AnimationType.fadeSlideInFromBottom,
+          duration: anim.AnimationDuration.normal,
+          delayMilliseconds: 1350,
+          child: Row(
+            children: [
+              Checkbox(
+                value: isSameAsPhone,
+                onChanged: (value) {
+                  setState(() {
+                    isSameAsPhone = value ?? true;
+                    if (isSameAsPhone) {
+                      whatsappController.clear();
+                    }
+                  });
+                },
+              ),
+              Expanded(
+                child: Text(
+                  "sameAsPhoneNumber".tr(),
+                  style: const TextStyle(fontSize: 14),
+                ),
+              ),
+            ],
+          ),
+        ),
+        if (!isSameAsPhone) const SizedBox(height: 12),
+        if (!isSameAsPhone)
+          anim.AnimatedWidgetWrapper(
+            animationType: anim.AnimationType.fadeSlideInFromBottom,
+            duration: anim.AnimationDuration.normal,
+            delayMilliseconds: 1400,
+            child: IntlPhoneField(
+              key: _fieldKeys['whatsapp'],
+              validator: (phone) {
+                if (!isSameAsPhone) {
+                  if (phone == null ||
+                      phone.number.isEmpty ||
+                      phone.number.length < 9) {
+                    return 'pleaseEnterValidPhoneNumber'.tr();
+                  }
+                  if (phone.number.length > 10) {
+                    return 'phoneNumberCannotExceed'.tr();
+                  }
+                }
+                return null;
+              },
+              style: const TextStyle(
+                color: kTextColor,
+                letterSpacing: 3,
+                fontSize: 14,
+                fontWeight: FontWeight.w400,
+              ),
+              controller: whatsappController,
+              disableLengthCheck: true,
+              showCountryFlag: true,
+              cursorColor: kBlack,
+              decoration: InputDecoration(
+                fillColor: kWhite,
+                hintText: 'enterWhatsappNumber'.tr(),
+                hintStyle: TextStyle(
+                  fontSize: 14,
+                  letterSpacing: .2,
+                  fontWeight: FontWeight.w200,
+                  color: kTextColor,
+                ),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8.0),
+                  borderSide: BorderSide(color: kBorder),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8.0),
+                  borderSide: BorderSide(color: kBorder),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8.0),
+                  borderSide: const BorderSide(color: kBorder),
+                ),
+                contentPadding: const EdgeInsets.symmetric(
+                  vertical: 16.0,
+                  horizontal: 10.0,
+                ),
+              ),
+              onCountryChanged: (value) {
+                whatsappCountryCode = value.dialCode;
+              },
+              initialCountryCode: 'IN',
+              flagsButtonPadding: const EdgeInsets.only(left: 10, right: 10.0),
+              showDropdownIcon: true,
+              dropdownIcon: const Icon(
+                Icons.arrow_drop_down_outlined,
+                color: kTextColor,
+              ),
+              dropdownIconPosition: IconPosition.trailing,
+              dropdownTextStyle: const TextStyle(
+                color: kTextColor,
+                fontSize: 15,
+                fontWeight: FontWeight.w400,
+              ),
+            ),
+          ),
+      ],
+    );
+  }
+
   Widget _buildSubmitButton() {
     return anim.AnimatedWidgetWrapper(
       animationType: anim.AnimationType.fadeScaleUp,
       duration: anim.AnimationDuration.normal,
-      delayMilliseconds: 1300,
+      delayMilliseconds: 1450,
       child: SizedBox(
         height: 50,
         width: double.infinity,

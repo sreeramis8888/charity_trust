@@ -26,12 +26,16 @@ class DeepLinkService {
   /// Call this in your main app after navigation is ready
   Future<void> initialize() async {
     try {
+      debugPrint('🔗 Deep link service initializing...');
+      
       // Handle deep link when app is launched from terminated state
       final appLink = await _appLinks.getInitialLink();
       if (appLink != null) {
         _pendingDeepLink = appLink;
         debugPrint('🔗 Initial deep link stored as pending: ${appLink.toString()}');
         debugPrint('🔗 Initial link path segments: ${appLink.pathSegments}');
+        debugPrint('🔗 Initial link scheme: ${appLink.scheme}');
+        debugPrint('🔗 Initial link host: ${appLink.host}');
         // Don't handle immediately - let splash screen handle it
       } else {
         debugPrint('🔗 No initial deep link found');
@@ -40,12 +44,16 @@ class DeepLinkService {
       // Handle deep links when app is in background/foreground
       _appLinks.uriLinkStream.listen((uri) {
         _pendingDeepLink = uri;
-        debugPrint('🔗 Deep link received while app is running: ${uri.toString()}');
+        debugPrint('🔗 ⚡ Deep link received while app is running: ${uri.toString()}');
         debugPrint('🔗 Link path segments: ${uri.pathSegments}');
+        debugPrint('🔗 Link scheme: ${uri.scheme}');
+        debugPrint('🔗 Link host: ${uri.host}');
         handleDeepLink(uri);
       });
+      
+      debugPrint('🔗 Deep link service initialized successfully');
     } catch (e) {
-      debugPrint('Deep link initialization error: $e');
+      debugPrint('❌ Deep link initialization error: $e');
     }
   }
 
@@ -57,9 +65,14 @@ class DeepLinkService {
       debugPrint('🔗 Query parameters: ${uri.queryParameters}');
 
       // Filter out empty segments and 'app' prefix
-      final pathSegments = uri.pathSegments
-          .where((segment) => segment.isNotEmpty && segment != 'app')
+      var pathSegments = uri.pathSegments
+          .where((segment) => segment.isNotEmpty)
           .toList();
+      
+      // Remove 'app' prefix if present
+      if (pathSegments.isNotEmpty && pathSegments[0] == 'app') {
+        pathSegments = pathSegments.sublist(1);
+      }
 
       debugPrint('🔗 Filtered segments: $pathSegments');
 
