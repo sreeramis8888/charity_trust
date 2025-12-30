@@ -272,7 +272,7 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
         'image': profilePictureUrl,
         'gender': selectedGender,
         'preferred_language': GlobalVariables.preferredLanguage,
-        'whatsapp_number': whatsappNumber,
+        'whatsapp_no': whatsappNumber,
         'dob': formattedDob,
         'recommended_by':
             recommendedByType == 'trustee' ? 'trustee' : 'charity-member',
@@ -1344,7 +1344,7 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
                                 'gender': selectedGender,
                                 'dob': dobController.text.trim(),
                                 'whatsapp_same_as_phone': isSameAsPhone,
-                                'whatsapp_number': isSameAsPhone
+                                'whatsapp_no': isSameAsPhone
                                     ? mobileController.text.trim()
                                     : whatsappController.text.trim(),
                                 'recommended_by_type': recommendedByType,

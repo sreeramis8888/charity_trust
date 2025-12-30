@@ -95,9 +95,8 @@ class UserModel {
       email: json["email"],
       image: json["image"],
       phone: json["phone"],
-      mobileNumber: json["mobile_number"] ?? json["phone"],
+
       whatsappNo: json["whatsapp_no"],
-      whatsappNumber: json["whatsapp_number"] ?? json["whatsapp_no"],
       fcm: json["fcm"],
       otp: json["otp"],
       gender: json["gender"],
@@ -150,9 +149,8 @@ class UserModel {
       "email": email,
       "image": image,
       "phone": phone,
-      "mobile_number": mobileNumber,
+
       "whatsapp_no": whatsappNo,
-      "whatsapp_number": whatsappNumber,
       "fcm": fcm,
       "otp": otp,
       "gender": gender,

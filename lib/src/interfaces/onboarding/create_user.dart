@@ -163,7 +163,7 @@ class _CreateUserPageState extends ConsumerState<CreateUserPage> {
         'dob': formattedDob,
         'recommended_by': 'trustee',
         'under_trustee': currentUserId,
-        'whatsapp_number': isSameAsPhone
+        'whatsapp_no': isSameAsPhone
             ? mobileController.text.trim()
             : whatsappController.text.trim(),
       };

@@ -277,5 +277,12 @@
   "buildCommunity": "Build Community",
   "buildCommunityDesc": "Connect with like-minded people who care about giving back",
   "spreadAwareness": "Spread Awareness",
-  "spreadAwarenessDesc": "Share meaningful campaigns and causes with your network"
+  "spreadAwarenessDesc": "Share meaningful campaigns and causes with your network",
+  "changePhoneNumber": "Change Phone Number",
+  "currentPhoneNumber": "Current Phone Number",
+  "newPhoneNumber": "New Phone Number",
+  "enterNewPhoneNumber": "Enter new phone number",
+  "phoneNumberChanged": "Phone Number Changed",
+  "youNeedToLoginAgain": "Your phone number has been updated successfully. You need to login again with your new phone number.",
+  "failedToChangePhoneNumber": "Failed to change phone number"
 }

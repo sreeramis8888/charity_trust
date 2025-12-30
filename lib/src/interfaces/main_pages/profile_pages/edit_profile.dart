@@ -42,7 +42,6 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
   final pincodeController = TextEditingController();
   final aadharNumberController = TextEditingController();
   final dobController = TextEditingController();
-  final mobileController = TextEditingController();
   final whatsappController = TextEditingController();
 
   XFile? profileImage;
@@ -68,7 +67,6 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
     'pincode': GlobalKey(),
     'aadharNumber': GlobalKey(),
     'dob': GlobalKey(),
-    'mobile': GlobalKey(),
     'gender': GlobalKey(),
     'whatsapp': GlobalKey(),
   };
@@ -82,8 +80,6 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
 
         if (nameController.text.trim().isEmpty) {
           firstErrorKey = 'name';
-        } else if (mobileController.text.trim().length < 9) {
-          firstErrorKey = 'mobile';
         } else if (dobController.text.trim().isEmpty) {
           firstErrorKey = 'dob';
         } else if (selectedGender == null || selectedGender!.isEmpty) {
@@ -134,7 +130,6 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
         areaController.text = userData.area ?? '';
         pincodeController.text = userData.pincode.toString() ?? '';
         aadharNumberController.text = userData.aadharNumber ?? '';
-        mobileController.text = userData.mobileNumber ?? '';
         selectedGender = userData.gender;
         selectedCountryCode = userData.countryCode;
         selectedCountryName = userData.country;
@@ -163,7 +158,6 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
     pincodeController.dispose();
     aadharNumberController.dispose();
     dobController.dispose();
-    mobileController.dispose();
     whatsappController.dispose();
     super.dispose();
   }
@@ -279,16 +273,11 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
         }
       }
 
-      final newMobile = mobileController.text.trim();
-      if (newMobile != (currentUser.mobileNumber ?? '')) {
-        userData['mobile_number'] = newMobile;
-      }
-
       final whatsappNumber = isSameAsPhone
-          ? mobileController.text.trim()
+          ? currentUser.mobileNumber ?? ''
           : whatsappController.text.trim();
-      if (whatsappNumber != (currentUser.whatsappNumber ?? '')) {
-        userData['whatsapp_number'] = whatsappNumber;
+      if (whatsappNumber != (currentUser.whatsappNo ?? '')) {
+        userData['whatsapp_no'] = whatsappNumber;
       }
 
       // Handle profile image upload if selected
@@ -317,7 +306,6 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
         pincode: int.parse(newPincode),
         aadharNumber: newAadhar,
         dob: parsedDob,
-        mobileNumber: newMobile,
         whatsappNumber: whatsappNumber,
         gender: selectedGender,
         countryCode: selectedCountryCode,
@@ -462,31 +450,7 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
                       ),
                     ),
                     const SizedBox(height: 18),
-                    anim.AnimatedWidgetWrapper(
-                      animationType: anim.AnimationType.fadeSlideInFromLeft,
-                      duration: anim.AnimationDuration.normal,
-                      delayMilliseconds: 200,
-                      child: Text("mobileNumber".tr(), style: kSmallTitleR),
-                    ),
-                    const SizedBox(height: 6),
-                    anim.AnimatedWidgetWrapper(
-                      animationType: anim.AnimationType.fadeSlideInFromBottom,
-                      duration: anim.AnimationDuration.normal,
-                      delayMilliseconds: 250,
-                      child: InputField(
-                        key: _fieldKeys['mobile'],
-                        type: CustomFieldType.number,
-                        hint: "enterMobileNumber".tr(),
-                        controller: mobileController,
-                        validator: (v) {
-                          if (v!.isEmpty) return "required".tr();
-                          if (v.length < 9) return "pleaseEnterValidPhoneNumber".tr();
-                          if (v.length > 10) return "phoneNumberCannotExceed".tr();
-                          return null;
-                        },
-                      ),
-                    ),
-                    const SizedBox(height: 18),
+
                     anim.AnimatedWidgetWrapper(
                       animationType: anim.AnimationType.fadeSlideInFromLeft,
                       duration: anim.AnimationDuration.normal,
