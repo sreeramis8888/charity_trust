@@ -21,7 +21,7 @@ class _ReferFriendPageState extends State<ReferFriendPage> {
   void initState() {
     super.initState();
     referralLink =
-        'https://play.google.com/store/apps/details?id=com.annujoom.charity_trust&referrer=utm_source%3Dreferral';
+        'https://play.google.com/store/apps/details?id=com.annujoomconnect';
   }
 
   Future<void> _copyToClipboard() async {
