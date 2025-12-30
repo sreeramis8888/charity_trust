@@ -19,7 +19,7 @@
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
-	<string>0.0.13</string>
+	<string>0.0.17</string>
 	<key>CFBundleSignature</key>
 	<string>????</string>
 	<key>CFBundleURLTypes</key>
@@ -60,7 +60,7 @@
 	<string>tez</string> <string>phonepe</string> <string>paytmmp</string> <string>credpay</string> <string>mobikwik</string> <string>in.fampay.app</string> <string>bhim</string> <string>amazonpay</string> <string>navi</string> <string>kiwi</string> <string>payzapp</string> <string>jupiter</string> <string>omnicard</string> <string>icici</string> <string>popclubapp</string> <string>sbiyono</string> <string>myjio</string> <string>slice-upi</string> <string>bobupi</string> <string>shriramone</string> <string>indusmobile</string> <string>whatsapp</string> <string>kotakbank</string>
 	</array>
 	<key>CFBundleVersion</key>
-	<string>21</string>
+	<string>23</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>LSSupportsOpeningDocumentsInPlace</key>
@@ -105,6 +105,10 @@
 		<string>UIInterfaceOrientationPortraitUpsideDown</string>
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
+	</array>
+	<key>com.apple.developer.associated-domains</key>
+	<array>
+		<string>applinks:app.annujoomcharitabletrust.com</string>
 	</array>
 </dict>
 </plist>
