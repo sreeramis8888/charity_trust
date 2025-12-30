@@ -163,6 +163,7 @@ class HomeCompletedCampaignCard extends StatelessWidget {
   final bool isImagePoster;
   final VoidCallback? onTap;
   final DateTime? completionDate;
+  final DateTime? targetDate;
 
   const HomeCompletedCampaignCard({
     super.key,
@@ -174,6 +175,7 @@ class HomeCompletedCampaignCard extends StatelessWidget {
     this.isImagePoster = true,
     this.onTap,
     this.completionDate,
+    this.targetDate,
   });
 
   @override
@@ -260,8 +262,8 @@ class HomeCompletedCampaignCard extends StatelessWidget {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      completionDate != null
-                          ? "Successfully Completed on ${DateFormat('dd MMM yyyy').format(completionDate!)}"
+                      targetDate != null
+                          ? "Successfully Completed on ${DateFormat('dd MMM yyyy').format(targetDate!)}"
                           : subtitle,
                       style: kSmallTitleL.copyWith(
                         color: kWhite.withOpacity(0.8),
