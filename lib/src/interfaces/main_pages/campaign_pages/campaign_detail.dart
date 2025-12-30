@@ -54,14 +54,32 @@ class _CampaignDetailPageState extends ConsumerState<CampaignDetailPage> {
   bool _isProcessing = false;
   bool _isDemoAccount = false;
   late Future<void> _campaignLoadFuture;
+  String _userPhone = '+919876543210';
+  String _userEmail = 'user@example.com';
 
   @override
   void initState() {
     super.initState();
     _donationFocusNode = FocusNode();
     _checkDemoAccount();
+    _loadUserData();
     if (widget.isDirectCategory && widget.category != null) {
       _campaignLoadFuture = _loadCategoryCampaign();
+    }
+  }
+
+  Future<void> _loadUserData() async {
+    final secureStorage = ref.read(secureStorageServiceProvider);
+    try {
+      final userData = await secureStorage.getUserData();
+      if (userData != null && mounted) {
+        setState(() {
+          _userPhone = userData.phone ?? '';
+          _userEmail = userData.email ?? '';
+        });
+      }
+    } catch (e) {
+      log("Error loading user data: $e");
     }
   }
 
@@ -228,8 +246,8 @@ class _CampaignDetailPageState extends ConsumerState<CampaignDetailPage> {
       razorpayService.openCheckout(
         orderId: orderId,
         amount: amount,
-        email: 'user@example.com',
-        phone: '+919876543210',
+        email: _userEmail,
+        phone: _userPhone,
         description: 'Donation to ${widget.title}',
       );
     } catch (e, stack) {
@@ -467,68 +485,68 @@ class _CampaignDetailPageState extends ConsumerState<CampaignDetailPage> {
       //   animationType: anim.AnimationType.fadeSlideInFromBottom,
       //   duration: anim.AnimationDuration.normal,
       //   delayMilliseconds: 475,
-        // child: Column(
-        //   crossAxisAlignment: CrossAxisAlignment.start,
-        //   children: [
-            // Text(
-            //   'recommended'.tr(),
-            //   style: kSmallerTitleL.copyWith(
-            //       color: kSecondaryTextColor, fontSize: 16),
-            // ),
-            // const SizedBox(height: 12),
-            // ValueListenableBuilder<TextEditingValue>(
-            //   valueListenable: _donationController,
-            //   builder: (context, value, child) {
-            //     final amounts = [1000, 2500, 5000];
-            //     return Row(
-            //       mainAxisAlignment: MainAxisAlignment.start,
-            //       children: amounts.asMap().entries.map((entry) {
-            //         final idx = entry.key;
-            //         final amount = entry.value;
-            //         final isSelected = value.text == amount.toString();
+      // child: Column(
+      //   crossAxisAlignment: CrossAxisAlignment.start,
+      //   children: [
+      // Text(
+      //   'recommended'.tr(),
+      //   style: kSmallerTitleL.copyWith(
+      //       color: kSecondaryTextColor, fontSize: 16),
+      // ),
+      // const SizedBox(height: 12),
+      // ValueListenableBuilder<TextEditingValue>(
+      //   valueListenable: _donationController,
+      //   builder: (context, value, child) {
+      //     final amounts = [1000, 2500, 5000];
+      //     return Row(
+      //       mainAxisAlignment: MainAxisAlignment.start,
+      //       children: amounts.asMap().entries.map((entry) {
+      //         final idx = entry.key;
+      //         final amount = entry.value;
+      //         final isSelected = value.text == amount.toString();
 
-            //         return Padding(
-            //           padding: EdgeInsets.only(
-            //             right: idx == amounts.length - 1 ? 0 : 10,
-            //           ),
-            //           child: InkWell(
-            //             onTap: () {
-            //               _donationController.text = amount.toString();
-            //               _donationController.selection =
-            //                   TextSelection.fromPosition(
-            //                 TextPosition(
-            //                     offset: _donationController.text.length),
-            //               );
-            //             },
-            //             borderRadius: BorderRadius.circular(10),
-            //             child: Container(
-            //               padding: const EdgeInsets.symmetric(
-            //                 horizontal: 14, 
-            //                 vertical: 8,
-            //               ),
-            //               decoration: BoxDecoration(
-            //                 color: isSelected
-            //                     ? kPrimaryColor.withOpacity(0.05)
-            //                     : Colors.transparent,
-            //                 borderRadius: BorderRadius.circular(10),
-            //                 border: Border.all(color: kPrimaryColor),
-            //               ),
-            //               child: Text(
-            //                 '₹ ${NumberFormat.decimalPattern('en_IN').format(amount)}',
-            //                 style: kSmallTitleL.copyWith(
-            //                   color: kPrimaryColor,
-            //                   fontWeight: FontWeight.bold,
-            //                 ),
-            //               ),
-            //             ),
-            //           ),
-            //         );
-            //       }).toList(),
-            //     );
-            //   },
-            // ),
-        //   ],
-        // ),
+      //         return Padding(
+      //           padding: EdgeInsets.only(
+      //             right: idx == amounts.length - 1 ? 0 : 10,
+      //           ),
+      //           child: InkWell(
+      //             onTap: () {
+      //               _donationController.text = amount.toString();
+      //               _donationController.selection =
+      //                   TextSelection.fromPosition(
+      //                 TextPosition(
+      //                     offset: _donationController.text.length),
+      //               );
+      //             },
+      //             borderRadius: BorderRadius.circular(10),
+      //             child: Container(
+      //               padding: const EdgeInsets.symmetric(
+      //                 horizontal: 14,
+      //                 vertical: 8,
+      //               ),
+      //               decoration: BoxDecoration(
+      //                 color: isSelected
+      //                     ? kPrimaryColor.withOpacity(0.05)
+      //                     : Colors.transparent,
+      //                 borderRadius: BorderRadius.circular(10),
+      //                 border: Border.all(color: kPrimaryColor),
+      //               ),
+      //               child: Text(
+      //                 '₹ ${NumberFormat.decimalPattern('en_IN').format(amount)}',
+      //                 style: kSmallTitleL.copyWith(
+      //                   color: kPrimaryColor,
+      //                   fontWeight: FontWeight.bold,
+      //                 ),
+      //               ),
+      //             ),
+      //           ),
+      //         );
+      //       }).toList(),
+      //     );
+      //   },
+      // ),
+      //   ],
+      // ),
       // ),
       const SizedBox(height: 24),
       anim.AnimatedWidgetWrapper(

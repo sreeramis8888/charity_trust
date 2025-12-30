@@ -4,16 +4,21 @@ class UserModel {
   final String? email;
   final String? image;
   final String? phone;
+  final String? mobileNumber;
   final String? whatsappNo;
+  final String? whatsappNumber;
   final String? fcm;
   final String? otp;
   final String? gender;
-  final int? aadharNumber;
+  final String? aadharNumber;
   final String? address;
   final String? area;
   final String? district;
+  final String? districtCode;
   final String? state;
+  final String? stateCode;
   final String? country;
+  final String? countryCode;
   final int? pincode;
   final String? password;
   final String? status;
@@ -42,7 +47,9 @@ class UserModel {
     this.email,
     this.image,
     this.phone,
+    this.mobileNumber,
     this.whatsappNo,
+    this.whatsappNumber,
     this.fcm,
     this.otp,
     this.gender,
@@ -50,8 +57,11 @@ class UserModel {
     this.address,
     this.area,
     this.district,
+    this.districtCode,
     this.state,
+    this.stateCode,
     this.country,
+    this.countryCode,
     this.pincode,
     this.password,
     this.status,
@@ -85,16 +95,21 @@ class UserModel {
       email: json["email"],
       image: json["image"],
       phone: json["phone"],
+      mobileNumber: json["mobile_number"] ?? json["phone"],
       whatsappNo: json["whatsapp_no"],
+      whatsappNumber: json["whatsapp_number"] ?? json["whatsapp_no"],
       fcm: json["fcm"],
       otp: json["otp"],
       gender: json["gender"],
-      aadharNumber: json["aadhar_number"],
+      aadharNumber: json["aadhar_number"]?.toString(),
       address: json["address"],
       area: json["area"],
       district: json["district"],
+      districtCode: json["district_code"],
       state: json["state"],
+      stateCode: json["state_code"],
       country: json["country"],
+      countryCode: json["country_code"],
       pincode: json["pincode"],
       password: json["password"],
       status: json["status"],
@@ -135,7 +150,9 @@ class UserModel {
       "email": email,
       "image": image,
       "phone": phone,
+      "mobile_number": mobileNumber,
       "whatsapp_no": whatsappNo,
+      "whatsapp_number": whatsappNumber,
       "fcm": fcm,
       "otp": otp,
       "gender": gender,
@@ -143,8 +160,11 @@ class UserModel {
       "address": address,
       "area": area,
       "district": district,
+      "district_code": districtCode,
       "state": state,
+      "state_code": stateCode,
       "country": country,
+      "country_code": countryCode,
       "pincode": pincode,
       "password": password,
       "status": status,
@@ -178,16 +198,21 @@ class UserModel {
     String? email,
     String? image,
     String? phone,
+    String? mobileNumber,
     String? whatsappNo,
+    String? whatsappNumber,
     String? fcm,
     String? otp,
     String? gender,
-    int? aadharNumber,
+    String? aadharNumber,
     String? address,
     String? area,
     String? district,
+    String? districtCode,
     String? state,
+    String? stateCode,
     String? country,
+    String? countryCode,
     int? pincode,
     String? password,
     String? status,
@@ -216,7 +241,9 @@ class UserModel {
       email: email ?? this.email,
       image: image ?? this.image,
       phone: phone ?? this.phone,
+      mobileNumber: mobileNumber ?? this.mobileNumber,
       whatsappNo: whatsappNo ?? this.whatsappNo,
+      whatsappNumber: whatsappNumber ?? this.whatsappNumber,
       fcm: fcm ?? this.fcm,
       otp: otp ?? this.otp,
       gender: gender ?? this.gender,
@@ -224,8 +251,11 @@ class UserModel {
       address: address ?? this.address,
       area: area ?? this.area,
       district: district ?? this.district,
+      districtCode: districtCode ?? this.districtCode,
       state: state ?? this.state,
+      stateCode: stateCode ?? this.stateCode,
       country: country ?? this.country,
+      countryCode: countryCode ?? this.countryCode,
       pincode: pincode ?? this.pincode,
       password: password ?? this.password,
       status: status ?? this.status,
