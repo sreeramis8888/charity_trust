@@ -295,6 +295,13 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
         SnackbarService()
             .showSnackBar('registrationSubmittedSuccessfully'.tr());
 
+        // Update user state directly in the widget
+        try {
+          ref.read(userProvider.notifier).setUser(result.user!);
+        } catch (e) {
+          log('Could not update user state: $e', name: 'RegistrationPage');
+        }
+
         if (mounted) {
           // If recommended by charity member, navigate to OTP verification
           if (recommendedByType == 'charity_member' &&
@@ -1248,8 +1255,7 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
                                         limit: 15,
                                       );
                                     },
-                                    itemLabel: (user) =>
-                                        user.name ?? 'Unknown',
+                                    itemLabel: (user) => user.name ?? 'Unknown',
                                     onItemSelected: (user) {
                                       setState(() {
                                         selectedRecommendedBy = user;

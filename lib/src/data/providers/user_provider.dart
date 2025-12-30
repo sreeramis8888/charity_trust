@@ -66,11 +66,14 @@ Future<UserModel?> fetchUserProfile(Ref ref) async {
         final user = UserModel.fromJson(data);
         log('fetchUserProfile: User created - id: ${user.id}, status: ${user.status}',
             name: 'fetchUserProfile');
-        // Only update provider state if ref is still mounted
-        if (ref.mounted) {
-          ref.read(userProvider.notifier).setUser(user);
+        try {
+          if (ref.mounted) {
+            ref.read(userProvider.notifier).setUser(user);
+          }
+        } catch (e) {
+          log('Could not update user state (provider disposed): $e',
+              name: 'fetchUserProfile');
         }
-        // Always return the user data regardless of ref.mounted
         return user;
       }
     }
@@ -105,9 +108,14 @@ Future<({UserModel? user, String? error})> updateUserProfile(
       final data = response.data!['data'] as Map<String, dynamic>?;
       if (data != null) {
         final user = UserModel.fromJson(data);
-        // Check if ref is still valid before using it
-        if (ref.mounted) {
-          ref.read(userProvider.notifier).setUser(user);
+        // Try to update state as backup (widget will also attempt this)
+        try {
+          if (ref.mounted) {
+            ref.read(userProvider.notifier).setUser(user);
+          }
+        } catch (e) {
+          log('Could not update user state from provider (will be updated from widget): $e',
+              name: 'updateUserProfile');
         }
         return (user: user, error: null);
       }
@@ -139,9 +147,14 @@ Future<({UserModel? user, String? error})> handleSuccessfulRegistration(
     // Clear any temporary registration data
     await secureStorage.clearRegistrationData();
 
-    // Update the user provider
-    if (ref.mounted) {
-      ref.read(userProvider.notifier).setUser(user);
+    // Try to update state, but don't fail if provider is disposed
+    try {
+      if (ref.mounted) {
+        ref.read(userProvider.notifier).setUser(user);
+      }
+    } catch (e) {
+      log('Could not update user state (provider disposed): $e',
+          name: 'handleSuccessfulRegistration');
     }
 
     log('User registration successful and data stored',
@@ -261,9 +274,14 @@ Future<UserModel?> fetchCurrentUserStatus(Ref ref) async {
           status: statusData['status'] ?? existingUser?.status,
         );
 
-        // Only update provider if ref is still mounted
-        if (ref.mounted) {
-          ref.read(userProvider.notifier).setUser(updatedUser);
+        // Try to update state, but don't fail if provider is disposed
+        try {
+          if (ref.mounted) {
+            ref.read(userProvider.notifier).setUser(updatedUser);
+          }
+        } catch (e) {
+          log('Could not update user state (provider disposed): $e',
+              name: 'fetchCurrentUserStatus');
         }
         return updatedUser;
       }

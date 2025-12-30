@@ -231,14 +231,16 @@ class _CharityMemberOtpVerificationScreenState
         verifyOtpForCharityMemberProvider(widget.charityMemberId, otp).future,
       );
 
+      if (!mounted) return;
+
       ref.read(loadingProvider.notifier).stopLoading();
 
-      if (result != null) {
+      if (result == true) {
         log('OTP verified for charity member',
             name: 'CharityMemberOtpVerification');
         SnackbarService().showSnackBar('Verification successful');
 
-        if (context.mounted) {
+        if (mounted) {
           Navigator.of(context).pushReplacementNamed('navbar');
         }
       } else {
