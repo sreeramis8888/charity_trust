@@ -87,7 +87,7 @@ final class FetchUserProfileProvider extends $FunctionalProvider<
   }
 }
 
-String _$fetchUserProfileHash() => r'54b61c5b31e68e0fa3ea329365611814a2729398';
+String _$fetchUserProfileHash() => r'0285c239a1a144d06fcf3af3130b6cc0b2c76275';
 
 @ProviderFor(updateUserProfile)
 const updateUserProfileProvider = UpdateUserProfileFamily._();
@@ -173,7 +173,7 @@ final class UpdateUserProfileProvider extends $FunctionalProvider<
   }
 }
 
-String _$updateUserProfileHash() => r'ae76aa2fc5e595dddedc0e89f2759cf80b44ddee';
+String _$updateUserProfileHash() => r'839720ab2d65d4b99629cde45b4a3d67af07f4c9';
 
 final class UpdateUserProfileFamily extends $Family
     with
@@ -289,7 +289,7 @@ final class HandleSuccessfulRegistrationProvider extends $FunctionalProvider<
 }
 
 String _$handleSuccessfulRegistrationHash() =>
-    r'64c2d553da54ad25f96a1ebdfa2f30d1049e88f4';
+    r'2ecabf73d0a8cda5bf4c34bac426768685c4275c';
 
 final class HandleSuccessfulRegistrationFamily extends $Family
     with
@@ -519,7 +519,7 @@ final class FetchCurrentUserStatusProvider extends $FunctionalProvider<
 }
 
 String _$fetchCurrentUserStatusHash() =>
-    r'716a193aeb5da5ed93e572d1c9f30dccbcd2a894';
+    r'6c026b1ad48b46baf70a81999ca93c0a5668485c';
 
 @ProviderFor(createNewUser)
 const createNewUserProvider = CreateNewUserFamily._();
@@ -950,6 +950,246 @@ abstract class _$UserReferralsNotifier extends $AsyncNotifier<List<UserModel>> {
     final element = ref.element as $ClassProviderElement<
         AnyNotifier<AsyncValue<List<UserModel>>, List<UserModel>>,
         AsyncValue<List<UserModel>>,
+        Object?,
+        Object?>;
+    element.handleValue(ref, created);
+  }
+}
+
+@ProviderFor(ReferralTypeFilter)
+const referralTypeFilterProvider = ReferralTypeFilterProvider._();
+
+final class ReferralTypeFilterProvider
+    extends $NotifierProvider<ReferralTypeFilter, bool> {
+  const ReferralTypeFilterProvider._()
+      : super(
+          from: null,
+          argument: null,
+          retry: null,
+          name: r'referralTypeFilterProvider',
+          isAutoDispose: false,
+          dependencies: null,
+          $allTransitiveDependencies: null,
+        );
+
+  @override
+  String debugGetCreateSourceHash() => _$referralTypeFilterHash();
+
+  @$internal
+  @override
+  ReferralTypeFilter create() => ReferralTypeFilter();
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(bool value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<bool>(value),
+    );
+  }
+}
+
+String _$referralTypeFilterHash() =>
+    r'ed06f917952c66f1a3c035f305150c2be3c2ceb2';
+
+abstract class _$ReferralTypeFilter extends $Notifier<bool> {
+  bool build();
+  @$mustCallSuper
+  @override
+  void runBuild() {
+    final created = build();
+    final ref = this.ref as $Ref<bool, bool>;
+    final element = ref.element as $ClassProviderElement<
+        AnyNotifier<bool, bool>, bool, Object?, Object?>;
+    element.handleValue(ref, created);
+  }
+}
+
+@ProviderFor(ReferralSearch)
+const referralSearchProvider = ReferralSearchProvider._();
+
+final class ReferralSearchProvider
+    extends $NotifierProvider<ReferralSearch, String> {
+  const ReferralSearchProvider._()
+      : super(
+          from: null,
+          argument: null,
+          retry: null,
+          name: r'referralSearchProvider',
+          isAutoDispose: false,
+          dependencies: null,
+          $allTransitiveDependencies: null,
+        );
+
+  @override
+  String debugGetCreateSourceHash() => _$referralSearchHash();
+
+  @$internal
+  @override
+  ReferralSearch create() => ReferralSearch();
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(String value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<String>(value),
+    );
+  }
+}
+
+String _$referralSearchHash() => r'391343f17e1a8904e8b14dad36edea47803c5a59';
+
+abstract class _$ReferralSearch extends $Notifier<String> {
+  String build();
+  @$mustCallSuper
+  @override
+  void runBuild() {
+    final created = build();
+    final ref = this.ref as $Ref<String, String>;
+    final element = ref.element as $ClassProviderElement<
+        AnyNotifier<String, String>, String, Object?, Object?>;
+    element.handleValue(ref, created);
+  }
+}
+
+@ProviderFor(ReferralStatusFilter)
+const referralStatusFilterProvider = ReferralStatusFilterProvider._();
+
+final class ReferralStatusFilterProvider
+    extends $NotifierProvider<ReferralStatusFilter, String> {
+  const ReferralStatusFilterProvider._()
+      : super(
+          from: null,
+          argument: null,
+          retry: null,
+          name: r'referralStatusFilterProvider',
+          isAutoDispose: false,
+          dependencies: null,
+          $allTransitiveDependencies: null,
+        );
+
+  @override
+  String debugGetCreateSourceHash() => _$referralStatusFilterHash();
+
+  @$internal
+  @override
+  ReferralStatusFilter create() => ReferralStatusFilter();
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(String value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<String>(value),
+    );
+  }
+}
+
+String _$referralStatusFilterHash() =>
+    r'caea49f9cebff10f2d7a89f62500776b6494baa8';
+
+abstract class _$ReferralStatusFilter extends $Notifier<String> {
+  String build();
+  @$mustCallSuper
+  @override
+  void runBuild() {
+    final created = build();
+    final ref = this.ref as $Ref<String, String>;
+    final element = ref.element as $ClassProviderElement<
+        AnyNotifier<String, String>, String, Object?, Object?>;
+    element.handleValue(ref, created);
+  }
+}
+
+@ProviderFor(ReferralDateFilter)
+const referralDateFilterProvider = ReferralDateFilterProvider._();
+
+final class ReferralDateFilterProvider
+    extends $NotifierProvider<ReferralDateFilter, Map<String, String?>> {
+  const ReferralDateFilterProvider._()
+      : super(
+          from: null,
+          argument: null,
+          retry: null,
+          name: r'referralDateFilterProvider',
+          isAutoDispose: false,
+          dependencies: null,
+          $allTransitiveDependencies: null,
+        );
+
+  @override
+  String debugGetCreateSourceHash() => _$referralDateFilterHash();
+
+  @$internal
+  @override
+  ReferralDateFilter create() => ReferralDateFilter();
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(Map<String, String?> value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<Map<String, String?>>(value),
+    );
+  }
+}
+
+String _$referralDateFilterHash() =>
+    r'c9b1500a5bb5391e191ed3c4abcc6c7c06317545';
+
+abstract class _$ReferralDateFilter extends $Notifier<Map<String, String?>> {
+  Map<String, String?> build();
+  @$mustCallSuper
+  @override
+  void runBuild() {
+    final created = build();
+    final ref = this.ref as $Ref<Map<String, String?>, Map<String, String?>>;
+    final element = ref.element as $ClassProviderElement<
+        AnyNotifier<Map<String, String?>, Map<String, String?>>,
+        Map<String, String?>,
+        Object?,
+        Object?>;
+    element.handleValue(ref, created);
+  }
+}
+
+@ProviderFor(AllReferralsNotifier)
+const allReferralsProvider = AllReferralsNotifierProvider._();
+
+final class AllReferralsNotifierProvider extends $AsyncNotifierProvider<
+    AllReferralsNotifier, ReferralPaginationState> {
+  const AllReferralsNotifierProvider._()
+      : super(
+          from: null,
+          argument: null,
+          retry: null,
+          name: r'allReferralsProvider',
+          isAutoDispose: true,
+          dependencies: null,
+          $allTransitiveDependencies: null,
+        );
+
+  @override
+  String debugGetCreateSourceHash() => _$allReferralsNotifierHash();
+
+  @$internal
+  @override
+  AllReferralsNotifier create() => AllReferralsNotifier();
+}
+
+String _$allReferralsNotifierHash() =>
+    r'1b4db66e748b17d7d10302491ff52dace92f0d59';
+
+abstract class _$AllReferralsNotifier
+    extends $AsyncNotifier<ReferralPaginationState> {
+  FutureOr<ReferralPaginationState> build();
+  @$mustCallSuper
+  @override
+  void runBuild() {
+    final created = build();
+    final ref = this.ref
+        as $Ref<AsyncValue<ReferralPaginationState>, ReferralPaginationState>;
+    final element = ref.element as $ClassProviderElement<
+        AnyNotifier<AsyncValue<ReferralPaginationState>,
+            ReferralPaginationState>,
+        AsyncValue<ReferralPaginationState>,
         Object?,
         Object?>;
     element.handleValue(ref, created);

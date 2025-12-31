@@ -496,3 +496,269 @@ class UserReferralsNotifier extends _$UserReferralsNotifier {
     state = await AsyncValue.guard(() => build());
   }
 }
+
+@Riverpod(keepAlive: true)
+class ReferralTypeFilter extends _$ReferralTypeFilter {
+  @override
+  bool build() {
+    return false; // false = Direct Referrals, true = Indirect Referrals
+  }
+
+  void setFilter(bool isIndirect) {
+    state = isIndirect;
+  }
+}
+
+@Riverpod(keepAlive: true)
+class ReferralSearch extends _$ReferralSearch {
+  @override
+  String build() => '';
+
+  void setSearch(String query) {
+    print('🟣 [ReferralSearch] setSearch called with: "$query"');
+    state = query;
+    print('🟣 [ReferralSearch] state updated to: "$state"');
+  }
+}
+
+@Riverpod(keepAlive: true)
+class ReferralStatusFilter extends _$ReferralStatusFilter {
+  @override
+  String build() => ''; // Empty means all statuses
+
+  void setStatus(String status) {
+    print('🟣 [ReferralStatusFilter] setStatus called with: "$status"');
+    state = status;
+    print('🟣 [ReferralStatusFilter] state updated to: "$state"');
+  }
+
+  void clear() {
+    print('🟣 [ReferralStatusFilter] clear called');
+    state = '';
+    print('🟣 [ReferralStatusFilter] state cleared to: "$state"');
+  }
+}
+
+@Riverpod(keepAlive: true)
+class ReferralDateFilter extends _$ReferralDateFilter {
+  @override
+  Map<String, String?> build() => {
+        'start_date': null,
+        'end_date': null,
+      };
+
+  void setDates(String? startDate, String? endDate) {
+    print('🟣 [ReferralDateFilter] setDates called with startDate: $startDate, endDate: $endDate');
+    state = {
+      'start_date': startDate,
+      'end_date': endDate,
+    };
+    print('🟣 [ReferralDateFilter] state updated to: $state');
+  }
+
+  void clear() {
+    print('🟣 [ReferralDateFilter] clear called');
+    state = {
+      'start_date': null,
+      'end_date': null,
+    };
+    print('🟣 [ReferralDateFilter] state cleared to: $state');
+  }
+}
+
+class ReferralPaginationState {
+  final int currentPage;
+  final int limit;
+  final int totalCount;
+  final List<UserModel> referrals;
+  final bool hasMore;
+
+  ReferralPaginationState({
+    required this.currentPage,
+    required this.limit,
+    required this.totalCount,
+    required this.referrals,
+  }) : hasMore = (currentPage * limit) < totalCount;
+
+  ReferralPaginationState copyWith({
+    int? currentPage,
+    int? limit,
+    int? totalCount,
+    List<UserModel>? referrals,
+  }) {
+    return ReferralPaginationState(
+      currentPage: currentPage ?? this.currentPage,
+      limit: limit ?? this.limit,
+      totalCount: totalCount ?? this.totalCount,
+      referrals: referrals ?? this.referrals,
+    );
+  }
+}
+
+@riverpod
+class AllReferralsNotifier extends _$AllReferralsNotifier {
+  @override
+  Future<ReferralPaginationState> build() async {
+    print('🔵 [AllReferralsNotifier] BUILD CALLED');
+    
+    final secureStorage = ref.watch(secureStorageServiceProvider);
+    final userId = await secureStorage.getUserId();
+    final search = ref.watch(referralSearchProvider);
+    final status = ref.watch(referralStatusFilterProvider);
+    final dates = ref.watch(referralDateFilterProvider);
+
+    print('🔵 [AllReferralsNotifier] userId: $userId');
+    print('🔵 [AllReferralsNotifier] search: "$search"');
+    print('🔵 [AllReferralsNotifier] status: "$status"');
+    print('🔵 [AllReferralsNotifier] dates: $dates');
+
+    if (userId == null || userId.isEmpty) {
+      log('User ID not found', name: 'AllReferralsNotifier');
+      return ReferralPaginationState(
+        currentPage: 1,
+        limit: 10,
+        totalCount: 0,
+        referrals: [],
+      );
+    }
+
+    final apiProvider = ref.watch(apiProviderProvider);
+
+    final queryParams = <String>[];
+    queryParams.add('page_no=1');
+    queryParams.add('limit=10');
+
+    print('🔵 [AllReferralsNotifier] Before adding filters - queryParams: $queryParams');
+
+    if (search.isNotEmpty) {
+      queryParams.add('search=${Uri.encodeComponent(search)}');
+      print('🔵 [AllReferralsNotifier] Added search parameter: $search');
+    }
+    if (status.isNotEmpty) {
+      queryParams.add('status=${Uri.encodeComponent(status)}');
+      print('🔵 [AllReferralsNotifier] Added status parameter: $status');
+    }
+    if (dates['start_date'] != null && dates['start_date']!.isNotEmpty) {
+      queryParams
+          .add('start_date=${Uri.encodeComponent(dates['start_date']!)}');
+      print('🔵 [AllReferralsNotifier] Added start_date parameter: ${dates['start_date']}');
+    }
+    if (dates['end_date'] != null && dates['end_date']!.isNotEmpty) {
+      queryParams.add('end_date=${Uri.encodeComponent(dates['end_date']!)}');
+      print('🔵 [AllReferralsNotifier] Added end_date parameter: ${dates['end_date']}');
+    }
+
+    final queryString = queryParams.join('&');
+    final url = '/user/referals/$userId?$queryString';
+
+    print('🔵 [AllReferralsNotifier] Final queryParams: $queryParams');
+    print('🔵 [AllReferralsNotifier] Final URL: $url');
+    log('AllReferralsNotifier API call: $url', name: 'AllReferralsNotifier');
+
+    final response = await apiProvider.get(
+      url,
+      requireAuth: true,
+    );
+
+    if (response.success && response.data != null) {
+      final data = response.data!['data'] as List?;
+      final totalCountValue = response.data!['total_count'];
+      final totalCount = totalCountValue is int
+          ? totalCountValue
+          : int.tryParse(totalCountValue.toString()) ?? 0;
+
+      final referrals = data != null
+          ? data
+              .map((item) => UserModel.fromJson(item as Map<String, dynamic>))
+              .toList()
+              .cast<UserModel>()
+          : <UserModel>[];
+
+      return ReferralPaginationState(
+        currentPage: 1,
+        limit: 10,
+        totalCount: totalCount,
+        referrals: referrals,
+      );
+    }
+    return ReferralPaginationState(
+      currentPage: 1,
+      limit: 10,
+      totalCount: 0,
+      referrals: [],
+    );
+  }
+
+  Future<void> loadNextPage() async {
+    if (!state.hasValue) return;
+
+    final currentState = state.value!;
+    if (!currentState.hasMore) return;
+
+    state = await AsyncValue.guard(() async {
+      final secureStorage = ref.watch(secureStorageServiceProvider);
+      final userId = await secureStorage.getUserId();
+      final search = ref.read(referralSearchProvider);
+      final status = ref.read(referralStatusFilterProvider);
+      final dates = ref.read(referralDateFilterProvider);
+
+      if (userId == null || userId.isEmpty) {
+        return currentState;
+      }
+
+      final apiProvider = ref.watch(apiProviderProvider);
+      final nextPage = currentState.currentPage + 1;
+
+      final queryParams = <String>[];
+      queryParams.add('page_no=$nextPage');
+      queryParams.add('limit=${currentState.limit}');
+
+      if (search.isNotEmpty) {
+        queryParams.add('search=${Uri.encodeComponent(search)}');
+      }
+      if (status.isNotEmpty) {
+        queryParams.add('status=${Uri.encodeComponent(status)}');
+      }
+      if (dates['start_date'] != null && dates['start_date']!.isNotEmpty) {
+        queryParams
+            .add('start_date=${Uri.encodeComponent(dates['start_date']!)}');
+      }
+      if (dates['end_date'] != null && dates['end_date']!.isNotEmpty) {
+        queryParams.add('end_date=${Uri.encodeComponent(dates['end_date']!)}');
+      }
+
+      final queryString = queryParams.join('&');
+      final response = await apiProvider.get(
+        '/user/referals/$userId?$queryString',
+        requireAuth: true,
+      );
+
+      if (response.success && response.data != null) {
+        final data = response.data!['data'] as List?;
+        final totalCountValue = response.data!['total_count'];
+        final totalCount = totalCountValue is int
+            ? totalCountValue
+            : int.tryParse(totalCountValue.toString()) ?? 0;
+
+        final referrals = data != null
+            ? data
+                .map((item) => UserModel.fromJson(item as Map<String, dynamic>))
+                .toList()
+                .cast<UserModel>()
+            : <UserModel>[];
+
+        return currentState.copyWith(
+          currentPage: nextPage,
+          totalCount: totalCount,
+          referrals: <UserModel>[...currentState.referrals, ...referrals],
+        );
+      }
+      return currentState;
+    });
+  }
+
+  Future<void> refresh() async {
+    state = const AsyncValue.loading();
+    state = await AsyncValue.guard(() => build());
+  }
+}

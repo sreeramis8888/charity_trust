@@ -529,7 +529,7 @@ class _HomePageState extends ConsumerState<HomePage> {
                           autoPlayInterval: const Duration(seconds: 3),
                           autoPlayAnimationDuration:
                               const Duration(milliseconds: 800),
-                          enableInfiniteScroll: false,
+                          enableInfiniteScroll: true,
                           initialPage: 0,
                           padEnds: false,
                           onPageChanged: (index, reason) {
@@ -652,7 +652,7 @@ class _HomePageState extends ConsumerState<HomePage> {
                         size: Size(8, 8),
                         unselectedSize: Size(7, 7),
                         currentItem: _categoryIndex,
-                        count: 5,
+                        count: 8,
                         unselectedColor: Color(0xFFAEB9E1),
                         selectedColor: Color(0xFF0D74BC),
                       ),

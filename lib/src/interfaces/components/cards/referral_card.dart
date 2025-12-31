@@ -19,6 +19,10 @@ class ReferralCard extends StatelessWidget {
     this.onViewDetails,
   });
 
+  String _formatCurrency(int amount) {
+    return '₹${amount.toString().replaceAllMapped(RegExp(r'\B(?=(\d{3})+(?!\d))'), (m) => ',')}';
+  }
+
   Color _getStatusBgColor(String status) {
     switch (status.toLowerCase()) {
       case 'active':
@@ -51,63 +55,110 @@ class ReferralCard extends StatelessWidget {
             )
           ],
         ),
-        child: Row(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Container(
-            //   width: 50,
-            //   height: 50,
-            //   decoration: BoxDecoration(
-            //     shape: BoxShape.circle,
-            //     color: Colors.grey[300],
-            //     image: user.image != null
-            //         ? DecorationImage(
-            //             image: NetworkImage(user.image!),
-            //             fit: BoxFit.cover,
-            //           )
-            //         : null,
-            //   ),
-            //   child: user.image == null
-            //       ? Icon(Icons.person, size: 24, color: Colors.grey[600])
-            //       : null,
-            // ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(user.name ?? 'unknown'.tr(), style: kBodyTitleM),
-                  const SizedBox(height: 4),
-                  Text(user.area ?? 'unknownArea'.tr(),
-                      style: kSmallTitleL.copyWith(color: kSecondaryTextColor)),
-                  const SizedBox(height: 2),
-                  Text(user.phone ?? 'N/A',
-                      style: kSmallTitleL.copyWith(color: kSecondaryTextColor)),
-                ],
-              ),
-            ),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.end,
+            // Header row with name and status
+            Row(
               children: [
-                if (onViewDetails != null)
-                  GestureDetector(
-                    onTap: onViewDetails,
-                    child: Text(
-                      'viewDetails'.tr(),
-                      style: kSmallTitleM.copyWith(
-                        color: kThirdTextColor,
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(user.name ?? 'unknown'.tr(), style: kBodyTitleM),
+                      const SizedBox(height: 4),
+                      Text(user.area ?? 'unknownArea'.tr(),
+                          style: kSmallTitleL.copyWith(color: kSecondaryTextColor)),
+                      const SizedBox(height: 2),
+                      Text(user.phone ?? 'N/A',
+                          style: kSmallTitleL.copyWith(color: kSecondaryTextColor)),
+                    ],
+                  ),
+                ),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    if (onViewDetails != null)
+                      GestureDetector(
+                        onTap: onViewDetails,
+                        child: Text(
+                          'viewDetails'.tr(),
+                          style: kSmallTitleM.copyWith(
+                            color: kThirdTextColor,
+                          ),
+                        ),
+                      ),
+                    if (onViewDetails != null) const SizedBox(height: 8),
+                    TextPill(
+                      text: (user.status ?? 'pending') == 'pending' ? 'pendingLabel'.tr() : (user.status == 'active' ? 'active'.tr() : (user.status == 'rejected' ? 'rejectedLabel'.tr() : (user.status ?? 'unknown').toUpperCase())),
+                      color: _getStatusBgColor(user.status ?? 'pending'),
+                      padding:
+                          const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                      textStyle: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 11,
+                        fontWeight: FontWeight.w600,
                       ),
                     ),
+                  ],
+                ),
+              ],
+            ),
+            const SizedBox(height: 12),
+            // Divider
+            Container(
+              height: 1,
+              color: kStrokeColor.withOpacity(0.1),
+            ),
+            const SizedBox(height: 12),
+            // Campaigns and Donations row
+            Row(
+              children: [
+                Expanded(
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                    decoration: BoxDecoration(
+                      color: kBackgroundColor,
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Campaigns',
+                          style: kSmallTitleL.copyWith(color: kSecondaryTextColor),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          ': ${user.totalCampaignsParticipated ?? 0}',
+                          style: kBodyTitleM,
+                        ),
+                      ],
+                    ),
                   ),
-                if (onViewDetails != null) const SizedBox(height: 8),
-                TextPill(
-                  text: (user.status ?? 'pending') == 'pending' ? 'pendingLabel'.tr() : (user.status == 'active' ? 'active'.tr() : (user.status == 'rejected' ? 'rejectedLabel'.tr() : (user.status ?? 'unknown').toUpperCase())),
-                  color: _getStatusBgColor(user.status ?? 'pending'),
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                  textStyle: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 11,
-                    fontWeight: FontWeight.w600,
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                    decoration: BoxDecoration(
+                      color: kBackgroundColor,
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Donations',
+                          style: kSmallTitleL.copyWith(color: kSecondaryTextColor),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          ': ${_formatCurrency(user.totalAmountDonated ?? 0)}',
+                          style: kBodyTitleM,
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ],
