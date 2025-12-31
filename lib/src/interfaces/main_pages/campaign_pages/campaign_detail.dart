@@ -109,12 +109,193 @@ class _CampaignDetailPageState extends ConsumerState<CampaignDetailPage> {
     SnackbarService().showSnackBar(message, type: type);
   }
 
+  void _showExceedsGoalDialog(double donationAmount, double remainingGoal) {
+    if (!mounted) return;
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return Dialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
+          backgroundColor: kWhite,
+          child: Padding(
+            padding: const EdgeInsets.all(28),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // Icon with background
+                Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: kPrimaryColor.withOpacity(0.1),
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(
+                    Icons.info_outline_rounded,
+                    color: kPrimaryColor,
+                    size: 40,
+                  ),
+                ),
+                const SizedBox(height: 24),
+                // Title
+                Text(
+                  'exceedsGoal'.tr(),
+                  style: kHeadTitleSB.copyWith(
+                    color: kTextColor,
+                    fontSize: 20,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 12),
+                // Description
+                Text(
+                  'donationAmountExceeds'.tr(),
+                  style: kBodyTitleR.copyWith(
+                    color: kSecondaryTextColor,
+                    height: 1.5,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 28),
+                // Amount comparison cards
+                Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: kBackgroundColor,
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(
+                      color: kBorder,
+                      width: 1,
+                    ),
+                  ),
+                  child: Column(
+                    children: [
+                      // Remaining goal
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            'remainingGoal'.tr(),
+                            style: kSmallerTitleR.copyWith(
+                              color: kSecondaryTextColor,
+                            ),
+                          ),
+                          Text(
+                            '₹${remainingGoal.toStringAsFixed(0)}',
+                            style: kSmallTitleB.copyWith(
+                              color: const Color(0xFF009000),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 12),
+                      Divider(
+                        color: kBorder,
+                        height: 1,
+                      ),
+                      const SizedBox(height: 12),
+                      // Your amount
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            'yourAmount'.tr(),
+                            style: kSmallerTitleR.copyWith(
+                              color: kSecondaryTextColor,
+                            ),
+                          ),
+                          Text(
+                            '₹${donationAmount.toStringAsFixed(0)}',
+                            style: kSmallTitleB.copyWith(
+                              color: kRed,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 28),
+                // Action buttons
+                Column(
+                  children: [
+                    SizedBox(
+                      width: double.infinity,
+                      child: ElevatedButton(
+                        onPressed: () {
+                          Navigator.pop(context);
+                          _donationController.text =
+                              remainingGoal.toStringAsFixed(0);
+                          _donationController.selection =
+                              TextSelection.fromPosition(
+                            TextPosition(
+                              offset: _donationController.text.length,
+                            ),
+                          );
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: kPrimaryColor,
+                          padding: const EdgeInsets.symmetric(vertical: 12),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          alignment: Alignment.center,
+                        ),
+                        child: Text(
+                          'adjustToMax'.tr(),
+                          style: kSmallTitleB.copyWith(
+                            color: kWhite,
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    SizedBox(
+                      width: double.infinity,
+                      child: OutlinedButton(
+                        onPressed: () => Navigator.pop(context),
+                        style: OutlinedButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(vertical: 12),
+                          side: const BorderSide(
+                            color: kBorder,
+                            width: 1.5,
+                          ),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          alignment: Alignment.center,
+                        ),
+                        child: Text(
+                          'cancel'.tr(),
+                          style: kSmallTitleB.copyWith(
+                            color: kTextColor,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
   Future<void> _handleDonation() async {
     final amountText = _donationController.text.trim();
     final amount = double.tryParse(amountText);
 
     if (amount == null || amount <= 0) {
       _showSnackBar('pleaseEnterValidAmount'.tr(), type: SnackbarType.warning);
+      return;
+    }
+
+    final remaining = ((widget.goal ?? 0) - (widget.raised ?? 0)).toDouble();
+    if (amount > remaining) {
+      _showExceedsGoalDialog(amount, remaining);
       return;
     }
 

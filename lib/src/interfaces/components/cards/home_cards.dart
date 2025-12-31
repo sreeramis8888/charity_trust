@@ -7,149 +7,101 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
-class HomeCampaignCard extends StatelessWidget {
-  final String title;
-  final String description;
-  final String? image;
-  final int raised;
-  final int goal;
-  final String dueDate;
-  final VoidCallback onViewDetails;
-  final VoidCallback? onDonate;
+// ============================================================================
+// WARNING BADGE WITH BLINKING ANIMATION
+// ============================================================================
+class _WarningBadge extends StatefulWidget {
+  const _WarningBadge();
 
-  const HomeCampaignCard({
-    super.key,
-    required this.title,
-    required this.description,
-    required this.raised,
-    required this.goal,
-    required this.dueDate,
-    required this.onViewDetails,
-    this.onDonate,
-    this.image,
-  });
+  @override
+  State<_WarningBadge> createState() => _WarningBadgeState();
+}
+
+class _WarningBadgeState extends State<_WarningBadge>
+    with TickerProviderStateMixin {
+  late final AnimationController _blinkController;
+  late final AnimationController _pulseController;
+  late final Animation<double> _blinkAnimation;
+  late final Animation<double> _pulseAnimation;
+
+  @override
+  void initState() {
+    super.initState();
+
+    _blinkController = AnimationController(
+      duration: const Duration(milliseconds: 700),
+      vsync: this,
+    )..repeat(reverse: true);
+
+    _blinkAnimation = Tween<double>(begin: 1.0, end: 0.5).animate(
+      CurvedAnimation(parent: _blinkController, curve: Curves.easeInOut),
+    );
+
+    _pulseController = AnimationController(
+      duration: const Duration(milliseconds: 1400),
+      vsync: this,
+    )..repeat();
+
+    _pulseAnimation = Tween<double>(begin: 1.0, end: 1.25).animate(
+      CurvedAnimation(parent: _pulseController, curve: Curves.easeOut),
+    );
+  }
+
+  @override
+  void dispose() {
+    _blinkController.dispose();
+    _pulseController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
-    final percent = (raised / goal).clamp(0.0, 1.0);
+    const Color warningYellow = Color(0xFFFFC107); // Amber warning
 
-    return Container(
-      decoration: BoxDecoration(
-        color: kCardBackgroundColor,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: kBorder),
-      ),
-      padding: const EdgeInsets.all(16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              TextPill(
-                text: "dueDate".tr(),
-                color: const Color(0xFF1E3C72),
-                textStyle: kSmallerTitleSB.copyWith(
-                  fontSize: 10,
-                  color: kWhite,
-                ),
-              ),
-              TextPill(
-                text: dueDate,
-                color: const Color(0xFF2B2B2B),
-                textStyle: kSmallerTitleM.copyWith(fontSize: 10),
-              ),
-            ],
-          ),
-          const SizedBox(height: 16),
-          ClipRRect(
-            borderRadius: BorderRadius.circular(12),
-            child: Image.network(
-              image ?? '',
-              height: 120,
-              width: double.infinity,
-              fit: BoxFit.cover,
-              errorBuilder: (_, __, ___) => Container(
-                height: 120,
-                color: Colors.grey[300],
-                child: Icon(Icons.broken_image, color: Colors.grey[600]),
+    return Stack(
+      alignment: Alignment.center,
+      children: [
+        // Subtle pulse ring
+        ScaleTransition(
+          scale: _pulseAnimation,
+          child: Container(
+            height: 30,
+            width: 30,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              border: Border.all(
+                color: warningYellow.withOpacity(0.35),
+                width: 1.5,
               ),
             ),
           ),
-          const SizedBox(height: 12),
-          Text(title, style: kBodyTitleSB),
-          const SizedBox(height: 8),
-          Text(
-            description,
-            style: kSmallerTitleR.copyWith(color: kSecondaryTextColor),
-            maxLines: 2,
-            overflow: TextOverflow.ellipsis,
-          ),
-          const SizedBox(height: 12),
-          LinearProgressIndicator(
-            color: const Color(0xFFFFD400),
-            minHeight: 8,
-            borderRadius: BorderRadius.circular(10),
-            value: percent,
-            backgroundColor: const Color(0xFFCFCFCF),
-          ),
-          const SizedBox(height: 8),
-          Row(
-            children: [
-              Text(
-                "₹$raised",
-                style: kSmallTitleM.copyWith(color: const Color(0xFF009000)),
-              ),
-              const SizedBox(width: 4),
-              Text(
-                "raisedOf".tr(),
-                style: kSmallTitleR,
-              ),
-              const SizedBox(width: 4),
-              Text(
-                "₹$goal",
-                style: kSmallTitleSB,
-              ),
-              const SizedBox(width: 4),
-              Text(
-                "goal".tr(),
-                style: kSmallTitleR,
-              ),
-              const Spacer(),
-              Text(
-                "${(percent * 100).toInt()}%",
-                style: kSmallTitleSB,
-              ),
-            ],
-          ),
-          const SizedBox(height: 12),
-          Row(
-            children: [
-              Expanded(
-                child: primaryButton(
-                  label: "viewDetails".tr(),
-                  onPressed: onViewDetails,
-                  buttonColor: kCardBackgroundColor,
-                  labelColor: kTextColor,
-                  sideColor: kTextColor,
-                  fontSize: 14,
-                  buttonHeight: 40,
+        ),
+
+        // Main badge
+        FadeTransition(
+          opacity: _blinkAnimation,
+          child: Container(
+            height: 24,
+            width: 24,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: warningYellow,
+              boxShadow: [
+                BoxShadow(
+                  color: warningYellow.withOpacity(0.55),
+                  blurRadius: 6,
+                  spreadRadius: 1,
                 ),
-              ),
-              // const SizedBox(width: 12),
-              // Expanded(
-              //   child: primaryButton(
-              //     label: "Donate",
-              //     onPressed: onDonate,
-              //     buttonColor: kPrimaryColor,
-              //     fontSize: 14,
-              //     buttonHeight: 40,
-              //   ),
-              // ),
-            ],
+              ],
+            ),
+            child: const Icon(
+              Icons.warning_rounded,
+              color: Colors.white,
+              size: 14,
+            ),
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 }
@@ -506,173 +458,187 @@ class HomeGradientCampaignCard extends StatelessWidget {
     final percent = (raised / goal).clamp(0.0, 1.0);
     final isGeneralCampaign = category == 'General Campaign';
 
-    return Container(
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [const Color(0xFF0A39C4), const Color(0xFF181818)],
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-        ),
-        borderRadius: BorderRadius.circular(16),
-      ),
-      padding: const EdgeInsets.all(16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    return Stack(
+      children: [
+        Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [const Color(0xFF0A39C4), const Color(0xFF181818)],
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+            ),
+            borderRadius: BorderRadius.circular(16),
+          ),
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                "dueDate".tr(),
-                style: kSmallerTitleSB.copyWith(
-                  fontSize: 10,
-                  color: kWhite,
-                ),
-              ),
-              Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                decoration: BoxDecoration(
-                  color: Colors.black.withOpacity(0.3),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Row(
-                  children: [
-                    const Icon(Icons.calendar_today, color: kWhite, size: 14),
-                    const SizedBox(width: 6),
-                    Text(
-                      isGeneralCampaign ? dueDate : "noDueDate".tr(),
-                      style: kSmallerTitleM.copyWith(
-                        fontSize: 10,
-                        color: kWhite,
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Row(
+                    children: [
+                      if (isGeneralCampaign)
+                        Padding(
+                          padding: const EdgeInsets.only(right: 6),
+                          child: _WarningBadge(),
+                        ),
+                      Text(
+                        "dueDate".tr(),
+                        style: kSmallerTitleSB.copyWith(
+                          fontSize: 10,
+                          color: kWhite,
+                        ),
                       ),
+                    ],
+                  ),
+                  Container(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    decoration: BoxDecoration(
+                      color: Colors.black.withOpacity(0.3),
+                      borderRadius: BorderRadius.circular(8),
                     ),
+                    child: Row(
+                      children: [
+                        const Icon(Icons.calendar_today,
+                            color: kWhite, size: 14),
+                        const SizedBox(width: 6),
+                        Text(
+                          isGeneralCampaign ? dueDate : "noDueDate".tr(),
+                          style: kSmallerTitleM.copyWith(
+                            fontSize: 10,
+                            color: kWhite,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 16),
+              ClipRRect(
+                borderRadius: BorderRadius.circular(12),
+                child: Image.network(
+                  image ?? '',
+                  height: 180,
+                  width: double.infinity,
+                  fit: BoxFit.cover,
+                  errorBuilder: (_, __, ___) => Container(
+                    height: 120,
+                    color: Colors.grey[300],
+                    child: Icon(Icons.broken_image, color: Colors.grey[600]),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 12),
+              Text(
+                title,
+                style: kBodyTitleSB.copyWith(color: kWhite),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                description,
+                style: kSmallerTitleR.copyWith(
+                  color: kWhite.withOpacity(0.8),
+                ),
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+              ),
+              const SizedBox(height: 12),
+              if (isGeneralCampaign)
+                Column(
+                  children: [
+                    LinearProgressIndicator(
+                      color: const Color(0xFFFFD400),
+                      minHeight: 8,
+                      borderRadius: BorderRadius.circular(10),
+                      value: percent,
+                      backgroundColor: Colors.white.withOpacity(0.3),
+                    ),
+                    const SizedBox(height: 8),
+                    Row(
+                      children: [
+                        Text(
+                          "₹$raised",
+                          style: kSmallTitleM.copyWith(
+                              color: const Color(0xFFFFD400)),
+                        ),
+                        const SizedBox(width: 4),
+                        Text(
+                          "raisedOf".tr(),
+                          style: kSmallTitleR.copyWith(color: kWhite),
+                        ),
+                        const SizedBox(width: 4),
+                        Text(
+                          "₹$goal",
+                          style: kSmallTitleSB.copyWith(color: kWhite),
+                        ),
+                        const SizedBox(width: 4),
+                        Text(
+                          "goal".tr(),
+                          style: kSmallTitleR.copyWith(color: kWhite),
+                        ),
+                        const Spacer(),
+                        Text(
+                          "${(percent * 100).toInt()}%",
+                          style: kSmallTitleSB.copyWith(color: kWhite),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 12),
+                  ],
+                )
+              else
+                Column(
+                  children: [
+                    Row(
+                      children: [
+                        Text(
+                          "₹$raised",
+                          style: kSmallTitleM.copyWith(
+                              color: const Color(0xFFFFD400)),
+                        ),
+                        const SizedBox(width: 4),
+                        Text(
+                          "raised".tr(),
+                          style: kSmallTitleR.copyWith(color: kWhite),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 12),
                   ],
                 ),
+              Row(
+                children: [
+                  Expanded(
+                    child: primaryButton(
+                      label: "viewDetails".tr(),
+                      onPressed: onViewDetails,
+                      buttonColor: kWhite.withOpacity(0.2),
+                      labelColor: kWhite,
+                      sideColor: kWhite,
+                      fontSize: 14,
+                      buttonHeight: 40,
+                    ),
+                  ),
+                  // const SizedBox(width: 12),
+                  // Expanded(
+                  //   child: primaryButton(
+                  //     label: "Donate",
+                  //     onPressed: onDonate,
+                  //     buttonColor: kWhite,
+                  //     labelColor: kPrimaryColor,
+                  //     fontSize: 14,
+                  //     buttonHeight: 40,
+                  //   ),
+                  // ),
+                ],
               ),
             ],
           ),
-          const SizedBox(height: 16),
-          ClipRRect(
-            borderRadius: BorderRadius.circular(12),
-            child: Image.network(
-              image ?? '',
-              height: 180,
-              width: double.infinity,
-              fit: BoxFit.cover,
-              errorBuilder: (_, __, ___) => Container(
-                height: 120,
-                color: Colors.grey[300],
-                child: Icon(Icons.broken_image, color: Colors.grey[600]),
-              ),
-            ),
-          ),
-          const SizedBox(height: 12),
-          Text(
-            title,
-            style: kBodyTitleSB.copyWith(color: kWhite),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            description,
-            style: kSmallerTitleR.copyWith(
-              color: kWhite.withOpacity(0.8),
-            ),
-            maxLines: 2,
-            overflow: TextOverflow.ellipsis,
-          ),
-          const SizedBox(height: 12),
-          if (isGeneralCampaign)
-            Column(
-              children: [
-                LinearProgressIndicator(
-                  color: const Color(0xFFFFD400),
-                  minHeight: 8,
-                  borderRadius: BorderRadius.circular(10),
-                  value: percent,
-                  backgroundColor: Colors.white.withOpacity(0.3),
-                ),
-                const SizedBox(height: 8),
-                Row(
-                  children: [
-                    Text(
-                      "₹$raised",
-                      style:
-                          kSmallTitleM.copyWith(color: const Color(0xFFFFD400)),
-                    ),
-                    const SizedBox(width: 4),
-                    Text(
-                      "raisedOf".tr(),
-                      style: kSmallTitleR.copyWith(color: kWhite),
-                    ),
-                    const SizedBox(width: 4),
-                    Text(
-                      "₹$goal",
-                      style: kSmallTitleSB.copyWith(color: kWhite),
-                    ),
-                    const SizedBox(width: 4),
-                    Text(
-                      "goal".tr(),
-                      style: kSmallTitleR.copyWith(color: kWhite),
-                    ),
-                    const Spacer(),
-                    Text(
-                      "${(percent * 100).toInt()}%",
-                      style: kSmallTitleSB.copyWith(color: kWhite),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 12),
-              ],
-            )
-          else
-            Column(
-              children: [
-                Row(
-                  children: [
-                    Text(
-                      "₹$raised",
-                      style:
-                          kSmallTitleM.copyWith(color: const Color(0xFFFFD400)),
-                    ),
-                    const SizedBox(width: 4),
-                    Text(
-                      "raised".tr(),
-                      style: kSmallTitleR.copyWith(color: kWhite),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 12),
-              ],
-            ),
-          Row(
-            children: [
-              Expanded(
-                child: primaryButton(
-                  label: "viewDetails".tr(),
-                  onPressed: onViewDetails,
-                  buttonColor: kWhite.withOpacity(0.2),
-                  labelColor: kWhite,
-                  sideColor: kWhite,
-                  fontSize: 14,
-                  buttonHeight: 40,
-                ),
-              ),
-              // const SizedBox(width: 12),
-              // Expanded(
-              //   child: primaryButton(
-              //     label: "Donate",
-              //     onPressed: onDonate,
-              //     buttonColor: kWhite,
-              //     labelColor: kPrimaryColor,
-              //     fontSize: 14,
-              //     buttonHeight: 40,
-              //   ),
-              // ),
-            ],
-          ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 }

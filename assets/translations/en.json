@@ -290,5 +290,10 @@
   "selectStatus": "Select Status",
   "inactive": "Inactive",
   "deleted": "Deleted",
-  "suspended": "Suspended"
+  "suspended": "Suspended",
+  "exceedsGoal": "Amount Exceeds Goal",
+  "donationAmountExceeds": "The donation amount exceeds the remaining goal for this campaign",
+  "remainingGoal": "Remaining Goal",
+  "yourAmount": "Your Amount",
+  "adjustToMax": "Adjust to Maximum"
 }
