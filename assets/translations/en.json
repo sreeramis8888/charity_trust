@@ -284,5 +284,11 @@
   "enterNewPhoneNumber": "Enter new phone number",
   "phoneNumberChanged": "Phone Number Changed",
   "youNeedToLoginAgain": "Your phone number has been updated successfully. You need to login again with your new phone number.",
-  "failedToChangePhoneNumber": "Failed to change phone number"
+  "failedToChangePhoneNumber": "Failed to change phone number",
+  "directReferrals": "Direct Referrals",
+  "indirectReferrals": "Indirect Referrals",
+  "selectStatus": "Select Status",
+  "inactive": "Inactive",
+  "deleted": "Deleted",
+  "suspended": "Suspended"
 }

@@ -68,10 +68,12 @@ class ReferralCard extends StatelessWidget {
                       Text(user.name ?? 'unknown'.tr(), style: kBodyTitleM),
                       const SizedBox(height: 4),
                       Text(user.area ?? 'unknownArea'.tr(),
-                          style: kSmallTitleL.copyWith(color: kSecondaryTextColor)),
+                          style: kSmallTitleL.copyWith(
+                              color: kSecondaryTextColor)),
                       const SizedBox(height: 2),
                       Text(user.phone ?? 'N/A',
-                          style: kSmallTitleL.copyWith(color: kSecondaryTextColor)),
+                          style: kSmallTitleL.copyWith(
+                              color: kSecondaryTextColor)),
                     ],
                   ),
                 ),
@@ -90,10 +92,16 @@ class ReferralCard extends StatelessWidget {
                       ),
                     if (onViewDetails != null) const SizedBox(height: 8),
                     TextPill(
-                      text: (user.status ?? 'pending') == 'pending' ? 'pendingLabel'.tr() : (user.status == 'active' ? 'active'.tr() : (user.status == 'rejected' ? 'rejectedLabel'.tr() : (user.status ?? 'unknown').toUpperCase())),
+                      text: (user.status ?? 'pending') == 'pending'
+                          ? 'pendingLabel'.tr()
+                          : (user.status == 'active'
+                              ? 'active'.tr()
+                              : (user.status == 'rejected'
+                                  ? 'rejectedLabel'.tr()
+                                  : (user.status ?? 'unknown').toUpperCase())),
                       color: _getStatusBgColor(user.status ?? 'pending'),
-                      padding:
-                          const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 12, vertical: 6),
                       textStyle: const TextStyle(
                         color: Colors.white,
                         fontSize: 11,
@@ -116,17 +124,19 @@ class ReferralCard extends StatelessWidget {
               children: [
                 Expanded(
                   child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 12, vertical: 10),
                     decoration: BoxDecoration(
                       color: kBackgroundColor,
                       borderRadius: BorderRadius.circular(8),
                     ),
-                    child: Column(
+                    child: Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Campaigns',
-                          style: kSmallTitleL.copyWith(color: kSecondaryTextColor),
+                          'campaigns'.tr(),
+                          style:
+                              kSmallTitleL.copyWith(color: kSecondaryTextColor),
                         ),
                         const SizedBox(height: 4),
                         Text(
@@ -140,17 +150,19 @@ class ReferralCard extends StatelessWidget {
                 const SizedBox(width: 12),
                 Expanded(
                   child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 12, vertical: 10),
                     decoration: BoxDecoration(
                       color: kBackgroundColor,
                       borderRadius: BorderRadius.circular(8),
                     ),
-                    child: Column(
+                    child: Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Donations',
-                          style: kSmallTitleL.copyWith(color: kSecondaryTextColor),
+                          'donations'.tr(),
+                          style:
+                              kSmallTitleL.copyWith(color: kSecondaryTextColor),
                         ),
                         const SizedBox(height: 4),
                         Text(

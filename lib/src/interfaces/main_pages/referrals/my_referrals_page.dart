@@ -449,7 +449,7 @@ class _MyReferralsPageState extends ConsumerState<MyReferralsPage>
                   const SizedBox(height: 8),
                   InputField(
                     type: CustomFieldType.date,
-                    hint: 'dd/mm/yyyy',
+                    hint: 'ddmmyyyy'.tr(),
                     controller: startDateController,
                   ),
                   const SizedBox(height: 20),
@@ -457,7 +457,7 @@ class _MyReferralsPageState extends ConsumerState<MyReferralsPage>
                   const SizedBox(height: 8),
                   InputField(
                     type: CustomFieldType.date,
-                    hint: 'dd/mm/yyyy',
+                    hint: 'ddmmyyyy'.tr(),
                     controller: endDateController,
                   ),
                   const SizedBox(height: 32),
