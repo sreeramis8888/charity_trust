@@ -18,6 +18,7 @@ import 'package:Annujoom/src/interfaces/main_pages/completed_campaigns_page.dart
 import 'package:Annujoom/src/interfaces/main_pages/videos_page.dart';
 import 'package:Annujoom/src/data/router/nav_router.dart';
 import 'package:Annujoom/src/data/utils/launch_url.dart';
+import 'package:Annujoom/src/data/utils/date_formatter.dart';
 import 'package:Annujoom/src/data/services/notification_service/get_fcm.dart';
 import 'package:Annujoom/src/interfaces/components/primaryButton.dart';
 import 'package:Annujoom/src/interfaces/components/confirmation_dialog.dart';
@@ -813,10 +814,7 @@ class _HomePageState extends ConsumerState<HomePage> {
                                 image: campaign.coverImage,
                                 raised: campaign.collectedAmount.toInt(),
                                 goal: campaign.targetAmount.toInt(),
-                                dueDate: campaign.targetDate
-                                        ?.toString()
-                                        .split(' ')[0] ??
-                                    '',
+                                dueDate: formatDate(campaign.targetDate),
                                 category: campaign.category,
                                 onViewDetails: () {
                                   Navigator.of(context).pushNamed(
@@ -828,10 +826,7 @@ class _HomePageState extends ConsumerState<HomePage> {
                                       'description': campaign
                                           .getDescription(preferredLanguage),
                                       'category': campaign.category,
-                                      'date': campaign.targetDate
-                                              ?.toString()
-                                              .split(' ')[0] ??
-                                          '',
+                                      'date': formatDate(campaign.targetDate),
                                       'image': campaign.coverImage,
                                       'raised':
                                           campaign.collectedAmount.toInt(),
@@ -934,7 +929,7 @@ class _HomePageState extends ConsumerState<HomePage> {
                               return Padding(
                                 padding: const EdgeInsets.symmetric(
                                     horizontal: 16.0),
-                                child: HomeCompletedCampaignCard(
+                                child: HomeCompletedCampaignCard(targetDate:promotion.targetDate,
                                   heading:
                                       promotion.getTitle(preferredLanguage),
                                   subtitle: promotion

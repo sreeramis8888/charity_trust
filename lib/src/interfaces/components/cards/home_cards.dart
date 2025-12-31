@@ -1,6 +1,7 @@
 import 'package:Annujoom/src/data/constants/color_constants.dart';
 import 'package:Annujoom/src/data/constants/style_constants.dart';
 import 'package:Annujoom/src/data/utils/currency_formatter.dart';
+import 'package:Annujoom/src/data/utils/date_formatter.dart';
 import 'package:Annujoom/src/interfaces/components/primaryButton.dart';
 import 'package:Annujoom/src/interfaces/components/text_pill.dart';
 import 'package:easy_localization/easy_localization.dart';
@@ -215,12 +216,12 @@ class HomeCompletedCampaignCard extends StatelessWidget {
                     const SizedBox(height: 4),
                     Text(
                       targetDate != null
-                          ? "Successfully Completed on ${DateFormat('dd MMM yyyy').format(targetDate!)}"
-                          : subtitle,
+                          ? "${'successfullyCompletedOn'.tr()} ${formatDate(targetDate)}"
+                          : "Successfully Completed on $subtitle",
                       style: kSmallTitleL.copyWith(
                         color: kWhite.withOpacity(0.8),
                       ),
-                      maxLines: 1,
+                      maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                     ),
                     const SizedBox(height: 12),

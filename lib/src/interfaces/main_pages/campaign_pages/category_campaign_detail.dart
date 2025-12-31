@@ -1,4 +1,5 @@
 import 'package:Annujoom/src/data/constants/global_variables.dart';
+import 'package:Annujoom/src/data/utils/date_formatter.dart';
 import 'package:Annujoom/src/interfaces/components/loading_indicator.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -55,7 +56,7 @@ class CategoryCampaignDetailPage extends ConsumerWidget {
           title: campaign.getTitle(preferredLanguage),
           description: campaign.getDescription(preferredLanguage),
           category: campaign.category,
-          date: campaign.targetDate?.toString().split(' ')[0],
+          date: formatDate(campaign.targetDate),
           image: campaign.coverImage,
           raised: campaign.collectedAmount?.toInt(),
           goal: campaign.targetAmount?.toInt(),

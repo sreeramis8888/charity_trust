@@ -295,5 +295,6 @@
   "donationAmountExceeds": "The donation amount exceeds the remaining goal for this campaign",
   "remainingGoal": "Remaining Goal",
   "yourAmount": "Your Amount",
-  "adjustToMax": "Adjust to Maximum"
+  "adjustToMax": "Adjust to Maximum",
+  "successfullyCompletedOn": "Successfully Completed on"
 }
