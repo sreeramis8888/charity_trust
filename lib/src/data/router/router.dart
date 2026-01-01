@@ -200,14 +200,15 @@ Route<dynamic> generateRoute(RouteSettings? settings) {
       if (settings?.arguments is Map) {
         final args = settings!.arguments as Map;
         page = CampaignDetailPage(
-          id: args['_id'] ?? '',
+          id: args['_id'] ?? args['id'] ?? '',
           title: args['title'] ?? '',
           description: args['description'] ?? '',
           category: args['category'] ?? '',
           date: args['date'] ?? '',
-          image: args['image'],
-          raised: args['raised'] ?? 0,
-          goal: args['goal'] ?? 0,
+          image: args['image'] ?? args['coverImage'],
+          raised: args['raised'] ?? args['collectedAmount'] ?? 0,
+          goal: args['goal'] ?? args['targetAmount'] ?? 0,
+          isDirectCategory: args['isDirectCategory'] ?? false,
         );
       }
       break;

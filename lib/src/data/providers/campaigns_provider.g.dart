@@ -680,3 +680,78 @@ final class CategoryCampaignsFamily extends $Family
   @override
   String toString() => r'categoryCampaignsProvider';
 }
+
+@ProviderFor(singleCampaign)
+const singleCampaignProvider = SingleCampaignFamily._();
+
+final class SingleCampaignProvider extends $FunctionalProvider<
+        AsyncValue<CampaignModel?>, CampaignModel?, FutureOr<CampaignModel?>>
+    with $FutureModifier<CampaignModel?>, $FutureProvider<CampaignModel?> {
+  const SingleCampaignProvider._(
+      {required SingleCampaignFamily super.from,
+      required String super.argument})
+      : super(
+          retry: null,
+          name: r'singleCampaignProvider',
+          isAutoDispose: true,
+          dependencies: null,
+          $allTransitiveDependencies: null,
+        );
+
+  @override
+  String debugGetCreateSourceHash() => _$singleCampaignHash();
+
+  @override
+  String toString() {
+    return r'singleCampaignProvider'
+        ''
+        '($argument)';
+  }
+
+  @$internal
+  @override
+  $FutureProviderElement<CampaignModel?> $createElement(
+          $ProviderPointer pointer) =>
+      $FutureProviderElement(pointer);
+
+  @override
+  FutureOr<CampaignModel?> create(Ref ref) {
+    final argument = this.argument as String;
+    return singleCampaign(
+      ref,
+      argument,
+    );
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other is SingleCampaignProvider && other.argument == argument;
+  }
+
+  @override
+  int get hashCode {
+    return argument.hashCode;
+  }
+}
+
+String _$singleCampaignHash() => r'663d17331ac9d9d8f6745993ab287c6f4cd66901';
+
+final class SingleCampaignFamily extends $Family
+    with $FunctionalFamilyOverride<FutureOr<CampaignModel?>, String> {
+  const SingleCampaignFamily._()
+      : super(
+          retry: null,
+          name: r'singleCampaignProvider',
+          dependencies: null,
+          $allTransitiveDependencies: null,
+          isAutoDispose: true,
+        );
+
+  SingleCampaignProvider call(
+    String campaignId,
+  ) =>
+      SingleCampaignProvider._(argument: campaignId, from: this);
+
+  @override
+  String toString() => r'singleCampaignProvider';
+}

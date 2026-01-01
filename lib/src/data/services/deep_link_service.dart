@@ -4,6 +4,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:Annujoom/src/data/router/nav_router.dart';
 import 'package:Annujoom/src/data/services/navigation_service.dart';
 import 'package:Annujoom/src/data/services/secure_storage_service.dart';
+import 'package:Annujoom/src/data/providers/campaigns_provider.dart';
+import 'package:Annujoom/src/data/constants/global_variables.dart';
+import 'package:Annujoom/src/data/utils/date_formatter.dart';
 
 final deepLinkServiceProvider = Provider<DeepLinkService>((ref) {
   return DeepLinkService(ref);
@@ -27,12 +30,13 @@ class DeepLinkService {
   Future<void> initialize() async {
     try {
       debugPrint('🔗 Deep link service initializing...');
-      
+
       // Handle deep link when app is launched from terminated state
       final appLink = await _appLinks.getInitialLink();
       if (appLink != null) {
         _pendingDeepLink = appLink;
-        debugPrint('🔗 Initial deep link stored as pending: ${appLink.toString()}');
+        debugPrint(
+            '🔗 Initial deep link stored as pending: ${appLink.toString()}');
         debugPrint('🔗 Initial link path segments: ${appLink.pathSegments}');
         debugPrint('🔗 Initial link scheme: ${appLink.scheme}');
         debugPrint('🔗 Initial link host: ${appLink.host}');
@@ -44,13 +48,14 @@ class DeepLinkService {
       // Handle deep links when app is in background/foreground
       _appLinks.uriLinkStream.listen((uri) {
         _pendingDeepLink = uri;
-        debugPrint('🔗 ⚡ Deep link received while app is running: ${uri.toString()}');
+        debugPrint(
+            '🔗 ⚡ Deep link received while app is running: ${uri.toString()}');
         debugPrint('🔗 Link path segments: ${uri.pathSegments}');
         debugPrint('🔗 Link scheme: ${uri.scheme}');
         debugPrint('🔗 Link host: ${uri.host}');
         handleDeepLink(uri);
       });
-      
+
       debugPrint('🔗 Deep link service initialized successfully');
     } catch (e) {
       debugPrint('❌ Deep link initialization error: $e');
@@ -65,10 +70,9 @@ class DeepLinkService {
       debugPrint('🔗 Query parameters: ${uri.queryParameters}');
 
       // Filter out empty segments and 'app' prefix
-      var pathSegments = uri.pathSegments
-          .where((segment) => segment.isNotEmpty)
-          .toList();
-      
+      var pathSegments =
+          uri.pathSegments.where((segment) => segment.isNotEmpty).toList();
+
       // Remove 'app' prefix if present
       if (pathSegments.isNotEmpty && pathSegments[0] == 'app') {
         pathSegments = pathSegments.sublist(1);
@@ -82,8 +86,9 @@ class DeepLinkService {
       final savedId = await secureStorage.getUserId();
 
       if (savedToken == null || savedToken.isEmpty || savedId == null) {
-        debugPrint('Authentication required for deep link. Redirecting to login.');
-        
+        debugPrint(
+            'Authentication required for deep link. Redirecting to login.');
+
         // Ensure navigator is ready
         if (NavigationService.navigatorKey.currentState == null) {
           debugPrint('Navigator not ready, retrying...');
@@ -131,8 +136,9 @@ class DeepLinkService {
           await _navigateToHome();
           break;
         default:
-           debugPrint('🔗 Unknown deep link route: $route. Staying on current page.');
-           break;
+          debugPrint(
+              '🔗 Unknown deep link route: $route. Staying on current page.');
+          break;
       }
     } catch (e) {
       debugPrint('❌ Deep link handling error: $e');
@@ -164,13 +170,36 @@ class DeepLinkService {
       await Future.delayed(const Duration(milliseconds: 300));
       _ref.read(selectedIndexProvider.notifier).updateIndex(1);
 
-      // If campaign ID provided, navigate to campaign details
       if (campaignId != null && campaignId.isNotEmpty) {
-        NavigationService.navigatorKey.currentState?.pushNamed(
-          'CampaignDetail',
-          arguments: {'_id': campaignId},
-        );
-        debugPrint('✅ Navigated to Campaign Detail: $campaignId');
+        try {
+          final campaign =
+              await _ref.read(singleCampaignProvider(campaignId).future);
+          if (campaign != null) {
+            final preferredLanguage =
+                GlobalVariables.getPreferredLanguage();
+            NavigationService.navigatorKey.currentState?.pushNamed(
+              'CampaignDetail',
+              arguments: {
+                '_id': campaign.id,
+                'title': campaign.getTitle(preferredLanguage),
+                'description': campaign.getDescription(preferredLanguage),
+                'category': campaign.category,
+                'date': formatDate(campaign.targetDate),
+                'image': campaign.coverImage,
+                'raised': campaign.collectedAmount?.toInt(),
+                'goal': campaign.targetAmount?.toInt(),
+                'isDirectCategory': false,
+              },
+            );
+            debugPrint('✅ Navigated to Campaign Detail: $campaignId');
+          } else {
+            debugPrint('⚠️ Campaign not found: $campaignId');
+            _showError('Campaign not found');
+          }
+        } catch (e) {
+          debugPrint('Error fetching campaign: $e');
+          _showError('Unable to load campaign details');
+        }
       } else {
         debugPrint('✅ Navigated to Campaigns');
       }
@@ -213,7 +242,9 @@ class DeepLinkService {
         (route) => false,
       );
       await Future.delayed(const Duration(milliseconds: 300));
-      _ref.read(selectedIndexProvider.notifier).updateIndex(0); // Use Home as base
+      _ref
+          .read(selectedIndexProvider.notifier)
+          .updateIndex(0); // Use Home as base
       NavigationService.navigatorKey.currentState?.pushNamed('Notifications');
       debugPrint('✅ Navigated to Notifications');
     } catch (e) {
@@ -230,7 +261,9 @@ class DeepLinkService {
         (route) => false,
       );
       await Future.delayed(const Duration(milliseconds: 300));
-      _ref.read(selectedIndexProvider.notifier).updateIndex(3); // Profile is index 3
+      _ref
+          .read(selectedIndexProvider.notifier)
+          .updateIndex(3); // Profile is index 3
       debugPrint('✅ Navigated to Profile');
     } catch (e) {
       debugPrint('Error navigating to profile: $e');
@@ -255,7 +288,7 @@ class DeepLinkService {
   String generateDeepLink(String route, {String? id}) {
     // Use HTTPS for clickable links in WhatsApp, Gmail, etc.
     const baseUrl = 'https://app.annujoomcharitabletrust.com/app';
-    
+
     switch (route) {
       case 'campaign':
         return id != null ? '$baseUrl/campaign/$id' : '$baseUrl/campaign';

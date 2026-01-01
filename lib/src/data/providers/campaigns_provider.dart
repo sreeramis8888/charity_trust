@@ -161,6 +161,15 @@ class CampaignsApi {
       requireAuth: true,
     );
   }
+
+  Future<ApiResponse<Map<String, dynamic>>> getSingleCampaign(
+    String campaignId,
+  ) async {
+    return await _apiProvider.get(
+      '$_endpoint/single-campaign/$campaignId',
+      requireAuth: true,
+    );
+  }
 }
 
 @riverpod
@@ -816,5 +825,27 @@ Future<CampaignPaginationState> categoryCampaigns(
     );
   } else {
     throw Exception(response.message ?? 'Failed to fetch campaigns');
+  }
+}
+
+
+@riverpod
+Future<CampaignModel?> singleCampaign(
+  Ref ref,
+  String campaignId,
+) async {
+  try {
+    final campaignsApi = ref.watch(campaignsApiProvider);
+    final response = await campaignsApi.getSingleCampaign(campaignId);
+
+    if (response.success && response.data != null) {
+      final data = response.data!['data'] as Map<String, dynamic>?;
+      if (data != null) {
+        return CampaignModel.fromJson(data);
+      }
+    }
+    return null;
+  } catch (e) {
+    throw Exception('Error fetching campaign: $e');
   }
 }
