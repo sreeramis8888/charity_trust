@@ -544,19 +544,27 @@ class ProfilePage extends ConsumerWidget {
 
   Future<void> _handleRateApp(BuildContext context) async {
     try {
-      // Replace with your actual Play Store app ID
-      const playStoreUrl =
-          'https://play.google.com/store/apps/details?id=com.annujoomconnect';
-      if (await canLaunchUrl(Uri.parse(playStoreUrl))) {
+      String appUrl;
+      String errorKey;
+
+      if (Theme.of(context).platform == TargetPlatform.iOS) {
+        appUrl = 'https://apps.apple.com/in/app/annujoom-connect/id6756281138';
+        errorKey = 'couldNotOpenAppStore';
+      } else {
+        appUrl = 'https://play.google.com/store/apps/details?id=com.annujoomconnect';
+        errorKey = 'couldNotOpenPlayStore';
+      }
+
+      if (await canLaunchUrl(Uri.parse(appUrl))) {
         await launchUrl(
-          Uri.parse(playStoreUrl),
+          Uri.parse(appUrl),
           mode: LaunchMode.externalApplication,
         );
       } else {
         if (context.mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text('couldNotOpenPlayStore'.tr()),
+              content: Text(errorKey.tr()),
               duration: const Duration(seconds: 2),
             ),
           );
@@ -566,7 +574,7 @@ class ProfilePage extends ConsumerWidget {
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('${'errorOpeningPlayStore'.tr()}: $e'),
+            content: Text('${'errorOpeningStore'.tr()}: $e'),
             duration: const Duration(seconds: 2),
           ),
         );

@@ -14,14 +14,16 @@ class ReferFriendPage extends StatefulWidget {
 }
 
 class _ReferFriendPageState extends State<ReferFriendPage> {
+  static const String _androidLink = 'https://play.google.com/store/apps/details?id=com.annujoomconnect';
+  static const String _iosLink = 'https://apps.apple.com/in/app/annujoom-connect/id6756281138';
+  
   late String referralLink;
   bool _isLinkCopied = false;
 
   @override
   void initState() {
     super.initState();
-    referralLink =
-        'https://play.google.com/store/apps/details?id=com.annujoomconnect';
+    referralLink = 'Android: $_androidLink\n\nIOS: $_iosLink';
   }
 
   Future<void> _copyToClipboard() async {
