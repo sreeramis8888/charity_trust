@@ -239,11 +239,22 @@ class _CampaignPageState extends ConsumerState<CampaignPage>
               ),
               tabs: [
                 Tab(
-                  child: _buildMarqueeTab("campaigns".tr()),
+                  child: _isPresident
+                      ? _buildMarqueeTab("campaigns".tr())
+                      : Text("campaigns".tr()),
                 ),
-                Tab(child: _buildMarqueeTab("transactions".tr())),
-                Tab(child: _buildMarqueeTab("myCampaigns".tr())),
-                if (_isPresident) Tab(child: _buildMarqueeTab("approvals".tr())),
+                Tab(
+                  child: _isPresident
+                      ? _buildMarqueeTab("transactions".tr())
+                      : Text("transactions".tr()),
+                ),
+                Tab(
+                  child: _isPresident
+                      ? _buildMarqueeTab("myCampaigns".tr())
+                      : Text("myCampaigns".tr()),
+                ),
+                if (_isPresident)
+                  Tab(child: _buildMarqueeTab("approvals".tr())),
               ],
             ),
           ),
