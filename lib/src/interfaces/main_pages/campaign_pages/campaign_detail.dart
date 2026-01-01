@@ -108,6 +108,25 @@ class _CampaignDetailPageState extends ConsumerState<CampaignDetailPage> {
     SnackbarService().showSnackBar(message, type: type);
   }
 
+  Future<void> _verifyFailedPayment(String? orderId, String? donationId) async {
+    if (orderId == null || donationId == null) return;
+    
+    try {
+      final donationApi = ref.read(donationApiProvider);
+      log("Verifying failed payment with backend");
+      await donationApi.verifyPayment(
+        razorpayOrderId: orderId,
+        razorpayPaymentId: '',
+        razorpaySignature: '',
+        donationId: donationId,
+        status: 'failed',
+      );
+      log("Failed payment recorded successfully");
+    } catch (e) {
+      log("Error recording failed payment: $e");
+    }
+  }
+
   void _showExceedsGoalDialog(double donationAmount, double remainingGoal) {
     if (!mounted) return;
     showDialog(
@@ -351,6 +370,7 @@ class _CampaignDetailPageState extends ConsumerState<CampaignDetailPage> {
               razorpayPaymentId: response.paymentId ?? '',
               razorpaySignature: response.signature ?? '',
               donationId: donationId ?? '',
+              status: 'success',
             );
 
             log("Verification response: success=${verifyResponse.success}");
@@ -402,6 +422,9 @@ class _CampaignDetailPageState extends ConsumerState<CampaignDetailPage> {
         onError: (PaymentFailureResponse response) {
           log("ERROR CALLBACK: Payment error - code=${response.code}, message=${response.message}");
           _donationFocusNode.unfocus();
+
+          // Call verify payment API with failed status
+          _verifyFailedPayment(orderId, donationId);
 
           if (mounted) {
             Navigator.of(context).pushReplacement(

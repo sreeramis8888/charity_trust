@@ -36,6 +36,7 @@ class DonationApi {
     required String razorpayPaymentId,
     required String razorpaySignature,
     required String donationId,
+    required String status,
   }) async {
     final response = await _apiProvider.post(
       '/donation/verify-payment',
@@ -44,6 +45,7 @@ class DonationApi {
         'razorpay_payment_id': razorpayPaymentId,
         'razorpay_signature': razorpaySignature,
         'donation_id': donationId,
+        'status': status,
       },
       requireAuth: true,
     );
@@ -104,6 +106,7 @@ class DonationNotifier extends _$DonationNotifier {
     required String razorpayPaymentId,
     required String razorpaySignature,
     required String donationId,
+    required String status,
   }) async {
     state = const AsyncValue.loading();
     state = await AsyncValue.guard(() async {
@@ -113,6 +116,7 @@ class DonationNotifier extends _$DonationNotifier {
         razorpayPaymentId: razorpayPaymentId,
         razorpaySignature: razorpaySignature,
         donationId: donationId,
+        status: status,
       );
 
       if (response.success) {
