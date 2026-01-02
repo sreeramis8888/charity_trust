@@ -31,8 +31,10 @@ class _AddCampaignPageState extends ConsumerState<AddCampaignPage> {
   final _scrollController = ScrollController();
   final FocusNode _unfocusNode = FocusNode();
 
-  final titleController = TextEditingController();
-  final descriptionController = TextEditingController();
+  final titleEnController = TextEditingController();
+  final titleMlController = TextEditingController();
+  final descriptionEnController = TextEditingController();
+  final descriptionMlController = TextEditingController();
   final targetAmountController = TextEditingController();
   final startDateController = TextEditingController();
   final endDateController = TextEditingController();
@@ -46,8 +48,10 @@ class _AddCampaignPageState extends ConsumerState<AddCampaignPage> {
 
   final Map<String, GlobalKey> _fieldKeys = {
     'category': GlobalKey(),
-    'title': GlobalKey(),
-    'description': GlobalKey(),
+    'titleEn': GlobalKey(),
+    'titleMl': GlobalKey(),
+    'descriptionEn': GlobalKey(),
+    'descriptionMl': GlobalKey(),
     'coverImage': GlobalKey(),
     'startDate': GlobalKey(),
     'endDate': GlobalKey(),
@@ -67,10 +71,14 @@ class _AddCampaignPageState extends ConsumerState<AddCampaignPage> {
 
         if (selectedCategory == null || selectedCategory!.isEmpty) {
           firstErrorKey = 'category';
-        } else if (titleController.text.trim().isEmpty) {
-          firstErrorKey = 'title';
-        } else if (descriptionController.text.trim().isEmpty) {
-          firstErrorKey = 'description';
+        } else if (titleEnController.text.trim().isEmpty) {
+          firstErrorKey = 'titleEn';
+        } else if (titleMlController.text.trim().isEmpty) {
+          firstErrorKey = 'titleMl';
+        } else if (descriptionEnController.text.trim().isEmpty) {
+          firstErrorKey = 'descriptionEn';
+        } else if (descriptionMlController.text.trim().isEmpty) {
+          firstErrorKey = 'descriptionMl';
         } else if (coverImage == null) {
           firstErrorKey = 'coverImage';
         } else if (startDateController.text.trim().isEmpty) {
@@ -102,8 +110,10 @@ class _AddCampaignPageState extends ConsumerState<AddCampaignPage> {
   void dispose() {
     _scrollController.dispose();
     _unfocusNode.dispose();
-    titleController.dispose();
-    descriptionController.dispose();
+    titleEnController.dispose();
+    titleMlController.dispose();
+    descriptionEnController.dispose();
+    descriptionMlController.dispose();
     targetAmountController.dispose();
     startDateController.dispose();
     endDateController.dispose();
@@ -167,8 +177,14 @@ class _AddCampaignPageState extends ConsumerState<AddCampaignPage> {
       final approvalStatus = userRole == 'president' ? 'approved' : 'pending';
 
       final campaignData = <String, dynamic>{
-        'title': titleController.text.trim(),
-        'description': descriptionController.text.trim(),
+        'title': {
+          'en': titleEnController.text.trim(),
+          'ml': titleMlController.text.trim(),
+        },
+        'description': {
+          'en': descriptionEnController.text.trim(),
+          'ml': descriptionMlController.text.trim(),
+        },
         'category': selectedCategory,
         'cover_image': coverImageUrl,
         'start_date': _formatDateForApi(startDateController.text.trim()),
@@ -268,7 +284,7 @@ class _AddCampaignPageState extends ConsumerState<AddCampaignPage> {
                       animationType: anim.AnimationType.fadeSlideInFromLeft,
                       duration: anim.AnimationDuration.normal,
                       delayMilliseconds: 200,
-                      child: Text("Campaign Name *", style: kSmallTitleR),
+                      child: Text("Campaign Name (English) *", style: kSmallTitleR),
                     ),
                     const SizedBox(height: 6),
                     anim.AnimatedWidgetWrapper(
@@ -276,10 +292,30 @@ class _AddCampaignPageState extends ConsumerState<AddCampaignPage> {
                       duration: anim.AnimationDuration.normal,
                       delayMilliseconds: 250,
                       child: InputField(
-                        key: _fieldKeys['title'],
+                        key: _fieldKeys['titleEn'],
                         type: CustomFieldType.text,
-                        hint: "Enter campaign name",
-                        controller: titleController,
+                        hint: "Enter campaign name in English",
+                        controller: titleEnController,
+                        validator: (v) => v!.isEmpty ? "Required" : null,
+                      ),
+                    ),
+                    const SizedBox(height: 18),
+                    anim.AnimatedWidgetWrapper(
+                      animationType: anim.AnimationType.fadeSlideInFromLeft,
+                      duration: anim.AnimationDuration.normal,
+                      delayMilliseconds: 200,
+                      child: Text("Campaign Name (Malayalam) *", style: kSmallTitleR),
+                    ),
+                    const SizedBox(height: 6),
+                    anim.AnimatedWidgetWrapper(
+                      animationType: anim.AnimationType.fadeSlideInFromBottom,
+                      duration: anim.AnimationDuration.normal,
+                      delayMilliseconds: 250,
+                      child: InputField(
+                        key: _fieldKeys['titleMl'],
+                        type: CustomFieldType.text,
+                        hint: "Enter campaign name in Malayalam",
+                        controller: titleMlController,
                         validator: (v) => v!.isEmpty ? "Required" : null,
                       ),
                     ),
@@ -288,7 +324,7 @@ class _AddCampaignPageState extends ConsumerState<AddCampaignPage> {
                       animationType: anim.AnimationType.fadeSlideInFromLeft,
                       duration: anim.AnimationDuration.normal,
                       delayMilliseconds: 300,
-                      child: Text("Description *", style: kSmallTitleR),
+                      child: Text("Description (English) *", style: kSmallTitleR),
                     ),
                     const SizedBox(height: 6),
                     anim.AnimatedWidgetWrapper(
@@ -296,10 +332,31 @@ class _AddCampaignPageState extends ConsumerState<AddCampaignPage> {
                       duration: anim.AnimationDuration.normal,
                       delayMilliseconds: 350,
                       child: InputField(
-                        key: _fieldKeys['description'],
+                        key: _fieldKeys['descriptionEn'],
                         type: CustomFieldType.text,
-                        hint: "Enter description",
-                        controller: descriptionController,
+                        hint: "Enter description in English",
+                        controller: descriptionEnController,
+                        maxLines: 4,
+                        validator: (v) => v!.isEmpty ? "Required" : null,
+                      ),
+                    ),
+                    const SizedBox(height: 18),
+                    anim.AnimatedWidgetWrapper(
+                      animationType: anim.AnimationType.fadeSlideInFromLeft,
+                      duration: anim.AnimationDuration.normal,
+                      delayMilliseconds: 300,
+                      child: Text("Description (Malayalam) *", style: kSmallTitleR),
+                    ),
+                    const SizedBox(height: 6),
+                    anim.AnimatedWidgetWrapper(
+                      animationType: anim.AnimationType.fadeSlideInFromBottom,
+                      duration: anim.AnimationDuration.normal,
+                      delayMilliseconds: 350,
+                      child: InputField(
+                        key: _fieldKeys['descriptionMl'],
+                        type: CustomFieldType.text,
+                        hint: "Enter description in Malayalam",
+                        controller: descriptionMlController,
                         maxLines: 4,
                         validator: (v) => v!.isEmpty ? "Required" : null,
                       ),

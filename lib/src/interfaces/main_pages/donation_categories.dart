@@ -45,6 +45,18 @@ class DonationCategoriesPage extends StatelessWidget {
           'image': 'assets/png/ghusal_mayyt.png',
           'category': 'Ghusl Mayyit'
         },
+        {
+          'title': 'patientRelief'.tr(),
+          'subtitle': 'patientReliefSubtitle'.tr(),
+          'image': 'assets/png/patient_relief.png',
+          'category': 'Patient Relief'
+        },
+        {
+          'title': 'foodKit'.tr(),
+          'subtitle': 'foodKitSubtitle'.tr(),
+          'image': 'assets/png/food_kit.png',
+          'category': 'Food Kit'
+        },
       ];
 
   void _handleCategoryTap(BuildContext context, String category) {
