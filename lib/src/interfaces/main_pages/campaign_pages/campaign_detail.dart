@@ -312,7 +312,7 @@ class _CampaignDetailPageState extends ConsumerState<CampaignDetailPage> {
     }
 
     final remaining = ((widget.goal ?? 0) - (widget.raised ?? 0)).toDouble();
-    if (amount > remaining) {
+    if (amount > remaining && widget.category == 'General Campaign' && (widget.goal ?? 0) > 0) {
       _showExceedsGoalDialog(amount, remaining);
       return;
     }
