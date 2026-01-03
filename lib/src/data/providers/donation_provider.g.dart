@@ -74,7 +74,7 @@ final class DonationNotifierProvider
   DonationNotifier create() => DonationNotifier();
 }
 
-String _$donationNotifierHash() => r'0806a6189ee29b399594db5a933369988a53e384';
+String _$donationNotifierHash() => r'3c0a789442c35074c3b48403350083532502b42a';
 
 abstract class _$DonationNotifier extends $AsyncNotifier<Map<String, dynamic>> {
   FutureOr<Map<String, dynamic>> build();

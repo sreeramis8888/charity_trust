@@ -436,33 +436,6 @@ Future<bool> rejectUser(
 }
 
 @riverpod
-class PendingApprovalsNotifier extends _$PendingApprovalsNotifier {
-  @override
-  Future<List<UserModel>> build() async {
-    final apiProvider = ref.watch(apiProviderProvider);
-    final response = await apiProvider.get(
-      '/user/appovals',
-      requireAuth: true,
-    );
-
-    if (response.success && response.data != null) {
-      final data = response.data!['data'] as List?;
-      if (data != null) {
-        return data
-            .map((item) => UserModel.fromJson(item as Map<String, dynamic>))
-            .toList();
-      }
-    }
-    return [];
-  }
-
-  Future<void> refresh() async {
-    state = const AsyncValue.loading();
-    state = await AsyncValue.guard(() => build());
-  }
-}
-
-@riverpod
 class UserReferralsNotifier extends _$UserReferralsNotifier {
   @override
   Future<List<UserModel>> build() async {
@@ -548,7 +521,8 @@ class ReferralDateFilter extends _$ReferralDateFilter {
       };
 
   void setDates(String? startDate, String? endDate) {
-    print('🟣 [ReferralDateFilter] setDates called with startDate: $startDate, endDate: $endDate');
+    print(
+        '🟣 [ReferralDateFilter] setDates called with startDate: $startDate, endDate: $endDate');
     state = {
       'start_date': startDate,
       'end_date': endDate,
@@ -571,6 +545,9 @@ class ReferralPaginationState {
   final int limit;
   final int totalCount;
   final List<UserModel> referrals;
+  final int totalPending;
+  final int totalApproved;
+  final int totalRejected;
   final bool hasMore;
 
   ReferralPaginationState({
@@ -578,29 +555,40 @@ class ReferralPaginationState {
     required this.limit,
     required this.totalCount,
     required this.referrals,
-  }) : hasMore = (currentPage * limit) < totalCount;
+    this.totalPending = 0,
+    this.totalApproved = 0,
+    this.totalRejected = 0,
+  }) : hasMore = referrals.length < totalCount;
 
   ReferralPaginationState copyWith({
     int? currentPage,
     int? limit,
     int? totalCount,
     List<UserModel>? referrals,
+    int? totalPending,
+    int? totalApproved,
+    int? totalRejected,
   }) {
     return ReferralPaginationState(
       currentPage: currentPage ?? this.currentPage,
       limit: limit ?? this.limit,
       totalCount: totalCount ?? this.totalCount,
       referrals: referrals ?? this.referrals,
+      totalPending: totalPending ?? this.totalPending,
+      totalApproved: totalApproved ?? this.totalApproved,
+      totalRejected: totalRejected ?? this.totalRejected,
     );
   }
 }
 
 @riverpod
 class AllReferralsNotifier extends _$AllReferralsNotifier {
+  bool _isLoadingMore = false;
+
   @override
   Future<ReferralPaginationState> build() async {
     print('🔵 [AllReferralsNotifier] BUILD CALLED');
-    
+
     final secureStorage = ref.watch(secureStorageServiceProvider);
     final userId = await secureStorage.getUserId();
     final search = ref.watch(referralSearchProvider);
@@ -628,7 +616,8 @@ class AllReferralsNotifier extends _$AllReferralsNotifier {
     queryParams.add('page_no=1');
     queryParams.add('limit=10');
 
-    print('🔵 [AllReferralsNotifier] Before adding filters - queryParams: $queryParams');
+    print(
+        '🔵 [AllReferralsNotifier] Before adding filters - queryParams: $queryParams');
 
     if (search.isNotEmpty) {
       queryParams.add('search=${Uri.encodeComponent(search)}');
@@ -641,15 +630,17 @@ class AllReferralsNotifier extends _$AllReferralsNotifier {
     if (dates['start_date'] != null && dates['start_date']!.isNotEmpty) {
       queryParams
           .add('start_date=${Uri.encodeComponent(dates['start_date']!)}');
-      print('🔵 [AllReferralsNotifier] Added start_date parameter: ${dates['start_date']}');
+      print(
+          '🔵 [AllReferralsNotifier] Added start_date parameter: ${dates['start_date']}');
     }
     if (dates['end_date'] != null && dates['end_date']!.isNotEmpty) {
       queryParams.add('end_date=${Uri.encodeComponent(dates['end_date']!)}');
-      print('🔵 [AllReferralsNotifier] Added end_date parameter: ${dates['end_date']}');
+      print(
+          '🔵 [AllReferralsNotifier] Added end_date parameter: ${dates['end_date']}');
     }
 
     final queryString = queryParams.join('&');
-    final url = '/user/referals/$userId?$queryString';
+    final url = '/user/approvals?$queryString';
 
     print('🔵 [AllReferralsNotifier] Final queryParams: $queryParams');
     print('🔵 [AllReferralsNotifier] Final URL: $url');
@@ -661,25 +652,41 @@ class AllReferralsNotifier extends _$AllReferralsNotifier {
     );
 
     if (response.success && response.data != null) {
-      final data = response.data!['data'] as List?;
-      final totalCountValue = response.data!['total_count'];
-      final totalCount = totalCountValue is int
-          ? totalCountValue
-          : int.tryParse(totalCountValue.toString()) ?? 0;
+      final data = response.data!['data'] as Map<String, dynamic>?;
+      if (data != null) {
+        final users = data['users'] as List?;
+        final totalCountValue = data['total_count'];
+        final totalCount = totalCountValue is int
+            ? totalCountValue
+            : int.tryParse(totalCountValue.toString()) ?? 0;
 
-      final referrals = data != null
-          ? data
-              .map((item) => UserModel.fromJson(item as Map<String, dynamic>))
-              .toList()
-              .cast<UserModel>()
-          : <UserModel>[];
+        final totalPending = data['total_pending'] is int
+            ? data['total_pending']
+            : int.tryParse(data['total_pending'].toString()) ?? 0;
+        final totalApproved = data['total_approved'] is int
+            ? data['total_approved']
+            : int.tryParse(data['total_approved'].toString()) ?? 0;
+        final totalRejected = data['total_rejected'] is int
+            ? data['total_rejected']
+            : int.tryParse(data['total_rejected'].toString()) ?? 0;
 
-      return ReferralPaginationState(
-        currentPage: 1,
-        limit: 10,
-        totalCount: totalCount,
-        referrals: referrals,
-      );
+        final referrals = users != null
+            ? users
+                .map((item) => UserModel.fromJson(item as Map<String, dynamic>))
+                .toList()
+                .cast<UserModel>()
+            : <UserModel>[];
+
+        return ReferralPaginationState(
+          currentPage: 1,
+          limit: 10,
+          totalCount: totalCount,
+          referrals: referrals,
+          totalPending: totalPending,
+          totalApproved: totalApproved,
+          totalRejected: totalRejected,
+        );
+      }
     }
     return ReferralPaginationState(
       currentPage: 1,
@@ -693,16 +700,31 @@ class AllReferralsNotifier extends _$AllReferralsNotifier {
     if (!state.hasValue) return;
 
     final currentState = state.value!;
-    if (!currentState.hasMore) return;
+
+    // Don't call API if we've already loaded all items
+    if (!currentState.hasMore) {
+      print(
+          '🔵 [AllReferralsNotifier] loadNextPage skipped - hasMore is false, all items loaded');
+      return;
+    }
+
+    // Prevent duplicate API calls while one is already in progress
+    if (_isLoadingMore) {
+      print(
+          '🔵 [AllReferralsNotifier] loadNextPage skipped - already loading more');
+      return;
+    }
+
+    _isLoadingMore = true;
+    print(
+        '🔵 [AllReferralsNotifier] loadNextPage started - loading page ${currentState.currentPage + 1}');
 
     state = await AsyncValue.guard(() async {
-      final secureStorage = ref.watch(secureStorageServiceProvider);
-      final userId = await secureStorage.getUserId();
       final search = ref.read(referralSearchProvider);
       final status = ref.read(referralStatusFilterProvider);
       final dates = ref.read(referralDateFilterProvider);
 
-      if (userId == null || userId.isEmpty) {
+      if (currentState.referrals.isEmpty) {
         return currentState;
       }
 
@@ -729,35 +751,229 @@ class AllReferralsNotifier extends _$AllReferralsNotifier {
 
       final queryString = queryParams.join('&');
       final response = await apiProvider.get(
-        '/user/referals/$userId?$queryString',
+        '/user/approvals?$queryString',
         requireAuth: true,
       );
 
       if (response.success && response.data != null) {
-        final data = response.data!['data'] as List?;
-        final totalCountValue = response.data!['total_count'];
+        final data = response.data!['data'] as Map<String, dynamic>?;
+        if (data != null) {
+          final users = data['users'] as List?;
+          final totalCountValue = data['total_count'];
+          final totalCount = totalCountValue is int
+              ? totalCountValue
+              : int.tryParse(totalCountValue.toString()) ?? 0;
+
+          final referrals = users != null
+              ? users
+                  .map((item) =>
+                      UserModel.fromJson(item as Map<String, dynamic>))
+                  .toList()
+                  .cast<UserModel>()
+              : <UserModel>[];
+
+          return currentState.copyWith(
+            currentPage: nextPage,
+            totalCount: totalCount,
+            referrals: <UserModel>[...currentState.referrals, ...referrals],
+          );
+        }
+      }
+      return currentState;
+    });
+    _isLoadingMore = false;
+    print('🔵 [AllReferralsNotifier] loadNextPage completed');
+  }
+
+  Future<void> refresh() async {
+    _isLoadingMore = false;
+    state = const AsyncValue.loading();
+    state = await AsyncValue.guard(() => build());
+  }
+}
+
+@riverpod
+class IndirectReferralsNotifier extends _$IndirectReferralsNotifier {
+  bool _isLoadingMore = false;
+
+  @override
+  Future<ReferralPaginationState> build() async {
+    print('🟣 [IndirectReferralsNotifier] BUILD CALLED - Indirect Referrals');
+    
+    final search = ref.watch(referralSearchProvider);
+    final status = ref.watch(referralStatusFilterProvider);
+    final dates = ref.watch(referralDateFilterProvider);
+
+    print('🟣 [IndirectReferralsNotifier] search: "$search"');
+    print('🟣 [IndirectReferralsNotifier] status: "$status"');
+    print('🟣 [IndirectReferralsNotifier] dates: $dates');
+
+    final apiProvider = ref.watch(apiProviderProvider);
+
+    final queryParams = <String>[];
+    queryParams.add('page_no=1');
+    queryParams.add('limit=10');
+
+    if (search.isNotEmpty) {
+      queryParams.add('search=${Uri.encodeComponent(search)}');
+      print('🟣 [IndirectReferralsNotifier] Added search parameter: $search');
+    }
+    if (status.isNotEmpty) {
+      queryParams.add('status=${Uri.encodeComponent(status)}');
+      print('🟣 [IndirectReferralsNotifier] Added status parameter: $status');
+    }
+    if (dates['start_date'] != null && dates['start_date']!.isNotEmpty) {
+      queryParams
+          .add('start_date=${Uri.encodeComponent(dates['start_date']!)}');
+      print('🟣 [IndirectReferralsNotifier] Added start_date parameter: ${dates['start_date']}');
+    }
+    if (dates['end_date'] != null && dates['end_date']!.isNotEmpty) {
+      queryParams.add('end_date=${Uri.encodeComponent(dates['end_date']!)}');
+      print('🟣 [IndirectReferralsNotifier] Added end_date parameter: ${dates['end_date']}');
+    }
+
+    final queryString = queryParams.join('&');
+    final url = '/user/indirect-referrals?$queryString';
+
+    print('🟣 [IndirectReferralsNotifier] Final URL: $url');
+    log('IndirectReferralsNotifier API call: $url', name: 'IndirectReferralsNotifier');
+
+    final response = await apiProvider.get(
+      url,
+      requireAuth: true,
+    );
+
+    if (response.success && response.data != null) {
+      final data = response.data!['data'] as Map<String, dynamic>?;
+      if (data != null) {
+        final users = data['users'] as List?;
+        final totalCountValue = data['total_count'];
         final totalCount = totalCountValue is int
             ? totalCountValue
             : int.tryParse(totalCountValue.toString()) ?? 0;
+        
+        final totalPending = data['total_pending'] is int
+            ? data['total_pending']
+            : int.tryParse(data['total_pending'].toString()) ?? 0;
+        final totalApproved = data['total_approved'] is int
+            ? data['total_approved']
+            : int.tryParse(data['total_approved'].toString()) ?? 0;
+        final totalRejected = data['total_rejected'] is int
+            ? data['total_rejected']
+            : int.tryParse(data['total_rejected'].toString()) ?? 0;
 
-        final referrals = data != null
-            ? data
+        final referrals = users != null
+            ? users
                 .map((item) => UserModel.fromJson(item as Map<String, dynamic>))
                 .toList()
                 .cast<UserModel>()
             : <UserModel>[];
 
-        return currentState.copyWith(
-          currentPage: nextPage,
+        return ReferralPaginationState(
+          currentPage: 1,
+          limit: 10,
           totalCount: totalCount,
-          referrals: <UserModel>[...currentState.referrals, ...referrals],
+          referrals: referrals,
+          totalPending: totalPending,
+          totalApproved: totalApproved,
+          totalRejected: totalRejected,
         );
+      }
+    }
+    return ReferralPaginationState(
+      currentPage: 1,
+      limit: 10,
+      totalCount: 0,
+      referrals: [],
+    );
+  }
+
+  Future<void> loadNextPage() async {
+    if (!state.hasValue) return;
+
+    final currentState = state.value!;
+    
+    if (!currentState.hasMore) {
+      print('🟣 [IndirectReferralsNotifier] loadNextPage skipped - hasMore is false');
+      return;
+    }
+
+    if (_isLoadingMore) {
+      print('🟣 [IndirectReferralsNotifier] loadNextPage skipped - already loading more');
+      return;
+    }
+
+    _isLoadingMore = true;
+    print('🟣 [IndirectReferralsNotifier] loadNextPage started - loading page ${currentState.currentPage + 1}');
+
+    state = await AsyncValue.guard(() async {
+      final search = ref.read(referralSearchProvider);
+      final status = ref.read(referralStatusFilterProvider);
+      final dates = ref.read(referralDateFilterProvider);
+
+      if (currentState.referrals.isEmpty) {
+        return currentState;
+      }
+
+      final apiProvider = ref.watch(apiProviderProvider);
+      final nextPage = currentState.currentPage + 1;
+
+      final queryParams = <String>[];
+      queryParams.add('page_no=$nextPage');
+      queryParams.add('limit=${currentState.limit}');
+
+      if (search.isNotEmpty) {
+        queryParams.add('search=${Uri.encodeComponent(search)}');
+      }
+      if (status.isNotEmpty) {
+        queryParams.add('status=${Uri.encodeComponent(status)}');
+      }
+      if (dates['start_date'] != null && dates['start_date']!.isNotEmpty) {
+        queryParams
+            .add('start_date=${Uri.encodeComponent(dates['start_date']!)}');
+      }
+      if (dates['end_date'] != null && dates['end_date']!.isNotEmpty) {
+        queryParams.add('end_date=${Uri.encodeComponent(dates['end_date']!)}');
+      }
+
+      final queryString = queryParams.join('&');
+      final response = await apiProvider.get(
+        '/user/indirect-referrals?$queryString',
+        requireAuth: true,
+      );
+
+      if (response.success && response.data != null) {
+        final data = response.data!['data'] as Map<String, dynamic>?;
+        if (data != null) {
+          final users = data['users'] as List?;
+          final totalCountValue = data['total_count'];
+          final totalCount = totalCountValue is int
+              ? totalCountValue
+              : int.tryParse(totalCountValue.toString()) ?? 0;
+
+          final referrals = users != null
+              ? users
+                  .map((item) =>
+                      UserModel.fromJson(item as Map<String, dynamic>))
+                  .toList()
+                  .cast<UserModel>()
+              : <UserModel>[];
+
+          return currentState.copyWith(
+            currentPage: nextPage,
+            totalCount: totalCount,
+            referrals: <UserModel>[...currentState.referrals, ...referrals],
+          );
+        }
       }
       return currentState;
     });
+    _isLoadingMore = false;
+    print('🟣 [IndirectReferralsNotifier] loadNextPage completed');
   }
 
   Future<void> refresh() async {
+    _isLoadingMore = false;
     state = const AsyncValue.loading();
     state = await AsyncValue.guard(() => build());
   }

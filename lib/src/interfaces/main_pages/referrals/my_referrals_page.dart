@@ -1,3 +1,4 @@
+import 'package:Annujoom/src/data/models/user_model.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:Annujoom/src/interfaces/components/loading_indicator.dart';
 import 'package:flutter/material.dart';
@@ -36,7 +37,13 @@ class _MyReferralsPageState extends ConsumerState<MyReferralsPage>
 
     _setupScrollController(
       _referralsScrollController,
-      () => ref.read(allReferralsProvider.notifier).loadNextPage(),
+      () {
+        if (_tabController.index == 0) {
+          ref.read(allReferralsProvider.notifier).loadNextPage();
+        } else {
+          ref.read(indirectReferralsProvider.notifier).loadNextPage();
+        }
+      },
     );
   }
 
@@ -71,9 +78,10 @@ class _MyReferralsPageState extends ConsumerState<MyReferralsPage>
   @override
   Widget build(BuildContext context) {
     print('🟣 [MyReferralsPage] BUILD called');
-    final pendingApprovalsAsync = ref.watch(pendingApprovalsProvider);
     final allReferralsAsync = ref.watch(allReferralsProvider);
+    final indirectReferralsAsync = ref.watch(indirectReferralsProvider);
     print('🟣 [MyReferralsPage] allReferralsAsync state: ${allReferralsAsync.runtimeType}');
+    print('🟣 [MyReferralsPage] indirectReferralsAsync state: ${indirectReferralsAsync.runtimeType}');
 
     return Scaffold(
       backgroundColor: kBackgroundColor,
@@ -98,178 +106,180 @@ class _MyReferralsPageState extends ConsumerState<MyReferralsPage>
           // Unfocus the search field when tapping elsewhere
           _searchFocusNode.unfocus();
         },
-        child: SingleChildScrollView(
-          child: Padding(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text('referralsSummary'.tr(), style: kBodyTitleM),
-                const SizedBox(height: 12),
-                anim.AnimatedWidgetWrapper(
-                  animationType: anim.AnimationType.fadeSlideInFromBottom,
-                  duration: anim.AnimationDuration.slow,
-                  curveType: anim.AnimationCurveType.easeOut,
-                  child: Container(
-                    padding: const EdgeInsets.all(18),
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                          colors: [
-                            const Color(0xFFFFFFFF),
-                            const Color(0xFFCEE8F8)
-                          ],
-                          begin: Alignment.topCenter,
-                          end: Alignment.bottomCenter),
-                      borderRadius: BorderRadius.circular(22),
-                    ),
-                    child: allReferralsAsync.when(
-                      data: (paginationState) {
-                        final referrals = paginationState.referrals;
-                        final total = referrals.length;
-                        final approved =
-                            referrals.where((r) => r.status == 'active').length;
-                        final pending = referrals
-                            .where((r) => r.status == 'pending')
-                            .length;
-                        final rejected = referrals
-                            .where((r) => r.status == 'rejected')
-                            .length;
-
-                        return _buildStatsColumn(
-                            total, approved, pending, rejected);
-                      },
-                      loading: () => _buildStatsColumn(0, 0, 0, 0),
-                      error: (error, stack) => _buildStatsColumn(0, 0, 0, 0),
-                    ),
-                  ),
+        child: ListView(
+          controller: _referralsScrollController,
+          padding: const EdgeInsets.all(16),
+          children: [
+            Text('referralsSummary'.tr(), style: kBodyTitleM),
+            const SizedBox(height: 12),
+            anim.AnimatedWidgetWrapper(
+              animationType: anim.AnimationType.fadeSlideInFromBottom,
+              duration: anim.AnimationDuration.slow,
+              curveType: anim.AnimationCurveType.easeOut,
+              child: Container(
+                padding: const EdgeInsets.all(18),
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                      colors: [
+                        const Color(0xFFFFFFFF),
+                        const Color(0xFFCEE8F8)
+                      ],
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter),
+                  borderRadius: BorderRadius.circular(22),
                 ),
-                const SizedBox(height: 24),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text('referrals'.tr(), style: kBodyTitleM),
-                    ElevatedButton.icon(
-                      onPressed: () {
-                        Navigator.of(context).pushNamed('CreateUser');
-                      },
-                      icon: const Icon(
-                        Icons.add,
-                        size: 18,
-                        color: kWhite,
-                      ),
-                      label: Text(
-                        'addNewMember'.tr(),
-                        style: kSmallTitleM.copyWith(color: kWhite),
-                      ),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: kPrimaryColor,
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 12, vertical: 8),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 16),
-                _buildSearchAndFilterBar(),
-                const SizedBox(height: 16),
-                _buildReferralTabBar(),
-                const SizedBox(height: 16),
-                allReferralsAsync.when(
+                child: allReferralsAsync.when(
                   data: (paginationState) {
-                    final allReferrals = paginationState.referrals;
+                    final total = paginationState.totalApproved + paginationState.totalPending + paginationState.totalRejected;
+                    final approved = paginationState.totalApproved;
+                    final pending = paginationState.totalPending;
+                    final rejected = paginationState.totalRejected;
 
-                    // Separate direct and indirect referrals
-                    final directReferrals = allReferrals
-                        .where((r) =>
-                            r.underCharityMember == null ||
-                            r.underCharityMember!.isEmpty)
-                        .toList();
-                    final indirectReferrals = allReferrals
-                        .where((r) =>
-                            r.underCharityMember != null &&
-                            r.underCharityMember!.isNotEmpty)
-                        .toList();
-
-                    final displayReferrals = _tabController.index == 0
-                        ? directReferrals
-                        : indirectReferrals;
-
-                    if (displayReferrals.isEmpty) {
-                      return Center(
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 32),
-                          child: Text(
-                            'noReferralsYet'.tr(),
-                            style: kSmallTitleR.copyWith(
-                              color: kSecondaryTextColor,
-                            ),
-                          ),
-                        ),
-                      );
-                    }
-
-                    return ListView.builder(
-                      shrinkWrap: true,
-                      physics: const NeverScrollableScrollPhysics(),
-                      itemCount: displayReferrals.length,
-                      itemBuilder: (context, index) {
-                        final user = displayReferrals[index];
-                        final isPending = user.status == 'pending';
-
-                        return ReferralCard(
-                          user: user,
-                          isPending: isPending,
-                          onTap: () async {
-                            final result = await Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => ReferralDetailsPage(
-                                  user: user,
-                                  isPending: isPending,
-                                ),
-                              ),
-                            );
-
-                            if (result == true) {
-                              await ref
-                                  .read(allReferralsProvider.notifier)
-                                  .refresh();
-                            }
-                          },
-                          onViewDetails: () async {
-                            final result = await Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => ReferralDetailsPage(
-                                  user: user,
-                                  isPending: isPending,
-                                ),
-                              ),
-                            );
-
-                            if (result == true) {
-                              await ref
-                                  .read(allReferralsProvider.notifier)
-                                  .refresh();
-                            }
-                          },
-                        );
-                      },
-                    );
+                    return _buildStatsColumn(
+                        total, approved, pending, rejected);
                   },
-                  loading: () => const Center(
-                    child: LoadingAnimation(),
+                  loading: () => _buildStatsColumn(0, 0, 0, 0),
+                  error: (error, stack) => _buildStatsColumn(0, 0, 0, 0),
+                ),
+              ),
+            ),
+            const SizedBox(height: 24),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text('referrals'.tr(), style: kBodyTitleM),
+                ElevatedButton.icon(
+                  onPressed: () {
+                    Navigator.of(context).pushNamed('CreateUser');
+                  },
+                  icon: const Icon(
+                    Icons.add,
+                    size: 18,
+                    color: kWhite,
                   ),
-                  error: (error, stack) => Center(
-                    child: Text('errorLoadingReferrals'.tr() + ': $error'),
+                  label: Text(
+                    'addNewMember'.tr(),
+                    style: kSmallTitleM.copyWith(color: kWhite),
+                  ),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: kPrimaryColor,
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 12, vertical: 8),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
                   ),
                 ),
               ],
             ),
-          ),
+            const SizedBox(height: 16),
+            _buildSearchAndFilterBar(),
+            const SizedBox(height: 16),
+            _buildReferralTabBar(),
+            const SizedBox(height: 16),
+            allReferralsAsync.when(
+              data: (paginationState) {
+                final displayReferrals = _tabController.index == 0
+                    ? paginationState.referrals
+                    : ref.watch(indirectReferralsProvider).maybeWhen(
+                          data: (indirectState) => indirectState.referrals,
+                          orElse: () => <UserModel>[],
+                        );
+
+                if (displayReferrals.isEmpty) {
+                  return Center(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 32),
+                      child: Text(
+                        'noReferralsYet'.tr(),
+                        style: kSmallTitleR.copyWith(
+                          color: kSecondaryTextColor,
+                        ),
+                      ),
+                    ),
+                  );
+                }
+
+                final hasMore = _tabController.index == 0
+                    ? paginationState.hasMore
+                    : ref.watch(indirectReferralsProvider).maybeWhen(
+                          data: (indirectState) => indirectState.hasMore,
+                          orElse: () => false,
+                        );
+
+                return Column(
+                  children: [
+                    ...displayReferrals.map((user) {
+                      final isPending = user.status == 'pending';
+
+                      return ReferralCard(
+                        user: user,
+                        isPending: isPending,
+                        onTap: () async {
+                          final result = await Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => ReferralDetailsPage(
+                                user: user,
+                                isPending: isPending,
+                              ),
+                            ),
+                          );
+
+                          if (result == true) {
+                            if (_tabController.index == 0) {
+                              await ref
+                                  .read(allReferralsProvider.notifier)
+                                  .refresh();
+                            } else {
+                              await ref
+                                  .read(indirectReferralsProvider.notifier)
+                                  .refresh();
+                            }
+                          }
+                        },
+                        onViewDetails: () async {
+                          final result = await Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => ReferralDetailsPage(
+                                user: user,
+                                isPending: isPending,
+                              ),
+                            ),
+                          );
+
+                          if (result == true) {
+                            if (_tabController.index == 0) {
+                              await ref
+                                  .read(allReferralsProvider.notifier)
+                                  .refresh();
+                            } else {
+                              await ref
+                                  .read(indirectReferralsProvider.notifier)
+                                  .refresh();
+                            }
+                          }
+                        },
+                      );
+                    }).toList(),
+                    // Show loading indicator if there are more items to load
+                    if (hasMore)
+                      Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        child: LoadingAnimation(size: 24),
+                      ),
+                  ],
+                );
+              },
+              loading: () => const Center(
+                child: LoadingAnimation(),
+              ),
+              error: (error, stack) => Center(
+                child: Text('errorLoadingReferrals'.tr() + ': $error'),
+              ),
+            ),
+          ],
         ),
       ),
     );

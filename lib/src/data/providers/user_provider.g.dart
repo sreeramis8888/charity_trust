@@ -869,50 +869,6 @@ final class RejectUserFamily extends $Family
   String toString() => r'rejectUserProvider';
 }
 
-@ProviderFor(PendingApprovalsNotifier)
-const pendingApprovalsProvider = PendingApprovalsNotifierProvider._();
-
-final class PendingApprovalsNotifierProvider
-    extends $AsyncNotifierProvider<PendingApprovalsNotifier, List<UserModel>> {
-  const PendingApprovalsNotifierProvider._()
-      : super(
-          from: null,
-          argument: null,
-          retry: null,
-          name: r'pendingApprovalsProvider',
-          isAutoDispose: true,
-          dependencies: null,
-          $allTransitiveDependencies: null,
-        );
-
-  @override
-  String debugGetCreateSourceHash() => _$pendingApprovalsNotifierHash();
-
-  @$internal
-  @override
-  PendingApprovalsNotifier create() => PendingApprovalsNotifier();
-}
-
-String _$pendingApprovalsNotifierHash() =>
-    r'b07c72528e0aa5dbafcd5ab32ad79c1910ac2a0a';
-
-abstract class _$PendingApprovalsNotifier
-    extends $AsyncNotifier<List<UserModel>> {
-  FutureOr<List<UserModel>> build();
-  @$mustCallSuper
-  @override
-  void runBuild() {
-    final created = build();
-    final ref = this.ref as $Ref<AsyncValue<List<UserModel>>, List<UserModel>>;
-    final element = ref.element as $ClassProviderElement<
-        AnyNotifier<AsyncValue<List<UserModel>>, List<UserModel>>,
-        AsyncValue<List<UserModel>>,
-        Object?,
-        Object?>;
-    element.handleValue(ref, created);
-  }
-}
-
 @ProviderFor(UserReferralsNotifier)
 const userReferralsProvider = UserReferralsNotifierProvider._();
 
@@ -1175,9 +1131,55 @@ final class AllReferralsNotifierProvider extends $AsyncNotifierProvider<
 }
 
 String _$allReferralsNotifierHash() =>
-    r'1b4db66e748b17d7d10302491ff52dace92f0d59';
+    r'990c3cea7051c9e8b81567ac29134b1de6b0cc9c';
 
 abstract class _$AllReferralsNotifier
+    extends $AsyncNotifier<ReferralPaginationState> {
+  FutureOr<ReferralPaginationState> build();
+  @$mustCallSuper
+  @override
+  void runBuild() {
+    final created = build();
+    final ref = this.ref
+        as $Ref<AsyncValue<ReferralPaginationState>, ReferralPaginationState>;
+    final element = ref.element as $ClassProviderElement<
+        AnyNotifier<AsyncValue<ReferralPaginationState>,
+            ReferralPaginationState>,
+        AsyncValue<ReferralPaginationState>,
+        Object?,
+        Object?>;
+    element.handleValue(ref, created);
+  }
+}
+
+@ProviderFor(IndirectReferralsNotifier)
+const indirectReferralsProvider = IndirectReferralsNotifierProvider._();
+
+final class IndirectReferralsNotifierProvider extends $AsyncNotifierProvider<
+    IndirectReferralsNotifier, ReferralPaginationState> {
+  const IndirectReferralsNotifierProvider._()
+      : super(
+          from: null,
+          argument: null,
+          retry: null,
+          name: r'indirectReferralsProvider',
+          isAutoDispose: true,
+          dependencies: null,
+          $allTransitiveDependencies: null,
+        );
+
+  @override
+  String debugGetCreateSourceHash() => _$indirectReferralsNotifierHash();
+
+  @$internal
+  @override
+  IndirectReferralsNotifier create() => IndirectReferralsNotifier();
+}
+
+String _$indirectReferralsNotifierHash() =>
+    r'a2e6a8d572fb6887155ef90984b9b398a38948bd';
+
+abstract class _$IndirectReferralsNotifier
     extends $AsyncNotifier<ReferralPaginationState> {
   FutureOr<ReferralPaginationState> build();
   @$mustCallSuper
