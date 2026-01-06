@@ -959,7 +959,7 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
                         animationType: anim.AnimationType.fadeSlideInFromLeft,
                         duration: anim.AnimationDuration.normal,
                         delayMilliseconds: 1000,
-                        child: Text("aadharNumber".tr(), style: kSmallTitleR),
+                        child: Text("aadharNumber".tr() + " (optional)", style: kSmallTitleR),
                       ),
                       const SizedBox(height: 6),
                       anim.AnimatedWidgetWrapper(

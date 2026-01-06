@@ -206,188 +206,190 @@ class _ModalSheetContentState<T> extends State<_ModalSheetContent<T>> {
   Widget build(BuildContext context) {
     final keyboardHeight = MediaQuery.of(context).viewInsets.bottom;
 
-    return DraggableScrollableSheet(
-      initialChildSize: widget.initialChildSize,
-      minChildSize: widget.minChildSize,
-      maxChildSize: widget.maxChildSize,
-      expand: false,
-      builder: (context, scrollController) {
-        return Container(
-          decoration: BoxDecoration(
-            color: widget.backgroundColor,
-            borderRadius: BorderRadius.only(
-              topLeft: Radius.circular(widget.borderRadius),
-              topRight: Radius.circular(widget.borderRadius),
+    return SafeArea(     top: false,
+      child: DraggableScrollableSheet(
+        initialChildSize: widget.initialChildSize,
+        minChildSize: widget.minChildSize,
+        maxChildSize: widget.maxChildSize,
+        expand: false,
+        builder: (context, scrollController) {
+          return Container(
+            decoration: BoxDecoration(
+              color: widget.backgroundColor,
+              borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(widget.borderRadius),
+                topRight: Radius.circular(widget.borderRadius),
+              ),
             ),
-          ),
-          child: Column(
-            children: [
-              // Handle bar
-              Padding(
-                padding: const EdgeInsets.only(top: 8),
-                child: Container(
-                  width: 40,
-                  height: 4,
-                  decoration: BoxDecoration(
-                    color: Colors.grey.shade300,
-                    borderRadius: BorderRadius.circular(2),
-                  ),
-                ),
-              ),
-              // Title
-              Padding(
-                padding: widget.contentPadding.copyWith(bottom: 12),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      widget.title,
-                      style: const TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.w600,
-                        color: Colors.black,
-                      ),
-                    ),
-                    GestureDetector(
-                      onTap: () => Navigator.pop(context),
-                      child: Icon(
-                        Icons.close,
-                        color: Colors.grey.shade600,
-                        size: 24,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              // Search bar
-              if (widget.showSearchBar)
+            child: Column(
+              children: [
+                // Handle bar
                 Padding(
-                  padding: widget.contentPadding.copyWith(top: 0, bottom: 12),
-                  child: TextField(
-                    controller: _searchController,
-                    onChanged: _filterItems,
-                    keyboardType: widget.searchInputType,
-                    maxLines: widget.maxLines ?? 1,
-                    autofocus: true,
-                    decoration: InputDecoration(
-                      hintText: widget.searchHint,
-                      hintStyle: TextStyle(
-                        color: Colors.grey.shade500,
-                        fontSize: 14,
-                        fontWeight: FontWeight.w400,
-                      ),
-                      prefixIcon: Icon(
-                        Icons.search,
-                        size: 20,
-                        color: Colors.grey.shade500,
-                      ),
-                      suffixIcon: _searchController.text.isNotEmpty
-                          ? GestureDetector(
-                              onTap: () {
-                                _searchController.clear();
-                                _filterItems('');
-                              },
-                              child: Icon(
-                                Icons.close,
-                                size: 18,
-                                color: Colors.grey.shade500,
-                              ),
-                            )
-                          : null,
-                      filled: true,
-                      fillColor: Colors.grey.shade100,
-                      contentPadding: const EdgeInsets.symmetric(
-                        vertical: 12,
-                        horizontal: 12,
-                      ),
-                      enabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(10),
-                        borderSide: BorderSide(
-                          color: Colors.grey.shade300,
-                          width: 1,
-                        ),
-                      ),
-                      focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(10),
-                        borderSide: BorderSide(
-                          color: Colors.grey.shade400,
-                          width: 1.5,
-                        ),
-                      ),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(10),
-                        borderSide: BorderSide(color: Colors.grey.shade300),
-                      ),
+                  padding: const EdgeInsets.only(top: 8),
+                  child: Container(
+                    width: 40,
+                    height: 4,
+                    decoration: BoxDecoration(
+                      color: Colors.grey.shade300,
+                      borderRadius: BorderRadius.circular(2),
                     ),
                   ),
                 ),
-              // Items list
-              Expanded(
-                child: Padding(
-                  padding: EdgeInsets.only(bottom: keyboardHeight),
-                  child: _filteredItems.isEmpty
-                      ? Center(
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Icon(
-                                Icons.search_off,
-                                size: 48,
-                                color: Colors.grey.shade400,
-                              ),
-                              const SizedBox(height: 12),
-                              Text(
-                                'No results found',
-                                style: TextStyle(
-                                  color: Colors.grey.shade600,
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w500,
-                                ),
-                              ),
-                            ],
-                          ),
-                        )
-                      : ListView.builder(
-                          controller: scrollController,
-                          padding: widget.contentPadding.copyWith(top: 8),
-                          itemCount: _filteredItems.length,
-                          itemBuilder: (context, index) {
-                            final item = _filteredItems[index];
-                            return GestureDetector(
-                              onTap: () {
-                                widget.onItemSelected(item);
-                                Navigator.pop(context);
-                              },
-                              child: Container(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 12,
-                                  vertical: 14,
-                                ),
-                                margin: const EdgeInsets.only(bottom: 4),
-                                decoration: BoxDecoration(
-                                  color: Colors.transparent,
-                                  borderRadius: BorderRadius.circular(8),
-                                ),
-                                child: widget.itemBuilder != null
-                                    ? widget.itemBuilder!(item)
-                                    : Text(
-                                        widget.itemLabel(item),
-                                        style: const TextStyle(
-                                          fontSize: 14,
-                                          color: Colors.black,
-                                          fontWeight: FontWeight.w400,
-                                        ),
-                                      ),
-                              ),
-                            );
-                          },
+                // Title
+                Padding(
+                  padding: widget.contentPadding.copyWith(bottom: 12),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        widget.title,
+                        style: const TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.black,
                         ),
+                      ),
+                      GestureDetector(
+                        onTap: () => Navigator.pop(context),
+                        child: Icon(
+                          Icons.close,
+                          color: Colors.grey.shade600,
+                          size: 24,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-            ],
-          ),
-        );
-      },
+                // Search bar
+                if (widget.showSearchBar)
+                  Padding(
+                    padding: widget.contentPadding.copyWith(top: 0, bottom: 12),
+                    child: TextField(
+                      controller: _searchController,
+                      onChanged: _filterItems,
+                      keyboardType: widget.searchInputType,
+                      maxLines: widget.maxLines ?? 1,
+                      autofocus: true,
+                      decoration: InputDecoration(
+                        hintText: widget.searchHint,
+                        hintStyle: TextStyle(
+                          color: Colors.grey.shade500,
+                          fontSize: 14,
+                          fontWeight: FontWeight.w400,
+                        ),
+                        prefixIcon: Icon(
+                          Icons.search,
+                          size: 20,
+                          color: Colors.grey.shade500,
+                        ),
+                        suffixIcon: _searchController.text.isNotEmpty
+                            ? GestureDetector(
+                                onTap: () {
+                                  _searchController.clear();
+                                  _filterItems('');
+                                },
+                                child: Icon(
+                                  Icons.close,
+                                  size: 18,
+                                  color: Colors.grey.shade500,
+                                ),
+                              )
+                            : null,
+                        filled: true,
+                        fillColor: Colors.grey.shade100,
+                        contentPadding: const EdgeInsets.symmetric(
+                          vertical: 12,
+                          horizontal: 12,
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10),
+                          borderSide: BorderSide(
+                            color: Colors.grey.shade300,
+                            width: 1,
+                          ),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10),
+                          borderSide: BorderSide(
+                            color: Colors.grey.shade400,
+                            width: 1.5,
+                          ),
+                        ),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10),
+                          borderSide: BorderSide(color: Colors.grey.shade300),
+                        ),
+                      ),
+                    ),
+                  ),
+                // Items list
+                Expanded(
+                  child: Padding(
+                    padding: EdgeInsets.only(bottom: keyboardHeight),
+                    child: _filteredItems.isEmpty
+                        ? Center(
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(
+                                  Icons.search_off,
+                                  size: 48,
+                                  color: Colors.grey.shade400,
+                                ),
+                                const SizedBox(height: 12),
+                                Text(
+                                  'No results found',
+                                  style: TextStyle(
+                                    color: Colors.grey.shade600,
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          )
+                        : ListView.builder(
+                            controller: scrollController,
+                            padding: widget.contentPadding.copyWith(top: 8),
+                            itemCount: _filteredItems.length,
+                            itemBuilder: (context, index) {
+                              final item = _filteredItems[index];
+                              return GestureDetector(
+                                onTap: () {
+                                  widget.onItemSelected(item);
+                                  Navigator.pop(context);
+                                },
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 12,
+                                    vertical: 14,
+                                  ),
+                                  margin: const EdgeInsets.only(bottom: 4),
+                                  decoration: BoxDecoration(
+                                    color: Colors.transparent,
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                  child: widget.itemBuilder != null
+                                      ? widget.itemBuilder!(item)
+                                      : Text(
+                                          widget.itemLabel(item),
+                                          style: const TextStyle(
+                                            fontSize: 14,
+                                            color: Colors.black,
+                                            fontWeight: FontWeight.w400,
+                                          ),
+                                        ),
+                                ),
+                              );
+                            },
+                          ),
+                  ),
+                ),
+              ],
+            ),
+          );
+        },
+      ),
     );
   }
 

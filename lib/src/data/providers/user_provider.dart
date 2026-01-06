@@ -548,6 +548,7 @@ class ReferralPaginationState {
   final int totalPending;
   final int totalApproved;
   final int totalRejected;
+  final double totalMemberDonations;
   final bool hasMore;
 
   ReferralPaginationState({
@@ -558,6 +559,7 @@ class ReferralPaginationState {
     this.totalPending = 0,
     this.totalApproved = 0,
     this.totalRejected = 0,
+    this.totalMemberDonations = 0,
   }) : hasMore = referrals.length < totalCount;
 
   ReferralPaginationState copyWith({
@@ -669,6 +671,9 @@ class AllReferralsNotifier extends _$AllReferralsNotifier {
         final totalRejected = data['total_rejected'] is int
             ? data['total_rejected']
             : int.tryParse(data['total_rejected'].toString()) ?? 0;
+        final totalMemberDonations = data['total_amount_referral_donated'] is double
+            ? data['total_amount_referral_donated']
+            : double.tryParse(data['total_amount_referral_donated'].toString()) ?? 0.0;
 
         final referrals = users != null
             ? users
@@ -684,7 +689,7 @@ class AllReferralsNotifier extends _$AllReferralsNotifier {
           referrals: referrals,
           totalPending: totalPending,
           totalApproved: totalApproved,
-          totalRejected: totalRejected,
+          totalRejected: totalRejected,totalMemberDonations: totalMemberDonations
         );
       }
     }

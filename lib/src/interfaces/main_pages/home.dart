@@ -239,7 +239,8 @@ class _HomePageState extends ConsumerState<HomePage> {
     return Scaffold(
       backgroundColor: Color(0xFFF2F2F2),
       body: homeDataAsync.when(
-        data: (homeData) => _buildHomeContent(context, ref, homeData),
+        data: (homeData) =>
+            _buildHomeContentWithSliverAppBar(context, ref, homeData),
         loading: () => Center(
           child: LoadingAnimation(),
         ),
@@ -352,6 +353,117 @@ class _HomePageState extends ConsumerState<HomePage> {
     );
   }
 
+  Widget _buildHomeContentWithSliverAppBar(
+      BuildContext context, WidgetRef ref, HomePageData homeData) {
+    return CustomScrollView(
+      slivers: [
+        SliverAppBar(
+          backgroundColor: Colors.white,
+          elevation: 0,
+          pinned: false,
+          toolbarHeight: 60,
+          shape: const RoundedRectangleBorder(
+            borderRadius: BorderRadius.only(
+              bottomLeft: Radius.circular(22),
+              bottomRight: Radius.circular(22),
+            ),
+          ),
+          shadowColor: Colors.black.withOpacity(0.08),
+          title: SizedBox(
+            height: 60,
+            width: 100,
+            child: Image.asset(
+              'assets/png/annujoom_logo.png',
+              fit: BoxFit.contain,
+            ),
+          ),
+          centerTitle: false,
+          actions: [
+            Stack(
+              children: [
+                IconButton(
+                  onPressed: () async {
+                    final secureStorage =
+                        ref.read(secureStorageServiceProvider);
+                    final existingFcmToken = await secureStorage.getFcmToken();
+                    if (existingFcmToken == null || existingFcmToken.isEmpty) {
+                      await getFcmToken(context, ref);
+                    }
+                    if (context.mounted) {
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (context) => const NotificationsPage(),
+                        ),
+                      );
+                    }
+                  },
+                  icon: SvgPicture.asset(
+                    'assets/svg/bell.svg',
+                    height: 20,
+                    width: 20,
+                  ),
+                ),
+                Consumer(
+                  builder: (context, ref, child) {
+                    final notificationsAsync = ref.watch(notificationsProvider);
+                    return notificationsAsync.when(
+                      data: (state) {
+                        final unreadCount =
+                            state.notifications.where((n) => !n.isRead).length;
+                        return unreadCount > 0
+                            ? Positioned(
+                                right: 8,
+                                top: 8,
+                                child: Container(
+                                  padding: const EdgeInsets.all(4),
+                                  decoration: BoxDecoration(
+                                    color: kPrimaryColor,
+                                    shape: BoxShape.circle,
+                                  ),
+                                  child: Text(
+                                    unreadCount > 99
+                                        ? '99+'
+                                        : unreadCount.toString(),
+                                    style: kSmallerTitleR.copyWith(
+                                      color: kWhite,
+                                      fontSize: 10,
+                                    ),
+                                  ),
+                                ),
+                              )
+                            : SizedBox.shrink();
+                      },
+                      loading: () => SizedBox.shrink(),
+                      error: (_, __) => SizedBox.shrink(),
+                    );
+                  },
+                ),
+              ],
+            ),
+            GestureDetector(
+              onTap: () {
+                _showCallSupportModal(context);
+              },
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 12),
+                child: Center(
+                  child: SvgPicture.asset(
+                    'assets/svg/call.svg',
+                    height: 20,
+                    width: 20,
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+        SliverToBoxAdapter(
+          child: _buildHomeContent(context, ref, homeData),
+        ),
+      ],
+    );
+  }
+
   Widget _buildHomeContent(
       BuildContext context, WidgetRef ref, HomePageData homeData) {
     return FutureBuilder<String?>(
@@ -361,508 +473,298 @@ class _HomePageState extends ConsumerState<HomePage> {
       builder: (context, snapshot) {
         final userName = snapshot.data ?? '';
 
-        return SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
-              Container(
-                padding: const EdgeInsets.only(top: 30, left: 16, right: 16),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: const BorderRadius.only(
-                    bottomLeft: Radius.circular(22),
-                    bottomRight: Radius.circular(22),
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            Padding(
+              padding: const EdgeInsets.only(
+                  top: 16, bottom: 8, left: 16, right: 16),
+              child: AnimatedWidgetWrapper(
+                animationType: AnimationType.fadeSlideInFromBottom,
+                duration: AnimationDuration.slow,
+                curveType: AnimationCurveType.easeOut,
+                child: Container(
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                        colors: [Color(0xFFCFDBFF), Color(0xFFEFF3FF)],
+                        begin: AlignmentGeometry.centerLeft,
+                        stops: [.1, .7],
+                        end: AlignmentGeometry.centerRight),
+                    borderRadius: BorderRadius.circular(16),
                   ),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.08),
-                      blurRadius: 12,
-                      offset: const Offset(0, 4),
-                    )
-                  ],
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    SizedBox(
-                      height: 60,
-                      width: 100,
-                      child: Image.asset(
-                        'assets/png/annujoom_logo.png',
-                        fit: BoxFit.contain,
-                      ),
-                    ),
-                    Row(
-                      children: [
-                        Stack(
-                          children: [
-                            IconButton(
-                              onPressed: () async {
-                                // Request FCM token only if not already saved
-                                final secureStorage =
-                                    ref.read(secureStorageServiceProvider);
-                                final existingFcmToken =
-                                    await secureStorage.getFcmToken();
-                                if (existingFcmToken == null ||
-                                    existingFcmToken.isEmpty) {
-                                  await getFcmToken(context, ref);
-                                }
-                                final notificationsAsync =
-                                    ref.read(notificationsProvider);
-                                if (context.mounted) {
-                                  Navigator.of(context).push(
-                                    MaterialPageRoute(
-                                      builder: (context) =>
-                                          const NotificationsPage(),
-                                    ),
-                                  );
-                                }
-                              },
-                              icon: SvgPicture.asset(
-                                'assets/svg/bell.svg',
-                                height: 20,
-                                width: 20,
-                              ),
-                            ),
-                            Consumer(
-                              builder: (context, ref, child) {
-                                final notificationsAsync =
-                                    ref.watch(notificationsProvider);
-                                return notificationsAsync.when(
-                                  data: (state) {
-                                    final unreadCount = state.notifications
-                                        .where((n) => !n.isRead)
-                                        .length;
-                                    return unreadCount > 0
-                                        ? Positioned(
-                                            right: 8,
-                                            top: 8,
-                                            child: Container(
-                                              padding: const EdgeInsets.all(4),
-                                              decoration: BoxDecoration(
-                                                color: kPrimaryColor,
-                                                shape: BoxShape.circle,
-                                              ),
-                                              child: Text(
-                                                unreadCount > 99
-                                                    ? '99+'
-                                                    : unreadCount.toString(),
-                                                style: kSmallerTitleR.copyWith(
-                                                  color: kWhite,
-                                                  fontSize: 10,
-                                                ),
-                                              ),
-                                            ),
-                                          )
-                                        : SizedBox.shrink();
-                                  },
-                                  loading: () => SizedBox.shrink(),
-                                  error: (_, __) => SizedBox.shrink(),
-                                );
-                              },
-                            ),
-                          ],
-                        ),
-                        IconButton(
-                          onPressed: () {
-                            _showCallSupportModal(context);
-                          },
-                          icon: SvgPicture.asset(
-                            'assets/svg/call.svg',
-                            height: 20,
-                            width: 20,
-                          ),
-                        ),
-                      ],
-                    )
-                  ],
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.only(
-                    top: 16, bottom: 8, left: 16, right: 16),
-                child: AnimatedWidgetWrapper(
-                  animationType: AnimationType.fadeSlideInFromBottom,
-                  duration: AnimationDuration.slow,
-                  curveType: AnimationCurveType.easeOut,
-                  child: Container(
-                    width: double.infinity,
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                          colors: [Color(0xFFCFDBFF), Color(0xFFEFF3FF)],
-                          begin: AlignmentGeometry.centerLeft,
-                          stops: [.1, .7],
-                          end: AlignmentGeometry.centerRight),
-                      borderRadius: BorderRadius.circular(16),
-                    ),
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 16, vertical: 25),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          '${'greeting'.tr()}, $userName!',
-                          style: kHeadTitleSB.copyWith(
-                              fontSize: 20, color: kThirdTextColor),
-                        ),
-                        Text(
-                          'tagline'.tr(),
-                          style: kSmallTitleL.copyWith(color: kThirdTextColor),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.only(top: 24, left: 0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    SizedBox(
-                      height: 120,
-                      child: CarouselSlider(
-                        carouselController: _categoryCarouselController,
-                        options: CarouselOptions(
-                          height: 120,
-                          viewportFraction: 0.25,
-                          autoPlay: true,
-                          autoPlayInterval: const Duration(seconds: 3),
-                          autoPlayAnimationDuration:
-                              const Duration(milliseconds: 800),
-                          enableInfiniteScroll: true,
-                          initialPage: 0,
-                          padEnds: false,
-                          onPageChanged: (index, reason) {
-                            setState(() => _categoryIndex = index);
-                          },
-                        ),
-                        items: [
-                          {
-                            'title': 'generalCampaign'.tr(),
-                            'image': 'assets/png/general_campaign.png',
-                            'category': 'General Campaign'
-                          },
-                          {
-                            'title': 'generalFunding'.tr(),
-                            'image': 'assets/jpg/general_funding.jpg',
-                            'category': 'General Funding'
-                          },
-                          {
-                            'title': 'zakat'.tr(),
-                            'image': 'assets/png/zakat.png',
-                            'category': 'Zakat'
-                          },
-                          {
-                            'title': 'orphan'.tr(),
-                            'image': 'assets/jpg/orphan.jpg',
-                            'category': 'Orphan'
-                          },
-                          {
-                            'title': 'widow'.tr(),
-                            'image': 'assets/png/widow.png',
-                            'category': 'Widow'
-                          },
-                          {
-                            'title': 'ghusalMayyit'.tr(),
-                            'image': 'assets/png/ghusal_mayyt.png',
-                            'category': 'Ghusl Mayyit'
-                          },
-                          {
-                            'title': 'patientRelief'.tr(),
-                            'image': 'assets/png/patient_relief.png',
-                            'category': 'Patient Relief'
-                          },
-                          {
-                            'title': 'foodKit'.tr(),
-                            'image': 'assets/png/food_kit.png',
-                            'category': 'Food Kit'
-                          },
-                        ].map((category) {
-                          return AnimatedWidgetWrapper(
-                            animationType: AnimationType.fadeScaleUp,
-                            duration: AnimationDuration.normal,
-                            curveType: AnimationCurveType.easeOut,
-                            child: Padding(
-                              padding:
-                                  const EdgeInsets.symmetric(horizontal: 6),
-                              child: GestureDetector(
-                                onTap: () {
-                                  _handleCategoryTap(
-                                      context, category['category'] as String);
-                                },
-                                child: Column(
-                                  children: [
-                                    Container(
-                                      width: 70,
-                                      height: 70,
-                                      decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(16),
-                                        boxShadow: [
-                                          BoxShadow(
-                                            color:
-                                                Colors.black.withOpacity(0.1),
-                                            blurRadius: 8,
-                                            offset: const Offset(0, 2),
-                                          )
-                                        ],
-                                      ),
-                                      child: ClipRRect(
-                                        borderRadius: BorderRadius.circular(16),
-                                        child: Image.asset(
-                                          category['image'] as String,
-                                          fit: BoxFit.cover,
-                                          cacheWidth: 140,
-                                          cacheHeight: 140,
-                                          errorBuilder:
-                                              (context, error, stackTrace) {
-                                            return Container(
-                                              color: Colors.grey[300],
-                                              child: const Icon(
-                                                  Icons.image_not_supported),
-                                            );
-                                          },
-                                        ),
-                                      ),
-                                    ),
-                                    const SizedBox(height: 8),
-                                    SizedBox(
-                                      width: 80,
-                                      child: Text(
-                                        category['title'] as String,
-                                        textAlign: TextAlign.center,
-                                        style: kSmallTitleR.copyWith(
-                                          fontSize: 10,
-                                          color: kTextColor,
-                                        ),
-                                        maxLines: 2,
-                                        overflow: TextOverflow.ellipsis,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          );
-                        }).toList(),
-                      ),
-                    ),
-                    const SizedBox(height: 12),
-                    Center(
-                      child: PageViewDotIndicator(
-                        size: Size(8, 8),
-                        unselectedSize: Size(7, 7),
-                        currentItem: _categoryIndex,
-                        count: 8,
-                        unselectedColor: Color(0xFFAEB9E1),
-                        selectedColor: Color(0xFF0D74BC),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              if (GlobalVariables.getUserRole() != 'member')
-                Padding(
                   padding:
-                      const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-                  child: GestureDetector(
-                    onTap: () {
-                      Navigator.of(context).pushNamed('MyReferrals');
-                    },
-                    child: Container(
-                      decoration: BoxDecoration(
-                        gradient: const LinearGradient(
-                          colors: [Color(0xFFFFFFFF), Color(0xFFCEE8F8)],
-                          begin: Alignment.topCenter,
-                          end: Alignment.bottomCenter,
-                        ),
-                        borderRadius: BorderRadius.circular(22),
-                      ),
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 16, vertical: 20),
-                      child: Row(
-                        children: [
-                          /// 🔹 LEFT : Referrals Received
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  homeData.referralsReceived.toString(),
-                                  style: kHeadTitleSB.copyWith(
-                                    fontSize: 22,
-                                    color: kThirdTextColor,
-                                  ),
-                                ),
-                                const SizedBox(height: 4),
-                                Text(
-                                  'referralsReceived'.tr(),
-                                  style: kSmallerTitleR,
-                                  maxLines: 2,
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                              ],
-                            ),
-                          ),
-
-                          /// 🔸 Divider
-                          Container(
-                            width: 1,
-                            height: 48,
-                            margin: const EdgeInsets.symmetric(horizontal: 12),
-                            color: kThirdTextColor.withOpacity(0.2),
-                          ),
-
-                          /// 🔹 RIGHT : Pending Approvals + Review Now
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  homeData.pendingReferrals.toString(),
-                                  style: kHeadTitleSB.copyWith(
-                                    fontSize: 22,
-                                    color: kThirdTextColor,
-                                  ),
-                                ),
-                                const SizedBox(height: 4),
-                                Wrap(
-                                  crossAxisAlignment: WrapCrossAlignment.center,
-                                  spacing: 6,
-                                  children: [
-                                    Text(
-                                      'pendingApprovals'.tr(),
-                                      style: kSmallerTitleR,
-                                    ),
-                                    GestureDetector(
-                                      onTap: () {
-                                        Navigator.of(context)
-                                            .pushNamed('MyReferrals');
-                                      },
-                                      child: Text(
-                                        'reviewNow'.tr(),
-                                        style: kSmallerTitleM.copyWith(
-                                          color: kThirdTextColor,
-                                          decoration: TextDecoration.underline,
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-              if (homeData.endingCampaigns.isNotEmpty)
-                Padding(
-                  padding: const EdgeInsets.all(16),
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 25),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Expanded(
-                            child: Text(
-                              'fundingCampaigns'.tr(),
-                              style: kBodyTitleM,
-                              softWrap: true,
-                            ),
-                          ),
-                          const SizedBox(width: 8),
-                          GestureDetector(
-                            onTap: () {
-                              Navigator.of(context).pushNamed(
-                                'Campaign',
-                                arguments: {'category': 'All'},
-                              );
-                            },
-                            child: Text(
-                              'seeAll'.tr(),
-                              style:
-                                  kSmallTitleM.copyWith(color: kThirdTextColor),
-                            ),
-                          ),
-                        ],
+                      Text(
+                        '${'greeting'.tr()}, $userName!',
+                        style: kHeadTitleSB.copyWith(
+                            fontSize: 20, color: kThirdTextColor),
                       ),
-                      const SizedBox(height: 12),
-                      SizedBox(
-                        height: 470,
-                        child: CarouselSlider(
-                          options: CarouselOptions(
-                            height: 470,
-                            viewportFraction: 1,
-                            enableInfiniteScroll: true,
-                            autoPlay: false,
-                            onPageChanged: (index, reason) {
-                              setState(() => _endingCampaignIndex = index);
-                            },
-                          ),
-                          items: homeData.endingCampaigns.map((campaign) {
-                            final preferredLanguage =
-                                GlobalVariables.getPreferredLanguage();
-                            return Padding(
-                              padding: const EdgeInsets.only(bottom: 16),
-                              child: HomeGradientCampaignCard(
-                                title: campaign.getTitle(preferredLanguage),
-                                description:
-                                    campaign.getDescription(preferredLanguage),
-                                image: campaign.coverImage,
-                                raised: campaign.collectedAmount.toInt(),
-                                goal: campaign.targetAmount.toInt(),
-                                dueDate: formatDate(campaign.targetDate),
-                                category: campaign.category,
-                                onViewDetails: () {
-                                  Navigator.of(context).pushNamed(
-                                    'CampaignDetail',
-                                    arguments: {
-                                      '_id': campaign.id ?? '',
-                                      'title':
-                                          campaign.getTitle(preferredLanguage),
-                                      'description': campaign
-                                          .getDescription(preferredLanguage),
-                                      'category': campaign.category,
-                                      'date': formatDate(campaign.targetDate),
-                                      'image': campaign.coverImage,
-                                      'raised':
-                                          campaign.collectedAmount.toInt(),
-                                      'goal': campaign.targetAmount.toInt(),
-                                    },
-                                  );
-                                },
-                                onDonate: () {},
-                              ),
-                            );
-                          }).toList(),
-                        ),
-                      ),
-                      const SizedBox(height: 14),
-                      Center(
-                        child: PageViewDotIndicator(
-                          size: Size(8, 8),
-                          unselectedSize: Size(7, 7),
-                          currentItem: _endingCampaignIndex,
-                          count: homeData.endingCampaigns.length,
-                          unselectedColor: Color(0xFFAEB9E1),
-                          selectedColor: Color(0xFF0D74BC),
-                        ),
+                      Text(
+                        'tagline'.tr(),
+                        style: kSmallTitleL.copyWith(color: kThirdTextColor),
                       ),
                     ],
                   ),
                 ),
-              if (homeData.posterPromotions.isNotEmpty)
-                Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.only(top: 24, left: 0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  SizedBox(
+                    height: 120,
+                    child: CarouselSlider(
+                      carouselController: _categoryCarouselController,
+                      options: CarouselOptions(
+                        height: 120,
+                        viewportFraction: 0.25,
+                        autoPlay: true,
+                        autoPlayInterval: const Duration(seconds: 3),
+                        autoPlayAnimationDuration:
+                            const Duration(milliseconds: 800),
+                        enableInfiniteScroll: true,
+                        initialPage: 0,
+                        padEnds: false,
+                        onPageChanged: (index, reason) {
+                          setState(() => _categoryIndex = index);
+                        },
+                      ),
+                      items: [
+                        {
+                          'title': 'generalCampaign'.tr(),
+                          'image': 'assets/png/general_campaign.png',
+                          'category': 'General Campaign'
+                        },
+                        {
+                          'title': 'generalFunding'.tr(),
+                          'image': 'assets/jpg/general_funding.jpg',
+                          'category': 'General Funding'
+                        },
+                        {
+                          'title': 'zakat'.tr(),
+                          'image': 'assets/png/zakat.png',
+                          'category': 'Zakat'
+                        },
+                        {
+                          'title': 'orphan'.tr(),
+                          'image': 'assets/jpg/orphan.jpg',
+                          'category': 'Orphan'
+                        },
+                        {
+                          'title': 'widow'.tr(),
+                          'image': 'assets/png/widow.png',
+                          'category': 'Widow'
+                        },
+                        {
+                          'title': 'ghusalMayyit'.tr(),
+                          'image': 'assets/png/ghusal_mayyt.png',
+                          'category': 'Ghusl Mayyit'
+                        },
+                        {
+                          'title': 'patientRelief'.tr(),
+                          'image': 'assets/png/patient_relief.png',
+                          'category': 'Patient Relief'
+                        },
+                        {
+                          'title': 'foodKit'.tr(),
+                          'image': 'assets/png/food_kit.png',
+                          'category': 'Food Kit'
+                        },
+                      ].map((category) {
+                        return AnimatedWidgetWrapper(
+                          animationType: AnimationType.fadeScaleUp,
+                          duration: AnimationDuration.normal,
+                          curveType: AnimationCurveType.easeOut,
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 6),
+                            child: GestureDetector(
+                              onTap: () {
+                                _handleCategoryTap(
+                                    context, category['category'] as String);
+                              },
+                              child: Column(
+                                children: [
+                                  Container(
+                                    width: 70,
+                                    height: 70,
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(16),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: Colors.black.withOpacity(0.1),
+                                          blurRadius: 8,
+                                          offset: const Offset(0, 2),
+                                        )
+                                      ],
+                                    ),
+                                    child: ClipRRect(
+                                      borderRadius: BorderRadius.circular(16),
+                                      child: Image.asset(
+                                        category['image'] as String,
+                                        fit: BoxFit.cover,
+                                        cacheWidth: 140,
+                                        cacheHeight: 140,
+                                        errorBuilder:
+                                            (context, error, stackTrace) {
+                                          return Container(
+                                            color: Colors.grey[300],
+                                            child: const Icon(
+                                                Icons.image_not_supported),
+                                          );
+                                        },
+                                      ),
+                                    ),
+                                  ),
+                                  const SizedBox(height: 8),
+                                  SizedBox(
+                                    width: 80,
+                                    child: Text(
+                                      category['title'] as String,
+                                      textAlign: TextAlign.center,
+                                      style: kSmallTitleR.copyWith(
+                                        fontSize: 10,
+                                        color: kTextColor,
+                                      ),
+                                      maxLines: 2,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        );
+                      }).toList(),
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  Center(
+                    child: PageViewDotIndicator(
+                      size: Size(8, 8),
+                      unselectedSize: Size(7, 7),
+                      currentItem: _categoryIndex,
+                      count: 8,
+                      unselectedColor: Color(0xFFAEB9E1),
+                      selectedColor: Color(0xFF0D74BC),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            if (GlobalVariables.getUserRole() != 'member')
+              Padding(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                child: GestureDetector(
+                  onTap: () {
+                    Navigator.of(context).pushNamed('MyReferrals');
+                  },
+                  child: Container(
+                    decoration: BoxDecoration(
+                      gradient: const LinearGradient(
+                        colors: [Color(0xFFFFFFFF), Color(0xFFCEE8F8)],
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                      ),
+                      borderRadius: BorderRadius.circular(22),
+                    ),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 16, vertical: 20),
                     child: Row(
+                      children: [
+                        /// 🔹 LEFT : Referrals Received
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                homeData.referralsReceived.toString(),
+                                style: kHeadTitleSB.copyWith(
+                                  fontSize: 22,
+                                  color: kThirdTextColor,
+                                ),
+                              ),
+                              const SizedBox(height: 4),
+                              Text(
+                                'referralsReceived'.tr(),
+                                style: kSmallerTitleR,
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ],
+                          ),
+                        ),
+
+                        /// 🔸 Divider
+                        Container(
+                          width: 1,
+                          height: 48,
+                          margin: const EdgeInsets.symmetric(horizontal: 12),
+                          color: kThirdTextColor.withOpacity(0.2),
+                        ),
+
+                        /// 🔹 RIGHT : Pending Approvals + Review Now
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                homeData.pendingReferrals.toString(),
+                                style: kHeadTitleSB.copyWith(
+                                  fontSize: 22,
+                                  color: kThirdTextColor,
+                                ),
+                              ),
+                              const SizedBox(height: 4),
+                              Wrap(
+                                crossAxisAlignment: WrapCrossAlignment.center,
+                                spacing: 6,
+                                children: [
+                                  Text(
+                                    'pendingApprovals'.tr(),
+                                    style: kSmallerTitleR,
+                                  ),
+                                  GestureDetector(
+                                    onTap: () {
+                                      Navigator.of(context)
+                                          .pushNamed('MyReferrals');
+                                    },
+                                    child: Text(
+                                      'reviewNow'.tr(),
+                                      style: kSmallerTitleM.copyWith(
+                                        color: kThirdTextColor,
+                                        decoration: TextDecoration.underline,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            if (homeData.endingCampaigns.isNotEmpty)
+              Padding(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Expanded(
                           child: Text(
-                            'completedCampaigns'.tr(),
+                            'fundingCampaigns'.tr(),
                             style: kBodyTitleM,
                             softWrap: true,
                           ),
@@ -870,11 +772,9 @@ class _HomePageState extends ConsumerState<HomePage> {
                         const SizedBox(width: 8),
                         GestureDetector(
                           onTap: () {
-                            Navigator.of(context).push(
-                              MaterialPageRoute(
-                                builder: (context) =>
-                                    const CompletedCampaignsPage(),
-                              ),
+                            Navigator.of(context).pushNamed(
+                              'Campaign',
+                              arguments: {'category': 'All'},
                             );
                           },
                           child: Text(
@@ -884,241 +784,331 @@ class _HomePageState extends ConsumerState<HomePage> {
                           ),
                         ),
                       ],
-                    )),
-              if (homeData.posterPromotions.isNotEmpty)
-                const SizedBox(height: 12),
-              if (homeData.posterPromotions.isNotEmpty)
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                  child: Container(
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(16),
-                      gradient: LinearGradient(
-                        begin: Alignment.topCenter,
-                        end: Alignment.bottomCenter,
-                        colors: [Color(0xFFFCEAEA), Color(0xFFFFF9E4)],
+                    ),
+                    const SizedBox(height: 12),
+                    SizedBox(
+                      height: 470,
+                      child: CarouselSlider(
+                        options: CarouselOptions(
+                          height: 470,
+                          viewportFraction: 1,
+                          enableInfiniteScroll: true,
+                          autoPlay: false,
+                          onPageChanged: (index, reason) {
+                            setState(() => _endingCampaignIndex = index);
+                          },
+                        ),
+                        items: homeData.endingCampaigns.map((campaign) {
+                          final preferredLanguage =
+                              GlobalVariables.getPreferredLanguage();
+                          return Padding(
+                            padding: const EdgeInsets.only(bottom: 16),
+                            child: HomeGradientCampaignCard(
+                              title: campaign.getTitle(preferredLanguage),
+                              description:
+                                  campaign.getDescription(preferredLanguage),
+                              image: campaign.coverImage,
+                              raised: campaign.collectedAmount.toInt(),
+                              goal: campaign.targetAmount.toInt(),
+                              dueDate: formatDate(campaign.targetDate),
+                              category: campaign.category,
+                              onViewDetails: () {
+                                Navigator.of(context).pushNamed(
+                                  'CampaignDetail',
+                                  arguments: {
+                                    '_id': campaign.id ?? '',
+                                    'title':
+                                        campaign.getTitle(preferredLanguage),
+                                    'description': campaign
+                                        .getDescription(preferredLanguage),
+                                    'category': campaign.category,
+                                    'date': formatDate(campaign.targetDate),
+                                    'image': campaign.coverImage,
+                                    'raised': campaign.collectedAmount.toInt(),
+                                    'goal': campaign.targetAmount.toInt(),
+                                  },
+                                );
+                              },
+                              onDonate: () {},
+                            ),
+                          );
+                        }).toList(),
                       ),
                     ),
-                    child: Column(
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.only(
-                              left: 16.0, right: 16, top: 16),
-                          child: Row(
-                            children: [
-                              Text('togetherWeDidIt'.tr(), style: kBodyTitleSB),
-                            ],
-                          ),
-                        ),
-                        const SizedBox(height: 12),
-                        SizedBox(
-                          height: 280,
-                          child: CarouselSlider(
-                            options: CarouselOptions(
-                              height: 280,
-                              viewportFraction: 1,
-                              enableInfiniteScroll: true,
-                              autoPlay: false,
-                              onPageChanged: (index, reason) {
-                                setState(() => _completedCampaignIndex = index);
-                              },
-                            ),
-                            items: homeData.posterPromotions.map((promotion) {
-                              final preferredLanguage =
-                                  GlobalVariables.getPreferredLanguage();
-                              return Padding(
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: 16.0),
-                                child: HomeCompletedCampaignCard(targetDate:promotion.targetDate,
-                                  heading:
-                                      promotion.getTitle(preferredLanguage),
-                                  subtitle: promotion
-                                      .getDescription(preferredLanguage),
-                                  goal: promotion.targetAmount,
-                                  collected: promotion.collectedAmount,
-                                  posterImage: promotion.media ?? '',
-                                  isImagePoster: true,
-                                  onTap: () {},
-                                ),
-                              );
-                            }).toList(),
-                          ),
-                        ),
-                        const SizedBox(height: 14),
-                        Padding(
-                          padding: const EdgeInsets.only(
-                            bottom: 16.0,
-                          ),
-                          child: Center(
-                            child: PageViewDotIndicator(
-                              size: Size(8, 8),
-                              unselectedSize: Size(7, 7),
-                              currentItem: _completedCampaignIndex,
-                              count: homeData.posterPromotions.length,
-                              unselectedColor: Color(0xFFAEB9E1),
-                              selectedColor: Color(0xFF0D74BC),
-                            ),
-                          ),
-                        ),
-                      ],
+                    const SizedBox(height: 14),
+                    Center(
+                      child: PageViewDotIndicator(
+                        size: Size(8, 8),
+                        unselectedSize: Size(7, 7),
+                        currentItem: _endingCampaignIndex,
+                        count: homeData.endingCampaigns.length,
+                        unselectedColor: Color(0xFFAEB9E1),
+                        selectedColor: Color(0xFF0D74BC),
+                      ),
                     ),
-                  ),
+                  ],
                 ),
-              const SizedBox(height: 24),
-              if (homeData.latestNews.isNotEmpty)
-                Padding(
+              ),
+            if (homeData.posterPromotions.isNotEmpty)
+              Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 16),
-                  child: Column(
+                  child: Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Expanded(
-                            child: Text(
-                              'latestNews'.tr(),
-                              style: kHeadTitleM.copyWith(fontSize: 18),
-                              softWrap: true, // allows next line
-                            ),
-                          ),
-                          const SizedBox(width: 8),
-                          GestureDetector(
-                            onTap: () {
-                              ref
-                                  .read(selectedIndexProvider.notifier)
-                                  .updateIndex(2);
-                            },
-                            child: Text(
-                              'seeAll'.tr(),
-                              style:
-                                  kSmallTitleM.copyWith(color: kThirdTextColor),
-                            ),
-                          ),
-                        ],
+                      Expanded(
+                        child: Text(
+                          'completedCampaigns'.tr(),
+                          style: kBodyTitleM,
+                          softWrap: true,
+                        ),
                       ),
-                      const SizedBox(height: 12),
-                    ],
-                  ),
-                ),
-              if (homeData.latestNews.isNotEmpty)
-                CarouselSlider(
-                  options: CarouselOptions(
-                      height: 208,
-                      viewportFraction: 0.55,
-                      enableInfiniteScroll: true,
-                      autoPlay: true,
-                      autoPlayInterval: const Duration(seconds: 4),
-                      autoPlayAnimationDuration:
-                          const Duration(milliseconds: 600),
-                      autoPlayCurve: Curves.easeInOut,
-                      enlargeCenterPage: false,
-                      padEnds: false,
-                      initialPage: 0,
-                      pauseAutoPlayOnTouch: true),
-                  items: homeData.latestNews.asMap().entries.map((entry) {
-                    int index = entry.key;
-                    var news = entry.value;
-                    final preferredLanguage =
-                        GlobalVariables.getPreferredLanguage();
-                    return Padding(
-                      padding: const EdgeInsets.only(left: 16.0),
-                      child: HomeNewsCard(
-                        title: news.getTitle(preferredLanguage),
-                        subtitle: news.getSubtitle(preferredLanguage),
-                        image: news.media ?? '',
+                      const SizedBox(width: 8),
+                      GestureDetector(
                         onTap: () {
                           Navigator.of(context).push(
                             MaterialPageRoute(
-                              builder: (context) => NewsDetailView(
-                                news: homeData.latestNews,
-                              ),
+                              builder: (context) =>
+                                  const CompletedCampaignsPage(),
                             ),
                           );
-                          Future.microtask(() {
-                            ref.read(currentNewsIndexProvider.notifier).state =
-                                index;
-                          });
                         },
+                        child: Text(
+                          'seeAll'.tr(),
+                          style: kSmallTitleM.copyWith(color: kThirdTextColor),
+                        ),
                       ),
-                    );
-                  }).toList(),
+                    ],
+                  )),
+            if (homeData.posterPromotions.isNotEmpty)
+              const SizedBox(height: 12),
+            if (homeData.posterPromotions.isNotEmpty)
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                child: Container(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(16),
+                    gradient: LinearGradient(
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                      colors: [Color(0xFFFCEAEA), Color(0xFFFFF9E4)],
+                    ),
+                  ),
+                  child: Column(
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.only(
+                            left: 16.0, right: 16, top: 16),
+                        child: Row(
+                          children: [
+                            Text('togetherWeDidIt'.tr(), style: kBodyTitleSB),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      SizedBox(
+                        height: 280,
+                        child: CarouselSlider(
+                          options: CarouselOptions(
+                            height: 280,
+                            viewportFraction: 1,
+                            enableInfiniteScroll: true,
+                            autoPlay: false,
+                            onPageChanged: (index, reason) {
+                              setState(() => _completedCampaignIndex = index);
+                            },
+                          ),
+                          items: homeData.posterPromotions.map((promotion) {
+                            final preferredLanguage =
+                                GlobalVariables.getPreferredLanguage();
+                            return Padding(
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 16.0),
+                              child: HomeCompletedCampaignCard(
+                                targetDate: promotion.targetDate,
+                                heading: promotion.getTitle(preferredLanguage),
+                                subtitle:
+                                    promotion.getDescription(preferredLanguage),
+                                goal: promotion.targetAmount,
+                                collected: promotion.collectedAmount,
+                                posterImage: promotion.media ?? '',
+                                isImagePoster: true,
+                                onTap: () {},
+                              ),
+                            );
+                          }).toList(),
+                        ),
+                      ),
+                      const SizedBox(height: 14),
+                      Padding(
+                        padding: const EdgeInsets.only(
+                          bottom: 16.0,
+                        ),
+                        child: Center(
+                          child: PageViewDotIndicator(
+                            size: Size(8, 8),
+                            unselectedSize: Size(7, 7),
+                            currentItem: _completedCampaignIndex,
+                            count: homeData.posterPromotions.length,
+                            unselectedColor: Color(0xFFAEB9E1),
+                            selectedColor: Color(0xFF0D74BC),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-              const SizedBox(height: 24),
-              if (homeData.videoPromotions.isNotEmpty)
-                Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              ),
+            const SizedBox(height: 24),
+            if (homeData.latestNews.isNotEmpty)
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Expanded(
                           child: Text(
-                            'latestVideos'.tr(),
-                            style: kBodyTitleM,
-                            maxLines: 2,
-                            overflow: TextOverflow.ellipsis,
+                            'latestNews'.tr(),
+                            style: kHeadTitleM.copyWith(fontSize: 18),
+                            softWrap: true, // allows next line
                           ),
                         ),
-                        const SizedBox(width: 12),
+                        const SizedBox(width: 8),
                         GestureDetector(
                           onTap: () {
-                            Navigator.of(context).push(
-                              MaterialPageRoute(
-                                builder: (context) => const VideosPage(),
-                              ),
-                            );
+                            ref
+                                .read(selectedIndexProvider.notifier)
+                                .updateIndex(2);
                           },
                           child: Text(
                             'seeAll'.tr(),
                             style:
                                 kSmallTitleM.copyWith(color: kThirdTextColor),
-                            maxLines: 1,
-                            overflow: TextOverflow.fade,
-                            softWrap: false,
                           ),
                         ),
                       ],
-                    )),
-              if (homeData.videoPromotions.isNotEmpty)
-                const SizedBox(height: 12),
-              if (homeData.videoPromotions.isNotEmpty)
-                SizedBox(
-                  height: 200,
-                  child: PageView(
-                    controller: _videoController,
-                    onPageChanged: (page) {
-                      setState(() => _videoIndex = page);
-                    },
-                    children: homeData.videoPromotions.map((video) {
-                      final videoId = extractYouTubeVideoId(video.link ?? '');
-                      return Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 16),
-                        child: videoId != null
-                            ? YoutubeVideoCard(
-                                videoId: videoId,
-                              )
-                            : Center(
-                                child: Text('Something went Wrong'),
-                              ),
-                      );
-                    }).toList(),
-                  ),
+                    ),
+                    const SizedBox(height: 12),
+                  ],
                 ),
-              if (homeData.videoPromotions.isNotEmpty)
-                const SizedBox(height: 12),
-              if (homeData.videoPromotions.isNotEmpty)
-                Center(
-                  child: PageViewDotIndicator(
-                    unselectedSize: Size(8, 8),
-                    size: Size(9, 9),
-                    currentItem: _videoIndex,
-                    count: homeData.videoPromotions.length,
-                    unselectedColor: Color(0xFFAEB9E1),
-                    selectedColor: Color(0xFF0D74BC),
-                  ),
+              ),
+            if (homeData.latestNews.isNotEmpty)
+              CarouselSlider(
+                options: CarouselOptions(
+                    height: 208,
+                    viewportFraction: 0.55,
+                    enableInfiniteScroll: true,
+                    autoPlay: true,
+                    autoPlayInterval: const Duration(seconds: 4),
+                    autoPlayAnimationDuration:
+                        const Duration(milliseconds: 600),
+                    autoPlayCurve: Curves.easeInOut,
+                    enlargeCenterPage: false,
+                    padEnds: false,
+                    initialPage: 0,
+                    pauseAutoPlayOnTouch: true),
+                items: homeData.latestNews.asMap().entries.map((entry) {
+                  int index = entry.key;
+                  var news = entry.value;
+                  final preferredLanguage =
+                      GlobalVariables.getPreferredLanguage();
+                  return Padding(
+                    padding: const EdgeInsets.only(left: 16.0),
+                    child: HomeNewsCard(
+                      title: news.getTitle(preferredLanguage),
+                      subtitle: news.getSubtitle(preferredLanguage),
+                      image: news.media ?? '',
+                      onTap: () {
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (context) => NewsDetailView(
+                              news: homeData.latestNews,
+                            ),
+                          ),
+                        );
+                        Future.microtask(() {
+                          ref.read(currentNewsIndexProvider.notifier).state =
+                              index;
+                        });
+                      },
+                    ),
+                  );
+                }).toList(),
+              ),
+            const SizedBox(height: 24),
+            if (homeData.videoPromotions.isNotEmpty)
+              Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Expanded(
+                        child: Text(
+                          'latestVideos'.tr(),
+                          style: kBodyTitleM,
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      GestureDetector(
+                        onTap: () {
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (context) => const VideosPage(),
+                            ),
+                          );
+                        },
+                        child: Text(
+                          'seeAll'.tr(),
+                          style: kSmallTitleM.copyWith(color: kThirdTextColor),
+                          maxLines: 1,
+                          overflow: TextOverflow.fade,
+                          softWrap: false,
+                        ),
+                      ),
+                    ],
+                  )),
+            if (homeData.videoPromotions.isNotEmpty) const SizedBox(height: 12),
+            if (homeData.videoPromotions.isNotEmpty)
+              SizedBox(
+                height: 200,
+                child: PageView(
+                  controller: _videoController,
+                  onPageChanged: (page) {
+                    setState(() => _videoIndex = page);
+                  },
+                  children: homeData.videoPromotions.map((video) {
+                    final videoId = extractYouTubeVideoId(video.link ?? '');
+                    return Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      child: videoId != null
+                          ? YoutubeVideoCard(
+                              videoId: videoId,
+                            )
+                          : Center(
+                              child: Text('Something went Wrong'),
+                            ),
+                    );
+                  }).toList(),
                 ),
-              const SizedBox(height: 24),
-            ],
-          ),
+              ),
+            if (homeData.videoPromotions.isNotEmpty) const SizedBox(height: 12),
+            if (homeData.videoPromotions.isNotEmpty)
+              Center(
+                child: PageViewDotIndicator(
+                  unselectedSize: Size(8, 8),
+                  size: Size(9, 9),
+                  currentItem: _videoIndex,
+                  count: homeData.videoPromotions.length,
+                  unselectedColor: Color(0xFFAEB9E1),
+                  selectedColor: Color(0xFF0D74BC),
+                ),
+              ),
+            const SizedBox(height: 24),
+          ],
         );
       },
     );

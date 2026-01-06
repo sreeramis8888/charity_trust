@@ -80,8 +80,10 @@ class _MyReferralsPageState extends ConsumerState<MyReferralsPage>
     print('🟣 [MyReferralsPage] BUILD called');
     final allReferralsAsync = ref.watch(allReferralsProvider);
     final indirectReferralsAsync = ref.watch(indirectReferralsProvider);
-    print('🟣 [MyReferralsPage] allReferralsAsync state: ${allReferralsAsync.runtimeType}');
-    print('🟣 [MyReferralsPage] indirectReferralsAsync state: ${indirectReferralsAsync.runtimeType}');
+    print(
+        '🟣 [MyReferralsPage] allReferralsAsync state: ${allReferralsAsync.runtimeType}');
+    print(
+        '🟣 [MyReferralsPage] indirectReferralsAsync state: ${indirectReferralsAsync.runtimeType}');
 
     return Scaffold(
       backgroundColor: kBackgroundColor,
@@ -119,18 +121,17 @@ class _MyReferralsPageState extends ConsumerState<MyReferralsPage>
               child: Container(
                 padding: const EdgeInsets.all(18),
                 decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                      colors: [
-                        const Color(0xFFFFFFFF),
-                        const Color(0xFFCEE8F8)
-                      ],
-                      begin: Alignment.topCenter,
-                      end: Alignment.bottomCenter),
+                  gradient: LinearGradient(colors: [
+                    const Color(0xFFFFFFFF),
+                    const Color(0xFFCEE8F8)
+                  ], begin: Alignment.topCenter, end: Alignment.bottomCenter),
                   borderRadius: BorderRadius.circular(22),
                 ),
                 child: allReferralsAsync.when(
                   data: (paginationState) {
-                    final total = paginationState.totalApproved + paginationState.totalPending + paginationState.totalRejected;
+                    final total = paginationState.totalApproved +
+                        paginationState.totalPending +
+                        paginationState.totalRejected;
                     final approved = paginationState.totalApproved;
                     final pending = paginationState.totalPending;
                     final rejected = paginationState.totalRejected;
@@ -163,8 +164,8 @@ class _MyReferralsPageState extends ConsumerState<MyReferralsPage>
                   ),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: kPrimaryColor,
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 12, vertical: 8),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(8),
                     ),
@@ -172,6 +173,12 @@ class _MyReferralsPageState extends ConsumerState<MyReferralsPage>
                 ),
               ],
             ),
+            const SizedBox(height: 16),
+            allReferralsAsync.when(
+                data: (data) => _buildTotalReferralsContainer(
+                    totalMemberDonation: data.totalMemberDonations.toString()),
+                error: (error, stackTrace) => _buildTotalReferralsContainer(),
+                loading: () => _buildTotalReferralsContainer()),
             const SizedBox(height: 16),
             _buildSearchAndFilterBar(),
             const SizedBox(height: 16),
@@ -322,6 +329,27 @@ class _MyReferralsPageState extends ConsumerState<MyReferralsPage>
     );
   }
 
+  Widget _buildTotalReferralsContainer({String? totalMemberDonation}) {
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+      decoration: BoxDecoration(
+          color: kCardBackgroundColor, borderRadius: BorderRadius.circular(10)),
+      child: Row(
+        children: [
+          Text(
+            'Total Member Donations',
+            style: kSmallTitleM,
+          ),
+          Spacer(),
+          Text(
+            "₹$totalMemberDonation" ?? '-',
+            style: kSubHeadingM.copyWith(color: kPrimaryColor),
+          )
+        ],
+      ),
+    );
+  }
+
   Widget _buildSearchAndFilterBar() {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 0),
@@ -339,7 +367,8 @@ class _MyReferralsPageState extends ConsumerState<MyReferralsPage>
                 controller: _searchController,
                 focusNode: _searchFocusNode,
                 onChanged: (value) {
-                  print('🟢 [SearchField] onChanged called with value: "$value"');
+                  print(
+                      '🟢 [SearchField] onChanged called with value: "$value"');
                   // Update search state first
                   ref.read(referralSearchProvider.notifier).setSearch(value);
                   print('🟢 [SearchField] Search state updated');
@@ -481,15 +510,18 @@ class _MyReferralsPageState extends ConsumerState<MyReferralsPage>
                       if (startDateController.text.isNotEmpty) {
                         final parts = startDateController.text.split('/');
                         formattedStart = "${parts[2]}-${parts[1]}-${parts[0]}";
-                        print('🟡 [FilterButton] Formatted start date: $formattedStart');
+                        print(
+                            '🟡 [FilterButton] Formatted start date: $formattedStart');
                       }
                       if (endDateController.text.isNotEmpty) {
                         final parts = endDateController.text.split('/');
                         formattedEnd = "${parts[2]}-${parts[1]}-${parts[0]}";
-                        print('🟡 [FilterButton] Formatted end date: $formattedEnd');
+                        print(
+                            '🟡 [FilterButton] Formatted end date: $formattedEnd');
                       }
 
-                      print('🟡 [FilterButton] Setting status to: $selectedStatus');
+                      print(
+                          '🟡 [FilterButton] Setting status to: $selectedStatus');
                       ref
                           .read(referralStatusFilterProvider.notifier)
                           .setStatus(selectedStatus);
