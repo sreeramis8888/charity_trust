@@ -169,64 +169,66 @@ class _HomePageState extends ConsumerState<HomePage> {
         ),
       ),
       backgroundColor: kWhite,
-      builder: (context) => Padding(
-        padding: const EdgeInsets.only(left: 16, right: 16, bottom: 16, top: 8),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Container(
-              width: 40,
-              height: 4,
-              decoration: BoxDecoration(
-                color: kGrey,
-                borderRadius: BorderRadius.circular(2),
+      builder: (context) => SafeArea(top:false,
+        child: Padding(
+          padding: const EdgeInsets.only(left: 16, right: 16, bottom: 16, top: 8),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                width: 40,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: kGrey,
+                  borderRadius: BorderRadius.circular(2),
+                ),
               ),
-            ),
-            const SizedBox(height: 20),
-            Row(
-              children: [
-                Text(
-                  'callSupportTeam'.tr(),
-                  style: kBodyTitleSB,
-                  textAlign: TextAlign.start,
-                ),
-              ],
-            ),
-            const SizedBox(height: 16),
-            Text(
-              'callSupportMessage'.tr(),
-              style: kBodyTitleL.copyWith(color: kSecondaryTextColor),
-              textAlign: TextAlign.start,
-            ),
-            const SizedBox(height: 32),
-            Row(
-              children: [
-                Expanded(
-                  child: primaryButton(
-                    label: 'cancel'.tr(),
-                    onPressed: () => Navigator.pop(context),
-                    buttonColor: kWhite,
-                    labelColor: kTextColor,
-                    sideColor: kStrokeColor,
-                    buttonHeight: 48,
+              const SizedBox(height: 20),
+              Row(
+                children: [
+                  Text(
+                    'callSupportTeam'.tr(),
+                    style: kBodyTitleSB,
+                    textAlign: TextAlign.start,
                   ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: primaryButton(
-                    label: 'call'.tr(),
-                    onPressed: () {
-                      Navigator.pop(context);
-                      launchPhone('+918891646431');
-                    },
-                    buttonColor: kPrimaryColor,
-                    labelColor: kWhite,
-                    buttonHeight: 48,
+                ],
+              ),
+              const SizedBox(height: 16),
+              Text(
+                'callSupportMessage'.tr(),
+                style: kBodyTitleL.copyWith(color: kSecondaryTextColor),
+                textAlign: TextAlign.start,
+              ),
+              const SizedBox(height: 32),
+              Row(
+                children: [
+                  Expanded(
+                    child: primaryButton(
+                      label: 'cancel'.tr(),
+                      onPressed: () => Navigator.pop(context),
+                      buttonColor: kWhite,
+                      labelColor: kTextColor,
+                      sideColor: kStrokeColor,
+                      buttonHeight: 48,
+                    ),
                   ),
-                ),
-              ],
-            ),
-          ],
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: primaryButton(
+                      label: 'call'.tr(),
+                      onPressed: () {
+                        Navigator.pop(context);
+                        launchPhone('+918891646431');
+                      },
+                      buttonColor: kPrimaryColor,
+                      labelColor: kWhite,
+                      buttonHeight: 48,
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
         ),
       ),
     );
