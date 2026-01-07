@@ -84,6 +84,8 @@ class _MyReferralsPageState extends ConsumerState<MyReferralsPage>
         '🟣 [MyReferralsPage] allReferralsAsync state: ${allReferralsAsync.runtimeType}');
     print(
         '🟣 [MyReferralsPage] indirectReferralsAsync state: ${indirectReferralsAsync.runtimeType}');
+    print(
+        '🟣 [MyReferralsPage] indirectReferralsAsync data: ${indirectReferralsAsync.maybeWhen(data: (d) => d.referrals.length, orElse: () => 0)} items');
 
     return Scaffold(
       backgroundColor: kBackgroundColor,
@@ -184,108 +186,167 @@ class _MyReferralsPageState extends ConsumerState<MyReferralsPage>
             const SizedBox(height: 16),
             _buildReferralTabBar(),
             const SizedBox(height: 16),
-            allReferralsAsync.when(
-              data: (paginationState) {
-                final displayReferrals = _tabController.index == 0
-                    ? paginationState.referrals
-                    : ref.watch(indirectReferralsProvider).maybeWhen(
-                          data: (indirectState) => indirectState.referrals,
-                          orElse: () => <UserModel>[],
-                        );
+            _tabController.index == 0
+                ? allReferralsAsync.when(
+                    data: (paginationState) {
+                      final displayReferrals = paginationState.referrals;
 
-                if (displayReferrals.isEmpty) {
-                  return Center(
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 32),
-                      child: Text(
-                        'noReferralsYet'.tr(),
-                        style: kSmallTitleR.copyWith(
-                          color: kSecondaryTextColor,
-                        ),
-                      ),
-                    ),
-                  );
-                }
-
-                final hasMore = _tabController.index == 0
-                    ? paginationState.hasMore
-                    : ref.watch(indirectReferralsProvider).maybeWhen(
-                          data: (indirectState) => indirectState.hasMore,
-                          orElse: () => false,
-                        );
-
-                return Column(
-                  children: [
-                    ...displayReferrals.map((user) {
-                      final isPending = user.status == 'pending';
-
-                      return ReferralCard(
-                        user: user,
-                        isPending: isPending,
-                        onTap: () async {
-                          final result = await Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => ReferralDetailsPage(
-                                user: user,
-                                isPending: isPending,
+                      if (displayReferrals.isEmpty) {
+                        return Center(
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 32),
+                            child: Text(
+                              'noReferralsYet'.tr(),
+                              style: kSmallTitleR.copyWith(
+                                color: kSecondaryTextColor,
                               ),
                             ),
-                          );
+                          ),
+                        );
+                      }
 
-                          if (result == true) {
-                            if (_tabController.index == 0) {
-                              await ref
-                                  .read(allReferralsProvider.notifier)
-                                  .refresh();
-                            } else {
-                              await ref
-                                  .read(indirectReferralsProvider.notifier)
-                                  .refresh();
-                            }
-                          }
-                        },
-                        onViewDetails: () async {
-                          final result = await Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => ReferralDetailsPage(
-                                user: user,
-                                isPending: isPending,
-                              ),
+                      final hasMore = paginationState.hasMore;
+
+                      return Column(
+                        children: [
+                          ...displayReferrals.map((user) {
+                            final isPending = user.status == 'pending';
+
+                            return ReferralCard(
+                              user: user,
+                              isPending: isPending,
+                              onTap: () async {
+                                final result = await Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => ReferralDetailsPage(
+                                      user: user,
+                                      isPending: isPending,
+                                    ),
+                                  ),
+                                );
+
+                                if (result == true) {
+                                  await ref
+                                      .read(allReferralsProvider.notifier)
+                                      .refresh();
+                                }
+                              },
+                              onViewDetails: () async {
+                                final result = await Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => ReferralDetailsPage(
+                                      user: user,
+                                      isPending: isPending,
+                                    ),
+                                  ),
+                                );
+
+                                if (result == true) {
+                                  await ref
+                                      .read(allReferralsProvider.notifier)
+                                      .refresh();
+                                }
+                              },
+                            );
+                          }).toList(),
+                          // Show loading indicator if there are more items to load
+                          if (hasMore)
+                            Padding(
+                              padding: const EdgeInsets.symmetric(vertical: 16),
+                              child: LoadingAnimation(size: 24),
                             ),
-                          );
-
-                          if (result == true) {
-                            if (_tabController.index == 0) {
-                              await ref
-                                  .read(allReferralsProvider.notifier)
-                                  .refresh();
-                            } else {
-                              await ref
-                                  .read(indirectReferralsProvider.notifier)
-                                  .refresh();
-                            }
-                          }
-                        },
+                        ],
                       );
-                    }).toList(),
-                    // Show loading indicator if there are more items to load
-                    if (hasMore)
-                      Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                        child: LoadingAnimation(size: 24),
-                      ),
-                  ],
-                );
-              },
-              loading: () => const Center(
-                child: LoadingAnimation(),
-              ),
-              error: (error, stack) => Center(
-                child: Text('errorLoadingReferrals'.tr() + ': $error'),
-              ),
-            ),
+                    },
+                    loading: () => const Center(
+                      child: LoadingAnimation(),
+                    ),
+                    error: (error, stack) => Center(
+                      child: Text('errorLoadingReferrals'.tr() + ': $error'),
+                    ),
+                  )
+                : indirectReferralsAsync.when(
+                    data: (paginationState) {
+                      final displayReferrals = paginationState.referrals;
+
+                      if (displayReferrals.isEmpty) {
+                        return Center(
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 32),
+                            child: Text(
+                              'noReferralsYet'.tr(),
+                              style: kSmallTitleR.copyWith(
+                                color: kSecondaryTextColor,
+                              ),
+                            ),
+                          ),
+                        );
+                      }
+
+                      final hasMore = paginationState.hasMore;
+
+                      return Column(
+                        children: [
+                          ...displayReferrals.map((user) {
+                            final isPending = user.status == 'pending';
+
+                            return ReferralCard(
+                              user: user,
+                              isPending: isPending,
+                              onTap: () async {
+                                final result = await Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => ReferralDetailsPage(
+                                      user: user,
+                                      isPending: isPending,
+                                    ),
+                                  ),
+                                );
+
+                                if (result == true) {
+                                  await ref
+                                      .read(indirectReferralsProvider.notifier)
+                                      .refresh();
+                                }
+                              },
+                              onViewDetails: () async {
+                                final result = await Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => ReferralDetailsPage(
+                                      user: user,
+                                      isPending: isPending,
+                                    ),
+                                  ),
+                                );
+
+                                if (result == true) {
+                                  await ref
+                                      .read(indirectReferralsProvider.notifier)
+                                      .refresh();
+                                }
+                              },
+                            );
+                          }).toList(),
+                          // Show loading indicator if there are more items to load
+                          if (hasMore)
+                            Padding(
+                              padding: const EdgeInsets.symmetric(vertical: 16),
+                              child: LoadingAnimation(size: 24),
+                            ),
+                        ],
+                      );
+                    },
+                    loading: () => const Center(
+                      child: LoadingAnimation(),
+                    ),
+                    error: (error, stack) => Center(
+                      child: Text('errorLoadingReferrals'.tr() + ': $error'),
+                    ),
+                  ),
           ],
         ),
       ),
@@ -337,12 +398,15 @@ class _MyReferralsPageState extends ConsumerState<MyReferralsPage>
       child: Row(
         children: [
           Text(
-            'Total Member Donations',
+            'totalMemberDonations'.tr(),
             style: kSmallTitleM,
           ),
-          Spacer(),
+          Spacer(), Text(
+            "₹",
+            style: kSubHeadingM.copyWith(color: kPrimaryColor),
+          ),
           Text(
-            "₹$totalMemberDonation" ?? '-',
+            totalMemberDonation ?? '-',
             style: kSubHeadingM.copyWith(color: kPrimaryColor),
           )
         ],

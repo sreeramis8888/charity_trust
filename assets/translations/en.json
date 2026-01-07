@@ -217,6 +217,7 @@
   "errorLoadingReferrals": "Error loading referrals",
   "errorLoadingApprovals": "Error loading approvals",
   "totalLabel": "Total",
+  "totalMemberDonations": "Total Member Donations",
   "approveMembership": "Approve Membership",
   "approveMembershipConfirmation": "Are you sure you want to approve this member's application?",
   "rejectMembership": "Reject Membership",

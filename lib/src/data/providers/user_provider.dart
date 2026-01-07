@@ -849,8 +849,26 @@ class IndirectReferralsNotifier extends _$IndirectReferralsNotifier {
     );
 
     if (response.success && response.data != null) {
-      final data = response.data!['data'] as Map<String, dynamic>?;
-      if (data != null) {
+      final responseData = response.data!['data'];
+      
+      // Handle case where 'data' is a List (direct referrals array)
+      if (responseData is List) {
+        final referrals = responseData
+            .map((item) => UserModel.fromJson(item as Map<String, dynamic>))
+            .toList()
+            .cast<UserModel>();
+        
+        return ReferralPaginationState(
+          currentPage: 1,
+          limit: 10,
+          totalCount: referrals.length,
+          referrals: referrals,
+        );
+      }
+      
+      // Handle case where 'data' is a Map (with metadata)
+      if (responseData is Map<String, dynamic>) {
+        final data = responseData;
         final users = data['users'] as List?;
         final totalCountValue = data['total_count'];
         final totalCount = totalCountValue is int
@@ -948,8 +966,25 @@ class IndirectReferralsNotifier extends _$IndirectReferralsNotifier {
       );
 
       if (response.success && response.data != null) {
-        final data = response.data!['data'] as Map<String, dynamic>?;
-        if (data != null) {
+        final responseData = response.data!['data'];
+        
+        // Handle case where 'data' is a List (direct referrals array)
+        if (responseData is List) {
+          final referrals = responseData
+              .map((item) => UserModel.fromJson(item as Map<String, dynamic>))
+              .toList()
+              .cast<UserModel>();
+          
+          return currentState.copyWith(
+            currentPage: nextPage,
+            totalCount: currentState.totalCount + referrals.length,
+            referrals: <UserModel>[...currentState.referrals, ...referrals],
+          );
+        }
+        
+        // Handle case where 'data' is a Map (with metadata)
+        if (responseData is Map<String, dynamic>) {
+          final data = responseData;
           final users = data['users'] as List?;
           final totalCountValue = data['total_count'];
           final totalCount = totalCountValue is int
