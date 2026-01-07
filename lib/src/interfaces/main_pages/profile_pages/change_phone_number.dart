@@ -27,7 +27,7 @@ class _ChangePhoneNumberPageState extends ConsumerState<ChangePhoneNumberPage> {
   final _scrollController = ScrollController();
   final FocusNode _unfocusNode = FocusNode();
   final newPhoneController = TextEditingController();
-
+  String? phoneCountryCode='91';
   @override
   void dispose() {
     _scrollController.dispose();
@@ -48,7 +48,7 @@ class _ChangePhoneNumberPageState extends ConsumerState<ChangePhoneNumberPage> {
 
       // Call update API to change phone number
       final userData = <String, dynamic>{
-        'phone': newPhoneNumber,
+        'phone': "+$phoneCountryCode${newPhoneNumber}",
       };
 
       final response =
@@ -271,7 +271,7 @@ class _ChangePhoneNumberPageState extends ConsumerState<ChangePhoneNumberPage> {
                               ),
                             ),
                             onCountryChanged: (value) {
-                              // Handle country code change if needed
+                                   phoneCountryCode = value.dialCode;
                             },
                             initialCountryCode: 'IN',
                             flagsButtonPadding:

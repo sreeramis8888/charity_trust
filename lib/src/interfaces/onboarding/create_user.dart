@@ -46,6 +46,7 @@ class _CreateUserPageState extends ConsumerState<CreateUserPage> {
   final whatsappController = TextEditingController();
 
   String? selectedCountryCode;
+  String mobileCountryCode='91';
   String? selectedCountryName;
   String? selectedStateCode;
   String? selectedStateName;
@@ -149,7 +150,7 @@ class _CreateUserPageState extends ConsumerState<CreateUserPage> {
       final userData = <String, dynamic>{
         'name': nameController.text.trim(),
         'email': emailController.text.trim(),
-        'phone': mobileController.text.trim(),
+        'phone': '+$mobileCountryCode${mobileController.text.trim()}',
         'address': addressController.text.trim(),
         'area': areaController.text.trim(),
         'country': selectedCountryName ?? selectedCountryCode,
@@ -353,6 +354,9 @@ class _CreateUserPageState extends ConsumerState<CreateUserPage> {
           duration: anim.AnimationDuration.normal,
           delayMilliseconds: 250,
           child: IntlPhoneField(
+            onCountryChanged: (value) {
+              mobileCountryCode = value.dialCode;
+            },
             key: _fieldKeys['mobile'],
             validator: (phone) {
               if (phone == null || phone.number.isEmpty) {
