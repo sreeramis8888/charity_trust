@@ -94,9 +94,9 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
       // Check version first
       await _checkAppVersion();
 
-      // If update is required (forced or optional), stop initialization and stay on splash
-      if (isAppUpdateRequired) {
-        log('_initializeApp: Update required, stopping initialization and staying on splash',
+      // If update is required (forced or optional) or server error, stop initialization and stay on splash
+      if (isAppUpdateRequired || hasVersionCheckError) {
+        log('_initializeApp: Update required or server error, stopping initialization and staying on splash',
             name: 'SplashScreen');
         return;
       }
@@ -137,22 +137,20 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
           });
           log('_checkAppVersion: State updated - isAppUpdateRequired: $isAppUpdateRequired, forceUpdate: $forceUpdate',
               name: 'SplashScreen');
-
-          if (forceUpdate) {
-            log('_checkAppVersion: Showing force update dialog',
-                name: 'SplashScreen');
-            _showForceUpdateDialog();
-          } else {
-            log('_checkAppVersion: Showing optional update dialog',
-                name: 'SplashScreen');
-            _showOptionalUpdateDialog();
-          }
         } else {
           log('_checkAppVersion: App is up to date. Current: $currentVersion, New: $newVersion',
               name: 'SplashScreen');
         }
       } else {
         log('_checkAppVersion: No version response received',
+            name: 'SplashScreen');
+        // Treat null response as server error
+        setState(() {
+          hasVersionCheckError = true;
+          errorMessage = 'serverDownMessage'.tr();
+          isAppUpdateRequired = true;
+        });
+        log('_checkAppVersion: Server error - no response received, staying on splash',
             name: 'SplashScreen');
       }
     } catch (e) {
@@ -162,164 +160,12 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
         errorMessage = 'serverDownMessage'.tr();
         isAppUpdateRequired = true;
       });
+      log('_checkAppVersion: Exception caught - staying on splash screen',
+          name: 'SplashScreen');
     }
   }
 
-  void _showForceUpdateDialog() {
-    log('_showForceUpdateDialog: Displaying force update dialog - Current version: $errorMessage',
-        name: 'SplashScreen');
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (context) => Dialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        backgroundColor: kWhite,
-        child: Padding(
-          padding: const EdgeInsets.all(24.0),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Container(
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: kPrimaryColor.withOpacity(0.1),
-                  shape: BoxShape.circle,
-                ),
-                child: Icon(
-                  Icons.system_update,
-                  color: kPrimaryColor,
-                  size: 32,
-                ),
-              ),
-              const SizedBox(height: 16),
-              Text(
-                'updateRequired'.tr(),
-                style: kHeadTitleB.copyWith(color: kTextColor),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 12),
-              Text(
-                errorMessage,
-                style: kBodyTitleR.copyWith(color: kSecondaryTextColor),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 24),
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: () {
-                    log('_showForceUpdateDialog: User tapped Update Now',
-                        name: 'SplashScreen');
-                    _openAppStore();
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: kPrimaryColor,
-                    padding: const EdgeInsets.symmetric(vertical: 12),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                  ),
-                  child: Text(
-                    'updateNow'.tr(),
-                    style: kBodyTitleM.copyWith(color: kWhite),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
 
-  void _showOptionalUpdateDialog() {
-    log('_showOptionalUpdateDialog: Displaying optional update dialog - Current version: $errorMessage',
-        name: 'SplashScreen');
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (context) => Dialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        backgroundColor: kWhite,
-        child: Padding(
-          padding: const EdgeInsets.all(24.0),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Container(
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: kThirdTextColor.withOpacity(0.1),
-                  shape: BoxShape.circle,
-                ),
-                child: Icon(
-                  Icons.cloud_download_outlined,
-                  color: kThirdTextColor,
-                  size: 32,
-                ),
-              ),
-              const SizedBox(height: 16),
-              Text(
-                'updateAvailable'.tr(),
-                style: kHeadTitleB.copyWith(color: kTextColor),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 12),
-              Text(
-                errorMessage,
-                style: kBodyTitleR.copyWith(color: kSecondaryTextColor),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 24),
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: () {
-                    log('_showOptionalUpdateDialog: User tapped Update',
-                        name: 'SplashScreen');
-                    _openAppStore();
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: kThirdTextColor,
-                    padding: const EdgeInsets.symmetric(vertical: 12),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                  ),
-                  child: Text(
-                    'update'.tr(),
-                    style: kBodyTitleM.copyWith(color: kWhite),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 12),
-              SizedBox(
-                width: double.infinity,
-                child: OutlinedButton(
-                  onPressed: () {
-                    log('_showOptionalUpdateDialog: User tapped Later, staying on splash',
-                        name: 'SplashScreen');
-                    Navigator.pop(context);
-                  },
-                  style: OutlinedButton.styleFrom(
-                    side: BorderSide(color: kBorder, width: 1.5),
-                    padding: const EdgeInsets.symmetric(vertical: 12),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                  ),
-                  child: Text(
-                    'later'.tr(),
-                    style: kBodyTitleM.copyWith(color: kTextColor),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
 
   Future<void> _openAppStore() async {
     log('_openAppStore: Attempting to open app store with link: $updateLink',
@@ -577,80 +423,102 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
     return Scaffold(
       backgroundColor: kWhite,
       body: Container(
-        child: Stack(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Align(
-              alignment: Alignment.center,
-              child: AnimatedBuilder(
-                animation: _controller,
-                builder: (context, child) {
-                  return Opacity(
-                    opacity: _opacityAnimation.value,
-                    child: Transform.rotate(
-                      angle: _rotationAnimation.value,
-                      child: Transform.scale(
-                        scale: _scaleAnimation.value,
-                        child: SvgPicture.asset(
-                          'assets/svg/annujoom_logo.svg',
+            Expanded(
+              child: Center(
+                child: AnimatedBuilder(
+                  animation: _controller,
+                  builder: (context, child) {
+                    return Opacity(
+                      opacity: _opacityAnimation.value,
+                      child: Transform.rotate(
+                        angle: _rotationAnimation.value,
+                        child: Transform.scale(
+                          scale: _scaleAnimation.value,
+                          child: SvgPicture.asset(
+                            'assets/svg/annujoom_logo.svg',
+                          ),
                         ),
                       ),
-                    ),
-                  );
-                },
+                    );
+                  },
+                ),
               ),
             ),
             if (hasVersionCheckError)
-              Align(
-                alignment: Alignment.bottomCenter,
-                child: Padding(
-                  padding: EdgeInsets.only(
-                    bottom: 100.0,
-                    left: 20.0,
-                    right: 20.0,
-                  ),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Container(
-                        padding:
-                            EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                        decoration: BoxDecoration(
-                          color: Colors.black.withOpacity(0.7),
-                          borderRadius: BorderRadius.circular(8),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(24),
+                      decoration: BoxDecoration(
+                        color: Colors.red.withOpacity(0.05),
+                        border: Border.all(
+                          color: Colors.red.withOpacity(0.2),
+                          width: 1.5,
                         ),
-                        child: Column(
-                          children: [
-                            Text(
-                              errorMessage,
-                              textAlign: TextAlign.center,
-                              style: TextStyle(
-                                color: kWhite,
-                                fontSize: 16,
-                                fontWeight: FontWeight.w500,
-                              ),
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      child: Column(
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.all(12),
+                            decoration: BoxDecoration(
+                              color: Colors.red.withOpacity(0.1),
+                              shape: BoxShape.circle,
                             ),
-                            SizedBox(height: 12),
-                            TextButton(
+                            child: Icon(
+                              Icons.cloud_off_outlined,
+                              color: Colors.red,
+                              size: 32,
+                            ),
+                          ),
+                          const SizedBox(height: 16),
+                          Text(
+                            'serverDownMessage'.tr(),
+                            style: kHeadTitleB.copyWith(
+                              color: kTextColor,
+                              fontSize: 16,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                          const SizedBox(height: 12),
+                          Text(
+                            'Please check your internet connection and try again.',
+                            style: kBodyTitleR.copyWith(
+                              color: kSecondaryTextColor,
+                              fontSize: 13,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                          const SizedBox(height: 20),
+                          SizedBox(
+                            width: double.infinity,
+                            child: ElevatedButton(
                               onPressed: retryVersionCheck,
-                              style: TextButton.styleFrom(
-                                backgroundColor: kWhite.withOpacity(0.2),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: kPrimaryColor,
+                                padding:
+                                    const EdgeInsets.symmetric(vertical: 12),
                                 shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(6),
+                                  borderRadius: BorderRadius.circular(8),
                                 ),
                               ),
                               child: Text(
                                 'retry'.tr(),
-                                style: TextStyle(
-                                  color: kWhite,
-                                  fontWeight: FontWeight.w600,
-                                ),
+                                style: kBodyTitleM.copyWith(color: kWhite),
                               ),
                             ),
-                          ],
-                        ),
+                          ),
+                        ],
                       ),
-                    ],
-                  ),
+                    ),
+                    const SizedBox(height: 40),
+                  ],
                 ),
               ),
           ],

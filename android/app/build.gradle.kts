@@ -30,9 +30,11 @@ android {
             isCoreLibraryDesugaringEnabled = true
     }
 
-    kotlinOptions {
-        jvmTarget = JavaVersion.VERSION_17.toString()
+tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach {
+    compilerOptions {
+        jvmTarget = org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17
     }
+}
     signingConfigs {
         create("release") {
             keyAlias = keystoreProperties["keyAlias"] as String?
@@ -68,7 +70,18 @@ android {
 }
 dependencies {
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.4")
+    implementation("com.razorpay:checkout:1.6.41")
+implementation("com.razorpay:standard-core:1.7.4")
+
+}
+
+configurations.configureEach {
+resolutionStrategy {
+force("com.razorpay:standard-core:1.7.4")
+force("com.razorpay:checkout:1.6.41")
+}
 }
 flutter {
     source = "../.."
 }
+
