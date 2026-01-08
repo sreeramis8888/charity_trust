@@ -55,7 +55,7 @@ class _CreateUserPageState extends ConsumerState<CreateUserPage> {
   String? selectedGender;
   XFile? profileImage;
   bool isSameAsPhone = true;
-  String? whatsappCountryCode;
+  String whatsappCountryCode="91";
 
   final Map<String, GlobalKey> _fieldKeys = {
     'name': GlobalKey(),

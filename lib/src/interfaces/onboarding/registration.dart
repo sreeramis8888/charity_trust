@@ -56,12 +56,11 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
   String? selectedDistrictCode;
   String? selectedDistrictName;
   String? selectedGender;
-  // String? selectedPreferredLanguage = 'en'; // Removed as per request
   XFile? profileImage;
   String? recommendedByType = 'trustee';
   UserModel? selectedRecommendedBy;
   bool isSameAsPhone = true;
-  String? whatsappCountryCode;
+  String whatsappCountryCode="91";
   final whatsappController = TextEditingController();
 
   final Map<String, GlobalKey> _fieldKeys = {
@@ -272,7 +271,7 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
         'image': profilePictureUrl,
         'gender': selectedGender,
         'preferred_language': GlobalVariables.preferredLanguage,
-        'whatsapp_no': whatsappNumber,
+        'whatsapp_no': "+$whatsappCountryCode${whatsappNumber}",
         'dob': formattedDob,
         'recommended_by':
             recommendedByType == 'trustee' ? 'trustee' : 'charity-member',
