@@ -41,7 +41,6 @@ class _CreateUserPageState extends ConsumerState<CreateUserPage> {
   final addressController = TextEditingController();
   final areaController = TextEditingController();
   final pincodeController = TextEditingController();
-  final aadharNumberController = TextEditingController();
   final dobController = TextEditingController();
   final whatsappController = TextEditingController();
 
@@ -67,7 +66,6 @@ class _CreateUserPageState extends ConsumerState<CreateUserPage> {
     'state': GlobalKey(),
     'district': GlobalKey(),
     'pincode': GlobalKey(),
-    'aadharNumber': GlobalKey(),
     'dob': GlobalKey(),
     'gender': GlobalKey(),
     'whatsapp': GlobalKey(),
@@ -83,7 +81,6 @@ class _CreateUserPageState extends ConsumerState<CreateUserPage> {
     addressController.dispose();
     areaController.dispose();
     pincodeController.dispose();
-    aadharNumberController.dispose();
     dobController.dispose();
     whatsappController.dispose();
     super.dispose();
@@ -125,7 +122,7 @@ class _CreateUserPageState extends ConsumerState<CreateUserPage> {
       String formattedDob = dobController.text.trim();
       if (formattedDob.isNotEmpty) {
         try {
-          final parts = formattedDob.split('/');
+          final parts = formattedDob.split('-');
           if (parts.length == 3) {
             formattedDob = '${parts[2]}-${parts[1]}-${parts[0]}';
           }
@@ -157,8 +154,6 @@ class _CreateUserPageState extends ConsumerState<CreateUserPage> {
         'state': selectedStateName ?? selectedStateCode,
         'district': selectedDistrictName ?? selectedDistrictCode,
         'pincode': pincodeController.text.trim(),
-        if (aadharNumberController.text.trim().isNotEmpty)
-          'aadhar_number': int.parse(aadharNumberController.text.trim()),
         'image': profilePictureUrl,
         'gender': selectedGender,
         'dob': formattedDob,
@@ -247,8 +242,6 @@ class _CreateUserPageState extends ConsumerState<CreateUserPage> {
                   _buildAreaField(),
                   const SizedBox(height: 18),
                   _buildPincodeField(),
-                  const SizedBox(height: 20),
-                  _buildAadharNumberField(),
                   const SizedBox(height: 20),
                   _buildDobField(),
                   const SizedBox(height: 20),
@@ -769,44 +762,6 @@ class _CreateUserPageState extends ConsumerState<CreateUserPage> {
     );
   }
 
-  Widget _buildAadharNumberField() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        anim.AnimatedWidgetWrapper(
-          animationType: anim.AnimationType.fadeSlideInFromLeft,
-          duration: anim.AnimationDuration.normal,
-          delayMilliseconds: 1000,
-          child: Text("aadharNumber".tr() + " (optional)", style: kSmallTitleR),
-        ),
-        const SizedBox(height: 6),
-        anim.AnimatedWidgetWrapper(
-          animationType: anim.AnimationType.fadeSlideInFromBottom,
-          duration: anim.AnimationDuration.normal,
-          delayMilliseconds: 1050,
-          child: InputField(
-            key: _fieldKeys['aadharNumber'],
-            type: CustomFieldType.number,
-            hint: "enterAadharNumber".tr(),
-            controller: aadharNumberController,
-            validator: (v) {
-              if (v == null || v.isEmpty) {
-                return null; // Optional field
-              }
-              if (v.length != 12) {
-                return 'aadharNumberMustBe12Digits'.tr();
-              }
-              if (!RegExp(r'^\d{12}$').hasMatch(v)) {
-                return 'aadharNumberMustContainOnlyDigits'.tr();
-              }
-              return null;
-            },
-          ),
-        ),
-      ],
-    );
-  }
-
   Widget _buildDobField() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -814,18 +769,18 @@ class _CreateUserPageState extends ConsumerState<CreateUserPage> {
         anim.AnimatedWidgetWrapper(
           animationType: anim.AnimationType.fadeSlideInFromLeft,
           duration: anim.AnimationDuration.normal,
-          delayMilliseconds: 1100,
+          delayMilliseconds: 1000,
           child: Text("dateOfBirth".tr() + " *", style: kSmallTitleR),
         ),
         const SizedBox(height: 6),
         anim.AnimatedWidgetWrapper(
           animationType: anim.AnimationType.fadeSlideInFromBottom,
           duration: anim.AnimationDuration.normal,
-          delayMilliseconds: 1150,
+          delayMilliseconds: 1050,
           child: InputField(
             key: _fieldKeys['dob'],
             type: CustomFieldType.date,
-            hint: "ddmmyyyy".tr(),
+            hint: "dd-mm-yyyy".tr(),
             controller: dobController,
             validator: (v) => v!.isEmpty ? "required".tr() : null,
           ),
@@ -841,14 +796,14 @@ class _CreateUserPageState extends ConsumerState<CreateUserPage> {
         anim.AnimatedWidgetWrapper(
           animationType: anim.AnimationType.fadeSlideInFromLeft,
           duration: anim.AnimationDuration.normal,
-          delayMilliseconds: 1200,
+          delayMilliseconds: 1100,
           child: Text("gender".tr() + " *", style: kSmallTitleR),
         ),
         const SizedBox(height: 6),
         anim.AnimatedWidgetWrapper(
           animationType: anim.AnimationType.fadeSlideInFromBottom,
           duration: anim.AnimationDuration.normal,
-          delayMilliseconds: 1250,
+          delayMilliseconds: 1150,
           child: AnimatedDropdown<String>(
             key: _fieldKeys['gender'],
             hint: "selectGender".tr(),
@@ -873,14 +828,14 @@ class _CreateUserPageState extends ConsumerState<CreateUserPage> {
         anim.AnimatedWidgetWrapper(
           animationType: anim.AnimationType.fadeSlideInFromLeft,
           duration: anim.AnimationDuration.normal,
-          delayMilliseconds: 1300,
+          delayMilliseconds: 1200,
           child: Text("whatsappNumber".tr() + " *", style: kSmallTitleR),
         ),
         const SizedBox(height: 12),
         anim.AnimatedWidgetWrapper(
           animationType: anim.AnimationType.fadeSlideInFromBottom,
           duration: anim.AnimationDuration.normal,
-          delayMilliseconds: 1350,
+          delayMilliseconds: 1250,
           child: Row(
             children: [
               Checkbox(
@@ -908,7 +863,7 @@ class _CreateUserPageState extends ConsumerState<CreateUserPage> {
           anim.AnimatedWidgetWrapper(
             animationType: anim.AnimationType.fadeSlideInFromBottom,
             duration: anim.AnimationDuration.normal,
-            delayMilliseconds: 1400,
+            delayMilliseconds: 1300,
             child: IntlPhoneField(
               key: _fieldKeys['whatsapp'],
               validator: (phone) {
@@ -986,7 +941,7 @@ class _CreateUserPageState extends ConsumerState<CreateUserPage> {
     return anim.AnimatedWidgetWrapper(
       animationType: anim.AnimationType.fadeScaleUp,
       duration: anim.AnimationDuration.normal,
-      delayMilliseconds: 1450,
+      delayMilliseconds: 1350,
       child: SizedBox(
         height: 50,
         width: double.infinity,

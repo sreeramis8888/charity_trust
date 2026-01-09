@@ -45,7 +45,6 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
   final addressController = TextEditingController();
   final areaController = TextEditingController();
   final pincodeController = TextEditingController();
-  final aadharNumberController = TextEditingController();
   final dobController = TextEditingController();
   final recommendedByController = TextEditingController();
 
@@ -73,10 +72,8 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
     'state': GlobalKey(),
     'district': GlobalKey(),
     'pincode': GlobalKey(),
-    'aadharNumber': GlobalKey(),
     'dob': GlobalKey(),
     'gender': GlobalKey(),
-    // 'preferredLanguage': GlobalKey(),
     'whatsapp': GlobalKey(),
     'recommendedBy': GlobalKey(),
   };
@@ -104,8 +101,6 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
         } else if (selectedDistrictCode == null ||
             selectedDistrictCode!.isEmpty) {
           firstErrorKey = 'district';
-        } else if (aadharNumberController.text.trim().isEmpty) {
-          firstErrorKey = 'aadharNumber';
         } else if (!isSameAsPhone && whatsappController.text.trim().isEmpty) {
           firstErrorKey = 'whatsapp';
         } else if (selectedRecommendedBy == null) {
@@ -138,7 +133,6 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
     addressController.dispose();
     areaController.dispose();
     pincodeController.dispose();
-    aadharNumberController.dispose();
     dobController.dispose();
     whatsappController.dispose();
     recommendedByController.dispose();
@@ -240,11 +234,11 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
         }
       }
 
-      // Convert date from dd/mm/yyyy to yyyy-mm-dd format
+      // Convert date from dd-mm-yyyy to yyyy-mm-dd format
       String formattedDob = dobController.text.trim();
       if (formattedDob.isNotEmpty) {
         try {
-          final parts = formattedDob.split('/');
+          final parts = formattedDob.split('-');
           if (parts.length == 3) {
             formattedDob = '${parts[2]}-${parts[1]}-${parts[0]}';
           }
@@ -266,8 +260,6 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
         'state': selectedStateName ?? selectedStateCode,
         'district': selectedDistrictName ?? selectedDistrictCode,
         'pincode': pincodeController.text.trim(),
-        if (aadharNumberController.text.trim().isNotEmpty)
-          'aadhar_number': int.parse(aadharNumberController.text.trim()),
         'image': profilePictureUrl,
         'gender': selectedGender,
         'preferred_language': GlobalVariables.preferredLanguage,
@@ -957,38 +949,7 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
                       anim.AnimatedWidgetWrapper(
                         animationType: anim.AnimationType.fadeSlideInFromLeft,
                         duration: anim.AnimationDuration.normal,
-                        delayMilliseconds: 1000,
-                        child: Text("aadharNumber".tr() + " (optional)", style: kSmallTitleR),
-                      ),
-                      const SizedBox(height: 6),
-                      anim.AnimatedWidgetWrapper(
-                        animationType: anim.AnimationType.fadeSlideInFromBottom,
-                        duration: anim.AnimationDuration.normal,
-                        delayMilliseconds: 1050,
-                        child: InputField(
-                          key: _fieldKeys['aadharNumber'],
-                          type: CustomFieldType.number,
-                          hint: "enterAadharNumber".tr(),
-                          controller: aadharNumberController,
-                          validator: (v) {
-                            if (v == null || v.isEmpty) {
-                              return null; // Optional field
-                            }
-                            if (v.length != 12) {
-                              return 'aadharNumberMustBe12Digits'.tr();
-                            }
-                            if (!RegExp(r'^\d{12}$').hasMatch(v)) {
-                              return 'aadharNumberMustContainOnlyDigits'.tr();
-                            }
-                            return null;
-                          },
-                        ),
-                      ),
-                      const SizedBox(height: 20),
-                      anim.AnimatedWidgetWrapper(
-                        animationType: anim.AnimationType.fadeSlideInFromLeft,
-                        duration: anim.AnimationDuration.normal,
-                        delayMilliseconds: 1300,
+                        delayMilliseconds: 1100,
                         child: Text("dateOfBirth".tr() + " *",
                             style: kSmallTitleR),
                       ),
@@ -996,11 +957,11 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
                       anim.AnimatedWidgetWrapper(
                         animationType: anim.AnimationType.fadeSlideInFromBottom,
                         duration: anim.AnimationDuration.normal,
-                        delayMilliseconds: 1350,
+                        delayMilliseconds: 1150,
                         child: InputField(
                           key: _fieldKeys['dob'],
                           type: CustomFieldType.date,
-                          hint: "ddmmyyyy".tr(),
+                          hint: "dd-mm-yyyy".tr(),
                           controller: dobController,
                           validator: (v) => v!.isEmpty ? "required".tr() : null,
                         ),
@@ -1009,14 +970,14 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
                       anim.AnimatedWidgetWrapper(
                         animationType: anim.AnimationType.fadeSlideInFromLeft,
                         duration: anim.AnimationDuration.normal,
-                        delayMilliseconds: 1400,
+                        delayMilliseconds: 1200,
                         child: Text("gender".tr() + " *", style: kSmallTitleR),
                       ),
                       const SizedBox(height: 6),
                       anim.AnimatedWidgetWrapper(
                         animationType: anim.AnimationType.fadeSlideInFromBottom,
                         duration: anim.AnimationDuration.normal,
-                        delayMilliseconds: 1450,
+                        delayMilliseconds: 1250,
                         child: AnimatedDropdown<String>(
                           key: _fieldKeys['gender'],
                           hint: "selectGender".tr(),
@@ -1344,8 +1305,6 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
                                 'district': selectedDistrictName ??
                                     selectedDistrictCode,
                                 'pincode': pincodeController.text.trim(),
-                                'aadhar_number':
-                                    aadharNumberController.text.trim(),
                                 'gender': selectedGender,
                                 'dob': dobController.text.trim(),
                                 'whatsapp_same_as_phone': isSameAsPhone,
