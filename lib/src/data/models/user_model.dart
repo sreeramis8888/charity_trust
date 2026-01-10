@@ -10,7 +10,6 @@ class UserModel {
   final String? fcm;
   final String? otp;
   final String? gender;
-  final String? aadharNumber;
   final String? address;
   final String? area;
   final String? district;
@@ -53,7 +52,6 @@ class UserModel {
     this.fcm,
     this.otp,
     this.gender,
-    this.aadharNumber,
     this.address,
     this.area,
     this.district,
@@ -100,7 +98,6 @@ class UserModel {
       fcm: json["fcm"],
       otp: json["otp"],
       gender: json["gender"],
-      aadharNumber: json["aadhar_number"]?.toString(),
       address: json["address"],
       area: json["area"],
       district: json["district"],
@@ -154,7 +151,6 @@ class UserModel {
       "fcm": fcm,
       "otp": otp,
       "gender": gender,
-      "aadhar_number": aadharNumber,
       "address": address,
       "area": area,
       "district": district,
@@ -202,7 +198,6 @@ class UserModel {
     String? fcm,
     String? otp,
     String? gender,
-    String? aadharNumber,
     String? address,
     String? area,
     String? district,
@@ -245,7 +240,6 @@ class UserModel {
       fcm: fcm ?? this.fcm,
       otp: otp ?? this.otp,
       gender: gender ?? this.gender,
-      aadharNumber: aadharNumber ?? this.aadharNumber,
       address: address ?? this.address,
       area: area ?? this.area,
       district: district ?? this.district,

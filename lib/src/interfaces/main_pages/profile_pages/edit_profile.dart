@@ -40,7 +40,6 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
   final addressController = TextEditingController();
   final areaController = TextEditingController();
   final pincodeController = TextEditingController();
-  final aadharNumberController = TextEditingController();
   final dobController = TextEditingController();
   final whatsappController = TextEditingController();
 
@@ -65,7 +64,6 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
     'state': GlobalKey(),
     'district': GlobalKey(),
     'pincode': GlobalKey(),
-    'aadharNumber': GlobalKey(),
     'dob': GlobalKey(),
     'gender': GlobalKey(),
     'whatsapp': GlobalKey(),
@@ -129,7 +127,6 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
         addressController.text = userData.address ?? '';
         areaController.text = userData.area ?? '';
         pincodeController.text = userData.pincode.toString() ?? '';
-        aadharNumberController.text = userData.aadharNumber ?? '';
         selectedGender = userData.gender;
         selectedCountryCode = userData.countryCode;
         selectedCountryName = userData.country;
@@ -156,7 +153,6 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
     addressController.dispose();
     areaController.dispose();
     pincodeController.dispose();
-    aadharNumberController.dispose();
     dobController.dispose();
     whatsappController.dispose();
     super.dispose();
@@ -257,13 +253,6 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
         userData['gender'] = selectedGender;
       }
 
-      final newAadhar = aadharNumberController.text.trim();
-      if (newAadhar != (currentUser.aadharNumber ?? '')) {
-        if (newAadhar.isNotEmpty) {
-          userData['aadhar_number'] = int.parse(newAadhar);
-        }
-      }
-
       if (parsedDob != currentUser.dob) {
         if (parsedDob != null) {
           userData['dob'] =
@@ -304,7 +293,6 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
         address: newAddress,
         area: newArea,
         pincode: int.parse(newPincode),
-        aadharNumber: newAadhar,
         dob: parsedDob,
         whatsappNumber: whatsappNumber,
         gender: selectedGender,
@@ -398,12 +386,14 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
                                           fit: BoxFit.cover,
                                         ),
                                       )
-                                    : existingImageUrl != null && existingImageUrl!.isNotEmpty
+                                    : existingImageUrl != null &&
+                                            existingImageUrl!.isNotEmpty
                                         ? ClipOval(
                                             child: Image.network(
                                               existingImageUrl!,
                                               fit: BoxFit.cover,
-                                              errorBuilder: (context, error, stackTrace) {
+                                              errorBuilder:
+                                                  (context, error, stackTrace) {
                                                 return const Icon(Icons.person,
                                                     color: kGreyDark, size: 50);
                                               },
@@ -450,7 +440,6 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
                       ),
                     ),
                     const SizedBox(height: 18),
-
                     anim.AnimatedWidgetWrapper(
                       animationType: anim.AnimationType.fadeSlideInFromLeft,
                       duration: anim.AnimationDuration.normal,
@@ -524,8 +513,7 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
                                     onItemSelected: (code) {
                                       setState(() {
                                         selectedCountryCode = code;
-                                        selectedCountryName =
-                                            countryMap[code];
+                                        selectedCountryName = countryMap[code];
                                         selectedStateCode = null;
                                         selectedStateName = null;
                                         selectedDistrictCode = null;
@@ -534,8 +522,9 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
                                     },
                                     searchFilter: (code, query) {
                                       final name = countryMap[code] ?? '';
-                                      return name.toLowerCase().contains(
-                                              query.toLowerCase()) ||
+                                      return name
+                                              .toLowerCase()
+                                              .contains(query.toLowerCase()) ||
                                           code
                                               .toLowerCase()
                                               .contains(query.toLowerCase());
@@ -549,8 +538,8 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
                                   decoration: BoxDecoration(
                                     color: Colors.white,
                                     borderRadius: BorderRadius.circular(12),
-                                    border: Border.all(
-                                        color: Colors.grey.shade300),
+                                    border:
+                                        Border.all(color: Colors.grey.shade300),
                                   ),
                                   child: Row(
                                     mainAxisAlignment:
@@ -580,8 +569,7 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
                               decoration: BoxDecoration(
                                 color: Colors.white,
                                 borderRadius: BorderRadius.circular(12),
-                                border:
-                                    Border.all(color: Colors.grey.shade300),
+                                border: Border.all(color: Colors.grey.shade300),
                               ),
                               child: const Center(
                                 child: SizedBox(
@@ -596,8 +584,7 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
                               decoration: BoxDecoration(
                                 color: Colors.white,
                                 borderRadius: BorderRadius.circular(12),
-                                border:
-                                    Border.all(color: Colors.grey.shade300),
+                                border: Border.all(color: Colors.grey.shade300),
                               ),
                               child: Center(
                                 child: Text('Error: $err',
@@ -617,12 +604,10 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
                         delayMilliseconds: 600,
                         child: Text("state".tr(), style: kSmallTitleR),
                       ),
-                    if (selectedCountryCode != null)
-                      const SizedBox(height: 6),
+                    if (selectedCountryCode != null) const SizedBox(height: 6),
                     if (selectedCountryCode != null)
                       anim.AnimatedWidgetWrapper(
-                        animationType:
-                            anim.AnimationType.fadeSlideInFromBottom,
+                        animationType: anim.AnimationType.fadeSlideInFromBottom,
                         duration: anim.AnimationDuration.normal,
                         delayMilliseconds: 650,
                         child: Consumer(
@@ -658,8 +643,9 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
                                         final name = stateMap[code] ?? '';
                                         return name.toLowerCase().contains(
                                                 query.toLowerCase()) ||
-                                            code.toLowerCase().contains(
-                                                query.toLowerCase());
+                                            code
+                                                .toLowerCase()
+                                                .contains(query.toLowerCase());
                                       },
                                     ).show();
                                   },
@@ -730,29 +716,25 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
                           },
                         ),
                       ),
-                    if (selectedCountryCode != null)
-                      const SizedBox(height: 18),
+                    if (selectedCountryCode != null) const SizedBox(height: 18),
                     if (selectedStateCode != null)
                       anim.AnimatedWidgetWrapper(
                         animationType: anim.AnimationType.fadeSlideInFromLeft,
                         duration: anim.AnimationDuration.normal,
                         delayMilliseconds: 700,
-                        child:
-                            Text("district".tr(), style: kSmallTitleR),
+                        child: Text("district".tr(), style: kSmallTitleR),
                       ),
                     if (selectedStateCode != null) const SizedBox(height: 6),
                     if (selectedStateCode != null)
                       anim.AnimatedWidgetWrapper(
-                        animationType:
-                            anim.AnimationType.fadeSlideInFromBottom,
+                        animationType: anim.AnimationType.fadeSlideInFromBottom,
                         duration: anim.AnimationDuration.normal,
                         delayMilliseconds: 750,
                         child: Consumer(
                           builder: (context, ref, _) {
                             final citiesAsync = ref.watch(
                                 getDistrictsByStateProvider(
-                                    selectedCountryCode!,
-                                    selectedStateCode!));
+                                    selectedCountryCode!, selectedStateCode!));
                             return citiesAsync.when(
                               data: (cities) {
                                 final districtMap = {
@@ -767,8 +749,7 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
                                       items: cities
                                           .map((c) => c.id.toString())
                                           .toList(),
-                                      itemLabel: (id) =>
-                                          districtMap[id] ?? id,
+                                      itemLabel: (id) => districtMap[id] ?? id,
                                       onItemSelected: (id) {
                                         setState(() {
                                           selectedDistrictCode = id;
@@ -802,10 +783,9 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
                                           selectedDistrictName ??
                                               'selectDistrict'.tr(),
                                           style: TextStyle(
-                                            color:
-                                                selectedDistrictName == null
-                                                    ? Colors.grey.shade600
-                                                    : Colors.black,
+                                            color: selectedDistrictName == null
+                                                ? Colors.grey.shade600
+                                                : Colors.black,
                                             fontSize: 14,
                                           ),
                                         ),
@@ -870,37 +850,6 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
                         hint: "enterPincode".tr(),
                         controller: pincodeController,
                         validator: (v) => v!.isEmpty ? "required".tr() : null,
-                      ),
-                    ),
-                    const SizedBox(height: 18),
-                    anim.AnimatedWidgetWrapper(
-                      animationType: anim.AnimationType.fadeSlideInFromLeft,
-                      duration: anim.AnimationDuration.normal,
-                      delayMilliseconds: 900,
-                      child: Text("aadharNumber".tr(), style: kSmallTitleR),
-                    ),
-                    const SizedBox(height: 6),
-                    anim.AnimatedWidgetWrapper(
-                      animationType: anim.AnimationType.fadeSlideInFromBottom,
-                      duration: anim.AnimationDuration.normal,
-                      delayMilliseconds: 950,
-                      child: InputField(
-                        key: _fieldKeys['aadharNumber'],
-                        type: CustomFieldType.number,
-                        hint: "enterAadharNumber".tr(),
-                        controller: aadharNumberController,
-                        validator: (v) {
-                          if (v == null || v.isEmpty) {
-                            return null; // Optional field
-                          }
-                          if (v.length != 12) {
-                            return 'aadharNumberMustBe12Digits'.tr();
-                          }
-                          if (!RegExp(r'^\d{12}$').hasMatch(v)) {
-                            return 'aadharNumberMustContainOnlyDigits'.tr();
-                          }
-                          return null;
-                        },
                       ),
                     ),
                     const SizedBox(height: 18),
@@ -986,8 +935,7 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
                     if (!isSameAsPhone) const SizedBox(height: 12),
                     if (!isSameAsPhone)
                       anim.AnimatedWidgetWrapper(
-                        animationType:
-                            anim.AnimationType.fadeSlideInFromBottom,
+                        animationType: anim.AnimationType.fadeSlideInFromBottom,
                         duration: anim.AnimationDuration.normal,
                         delayMilliseconds: 1300,
                         child: IntlPhoneField(
