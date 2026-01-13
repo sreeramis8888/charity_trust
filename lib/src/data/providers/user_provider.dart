@@ -657,7 +657,8 @@ class AllReferralsNotifier extends _$AllReferralsNotifier {
       final data = response.data!['data'] as Map<String, dynamic>?;
       if (data != null) {
         final users = data['users'] as List?;
-        final totalCountValue = data['total_count'];
+        // Use the outer total_count for pagination (86 in your example)
+        final totalCountValue = response.data!['total_count'];
         final totalCount = totalCountValue is int
             ? totalCountValue
             : int.tryParse(totalCountValue.toString()) ?? 0;
@@ -689,7 +690,8 @@ class AllReferralsNotifier extends _$AllReferralsNotifier {
           referrals: referrals,
           totalPending: totalPending,
           totalApproved: totalApproved,
-          totalRejected: totalRejected,totalMemberDonations: totalMemberDonations
+          totalRejected: totalRejected,
+          totalMemberDonations: totalMemberDonations
         );
       }
     }
@@ -764,7 +766,8 @@ class AllReferralsNotifier extends _$AllReferralsNotifier {
         final data = response.data!['data'] as Map<String, dynamic>?;
         if (data != null) {
           final users = data['users'] as List?;
-          final totalCountValue = data['total_count'];
+          // Use the outer total_count for pagination
+          final totalCountValue = response.data!['total_count'];
           final totalCount = totalCountValue is int
               ? totalCountValue
               : int.tryParse(totalCountValue.toString()) ?? 0;
