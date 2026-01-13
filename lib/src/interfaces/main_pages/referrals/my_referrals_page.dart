@@ -131,9 +131,7 @@ class _MyReferralsPageState extends ConsumerState<MyReferralsPage>
                 ),
                 child: allReferralsAsync.when(
                   data: (paginationState) {
-                    final total = paginationState.totalApproved +
-                        paginationState.totalPending +
-                        paginationState.totalRejected;
+                    final total = paginationState.totalCount;
                     final approved = paginationState.totalApproved;
                     final pending = paginationState.totalPending;
                     final rejected = paginationState.totalRejected;
@@ -401,7 +399,8 @@ class _MyReferralsPageState extends ConsumerState<MyReferralsPage>
             'totalMemberDonations'.tr(),
             style: kSmallTitleM,
           ),
-          Spacer(), Text(
+          Spacer(),
+          Text(
             "₹",
             style: kSubHeadingM.copyWith(color: kPrimaryColor),
           ),
