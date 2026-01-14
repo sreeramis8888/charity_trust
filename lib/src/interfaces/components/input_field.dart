@@ -9,6 +9,7 @@ enum CustomFieldType {
   number,
   date,
   document,
+  email
 }
 
 class _DateInputFormatter extends TextInputFormatter {
@@ -123,6 +124,7 @@ class InputField extends StatelessWidget {
     final isText = type == CustomFieldType.text;
     final isNumber = type == CustomFieldType.number;
     final isDate = type == CustomFieldType.date;
+    final isEmail = type == CustomFieldType.email;
 
     return TextFormField(
       controller: controller,
@@ -133,7 +135,9 @@ class InputField extends StatelessWidget {
           ? TextInputType.numberWithOptions(decimal: allowDecimal)
           : isDate
               ? TextInputType.number
-              : TextInputType.text,
+              : isEmail
+                  ? TextInputType.emailAddress
+                  : TextInputType.text,
       inputFormatters: isNumber
           ? [
               FilteringTextInputFormatter.allow(
@@ -143,7 +147,18 @@ class InputField extends StatelessWidget {
           : isDate
               ? [_DateInputFormatter()]
               : null,
-      validator: validator,
+      validator: validator ??
+          (isEmail
+              ? (value) {
+                  if (value == null || value.trim().isEmpty) return null;
+                  final emailRegex =
+                      RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
+                  if (!emailRegex.hasMatch(value.trim())) {
+                    return 'Enter a valid email address';
+                  }
+                  return null;
+                }
+              : null),
       autovalidateMode: AutovalidateMode.onUserInteraction,
       style: kBodyTitleR,
       cursorColor: kPrimaryColor,
@@ -171,7 +186,10 @@ class InputField extends StatelessWidget {
             : type == CustomFieldType.document
                 ? const Icon(Icons.cloud_upload_outlined,
                     size: 22, color: Colors.grey)
-                : null,
+                : isEmail
+                    ? const Icon(Icons.email_outlined,
+                        size: 20, color: Colors.grey)
+                    : null,
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(10),
           borderSide: BorderSide(color: kBorder),

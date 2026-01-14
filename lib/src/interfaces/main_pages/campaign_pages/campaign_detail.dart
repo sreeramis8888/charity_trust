@@ -1,4 +1,5 @@
 import 'dart:developer';
+import 'package:Annujoom/src/interfaces/components/additional_pages/mswipe_payment_page.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:Annujoom/src/interfaces/components/loading_indicator.dart';
 import 'package:flutter/material.dart';
@@ -12,12 +13,14 @@ import 'package:Annujoom/src/interfaces/components/input_field.dart';
 import 'package:Annujoom/src/interfaces/animations/index.dart' as anim;
 import 'package:Annujoom/src/data/providers/donation_provider.dart';
 import 'package:Annujoom/src/data/providers/razorpay_provider.dart';
+import 'package:Annujoom/src/data/providers/mswipe_provider.dart';
 import 'package:Annujoom/src/data/providers/campaigns_provider.dart'
     show generalCampaignsProvider, participatedCampaignsProvider;
 import 'package:Annujoom/src/data/services/snackbar_service.dart';
 import 'package:Annujoom/src/data/services/secure_storage_service.dart';
 import 'package:Annujoom/src/interfaces/components/additional_pages/payment_success_page.dart';
 import 'package:Annujoom/src/interfaces/components/additional_pages/payment_failed_page.dart';
+import 'package:Annujoom/src/interfaces/components/additional_pages/payment_method_page.dart';
 
 class CampaignDetailPage extends ConsumerStatefulWidget {
   final String? id;
@@ -55,6 +58,7 @@ class _CampaignDetailPageState extends ConsumerState<CampaignDetailPage> {
   late Future<void> _campaignLoadFuture;
   String _userPhone = '+919876543210';
   String _userEmail = 'user@example.com';
+  String _selectedGateway = 'razorpay';
 
   @override
   void initState() {
@@ -317,19 +321,48 @@ class _CampaignDetailPageState extends ConsumerState<CampaignDetailPage> {
       return;
     }
 
+    // Show payment method page
+    if (mounted) {
+      Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (_) => PaymentMethodPage(
+            campaignTitle: widget.title ?? '',
+            amount: amount,
+            onRazorpaySelected: () {
+              Navigator.pop(context);
+              setState(() => _selectedGateway = 'razorpay');
+              _processPayment(amount);
+            },
+            onMswipeSelected: (String email) {
+              Navigator.pop(context);
+              setState(() {
+                _selectedGateway = 'mswipe';
+                _userEmail = email;
+              });
+              _processPayment(amount);
+            },
+          ),
+        ),
+      );
+    }
+  }
+
+  Future<void> _processPayment(double amount) async {
     setState(() => _isProcessing = true);
     _donationFocusNode.unfocus();
 
     try {
-      final razorpayService = ref.read(razorpayServiceProvider);
       final donationApi = ref.read(donationApiProvider);
 
-      log("Creating donation for campaign: ${widget.id} with amount: $amount");
+      log("Creating donation for campaign: ${widget.id} with amount: $amount, gateway: $_selectedGateway");
 
-      // Step 1: Create donation and get order ID
+      // Step 1: Create donation with selected gateway
       final response = await donationApi.createDonation(
         campaignId: widget.id ?? '',
         amount: amount,
+        gateway: _selectedGateway,
+        email: _userEmail,
+        phone: _userPhone,
       );
 
       if (!response.success || response.data == null) {
@@ -356,103 +389,27 @@ class _CampaignDetailPageState extends ConsumerState<CampaignDetailPage> {
         return;
       }
 
-      // Step 2: Setup Razorpay callbacks BEFORE opening checkout
-      log("Setting up Razorpay callbacks");
-      razorpayService.setCallbacks(
-        onSuccess: (PaymentSuccessResponse response) async {
-          log("SUCCESS CALLBACK: Payment success - paymentId=${response.paymentId}, orderId=${response.orderId}");
-
-          try {
-            // Step 3: Verify payment on backend
-            log("Verifying payment with backend");
-            final verifyResponse = await donationApi.verifyPayment(
-              razorpayOrderId: orderId,
-              razorpayPaymentId: response.paymentId ?? '',
-              razorpaySignature: response.signature ?? '',
-              donationId: donationId ?? '',
-              status: 'success',
-            );
-
-            log("Verification response: success=${verifyResponse.success}");
-
-            if (verifyResponse.success) {
-              log("Payment verified successfully - navigating to success page");
-              log("Payment verification data ${verifyResponse.data}");
-
-              // Extract receipt URL from verification response
-              final receiptData = verifyResponse.data as Map<String, dynamic>?;
-              final receipt = receiptData?['data']?['receipt'] as String?;
-
-              _donationController.clear();
-              _donationFocusNode.unfocus();
-
-              if (mounted) {
-                // Invalidate campaign providers to refresh data
-                ref.invalidate(generalCampaignsProvider);
-                ref.invalidate(participatedCampaignsProvider);
-
-                Navigator.of(context).pushReplacement(
-                  MaterialPageRoute(
-                    builder: (_) => PaymentSuccessPage(
-                      orderId: orderId,
-                      paymentId: response.paymentId,
-                      amount: amount,
-                      receipt: receipt,
-                    ),
-                  ),
-                );
-              }
-            } else {
-              log("Payment verification failed: ${verifyResponse.message}");
-              _showSnackBar('paymentVerificationFailed'.tr(),
-                  type: SnackbarType.error);
-              if (mounted) {
-                setState(() => _isProcessing = false);
-              }
-            }
-          } catch (e) {
-            log("Verification error: $e");
-            _showSnackBar('${'verificationError'.tr()}: $e',
-                type: SnackbarType.error);
-            if (mounted) {
-              setState(() => _isProcessing = false);
-            }
-          }
-        },
-        onError: (PaymentFailureResponse response) {
-          log("ERROR CALLBACK: Payment error - code=${response.code}, message=${response.message}");
-          _donationFocusNode.unfocus();
-
-          // Call verify payment API with failed status
-          _verifyFailedPayment(orderId, donationId);
-
-          if (mounted) {
-            Navigator.of(context).pushReplacement(
-              MaterialPageRoute(builder: (_) => const PaymentFailurePage()),
-            );
-          }
-        },
-        onExternalWallet: (ExternalWalletResponse response) {
-          log("EXTERNAL WALLET CALLBACK: ${response.walletName}");
-          _showSnackBar(
-            '${'externalWalletSelected'.tr()}: ${response.walletName}',
-            type: SnackbarType.info,
-          );
+      if (_selectedGateway == 'mswipe') {
+        if (data != null && donationId != null) {
+          await _processMswipePayment(orderId, donationId, amount, data);
+        } else {
+          log("Missing data or donationId for Mswipe payment");
+          _showSnackBar('failedToProcessPayment'.tr(), type: SnackbarType.error);
           if (mounted) {
             setState(() => _isProcessing = false);
           }
-        },
-      );
-
-      // Step 4: Open Razorpay checkout
-      log("Opening Razorpay checkout with order: $orderId, amount: $amount");
-      razorpayService.openCheckout(
-        orderId: orderId,
-        amount: amount,
-        email: _userEmail,
-        phone: _userPhone,
-        description: 'Donation to ${widget.title}',
-      );
+        }
+      } else {
+        if (donationId != null) {
+          await _processRazorpayPayment(orderId, donationId, amount);
+        } else {
+          log("Missing donationId for Razorpay payment");
+          _showSnackBar('failedToProcessPayment'.tr(), type: SnackbarType.error);
+          if (mounted) {
+            setState(() => _isProcessing = false);
+          }
+        }
+      }
     } catch (e, stack) {
       log("Error in donation: $e\n$stack");
       _showSnackBar('Error: $e', type: SnackbarType.error);
@@ -460,6 +417,149 @@ class _CampaignDetailPageState extends ConsumerState<CampaignDetailPage> {
         setState(() => _isProcessing = false);
       }
     }
+  }
+
+  Future<void> _processMswipePayment(
+    String orderId,
+    String donationId,
+    double amount,
+    Map<String, dynamic> data,
+  ) async {
+    final paymentUrl = data['payment_url'] as String?;
+
+    if (paymentUrl == null) {
+      log("Payment URL is null for Mswipe");
+      _showSnackBar('failedToGetPaymentUrl'.tr(), type: SnackbarType.error);
+      if (mounted) {
+        setState(() => _isProcessing = false);
+      }
+      return;
+    }
+
+    log("Opening Mswipe payment page with URL: $paymentUrl");
+
+    if (mounted) {
+      _donationController.clear();
+      _donationFocusNode.unfocus();
+
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(
+          builder: (_) => MswipePaymentPage(
+            paymentUrl: paymentUrl,
+            donationId: donationId,
+            orderId: orderId,
+            amount: amount,
+          ),
+        ),
+      );
+    }
+  }
+
+  Future<void> _processRazorpayPayment(
+    String orderId,
+    String donationId,
+    double amount,
+  ) async {
+    final razorpayService = ref.read(razorpayServiceProvider);
+    final donationApi = ref.read(donationApiProvider);
+
+    // Step 2: Setup Razorpay callbacks BEFORE opening checkout
+    log("Setting up Razorpay callbacks");
+    razorpayService.setCallbacks(
+      onSuccess: (PaymentSuccessResponse response) async {
+        log("SUCCESS CALLBACK: Payment success - paymentId=${response.paymentId}, orderId=${response.orderId}");
+
+        try {
+          // Step 3: Verify payment on backend
+          log("Verifying payment with backend");
+          final verifyResponse = await donationApi.verifyPayment(
+            razorpayOrderId: orderId,
+            razorpayPaymentId: response.paymentId ?? '',
+            razorpaySignature: response.signature ?? '',
+            donationId: donationId,
+            status: 'success',
+          );
+
+          log("Verification response: success=${verifyResponse.success}");
+
+          if (verifyResponse.success) {
+            log("Payment verified successfully - navigating to success page");
+            log("Payment verification data ${verifyResponse.data}");
+
+            // Extract receipt URL from verification response
+            final receiptData = verifyResponse.data as Map<String, dynamic>?;
+            final receipt = receiptData?['data']?['receipt'] as String?;
+
+            _donationController.clear();
+            _donationFocusNode.unfocus();
+
+            if (mounted) {
+              // Invalidate campaign providers to refresh data
+              ref.invalidate(generalCampaignsProvider);
+              ref.invalidate(participatedCampaignsProvider);
+
+              Navigator.of(context).pushReplacement(
+                MaterialPageRoute(
+                  builder: (_) => PaymentSuccessPage(
+                    orderId: orderId,
+                    paymentId: response.paymentId,
+                    amount: amount,
+                    receipt: receipt,
+                  ),
+                ),
+              );
+            }
+          } else {
+            log("Payment verification failed: ${verifyResponse.message}");
+            _showSnackBar('paymentVerificationFailed'.tr(),
+                type: SnackbarType.error);
+            if (mounted) {
+              setState(() => _isProcessing = false);
+            }
+          }
+        } catch (e) {
+          log("Verification error: $e");
+          _showSnackBar('${'verificationError'.tr()}: $e',
+              type: SnackbarType.error);
+          if (mounted) {
+            setState(() => _isProcessing = false);
+          }
+        }
+      },
+      onError: (PaymentFailureResponse response) {
+        log("ERROR CALLBACK: Payment error - code=${response.code}, message=${response.message}");
+        _donationFocusNode.unfocus();
+
+        // Call verify payment API with failed status
+        _verifyFailedPayment(orderId, donationId);
+
+        if (mounted) {
+          Navigator.of(context).pushReplacement(
+            MaterialPageRoute(builder: (_) => const PaymentFailurePage()),
+          );
+        }
+      },
+      onExternalWallet: (ExternalWalletResponse response) {
+        log("EXTERNAL WALLET CALLBACK: ${response.walletName}");
+        _showSnackBar(
+          '${'externalWalletSelected'.tr()}: ${response.walletName}',
+          type: SnackbarType.info,
+        );
+        if (mounted) {
+          setState(() => _isProcessing = false);
+        }
+      },
+    );
+
+    // Step 4: Open Razorpay checkout
+    log("Opening Razorpay checkout with order: $orderId, amount: $amount");
+    razorpayService.openCheckout(
+      orderId: orderId,
+      amount: amount,
+      email: _userEmail,
+      phone: _userPhone,
+      description: 'Donation to ${widget.title}',
+    );
   }
 
   @override

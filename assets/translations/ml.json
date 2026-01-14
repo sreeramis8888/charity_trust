@@ -299,5 +299,13 @@
   "remainingGoal": "ശേഷിക്കുന്ന ലക്ഷ്യം",
   "yourAmount": "നിങ്ങളുടെ തുക",
   "adjustToMax": "പരമാവധിയിലേക്ക് ക്രമീകരിക്കുക",
-  "successfullyCompletedOn": "വിജയകരമായി പൂർത്തിയായത്"
+  "successfullyCompletedOn": "വിജയകരമായി പൂർത്തിയായത്",
+  "selectPaymentMethod": "പേയ്‌മെന്റ് രീതി തിരഞ്ഞെടുക്കുക",
+  "failedToGetPaymentUrl": "പേയ്‌മെന്റ് URL ലഭിക്കുന്നതിൽ പരാജയപ്പെട്ടു",
+  "failedToProcessPayment": "പേയ്‌മെന്റ് പ്രോസസ്സ് ചെയ്യുന്നതിൽ പരാജയപ്പെട്ടു",
+  "emailRequired": "ഇമെയിൽ ആവശ്യമാണ്",
+  "emailRequiredForMswipe": "Mswipe പേയ്‌മെന്റ് തുടരാൻ ദയവായി നിങ്ങളുടെ ഇമെയിൽ വിലാസം നൽകുക",
+  "enterEmail": "ഇമെയിൽ വിലാസം നൽകുക",
+  "pleaseEnterEmail": "ദയവായി നിങ്ങളുടെ ഇമെയിൽ നൽകുക",
+  "pleaseEnterValidEmail": "ദയവായി സാധുവായ ഇമെയിൽ വിലാസം നൽകുക"
 }

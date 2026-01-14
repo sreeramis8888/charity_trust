@@ -299,5 +299,16 @@
   "remainingGoal": "Remaining Goal",
   "yourAmount": "Your Amount",
   "adjustToMax": "Adjust to Maximum",
-  "successfullyCompletedOn": "Successfully Completed on"
+  "successfullyCompletedOn": "Successfully Completed on",
+  "selectPaymentMethod": "Select Payment Method",
+  "failedToGetPaymentUrl": "Failed to get payment URL",
+  "failedToProcessPayment": "Failed to process payment",
+  "emailRequired": "Email Required",
+  "emailRequiredForMswipe": "Please provide your email address to proceed with Mswipe payment",
+  "enterEmail": "Enter email address",
+  "pleaseEnterEmail": "Please enter your email",
+  "pleaseEnterValidEmail": "Please enter a valid email address",
+  "paymentMethod": "Payment Method",
+  "continuePayment": "Continue Payment",
+  "totalPayable": "Total Payable"
 }

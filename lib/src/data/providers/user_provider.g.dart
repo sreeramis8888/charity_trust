@@ -1131,7 +1131,7 @@ final class AllReferralsNotifierProvider extends $AsyncNotifierProvider<
 }
 
 String _$allReferralsNotifierHash() =>
-    r'990c3cea7051c9e8b81567ac29134b1de6b0cc9c';
+    r'f5383bc91aab0f099c389e9fb18bce185e850ae2';
 
 abstract class _$AllReferralsNotifier
     extends $AsyncNotifier<ReferralPaginationState> {
@@ -1177,7 +1177,7 @@ final class IndirectReferralsNotifierProvider extends $AsyncNotifierProvider<
 }
 
 String _$indirectReferralsNotifierHash() =>
-    r'a2e6a8d572fb6887155ef90984b9b398a38948bd';
+    r'81c45197c7b5bce0f31ce2bcec89a49c89da34c8';
 
 abstract class _$IndirectReferralsNotifier
     extends $AsyncNotifier<ReferralPaginationState> {

@@ -9,23 +9,37 @@ class DonationApi {
   final ApiProvider _apiProvider;
 
   DonationApi({required ApiProvider apiProvider}) : _apiProvider = apiProvider;
+
   Future<ApiResponse<Map<String, dynamic>>> createDonation({
     required String campaignId,
     required double amount,
     String currency = 'INR',
+    String gateway = 'razorpay',
+    String? email,
+    String? phone,
   }) async {
+    final payload = {
+      'campaign': campaignId,
+      'amount': amount,
+      'currency': currency,
+      'gateway': gateway,
+    };
+
+    // Add email and phone for Mswipe gateway
+    if (gateway == 'mswipe') {
+      if (email != null) payload['email'] = email;
+      if (phone != null) payload['phone'] = phone;
+    }
+
     final response = await _apiProvider.post(
       '/donation',
-      {
-        'campaign': campaignId,
-        'amount': amount,
-        'currency': currency,
-      },
+      payload,
       requireAuth: true,
     );
 
     if (response.success) {
-      log('Donation created successfully', name: 'DonationApi');
+      log('Donation created successfully with gateway: $gateway',
+          name: 'DonationApi');
     }
 
     return response;

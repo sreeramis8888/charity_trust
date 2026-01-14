@@ -381,6 +381,21 @@ class _HomePageState extends ConsumerState<HomePage> {
           ),
           centerTitle: false,
           actions: [
+             GestureDetector(
+              onTap: () {
+                _showCallSupportModal(context);
+              },
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 12),
+                child: Center(
+                  child: SvgPicture.asset(
+                    'assets/svg/call.svg',
+                    height: 20,
+                    width: 20,
+                  ),
+                ),
+              ),
+            ),
             Stack(
               children: [
                 IconButton(
