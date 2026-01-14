@@ -6,6 +6,7 @@ import 'package:Annujoom/src/data/constants/color_constants.dart';
 import 'package:Annujoom/src/data/constants/style_constants.dart';
 import 'package:Annujoom/src/interfaces/components/primaryButton.dart';
 import 'package:Annujoom/src/interfaces/components/input_field.dart';
+import 'package:flutter_svg/svg.dart';
 
 class PaymentMethodPage extends ConsumerStatefulWidget {
   final String campaignTitle;
@@ -75,7 +76,7 @@ class _PaymentMethodPageState extends ConsumerState<PaymentMethodPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: kBackgroundColor,
+      backgroundColor: kWhite,
       appBar: AppBar(
         backgroundColor: kWhite,
         elevation: 0,
@@ -98,7 +99,8 @@ class _PaymentMethodPageState extends ConsumerState<PaymentMethodPage> {
                     gateway: 'razorpay',
                     title: 'Razorpay',
                     subtitle: '2% convenience fee applicable',
-                    icon: 'assets/svg/razorpay_logo.svg', // You can use Image.asset or Icon
+                    icon:
+                        'assets/svg/razorpay_logo.svg', // You can use Image.asset or Icon
                     isSelected: _selectedGateway == 'razorpay',
                     onTap: () {
                       setState(() {
@@ -112,9 +114,10 @@ class _PaymentMethodPageState extends ConsumerState<PaymentMethodPage> {
                   // Mswipe Option
                   _buildPaymentOption(
                     gateway: 'mswipe',
-                    title: 'Mswipe',
+                    title: 'Union Bank',
                     subtitle: 'No additional charges',
-                    icon: 'assets/svg/mswipe_logo.svg', // You can use Image.asset or Icon
+                    icon:
+                        'assets/svg/mswipe_logo.svg', // You can use Image.asset or Icon
                     isSelected: _selectedGateway == 'mswipe',
                     onTap: () {
                       setState(() {
@@ -147,18 +150,20 @@ class _PaymentMethodPageState extends ConsumerState<PaymentMethodPage> {
                       },
                     ),
                   ],
-
-                  const SizedBox(height: 32),
-
-                  // Amount Summary
-                  _buildAmountSummary(),
                 ],
               ),
             ),
           ),
 
+          // Amount Summary
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+            child: _buildAmountSummary(),
+          ),
+
           // Continue Button
-          SafeArea(top:false,
+          SafeArea(
+            top: false,
             child: Padding(
               padding: const EdgeInsets.all(16),
               child: primaryButton(
@@ -185,81 +190,73 @@ class _PaymentMethodPageState extends ConsumerState<PaymentMethodPage> {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.only(left: 16, right: 16, top: 4, bottom: 16),
         decoration: BoxDecoration(
-          color: kWhite,
+          color: Color.fromARGB(255, 242, 242, 242),
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
-            color: isSelected ? kPrimaryColor : kBorder,
+            color: isSelected ? Color(0xFF0088FF) : kBorder,
             width: isSelected ? 2 : 1,
           ),
         ),
-        child: Row(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Logo/Icon
-            Container(
-              width: 60,
-              height: 60,
-              decoration: BoxDecoration(
-                color: kBackgroundColor,
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Center(
-                child: Icon(
-                  gateway == 'razorpay' ? Icons.payment : Icons.credit_card,
-                  color: kPrimaryColor,
-                  size: 32,
+            Row(
+              children: [
+                // Logo/Icon
+                Container(
+                  width: 60,
+                  height: 60,
+                  child: gateway == 'razorpay'
+                      ? Image.asset('assets/png/razorpay.png')
+                      : Image.asset('assets/png/union_bank.png'),
                 ),
-              ),
-            ),
-            const SizedBox(width: 16),
+                const SizedBox(width: 16),
 
-            // Title and Subtitle
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
+                // Title and Subtitle
+                Expanded(
+                  child: Text(
                     title,
-                    style: kSmallTitleB.copyWith(color: kTextColor),
+                    style: kBodyTitleM.copyWith(color: kTextColor),
                   ),
-                  const SizedBox(height: 4),
-                  Text(
-                    subtitle,
-                    style: kSmallerTitleR.copyWith(
-                      color: gateway == 'razorpay'
-                          ? const Color(0xFFFF9500)
-                          : kSecondaryTextColor,
-                      fontSize: 12,
+                ),
+
+                // Radio Button
+                Container(
+                  width: 24,
+                  height: 24,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    border: Border.all(
+                      color: isSelected ? Color(0xFF0088FF) : kBorder,
+                      width: 2,
                     ),
                   ),
-                ],
-              ),
-            ),
-
-            // Radio Button
-            Container(
-              width: 24,
-              height: 24,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                border: Border.all(
-                  color: isSelected ? kPrimaryColor : kBorder,
-                  width: 2,
+                  child: isSelected
+                      ? Center(
+                          child: Container(
+                            width: 12,
+                            height: 12,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: Color(0xFF0088FF),
+                            ),
+                          ),
+                        )
+                      : null,
                 ),
+              ],
+            ),
+            Text(
+              subtitle,
+              style: kSmallerTitleR.copyWith(
+                fontStyle: FontStyle.italic,
+                color: gateway == 'razorpay'
+                    ? const Color(0xFFFF9500)
+                    : kSecondaryTextColor,
+                fontSize: 12,
               ),
-              child: isSelected
-                  ? Center(
-                      child: Container(
-                        width: 12,
-                        height: 12,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: kPrimaryColor,
-                        ),
-                      ),
-                    )
-                  : null,
             ),
           ],
         ),
@@ -268,44 +265,54 @@ class _PaymentMethodPageState extends ConsumerState<PaymentMethodPage> {
   }
 
   Widget _buildAmountSummary() {
+    final convenienceFeePercentage = _selectedGateway == 'razorpay' ? 2.0 : 0.0;
+    final convenienceFee = (widget.amount * convenienceFeePercentage) / 100;
+    final totalAmount = widget.amount + convenienceFee;
+
     return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: kWhite,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: kBorder, width: 1),
-      ),
+      padding: const EdgeInsets.all(8),
       child: Column(
         children: [
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                'donationAmount'.tr(),
-                style: kSmallerTitleR.copyWith(color: kSecondaryTextColor),
+                'donationAmount'.tr() + ' :',
+                style: kSmallTitleL.copyWith(color: kTextColor),
               ),
               Text(
                 '₹${widget.amount.toStringAsFixed(0)}',
-                style: kSmallTitleB.copyWith(color: kTextColor),
+                style: kSmallTitleL.copyWith(color: kTextColor),
               ),
             ],
           ),
-          const SizedBox(height: 12),
-          Divider(color: kBorder, height: 1),
+          if (convenienceFee > 0) ...[
+            const SizedBox(height: 12),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  'convenienceFee'.tr() + ' :',
+                  style: kSmallTitleL.copyWith(color: kTextColor),
+                ),
+                Text(
+                  '₹${convenienceFee.toStringAsFixed(2)}',
+                  style: kSmallTitleL.copyWith(color: kTextColor),
+                ),
+              ],
+            ),
+          ],
           const SizedBox(height: 12),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                'totalPayable'.tr(),
-                style: kSmallTitleB.copyWith(color: kTextColor),
+                'totalPayable'.tr() + ' :',
+                style: kSmallTitleM.copyWith(color: kTextColor),
               ),
               Text(
-                '₹${widget.amount.toStringAsFixed(0)}',
-                style: kSmallTitleB.copyWith(
-                  color: kPrimaryColor,
-                  fontSize: 18,
-                ),
+                '₹${totalAmount.toStringAsFixed(2)}',
+                style: kSmallTitleM.copyWith(color: kTextColor),
               ),
             ],
           ),

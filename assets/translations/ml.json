@@ -307,5 +307,10 @@
   "emailRequiredForMswipe": "Mswipe പേയ്‌മെന്റ് തുടരാൻ ദയവായി നിങ്ങളുടെ ഇമെയിൽ വിലാസം നൽകുക",
   "enterEmail": "ഇമെയിൽ വിലാസം നൽകുക",
   "pleaseEnterEmail": "ദയവായി നിങ്ങളുടെ ഇമെയിൽ നൽകുക",
-  "pleaseEnterValidEmail": "ദയവായി സാധുവായ ഇമെയിൽ വിലാസം നൽകുക"
+  "pleaseEnterValidEmail": "ദയവായി സാധുവായ ഇമെയിൽ വിലാസം നൽകുക",
+  "paymentMethod": "പേയ്‌മെന്റ് രീതി",
+  "continuePayment": "പേയ്‌മെന്റ് തുടരുക",
+  "totalPayable": "ആകെ നൽകേണ്ടത്",
+  "donationAmount": "സംഭാവന തുക",
+  "convenienceFee": "സൗകര്യ ഫീ (2%)"
 }

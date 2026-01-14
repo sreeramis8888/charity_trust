@@ -310,5 +310,7 @@
   "pleaseEnterValidEmail": "Please enter a valid email address",
   "paymentMethod": "Payment Method",
   "continuePayment": "Continue Payment",
-  "totalPayable": "Total Payable"
+  "totalPayable": "Total Payable",
+  "donationAmount": "Donation Amount",
+  "convenienceFee": "Convenience Fee (2%)"
 }
