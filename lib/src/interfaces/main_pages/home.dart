@@ -509,20 +509,28 @@ class _HomePageState extends ConsumerState<HomePage> {
           ),
           centerTitle: false,
           actions: [
-            GestureDetector(
-              onTap: () {
-                _showQRCodeDialog(context);
-              },
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 12),
-                child: Center(
-                  child: SvgPicture.asset(
-                    'assets/svg/qr.svg',
-                    height: 20,
-                    width: 20,
+            FutureBuilder<bool>(
+              future: ref.read(secureStorageServiceProvider).isDemoAccount(),
+              builder: (context, snapshot) {
+                if (snapshot.data == true) {
+                  return SizedBox.shrink();
+                }
+                return GestureDetector(
+                  onTap: () {
+                    _showQRCodeDialog(context);
+                  },
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 12),
+                    child: Center(
+                      child: SvgPicture.asset(
+                        'assets/svg/qr.svg',
+                        height: 20,
+                        width: 20,
+                      ),
+                    ),
                   ),
-                ),
-              ),
+                );
+              },
             ),
             Stack(
               children: [
