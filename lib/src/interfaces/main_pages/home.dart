@@ -255,12 +255,10 @@ class _HomePageState extends ConsumerState<HomePage> {
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 24),
-              FutureBuilder<String?>(
-                future: ref.read(secureStorageServiceProvider).getUserData().then(
-                      (userData) => userData?.qrCode,
-                    ),
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
+              FutureBuilder<bool>(
+                future: ref.read(secureStorageServiceProvider).isDemoAccount(),
+                builder: (context, demoSnapshot) {
+                  if (demoSnapshot.connectionState == ConnectionState.waiting) {
                     return SizedBox(
                       width: 200,
                       height: 200,
@@ -270,53 +268,80 @@ class _HomePageState extends ConsumerState<HomePage> {
                     );
                   }
 
-                  if (snapshot.hasError || snapshot.data == null || snapshot.data!.isEmpty) {
+                  if (demoSnapshot.data == true) {
                     return SizedBox(
                       width: 200,
                       height: 200,
                       child: Center(
-                        child: Text('QR code not available'),
+                        child: Text('QR code not available for demo account'),
                       ),
                     );
                   }
 
-                  final qrCodeDataUri = snapshot.data!;
-                  
-                  // Extract base64 data from data URI
-                  String base64Data = qrCodeDataUri;
-                  if (qrCodeDataUri.contains(',')) {
-                    base64Data = qrCodeDataUri.split(',').last;
-                  }
-
-                  try {
-                    final imageBytes = base64Decode(base64Data);
-                    
-                    return Container(
-                      padding: const EdgeInsets.all(12),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(12),
-                        border: Border.all(
-                          color: kStrokeColor,
-                          width: 1,
+                  return FutureBuilder<String?>(
+                    future: ref.read(secureStorageServiceProvider).getUserData().then(
+                          (userData) => userData?.qrCode,
                         ),
-                      ),
-                      child: Image.memory(
-                        imageBytes,
-                        width: 200,
-                        height: 200,
-                        fit: BoxFit.contain,
-                      ),
-                    );
-                  } catch (e) {
-                    return SizedBox(
-                      width: 200,
-                      height: 200,
-                      child: Center(
-                        child: Text('Error loading QR code'),
-                      ),
-                    );
-                  }
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return SizedBox(
+                          width: 200,
+                          height: 200,
+                          child: Center(
+                            child: LoadingAnimation(),
+                          ),
+                        );
+                      }
+
+                      if (snapshot.hasError || snapshot.data == null || snapshot.data!.isEmpty) {
+                        return SizedBox(
+                          width: 200,
+                          height: 200,
+                          child: Center(
+                            child: Text('QR code not available'),
+                          ),
+                        );
+                      }
+
+                      final qrCodeDataUri = snapshot.data!;
+                      
+                      // Extract base64 data from data URI
+                      String base64Data = qrCodeDataUri;
+                      if (qrCodeDataUri.contains(',')) {
+                        base64Data = qrCodeDataUri.split(',').last;
+                      }
+
+                      try {
+                        final imageBytes = base64Decode(base64Data);
+                        
+                        return Container(
+                          padding: const EdgeInsets.all(12),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(
+                              color: kStrokeColor,
+                              width: 1,
+                            ),
+                          ),
+                          child: Image.memory(
+                            imageBytes,
+                            width: 200,
+                            height: 200,
+                            fit: BoxFit.contain,
+                          ),
+                        );
+                      } catch (e) {
+                        return SizedBox(
+                          width: 200,
+                          height: 200,
+                          child: Center(
+                            child: Text('Error loading QR code'),
+                          ),
+                        );
+                      }
+                    },
+                  );
                 },
               ),
               const SizedBox(height: 24),

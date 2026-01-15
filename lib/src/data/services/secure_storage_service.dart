@@ -82,7 +82,7 @@ class SecureStorageService {
   /// Check if current user is the demo account for App Store Connect
   Future<bool> isDemoAccount() async {
     final user = await getUserData();
-    return user?.phone == '+91964539855';
+    return user?.phone == '+919645398555';
   }
 
   /// Save registration data temporarily during the registration process
