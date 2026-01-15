@@ -70,29 +70,6 @@ class DonationApi {
 
     return response;
   }
-
-  Future<ApiResponse<Map<String, dynamic>>> mswipeCallback({
-    required String tranStatus,
-    required String rrn,
-    required String meInvNo,
-    required String ipgId,
-  }) async {
-    final response = await _apiProvider.post(
-      '/donation/mswipe-callback',
-      {
-        'TRAN_STATUS': tranStatus,
-        'RRN': rrn,
-        'ME_InvNo': meInvNo,
-        'IPG_ID': ipgId,
-      },
-    );
-
-    if (response.success) {
-      log('Mswipe callback processed successfully', name: 'DonationApi');
-    }
-
-    return response;
-  }
 }
 
 @riverpod
