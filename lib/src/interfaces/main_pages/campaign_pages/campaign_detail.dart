@@ -104,6 +104,7 @@ class _CampaignDetailPageState extends ConsumerState<CampaignDetailPage> {
   void dispose() {
     _donationController.dispose();
     _donationFocusNode.dispose();
+    // Don't use ref in dispose - it's unsafe when widget is unmounted
     super.dispose();
   }
 

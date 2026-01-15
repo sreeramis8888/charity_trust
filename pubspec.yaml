@@ -78,6 +78,7 @@ dependencies:
   package_info_plus: ^8.0.0
   marquee: ^2.3.0
   easy_localization: ^3.0.8
+  qr_flutter: ^4.1.0
 
 dev_dependencies:
   flutter_test:

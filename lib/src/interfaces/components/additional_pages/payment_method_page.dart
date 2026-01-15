@@ -27,8 +27,8 @@ class PaymentMethodPage extends ConsumerStatefulWidget {
 }
 
 class _PaymentMethodPageState extends ConsumerState<PaymentMethodPage> {
-  String _selectedGateway = 'razorpay';
-  bool _showEmailInput = false;
+  String _selectedGateway = 'mswipe';
+  bool _showEmailInput = true;
   final TextEditingController _emailController = TextEditingController();
 
   @override

@@ -52,25 +52,24 @@ class _MswipePaymentPageState extends ConsumerState<MswipePaymentPage> {
         try {
           final donationApi = ref.read(donationApiProvider);
 
-          log('Verifying Mswipe payment with backend',
+          log('Processing Mswipe callback with backend',
               name: 'MswipePaymentPage');
 
-          final verifyResponse = await donationApi.verifyPayment(
-            razorpayOrderId: widget.orderId,
-            razorpayPaymentId: paymentId,
-            razorpaySignature: rrn,
-            donationId: widget.donationId,
-            status: 'success',
+          final callbackResponse = await donationApi.mswipeCallback(
+            tranStatus: 'approved',
+            rrn: rrn,
+            meInvNo: widget.donationId,
+            ipgId: paymentId,
           );
 
-          log('Mswipe verification response: success=${verifyResponse.success}',
+          log('Mswipe callback response: success=${callbackResponse.success}',
               name: 'MswipePaymentPage');
 
-          if (verifyResponse.success) {
-            log('Mswipe payment verified successfully',
+          if (callbackResponse.success) {
+            log('Mswipe payment processed successfully',
                 name: 'MswipePaymentPage');
 
-            final receiptData = verifyResponse.data as Map<String, dynamic>?;
+            final receiptData = callbackResponse.data as Map<String, dynamic>?;
             final receipt = receiptData?['data']?['receipt'] as String?;
 
             if (mounted) {
@@ -86,23 +85,23 @@ class _MswipePaymentPageState extends ConsumerState<MswipePaymentPage> {
               );
             }
           } else {
-            log('Mswipe payment verification failed: ${verifyResponse.message}',
+            log('Mswipe callback processing failed: ${callbackResponse.message}',
                 name: 'MswipePaymentPage');
 
             if (mounted) {
               SnackbarService().showSnackBar(
-                'Payment verification failed',
+                'Payment processing failed',
                 type: SnackbarType.error,
               );
               setState(() => _isVerifying = false);
             }
           }
         } catch (e) {
-          log('Mswipe verification error: $e', name: 'MswipePaymentPage');
+          log('Mswipe callback error: $e', name: 'MswipePaymentPage');
 
           if (mounted) {
             SnackbarService().showSnackBar(
-              'Verification error: $e',
+              'Processing error: $e',
               type: SnackbarType.error,
             );
             setState(() => _isVerifying = false);

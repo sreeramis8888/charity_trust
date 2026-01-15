@@ -18,6 +18,7 @@ class UserModel {
   final String? stateCode;
   final String? country;
   final String? countryCode;
+  final String? qrCode;
   final int? pincode;
   final String? password;
   final String? status;
@@ -60,6 +61,7 @@ class UserModel {
     this.stateCode,
     this.country,
     this.countryCode,
+    this.qrCode,
     this.pincode,
     this.password,
     this.status,
@@ -97,6 +99,7 @@ class UserModel {
       whatsappNo: json["whatsapp_no"],
       fcm: json["fcm"],
       otp: json["otp"],
+      qrCode: json["qr_code"],
       gender: json["gender"],
       address: json["address"],
       area: json["area"],
@@ -150,6 +153,7 @@ class UserModel {
       "whatsapp_no": whatsappNo,
       "fcm": fcm,
       "otp": otp,
+      "qr_code": qrCode,
       "gender": gender,
       "address": address,
       "area": area,
@@ -192,6 +196,7 @@ class UserModel {
     String? email,
     String? image,
     String? phone,
+    String? qrCode,
     String? mobileNumber,
     String? whatsappNo,
     String? whatsappNumber,
@@ -238,6 +243,7 @@ class UserModel {
       whatsappNo: whatsappNo ?? this.whatsappNo,
       whatsappNumber: whatsappNumber ?? this.whatsappNumber,
       fcm: fcm ?? this.fcm,
+      qrCode: qrCode ?? this.qrCode,
       otp: otp ?? this.otp,
       gender: gender ?? this.gender,
       address: address ?? this.address,

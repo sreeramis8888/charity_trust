@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:webview_flutter/webview_flutter.dart';
@@ -72,8 +73,32 @@ class MswipeService {
 
   void _handlePaymentSuccess(String url) {
     try {
-      // Extract payment ID and RRN from URL parameters if available
       final uri = Uri.parse(url);
+      
+      // Try to extract from bepg parameter (base64-encoded JSON)
+      final bepgParam = uri.queryParameters['bepg'];
+      if (bepgParam != null && bepgParam.isNotEmpty) {
+        try {
+          final decodedJson = utf8.decode(base64.decode(bepgParam));
+          final responseData = jsonDecode(decodedJson) as Map<String, dynamic>;
+          
+          // Extract IPG_ID as paymentId and use it as rrn if available
+          final paymentId = responseData['IPG_ID'] as String? ?? '';
+          final rrn = responseData['IPG_ID'] as String? ?? '';
+          
+          log('Extracted from bepg - paymentId: $paymentId, rrn: $rrn',
+              name: 'MswipeService');
+          
+          if (_onPaymentSuccess != null) {
+            _onPaymentSuccess!(paymentId, rrn);
+          }
+          return;
+        } catch (e) {
+          log('Error decoding bepg parameter: $e', name: 'MswipeService');
+        }
+      }
+      
+      // Fallback: Extract from query parameters
       final paymentId = uri.queryParameters['payment_id'] ?? '';
       final rrn = uri.queryParameters['rrn'] ?? '';
 

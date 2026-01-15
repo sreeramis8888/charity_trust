@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'package:Annujoom/src/data/providers/campaigns_provider.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:Annujoom/src/data/constants/color_constants.dart';
@@ -169,9 +170,11 @@ class _HomePageState extends ConsumerState<HomePage> {
         ),
       ),
       backgroundColor: kWhite,
-      builder: (context) => SafeArea(top:false,
+      builder: (context) => SafeArea(
+        top: false,
         child: Padding(
-          padding: const EdgeInsets.only(left: 16, right: 16, bottom: 16, top: 8),
+          padding:
+              const EdgeInsets.only(left: 16, right: 16, bottom: 16, top: 8),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -226,6 +229,106 @@ class _HomePageState extends ConsumerState<HomePage> {
                     ),
                   ),
                 ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _showQRCodeDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (dialogContext) => Dialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                'Scan the QR to donate',
+                style: kBodyTitleSB,
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 24),
+              FutureBuilder<String?>(
+                future: ref.read(secureStorageServiceProvider).getUserData().then(
+                      (userData) => userData?.qrCode,
+                    ),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return SizedBox(
+                      width: 200,
+                      height: 200,
+                      child: Center(
+                        child: LoadingAnimation(),
+                      ),
+                    );
+                  }
+
+                  if (snapshot.hasError || snapshot.data == null || snapshot.data!.isEmpty) {
+                    return SizedBox(
+                      width: 200,
+                      height: 200,
+                      child: Center(
+                        child: Text('QR code not available'),
+                      ),
+                    );
+                  }
+
+                  final qrCodeDataUri = snapshot.data!;
+                  
+                  // Extract base64 data from data URI
+                  String base64Data = qrCodeDataUri;
+                  if (qrCodeDataUri.contains(',')) {
+                    base64Data = qrCodeDataUri.split(',').last;
+                  }
+
+                  try {
+                    final imageBytes = base64Decode(base64Data);
+                    
+                    return Container(
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(
+                          color: kStrokeColor,
+                          width: 1,
+                        ),
+                      ),
+                      child: Image.memory(
+                        imageBytes,
+                        width: 200,
+                        height: 200,
+                        fit: BoxFit.contain,
+                      ),
+                    );
+                  } catch (e) {
+                    return SizedBox(
+                      width: 200,
+                      height: 200,
+                      child: Center(
+                        child: Text('Error loading QR code'),
+                      ),
+                    );
+                  }
+                },
+              ),
+              const SizedBox(height: 24),
+              SizedBox(
+                width: double.infinity,
+                child: primaryButton(
+                  label: 'close'.tr(),
+                  onPressed: () => Navigator.pop(dialogContext),
+                  buttonColor: kPrimaryColor,
+                  labelColor: kWhite,
+                  buttonHeight: 48,
+                ),
               ),
             ],
           ),
@@ -381,15 +484,15 @@ class _HomePageState extends ConsumerState<HomePage> {
           ),
           centerTitle: false,
           actions: [
-             GestureDetector(
+            GestureDetector(
               onTap: () {
-                _showCallSupportModal(context);
+                _showQRCodeDialog(context);
               },
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 12),
                 child: Center(
                   child: SvgPicture.asset(
-                    'assets/svg/call.svg',
+                    'assets/svg/qr.svg',
                     height: 20,
                     width: 20,
                   ),
