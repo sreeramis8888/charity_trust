@@ -543,7 +543,8 @@ class ReferralDateFilter extends _$ReferralDateFilter {
 class ReferralPaginationState {
   final int currentPage;
   final int limit;
-  final int totalCount;
+  final int totalCount; // For pagination (outer total_count)
+  final int uiTotalCount; // For UI display (inner total_count)
   final List<UserModel> referrals;
   final int totalPending;
   final int totalApproved;
@@ -556,6 +557,7 @@ class ReferralPaginationState {
     required this.limit,
     required this.totalCount,
     required this.referrals,
+    this.uiTotalCount = 0,
     this.totalPending = 0,
     this.totalApproved = 0,
     this.totalRejected = 0,
@@ -566,6 +568,7 @@ class ReferralPaginationState {
     int? currentPage,
     int? limit,
     int? totalCount,
+    int? uiTotalCount,
     List<UserModel>? referrals,
     int? totalPending,
     int? totalApproved,
@@ -576,6 +579,7 @@ class ReferralPaginationState {
       limit: limit ?? this.limit,
       totalCount: totalCount ?? this.totalCount,
       referrals: referrals ?? this.referrals,
+      uiTotalCount: uiTotalCount ?? this.uiTotalCount,
       totalPending: totalPending ?? this.totalPending,
       totalApproved: totalApproved ?? this.totalApproved,
       totalRejected: totalRejected ?? this.totalRejected,
@@ -657,11 +661,16 @@ class AllReferralsNotifier extends _$AllReferralsNotifier {
       final data = response.data!['data'] as Map<String, dynamic>?;
       if (data != null) {
         final users = data['users'] as List?;
-        // Use the outer total_count for pagination (86 in your example)
-        final totalCountValue = response.data!['total_count'];
-        final totalCount = totalCountValue is int
-            ? totalCountValue
-            : int.tryParse(totalCountValue.toString()) ?? 0;
+        // Use the outer total_count for pagination
+        final paginationTotalCount = response.data!['total_count'];
+        final totalCountForPagination = paginationTotalCount is int
+            ? paginationTotalCount
+            : int.tryParse(paginationTotalCount.toString()) ?? 0;
+        
+        // Use the inner total_count for UI display
+        final uiTotalCount = data['total_count'] is int
+            ? data['total_count']
+            : int.tryParse(data['total_count'].toString()) ?? 0;
 
         final totalPending = data['total_pending'] is int
             ? data['total_pending']
@@ -686,8 +695,9 @@ class AllReferralsNotifier extends _$AllReferralsNotifier {
         return ReferralPaginationState(
           currentPage: 1,
           limit: 10,
-          totalCount: totalCount,
+          totalCount: totalCountForPagination,
           referrals: referrals,
+          uiTotalCount: uiTotalCount,
           totalPending: totalPending,
           totalApproved: totalApproved,
           totalRejected: totalRejected,
@@ -767,10 +777,10 @@ class AllReferralsNotifier extends _$AllReferralsNotifier {
         if (data != null) {
           final users = data['users'] as List?;
           // Use the outer total_count for pagination
-          final totalCountValue = response.data!['total_count'];
-          final totalCount = totalCountValue is int
-              ? totalCountValue
-              : int.tryParse(totalCountValue.toString()) ?? 0;
+          final paginationTotalCount = response.data!['total_count'];
+          final totalCountForPagination = paginationTotalCount is int
+              ? paginationTotalCount
+              : int.tryParse(paginationTotalCount.toString()) ?? 0;
 
           final referrals = users != null
               ? users
@@ -782,7 +792,7 @@ class AllReferralsNotifier extends _$AllReferralsNotifier {
 
           return currentState.copyWith(
             currentPage: nextPage,
-            totalCount: totalCount,
+            totalCount: totalCountForPagination,
             referrals: <UserModel>[...currentState.referrals, ...referrals],
           );
         }
@@ -873,10 +883,16 @@ class IndirectReferralsNotifier extends _$IndirectReferralsNotifier {
       if (responseData is Map<String, dynamic>) {
         final data = responseData;
         final users = data['users'] as List?;
-        final totalCountValue = data['total_count'];
-        final totalCount = totalCountValue is int
-            ? totalCountValue
-            : int.tryParse(totalCountValue.toString()) ?? 0;
+        // Use the outer total_count for pagination
+        final paginationTotalCount = response.data!['total_count'];
+        final totalCountForPagination = paginationTotalCount is int
+            ? paginationTotalCount
+            : int.tryParse(paginationTotalCount.toString()) ?? 0;
+        
+        // Use the inner total_count for UI display
+        final uiTotalCount = data['total_count'] is int
+            ? data['total_count']
+            : int.tryParse(data['total_count'].toString()) ?? 0;
         
         final totalPending = data['total_pending'] is int
             ? data['total_pending']
@@ -898,8 +914,9 @@ class IndirectReferralsNotifier extends _$IndirectReferralsNotifier {
         return ReferralPaginationState(
           currentPage: 1,
           limit: 10,
-          totalCount: totalCount,
+          totalCount: totalCountForPagination,
           referrals: referrals,
+          uiTotalCount: uiTotalCount,
           totalPending: totalPending,
           totalApproved: totalApproved,
           totalRejected: totalRejected,
@@ -989,10 +1006,11 @@ class IndirectReferralsNotifier extends _$IndirectReferralsNotifier {
         if (responseData is Map<String, dynamic>) {
           final data = responseData;
           final users = data['users'] as List?;
-          final totalCountValue = data['total_count'];
-          final totalCount = totalCountValue is int
-              ? totalCountValue
-              : int.tryParse(totalCountValue.toString()) ?? 0;
+          // Use the outer total_count for pagination
+          final paginationTotalCount = response.data!['total_count'];
+          final totalCountForPagination = paginationTotalCount is int
+              ? paginationTotalCount
+              : int.tryParse(paginationTotalCount.toString()) ?? 0;
 
           final referrals = users != null
               ? users
@@ -1004,7 +1022,7 @@ class IndirectReferralsNotifier extends _$IndirectReferralsNotifier {
 
           return currentState.copyWith(
             currentPage: nextPage,
-            totalCount: totalCount,
+            totalCount: totalCountForPagination,
             referrals: <UserModel>[...currentState.referrals, ...referrals],
           );
         }

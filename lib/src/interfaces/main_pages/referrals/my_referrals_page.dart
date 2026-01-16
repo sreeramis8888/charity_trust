@@ -131,7 +131,7 @@ class _MyReferralsPageState extends ConsumerState<MyReferralsPage>
                 ),
                 child: allReferralsAsync.when(
                   data: (paginationState) {
-                    final total = paginationState.totalCount;
+                    final total = paginationState.uiTotalCount;
                     final approved = paginationState.totalApproved;
                     final pending = paginationState.totalPending;
                     final rejected = paginationState.totalRejected;
