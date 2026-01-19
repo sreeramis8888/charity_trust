@@ -76,6 +76,7 @@ class _HomePageState extends ConsumerState<HomePage> {
       'assets/jpg/orphan.jpg',
       'assets/png/widow.png',
       'assets/png/ghusal_mayyt.png',
+      'assets/jpg/nofundingcampaigns.jpg'
     ];
     for (var image in categoryImages) {
       precacheImage(AssetImage(image), context);
@@ -279,7 +280,10 @@ class _HomePageState extends ConsumerState<HomePage> {
                   }
 
                   return FutureBuilder<String?>(
-                    future: ref.read(secureStorageServiceProvider).getUserData().then(
+                    future: ref
+                        .read(secureStorageServiceProvider)
+                        .getUserData()
+                        .then(
                           (userData) => userData?.qrCode,
                         ),
                     builder: (context, snapshot) {
@@ -293,7 +297,9 @@ class _HomePageState extends ConsumerState<HomePage> {
                         );
                       }
 
-                      if (snapshot.hasError || snapshot.data == null || snapshot.data!.isEmpty) {
+                      if (snapshot.hasError ||
+                          snapshot.data == null ||
+                          snapshot.data!.isEmpty) {
                         return SizedBox(
                           width: 200,
                           height: 200,
@@ -304,7 +310,7 @@ class _HomePageState extends ConsumerState<HomePage> {
                       }
 
                       final qrCodeDataUri = snapshot.data!;
-                      
+
                       // Extract base64 data from data URI
                       String base64Data = qrCodeDataUri;
                       if (qrCodeDataUri.contains(',')) {
@@ -313,7 +319,7 @@ class _HomePageState extends ConsumerState<HomePage> {
 
                       try {
                         final imageBytes = base64Decode(base64Data);
-                        
+
                         return Container(
                           padding: const EdgeInsets.all(12),
                           decoration: BoxDecoration(
@@ -906,7 +912,245 @@ class _HomePageState extends ConsumerState<HomePage> {
                   ),
                 ),
               ),
+            // if (homeData.endingCampaigns.isNotEmpty)
+            //   Padding(
+            //     padding: const EdgeInsets.all(16),
+            //     child: Column(
+            //       crossAxisAlignment: CrossAxisAlignment.start,
+            //       children: [
+            //         Row(
+            //           crossAxisAlignment: CrossAxisAlignment.start,
+            //           children: [
+            //             Expanded(
+            //               child: Text(
+            //                 'fundingCampaigns'.tr(),
+            //                 style: kBodyTitleM,
+            //                 softWrap: true,
+            //               ),
+            //             ),
+            //             const SizedBox(width: 8),
+            //             GestureDetector(
+            //               onTap: () {
+            //                 Navigator.of(context).pushNamed(
+            //                   'Campaign',
+            //                   arguments: {'category': 'All'},
+            //                 );
+            //               },
+            //               child: Text(
+            //                 'seeAll'.tr(),
+            //                 style:
+            //                     kSmallTitleM.copyWith(color: kThirdTextColor),
+            //               ),
+            //             ),
+            //           ],
+            //         ),
+            //         const SizedBox(height: 12),
+            //         SizedBox(
+            //           height: 470,
+            //           child: CarouselSlider(
+            //             options: CarouselOptions(
+            //               height: 470,
+            //               viewportFraction: 1,
+            //               enableInfiniteScroll: true,
+            //               autoPlay: false,
+            //               onPageChanged: (index, reason) {
+            //                 setState(() => _endingCampaignIndex = index);
+            //               },
+            //             ),
+            //             items: homeData.endingCampaigns.map((campaign) {
+            //               final preferredLanguage =
+            //                   GlobalVariables.getPreferredLanguage();
+            //               return Padding(
+            //                 padding: const EdgeInsets.only(bottom: 16),
+            //                 child: HomeGradientCampaignCard(
+            //                   title: campaign.getTitle(preferredLanguage),
+            //                   description:
+            //                       campaign.getDescription(preferredLanguage),
+            //                   image: campaign.coverImage,
+            //                   raised: campaign.collectedAmount.toInt(),
+            //                   goal: campaign.targetAmount.toInt(),
+            //                   dueDate: formatDate(campaign.targetDate),
+            //                   category: campaign.category,
+            //                   onViewDetails: () {
+            //                     Navigator.of(context).pushNamed(
+            //                       'CampaignDetail',
+            //                       arguments: {
+            //                         '_id': campaign.id ?? '',
+            //                         'title':
+            //                             campaign.getTitle(preferredLanguage),
+            //                         'description': campaign
+            //                             .getDescription(preferredLanguage),
+            //                         'category': campaign.category,
+            //                         'date': formatDate(campaign.targetDate),
+            //                         'image': campaign.coverImage,
+            //                         'raised': campaign.collectedAmount.toInt(),
+            //                         'goal': campaign.targetAmount.toInt(),
+            //                       },
+            //                     );
+            //                   },
+            //                   onDonate: () {},
+            //                 ),
+            //               );
+            //             }).toList(),
+            //           ),
+            //         ),
+            //         const SizedBox(height: 14),
+            //         Center(
+            //           child: PageViewDotIndicator(
+            //             size: Size(8, 8),
+            //             unselectedSize: Size(7, 7),
+            //             currentItem: _endingCampaignIndex,
+            //             count: homeData.endingCampaigns.length,
+            //             unselectedColor: Color(0xFFAEB9E1),
+            //             selectedColor: Color(0xFF0D74BC),
+            //           ),
+            //         ),
+            //       ],
+            //     ),
+            //   ),
             if (homeData.endingCampaigns.isNotEmpty)
+              Padding(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  children: [
+                    // Main card with image background, overlaid content, and bottom text
+                    Container(
+                      decoration: BoxDecoration(
+                        color: kWhite,
+                        borderRadius: BorderRadius.circular(16),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.05),
+                            blurRadius: 10,
+                            offset: const Offset(0, 2),
+                          ),
+                        ],
+                      ),
+                      child: Column(
+                        children: [
+                          // Image section with overlay
+                          Container(
+                            height: 200,
+                            child: ClipRRect(
+                              borderRadius: const BorderRadius.only(
+                                topLeft: Radius.circular(16),
+                                topRight: Radius.circular(16),
+                              ),
+                              child: Stack(
+                                children: [
+                                  // Background image - fills entire container
+                                  Positioned.fill(
+                                    child: Image.asset(
+                                      'assets/jpg/nofundingcampaigns.jpg',
+                                      fit: BoxFit.cover,
+                                      errorBuilder:
+                                          (context, error, stackTrace) {
+                                        return Container(
+                                          color: Color(0xFFF5F5F5),
+                                          child: Center(
+                                            child: Icon(
+                                              Icons.favorite,
+                                              size: 60,
+                                              color: Colors.grey[400],
+                                            ),
+                                          ),
+                                        );
+                                      },
+                                    ),
+                                  ),
+                                  // Right side - Content overlay
+                                  Positioned(
+                                    right: 0,
+                                    top: 0,
+                                    bottom: 0,
+                                    child: Container(
+                                      width: MediaQuery.of(context).size.width *
+                                          0.6,
+                                      padding: const EdgeInsets.all(20),
+                                      decoration: BoxDecoration(
+                                        gradient: LinearGradient(
+                                          begin: Alignment.centerRight,
+                                          end: Alignment.centerLeft,
+                                          colors: [
+                                            Color(0xFFF5F5F5),
+                                            Color(0xFFF5F5F5).withOpacity(0.95),
+                                            Colors.transparent,
+                                          ],
+                                        ),
+                                      ),
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        children: [
+                                          Text(
+                                            'noFundingCampaignsTitle'.tr(),
+                                            style: kBodyTitleSB.copyWith(
+                                              fontSize: 19,
+                                              fontWeight: FontWeight.bold,
+                                              color: kTextColor,
+                                            ),
+                                          ),
+                                          const SizedBox(height: 8),
+                                          Text(
+                                            'noFundingCampaignsSubtitle'.tr(),
+                                            style: kSmallTitleR.copyWith(
+                                              fontSize: 12,
+                                              color: kSecondaryTextColor,
+                                            ),
+                                          ),
+                                          const SizedBox(height: 20),
+                                          SizedBox(
+                                            width: double.infinity,
+                                            child: primaryButton(
+                                              label: 'donateNow'.tr(),
+                                              onPressed: () {
+                                                Navigator.of(context).pushNamed(
+                                                    'DonationCategories');
+                                              },
+                                              buttonColor: kPrimaryColor,
+                                              labelColor: kWhite,
+                                              buttonHeight: 44,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                          // Bottom message text - part of the same container
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 16,
+                              vertical: 12,
+                            ),
+                            decoration: BoxDecoration(
+                              color: kWhite,
+                              borderRadius: const BorderRadius.only(
+                                bottomLeft: Radius.circular(16),
+                                bottomRight: Radius.circular(16),
+                              ),
+                            ),
+                            child: Text(
+                              'noFundingCampaignsDescription'.tr(),
+                              style: kSmallTitleR.copyWith(
+                                fontSize: 12,
+                                color: kSecondaryTextColor,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            if (homeData.endingCampaigns.isEmpty)
               Padding(
                 padding: const EdgeInsets.all(16),
                 child: Column(

@@ -52,7 +52,8 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
   String? selectedDistrictCode;
   String? selectedDistrictName;
   String? selectedGender;
-  String? whatsappCountryCode;
+  // String? whatsappCountryCode;
+  final String whatsappCountryCode = '91'; // Always use India country code
   bool isSameAsPhone = true;
 
   final Map<String, GlobalKey> _fieldKeys = {
@@ -938,74 +939,95 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
                         animationType: anim.AnimationType.fadeSlideInFromBottom,
                         duration: anim.AnimationDuration.normal,
                         delayMilliseconds: 1300,
-                        child: IntlPhoneField(
-                          key: _fieldKeys['whatsapp'],
-                          validator: (phone) {
-                            if (!isSameAsPhone) {
-                              if (phone == null ||
-                                  phone.number.isEmpty ||
-                                  phone.number.length < 9) {
-                                return 'pleaseEnterValidPhoneNumber'.tr();
-                              }
-                              if (phone.number.length > 10) {
-                                return 'phoneNumberCannotExceed'.tr();
-                              }
-                            }
-                            return null;
-                          },
-                          style: const TextStyle(
-                            color: kTextColor,
-                            letterSpacing: 3,
-                            fontSize: 14,
-                            fontWeight: FontWeight.w400,
-                          ),
-                          controller: whatsappController,
-                          disableLengthCheck: true,
-                          showCountryFlag: true,
-                          cursorColor: kBlack,
-                          decoration: InputDecoration(
-                            fillColor: kWhite,
-                            hintText: 'enterWhatsappNumber'.tr(),
-                            hintStyle: TextStyle(
-                              fontSize: 14,
-                              letterSpacing: .2,
-                              fontWeight: FontWeight.w200,
-                              color: kTextColor,
+                        child: Stack(
+                          children: [
+                            IntlPhoneField(
+                              key: _fieldKeys['whatsapp'],
+                              validator: (phone) {
+                                if (!isSameAsPhone) {
+                                  if (phone == null ||
+                                      phone.number.isEmpty ||
+                                      phone.number.length < 9) {
+                                    return 'pleaseEnterValidPhoneNumber'.tr();
+                                  }
+                                  if (phone.number.length > 10) {
+                                    return 'phoneNumberCannotExceed'.tr();
+                                  }
+                                }
+                                return null;
+                              },
+                              style: const TextStyle(
+                                color: kTextColor,
+                                letterSpacing: 3,
+                                fontSize: 14,
+                                fontWeight: FontWeight.w400,
+                              ),
+                              controller: whatsappController,
+                              disableLengthCheck: true,
+                              showCountryFlag: true,
+                              cursorColor: kBlack,
+                              decoration: InputDecoration(
+                                fillColor: kWhite,
+                                hintText: 'enterWhatsappNumber'.tr(),
+                                hintStyle: TextStyle(
+                                  fontSize: 14,
+                                  letterSpacing: .2,
+                                  fontWeight: FontWeight.w200,
+                                  color: kTextColor,
+                                ),
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(8.0),
+                                  borderSide: BorderSide(color: kBorder),
+                                ),
+                                enabledBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(8.0),
+                                  borderSide: BorderSide(color: kBorder),
+                                ),
+                                focusedBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(8.0),
+                                  borderSide: const BorderSide(color: kBorder),
+                                ),
+                                contentPadding: const EdgeInsets.symmetric(
+                                  vertical: 16.0,
+                                  horizontal: 10.0,
+                                ),
+                              ),
+                              // onCountryChanged: (value) {
+                              //   whatsappCountryCode = value.dialCode;
+                              // },
+                              initialCountryCode: 'IN',
+                              flagsButtonPadding:
+                                  const EdgeInsets.only(left: 10, right: 10.0),
+                              showDropdownIcon: false,
+                              // dropdownIcon: const Icon(
+                              //   Icons.arrow_drop_down_outlined,
+                              //   color: kTextColor,
+                              // ),
+                              // dropdownIconPosition: IconPosition.trailing,
+                              // dropdownTextStyle: const TextStyle(
+                              //   color: kTextColor,
+                              //   fontSize: 15,
+                              //   fontWeight: FontWeight.w400,
+                              // ),
                             ),
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(8.0),
-                              borderSide: BorderSide(color: kBorder),
+                            // Overlay to block taps on flag area (prevents country dropdown)
+                            Positioned(
+                              left: 0,
+                              top: 0,
+                              width:
+                                  100, // Approximate width of flag + country code area
+                              height: 50, // Height of the input field
+                              child: GestureDetector(
+                                onTap: () {
+                                  // Do nothing - block the tap
+                                },
+                                behavior: HitTestBehavior.translucent,
+                                child: Container(
+                                  color: Colors.transparent,
+                                ),
+                              ),
                             ),
-                            enabledBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(8.0),
-                              borderSide: BorderSide(color: kBorder),
-                            ),
-                            focusedBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(8.0),
-                              borderSide: const BorderSide(color: kBorder),
-                            ),
-                            contentPadding: const EdgeInsets.symmetric(
-                              vertical: 16.0,
-                              horizontal: 10.0,
-                            ),
-                          ),
-                          onCountryChanged: (value) {
-                            whatsappCountryCode = value.dialCode;
-                          },
-                          initialCountryCode: 'IN',
-                          flagsButtonPadding:
-                              const EdgeInsets.only(left: 10, right: 10.0),
-                          showDropdownIcon: true,
-                          dropdownIcon: const Icon(
-                            Icons.arrow_drop_down_outlined,
-                            color: kTextColor,
-                          ),
-                          dropdownIconPosition: IconPosition.trailing,
-                          dropdownTextStyle: const TextStyle(
-                            color: kTextColor,
-                            fontSize: 15,
-                            fontWeight: FontWeight.w400,
-                          ),
+                          ],
                         ),
                       ),
                     const SizedBox(height: 30),
