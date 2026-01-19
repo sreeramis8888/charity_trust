@@ -39,6 +39,8 @@ class _PhoneNumberScreenState extends ConsumerState<PhoneNumberScreen> {
   void initState() {
     super.initState();
     _mobileController = TextEditingController();
+    // Set India as default country code
+    // ref.read(countryCodeProvider.notifier).state = '91';
   }
 
   @override
@@ -93,73 +95,95 @@ class _PhoneNumberScreenState extends ConsumerState<PhoneNumberScreen> {
                                 anim.AnimationType.fadeSlideInFromBottom,
                             duration: anim.AnimationDuration.normal,
                             delayMilliseconds: 200,
-                            child: IntlPhoneField(
-                              validator: (phone) {
-                                if (phone!.number.length > 9) {
-                                  if (phone.number.length > 10) {
-                                    return 'phoneNumberCannotExceed'.tr();
-                                  }
-                                }
-                                return null;
-                              },
-                              style: const TextStyle(
-                                color: kTextColor,
-                                letterSpacing: 3,
-                                fontSize: 14,
-                                fontWeight: FontWeight.w400,
-                              ),
-                              controller: _mobileController,
-                              disableLengthCheck: true,
-                              showCountryFlag: true,
-                              cursorColor: kBlack,
-                              decoration: InputDecoration(
-                                filled: true,
-                                fillColor: kWhite,
-                                hintText: 'enterYourPhoneNumber'.tr(),
-                                hintStyle: TextStyle(
-                                  fontSize: 14,
-                                  letterSpacing: .2,
-                                  fontWeight: FontWeight.w200,
-                                  color: kTextColor,
+                            child: Stack(
+                              children: [
+                                IntlPhoneField(
+                                  validator: (phone) {
+                                    if (phone!.number.length > 9) {
+                                      if (phone.number.length > 10) {
+                                        return 'phoneNumberCannotExceed'.tr();
+                                      }
+                                    }
+                                    return null;
+                                  },
+                                  style: const TextStyle(
+                                    color: kTextColor,
+                                    letterSpacing: 3,
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w400,
+                                  ),
+                                  controller: _mobileController,
+                                  disableLengthCheck: true,
+                                  showCountryFlag: true,
+                                  cursorColor: kBlack,
+                                  decoration: InputDecoration(
+                                    filled: true,
+                                    fillColor: kWhite,
+                                    hintText: 'enterYourPhoneNumber'.tr(),
+                                    hintStyle: TextStyle(
+                                      fontSize: 14,
+                                      letterSpacing: .2,
+                                      fontWeight: FontWeight.w200,
+                                      color: kTextColor,
+                                    ),
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(8.0),
+                                      borderSide: BorderSide(color: kBorder),
+                                    ),
+                                    enabledBorder: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(8.0),
+                                      borderSide: BorderSide(color: kBorder),
+                                    ),
+                                    focusedBorder: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(8.0),
+                                      borderSide:
+                                          const BorderSide(color: kBorder),
+                                    ),
+                                    contentPadding: const EdgeInsets.symmetric(
+                                      vertical: 16.0,
+                                      horizontal: 10.0,
+                                    ),
+                                  ),
+                                  // onCountryChanged: (value) {
+                                  //   ref.read(countryCodeProvider.notifier).state =
+                                  //       value.dialCode;
+                                  // },
+                                  initialCountryCode: 'IN',
+                                  onChanged: (phone) {
+                                    print(phone.completeNumber);
+                                  },
+                                  flagsButtonPadding: const EdgeInsets.only(
+                                      left: 10, right: 10.0),
+                                  showDropdownIcon: false,
+                                  // dropdownIcon: const Icon(
+                                  //   Icons.arrow_drop_down_outlined,
+                                  //   color: kTextColor,
+                                  // ),
+                                  // dropdownIconPosition: IconPosition.trailing,
+                                  // dropdownTextStyle: const TextStyle(
+                                  //   color: kTextColor,
+                                  //   fontSize: 15,
+                                  //   fontWeight: FontWeight.w400,
+                                  // ),
                                 ),
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(8.0),
-                                  borderSide: BorderSide(color: kBorder),
+                                // Overlay to block taps on flag area (prevents country dropdown)
+                                Positioned(
+                                  left: 0,
+                                  top: 0,
+                                  width:
+                                      100, // Approximate width of flag + country code area
+                                  height: 50, // Height of the input field
+                                  child: GestureDetector(
+                                    onTap: () {
+                                      // Do nothing - block the tap
+                                    },
+                                    behavior: HitTestBehavior.translucent,
+                                    child: Container(
+                                      color: Colors.transparent,
+                                    ),
+                                  ),
                                 ),
-                                enabledBorder: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(8.0),
-                                  borderSide: BorderSide(color: kBorder),
-                                ),
-                                focusedBorder: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(8.0),
-                                  borderSide: const BorderSide(color: kBorder),
-                                ),
-                                contentPadding: const EdgeInsets.symmetric(
-                                  vertical: 16.0,
-                                  horizontal: 10.0,
-                                ),
-                              ),
-                              onCountryChanged: (value) {
-                                ref.read(countryCodeProvider.notifier).state =
-                                    value.dialCode;
-                              },
-                              initialCountryCode: 'IN',
-                              onChanged: (phone) {
-                                print(phone.completeNumber);
-                              },
-                              flagsButtonPadding:
-                                  const EdgeInsets.only(left: 10, right: 10.0),
-                              showDropdownIcon: true,
-                              dropdownIcon: const Icon(
-                                Icons.arrow_drop_down_outlined,
-                                color: kTextColor,
-                              ),
-                              dropdownIconPosition: IconPosition.trailing,
-                              dropdownTextStyle: const TextStyle(
-                                color: kTextColor,
-                                fontSize: 15,
-                                fontWeight: FontWeight.w400,
-                              ),
+                              ],
                             ),
                           ),
                           const SizedBox(height: 16),
@@ -205,7 +229,8 @@ class _PhoneNumberScreenState extends ConsumerState<PhoneNumberScreen> {
   }
 
   Future<void> _handleOtpGeneration(BuildContext context, WidgetRef ref) async {
-    final countryCode = ref.read(countryCodeProvider);
+    // final countryCode = ref.read(countryCodeProvider);
+    const countryCode = '91'; // Always use India country code
     final phoneNumber = _mobileController.text;
 
     if (phoneNumber.isEmpty) {
@@ -250,7 +275,7 @@ class _PhoneNumberScreenState extends ConsumerState<PhoneNumberScreen> {
           MaterialPageRoute(
             builder: (context) => OTPScreen(
               fullPhone: fullPhone,
-              countryCode: countryCode ?? '91',
+              countryCode: countryCode, // Always '91'
               // verificationId: verificationId, // Not needed for backend OTP
               // resendToken: resendToken, // Not needed for backend OTP
             ),
