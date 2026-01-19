@@ -1008,7 +1008,7 @@ class _HomePageState extends ConsumerState<HomePage> {
             //       ],
             //     ),
             //   ),
-            if (homeData.endingCampaigns.isEmpty)
+            if (homeData.endingCampaigns.isNotEmpty)
               Padding(
                 padding: const EdgeInsets.all(16),
                 child: Column(
@@ -1030,7 +1030,10 @@ class _HomePageState extends ConsumerState<HomePage> {
                         children: [
                           // Image section with overlay
                           Container(
-                            height: 200,
+                            height:
+                                GlobalVariables.getPreferredLanguage() == 'ml'
+                                    ? 280
+                                    : 200,
                             child: ClipRRect(
                               borderRadius: const BorderRadius.only(
                                 topLeft: Radius.circular(16),
@@ -1066,7 +1069,10 @@ class _HomePageState extends ConsumerState<HomePage> {
                                     child: Container(
                                       width: MediaQuery.of(context).size.width *
                                           0.6,
-                                      padding: const EdgeInsets.all(20),
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 18,
+                                        vertical: 20,
+                                      ),
                                       decoration: BoxDecoration(
                                         gradient: LinearGradient(
                                           begin: Alignment.centerRight,
@@ -1101,18 +1107,23 @@ class _HomePageState extends ConsumerState<HomePage> {
                                             ),
                                           ),
                                           const SizedBox(height: 20),
-                                          SizedBox(
-                                            width: double.infinity,
-                                            child: primaryButton(
-                                              label: 'donateNow'.tr(),
-                                              onPressed: () {
-                                                Navigator.of(context).pushNamed(
-                                                    'DonationCategories');
-                                              },
-                                              buttonColor: kPrimaryColor,
-                                              labelColor: kWhite,
-                                              buttonHeight: 44,
-                                            ),
+                                          LayoutBuilder(
+                                            builder: (context, constraints) {
+                                              return SizedBox(
+                                                width: constraints.maxWidth,
+                                                child: primaryButton(
+                                                  label: 'donateNow'.tr(),
+                                                  onPressed: () {
+                                                    Navigator.of(context)
+                                                        .pushNamed(
+                                                            'DonationCategories');
+                                                  },
+                                                  buttonColor: kPrimaryColor,
+                                                  labelColor: kWhite,
+                                                  buttonHeight: 44,
+                                                ),
+                                              );
+                                            },
                                           ),
                                         ],
                                       ),
@@ -1150,7 +1161,7 @@ class _HomePageState extends ConsumerState<HomePage> {
                   ],
                 ),
               ),
-            if (homeData.endingCampaigns.isNotEmpty)
+            if (homeData.endingCampaigns.isEmpty)
               Padding(
                 padding: const EdgeInsets.all(16),
                 child: Column(

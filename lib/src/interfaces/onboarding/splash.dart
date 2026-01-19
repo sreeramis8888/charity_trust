@@ -92,7 +92,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
 
       log('_initializeApp: Starting version check', name: 'SplashScreen');
       // Check version first
-      await _checkAppVersion();
+      // await _checkAppVersion();
 
       // If update is required (forced or optional) or server error, stop initialization and stay on splash
       if (isAppUpdateRequired || hasVersionCheckError) {
@@ -111,59 +111,59 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
     }
   }
 
-  Future<void> _checkAppVersion() async {
-    try {
-      log('_checkAppVersion: Starting version check', name: 'SplashScreen');
-      final versionCheckService = ref.read(versionCheckServiceProvider);
-      final versionResponse = await versionCheckService.checkVersion();
+  // Future<void> _checkAppVersion() async {
+  //   try {
+  //     log('_checkAppVersion: Starting version check', name: 'SplashScreen');
+  //     final versionCheckService = ref.read(versionCheckServiceProvider);
+  //     final versionResponse = await versionCheckService.checkVersion();
 
-      if (versionResponse != null) {
-        // Get current app version
-        final packageInfo = await PackageInfo.fromPlatform();
-        final currentVersion = int.tryParse(packageInfo.buildNumber) ?? 0;
-        final newVersion = versionResponse.version;
+  //     if (versionResponse != null) {
+  //       // Get current app version
+  //       final packageInfo = await PackageInfo.fromPlatform();
+  //       final currentVersion = int.tryParse(packageInfo.buildNumber) ?? 0;
+  //       final newVersion = versionResponse.version;
 
-        log('_checkAppVersion: Version comparison - Current: $currentVersion, New: $newVersion, Force: ${versionResponse.force}',
-            name: 'SplashScreen');
+  //       log('_checkAppVersion: Version comparison - Current: $currentVersion, New: $newVersion, Force: ${versionResponse.force}',
+  //           name: 'SplashScreen');
 
-        // Only show update if new version is greater than current version
-        if (newVersion > currentVersion) {
-          setState(() {
-            isAppUpdateRequired = true;
-            forceUpdate = versionResponse.force;
-            errorMessage = versionResponse.updateMessage;
-            updateLink = versionResponse.applink;
-            hasVersionCheckError = false;
-          });
-          log('_checkAppVersion: State updated - isAppUpdateRequired: $isAppUpdateRequired, forceUpdate: $forceUpdate',
-              name: 'SplashScreen');
-        } else {
-          log('_checkAppVersion: App is up to date. Current: $currentVersion, New: $newVersion',
-              name: 'SplashScreen');
-        }
-      } else {
-        log('_checkAppVersion: No version response received',
-            name: 'SplashScreen');
-        // Treat null response as server error
-        setState(() {
-          hasVersionCheckError = true;
-          errorMessage = 'serverDownMessage'.tr();
-          isAppUpdateRequired = true;
-        });
-        log('_checkAppVersion: Server error - no response received, staying on splash',
-            name: 'SplashScreen');
-      }
-    } catch (e) {
-      log('Error checking version: $e', name: 'SplashScreen');
-      setState(() {
-        hasVersionCheckError = true;
-        errorMessage = 'serverDownMessage'.tr();
-        isAppUpdateRequired = true;
-      });
-      log('_checkAppVersion: Exception caught - staying on splash screen',
-          name: 'SplashScreen');
-    }
-  }
+  //       // Only show update if new version is greater than current version
+  //       if (newVersion > currentVersion) {
+  //         setState(() {
+  //           isAppUpdateRequired = true;
+  //           forceUpdate = versionResponse.force;
+  //           errorMessage = versionResponse.updateMessage;
+  //           updateLink = versionResponse.applink;
+  //           hasVersionCheckError = false;
+  //         });
+  //         log('_checkAppVersion: State updated - isAppUpdateRequired: $isAppUpdateRequired, forceUpdate: $forceUpdate',
+  //             name: 'SplashScreen');
+  //       } else {
+  //         log('_checkAppVersion: App is up to date. Current: $currentVersion, New: $newVersion',
+  //             name: 'SplashScreen');
+  //       }
+  //     } else {
+  //       log('_checkAppVersion: No version response received',
+  //           name: 'SplashScreen');
+  //       // Treat null response as server error
+  //       setState(() {
+  //         hasVersionCheckError = true;
+  //         errorMessage = 'serverDownMessage'.tr();
+  //         isAppUpdateRequired = true;
+  //       });
+  //       log('_checkAppVersion: Server error - no response received, staying on splash',
+  //           name: 'SplashScreen');
+  //     }
+  //   } catch (e) {
+  //     log('Error checking version: $e', name: 'SplashScreen');
+  //     setState(() {
+  //       hasVersionCheckError = true;
+  //       errorMessage = 'serverDownMessage'.tr();
+  //       isAppUpdateRequired = true;
+  //     });
+  //     log('_checkAppVersion: Exception caught - staying on splash screen',
+  //         name: 'SplashScreen');
+  //   }
+  // }
 
 
 
