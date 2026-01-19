@@ -332,5 +332,8 @@
   "calculateZakat": "Calculate Zakat",
   "zakatCalculationResult": "Zakat Calculation Result",
   "netWorth": "Net Worth",
-  "zakatPayable": "Zakat Payable"
+  "zakatPayable": "Zakat Payable",
+  "noFundingCampaignsTitle": "Your Kindness Can Change Lives",
+  "noFundingCampaignsSubtitle": "Help us make a difference in the lives of those in need.",
+  "noFundingCampaignsDescription": "Currently, funding campaigns are unavailable. You can still donate on the above campaigns."
 }
