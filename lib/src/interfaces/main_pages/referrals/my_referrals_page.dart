@@ -553,6 +553,7 @@ class _MyReferralsPageState extends ConsumerState<MyReferralsPage>
                     type: CustomFieldType.date,
                     hint: 'ddmmyyyy'.tr(),
                     controller: startDateController,
+                    readOnly: true,
                   ),
                   const SizedBox(height: 20),
                   Text("endDate".tr(), style: kSmallTitleM),
@@ -561,6 +562,7 @@ class _MyReferralsPageState extends ConsumerState<MyReferralsPage>
                     type: CustomFieldType.date,
                     hint: 'ddmmyyyy'.tr(),
                     controller: endDateController,
+                    readOnly: true,
                   ),
                   const SizedBox(height: 32),
                   primaryButton(
@@ -571,16 +573,78 @@ class _MyReferralsPageState extends ConsumerState<MyReferralsPage>
                       String? formattedEnd;
 
                       if (startDateController.text.isNotEmpty) {
-                        final parts = startDateController.text.split('/');
-                        formattedStart = "${parts[2]}-${parts[1]}-${parts[0]}";
-                        print(
-                            '🟡 [FilterButton] Formatted start date: $formattedStart');
+                        try {
+                          // Normalize date string: replace both '/' and '-' with '-'
+                          final normalizedDate = startDateController.text
+                              .replaceAll('/', '-')
+                              .replaceAll(RegExp(r'[^\d-]'), '');
+                          final parts = normalizedDate.split('-');
+
+                          if (parts.length == 3) {
+                            formattedStart =
+                                "${parts[2]}-${parts[1]}-${parts[0]}";
+                            print(
+                                '🟡 [FilterButton] Formatted start date: $formattedStart');
+                          } else {
+                            print(
+                                '🟡 [FilterButton] Invalid start date format: ${startDateController.text}');
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text(
+                                    'Please enter a valid date (dd/mm/yyyy or dd-mm-yyyy)'),
+                                backgroundColor: Colors.red,
+                              ),
+                            );
+                            return;
+                          }
+                        } catch (e) {
+                          print(
+                              '🟡 [FilterButton] Error formatting start date: $e');
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text('Error formatting start date'),
+                              backgroundColor: Colors.red,
+                            ),
+                          );
+                          return;
+                        }
                       }
                       if (endDateController.text.isNotEmpty) {
-                        final parts = endDateController.text.split('/');
-                        formattedEnd = "${parts[2]}-${parts[1]}-${parts[0]}";
-                        print(
-                            '🟡 [FilterButton] Formatted end date: $formattedEnd');
+                        try {
+                          // Normalize date string: replace both '/' and '-' with '-'
+                          final normalizedDate = endDateController.text
+                              .replaceAll('/', '-')
+                              .replaceAll(RegExp(r'[^\d-]'), '');
+                          final parts = normalizedDate.split('-');
+
+                          if (parts.length == 3) {
+                            formattedEnd =
+                                "${parts[2]}-${parts[1]}-${parts[0]}";
+                            print(
+                                '🟡 [FilterButton] Formatted end date: $formattedEnd');
+                          } else {
+                            print(
+                                '🟡 [FilterButton] Invalid end date format: ${endDateController.text}');
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text(
+                                    'Please enter a valid date (dd/mm/yyyy or dd-mm-yyyy)'),
+                                backgroundColor: Colors.red,
+                              ),
+                            );
+                            return;
+                          }
+                        } catch (e) {
+                          print(
+                              '🟡 [FilterButton] Error formatting end date: $e');
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text('Error formatting end date'),
+                              backgroundColor: Colors.red,
+                            ),
+                          );
+                          return;
+                        }
                       }
 
                       print(

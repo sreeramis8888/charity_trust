@@ -1008,7 +1008,7 @@ class _HomePageState extends ConsumerState<HomePage> {
             //       ],
             //     ),
             //   ),
-            if (homeData.endingCampaigns.isNotEmpty)
+            if (homeData.endingCampaigns.isEmpty)
               Padding(
                 padding: const EdgeInsets.all(16),
                 child: Column(
@@ -1150,7 +1150,7 @@ class _HomePageState extends ConsumerState<HomePage> {
                   ],
                 ),
               ),
-            if (homeData.endingCampaigns.isEmpty)
+            if (homeData.endingCampaigns.isNotEmpty)
               Padding(
                 padding: const EdgeInsets.all(16),
                 child: Column(
