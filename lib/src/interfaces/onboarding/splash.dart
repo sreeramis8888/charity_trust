@@ -445,7 +445,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
                 ),
               ),
             ),
-            if (hasVersionCheckError)
+            if (isAppUpdateRequired)
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 24.0),
                 child: Column(
@@ -454,9 +454,13 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
                     Container(
                       padding: const EdgeInsets.all(24),
                       decoration: BoxDecoration(
-                        color: Colors.red.withOpacity(0.05),
+                        color: hasVersionCheckError
+                            ? Colors.red.withOpacity(0.05)
+                            : kPrimaryColor.withOpacity(0.05),
                         border: Border.all(
-                          color: Colors.red.withOpacity(0.2),
+                          color: hasVersionCheckError
+                              ? Colors.red.withOpacity(0.2)
+                              : kPrimaryColor.withOpacity(0.2),
                           width: 1.5,
                         ),
                         borderRadius: BorderRadius.circular(16),
@@ -466,18 +470,28 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
                           Container(
                             padding: const EdgeInsets.all(12),
                             decoration: BoxDecoration(
-                              color: Colors.red.withOpacity(0.1),
+                              color: hasVersionCheckError
+                                  ? Colors.red.withOpacity(0.1)
+                                  : kPrimaryColor.withOpacity(0.1),
                               shape: BoxShape.circle,
                             ),
                             child: Icon(
-                              Icons.cloud_off_outlined,
-                              color: Colors.red,
+                              hasVersionCheckError
+                                  ? Icons.cloud_off_outlined
+                                  : Icons.system_update_outlined,
+                              color: hasVersionCheckError
+                                  ? Colors.red
+                                  : kPrimaryColor,
                               size: 32,
                             ),
                           ),
                           const SizedBox(height: 16),
                           Text(
-                            'serverDownMessage'.tr(),
+                            hasVersionCheckError
+                                ? 'serverDownMessage'.tr()
+                                : errorMessage.isNotEmpty
+                                    ? errorMessage
+                                    : 'Update Available',
                             style: kHeadTitleB.copyWith(
                               color: kTextColor,
                               fontSize: 16,
@@ -486,7 +500,11 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
                           ),
                           const SizedBox(height: 12),
                           Text(
-                            'Please check your internet connection and try again.',
+                            hasVersionCheckError
+                                ? 'Please check your internet connection and try again.'
+                                : forceUpdate
+                                    ? 'This update is required to continue using the app.'
+                                    : 'A new version is available. Update now for the best experience.',
                             style: kBodyTitleR.copyWith(
                               color: kSecondaryTextColor,
                               fontSize: 13,
@@ -494,24 +512,74 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
                             textAlign: TextAlign.center,
                           ),
                           const SizedBox(height: 20),
-                          SizedBox(
-                            width: double.infinity,
-                            child: ElevatedButton(
-                              onPressed: retryVersionCheck,
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: kPrimaryColor,
-                                padding:
-                                    const EdgeInsets.symmetric(vertical: 12),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(8),
+                          if (hasVersionCheckError)
+                            SizedBox(
+                              width: double.infinity,
+                              child: ElevatedButton(
+                                onPressed: retryVersionCheck,
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: kPrimaryColor,
+                                  padding:
+                                      const EdgeInsets.symmetric(vertical: 12),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                ),
+                                child: Text(
+                                  'retry'.tr(),
+                                  style: kBodyTitleM.copyWith(color: kWhite),
                                 ),
                               ),
-                              child: Text(
-                                'retry'.tr(),
-                                style: kBodyTitleM.copyWith(color: kWhite),
-                              ),
+                            )
+                          else
+                            Row(
+                              children: [
+                                if (!forceUpdate)
+                                  Expanded(
+                                    child: OutlinedButton(
+                                      onPressed: () async {
+                                        setState(() {
+                                          isAppUpdateRequired = false;
+                                        });
+                                        await _checkAuthenticationAndLoadUser();
+                                      },
+                                      style: OutlinedButton.styleFrom(
+                                        padding: const EdgeInsets.symmetric(
+                                            vertical: 12),
+                                        side: BorderSide(color: kPrimaryColor),
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(8),
+                                        ),
+                                      ),
+                                      child: Text(
+                                        'Later',
+                                        style: kBodyTitleM.copyWith(
+                                            color: kPrimaryColor),
+                                      ),
+                                    ),
+                                  ),
+                                if (!forceUpdate) const SizedBox(width: 12),
+                                Expanded(
+                                  child: ElevatedButton(
+                                    onPressed: _openAppStore,
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: kPrimaryColor,
+                                      padding: const EdgeInsets.symmetric(
+                                          vertical: 12),
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(8),
+                                      ),
+                                    ),
+                                    child: Text(
+                                      'Update Now',
+                                      style:
+                                          kBodyTitleM.copyWith(color: kWhite),
+                                    ),
+                                  ),
+                                ),
+                              ],
                             ),
-                          ),
                         ],
                       ),
                     ),
