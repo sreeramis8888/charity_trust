@@ -115,7 +115,7 @@ class _CampaignDetailPageState extends ConsumerState<CampaignDetailPage> {
 
   Future<void> _verifyFailedPayment(String? orderId, String? donationId) async {
     if (orderId == null || donationId == null) return;
-    
+
     try {
       final donationApi = ref.read(donationApiProvider);
       log("Verifying failed payment with backend");
@@ -317,7 +317,9 @@ class _CampaignDetailPageState extends ConsumerState<CampaignDetailPage> {
     }
 
     final remaining = ((widget.goal ?? 0) - (widget.raised ?? 0)).toDouble();
-    if (amount > remaining && widget.category == 'General Campaign' && (widget.goal ?? 0) > 0) {
+    if (amount > remaining &&
+        widget.category == 'General Campaign' &&
+        (widget.goal ?? 0) > 0) {
       _showExceedsGoalDialog(amount, remaining);
       return;
     }
@@ -334,11 +336,11 @@ class _CampaignDetailPageState extends ConsumerState<CampaignDetailPage> {
               setState(() => _selectedGateway = 'razorpay');
               _processPayment(amount);
             },
-            onMswipeSelected: (String email) {
+            onMswipeSelected: () {
               Navigator.pop(context);
               setState(() {
                 _selectedGateway = 'mswipe';
-                _userEmail = email;
+                // _userEmail = email;
               });
               _processPayment(amount);
             },
@@ -362,7 +364,7 @@ class _CampaignDetailPageState extends ConsumerState<CampaignDetailPage> {
         campaignId: widget.id ?? '',
         amount: amount,
         gateway: _selectedGateway,
-        email: _userEmail,
+        // email: _userEmail,
         phone: _userPhone,
       );
 
@@ -395,7 +397,8 @@ class _CampaignDetailPageState extends ConsumerState<CampaignDetailPage> {
           await _processMswipePayment(orderId, donationId, amount, data);
         } else {
           log("Missing data or donationId for Mswipe payment");
-          _showSnackBar('failedToProcessPayment'.tr(), type: SnackbarType.error);
+          _showSnackBar('failedToProcessPayment'.tr(),
+              type: SnackbarType.error);
           if (mounted) {
             setState(() => _isProcessing = false);
           }
@@ -405,7 +408,8 @@ class _CampaignDetailPageState extends ConsumerState<CampaignDetailPage> {
           await _processRazorpayPayment(orderId, donationId, amount);
         } else {
           log("Missing donationId for Razorpay payment");
-          _showSnackBar('failedToProcessPayment'.tr(), type: SnackbarType.error);
+          _showSnackBar('failedToProcessPayment'.tr(),
+              type: SnackbarType.error);
           if (mounted) {
             setState(() => _isProcessing = false);
           }

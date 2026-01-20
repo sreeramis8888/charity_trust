@@ -180,33 +180,31 @@ class _CampaignPageState extends ConsumerState<CampaignPage>
           Padding(
             padding: const EdgeInsets.only(right: 16),
             child: Center(
-              child: Builder(
-                builder: (context) {
-                  final userRole = GlobalVariables.getUserRole();
-                  final isAdmin = userRole != 'member';
-                  if (!isAdmin) {
-                    return const SizedBox.shrink();
-                  }
-                  return GestureDetector(
-                    onTap: () {
-                      Navigator.of(context).push(
-                        MaterialPageRoute(
-                          builder: (context) => const AddCampaignPage(),
-                        ),
-                      );
-                    },
-                    child: Row(
-                      children: [
-                        const Icon(
-                          Icons.add,
-                          color: kPrimaryColor,
-                          size: 24,
-                        ),
-                      ],
-                    ),
-                  );
+              child: Builder(builder: (context) {
+                final userRole = GlobalVariables.getUserRole();
+                final isAdmin = userRole != 'member';
+                if (!isAdmin) {
+                  return const SizedBox.shrink();
                 }
-              ),
+                return GestureDetector(
+                  onTap: () {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (context) => const AddCampaignPage(),
+                      ),
+                    );
+                  },
+                  child: Row(
+                    children: [
+                      const Icon(
+                        Icons.add,
+                        color: kPrimaryColor,
+                        size: 24,
+                      ),
+                    ],
+                  ),
+                );
+              }),
             ),
           ),
         ],
@@ -293,8 +291,7 @@ class _CampaignPageState extends ConsumerState<CampaignPage>
   Widget _generalCampaignTab() {
     final campaignsState = ref.watch(generalCampaignsProvider);
     final selectedCategory = ref.watch(campaignCategoryFilterProvider);
-      final preferredLanguage =
-                        GlobalVariables.getPreferredLanguage();
+    final preferredLanguage = GlobalVariables.getPreferredLanguage();
     print('=== _generalCampaignTab rebuild ===');
     print('selectedCategory from provider: $selectedCategory');
 
@@ -342,8 +339,8 @@ class _CampaignPageState extends ConsumerState<CampaignPage>
       children: [
         ChoiceChipFilter(
           options: displayOptions,
-          selectedOption: getLocalized(
-              selectedCategory.isEmpty ? 'All' : selectedCategory),
+          selectedOption:
+              getLocalized(selectedCategory.isEmpty ? 'All' : selectedCategory),
           onSelectionChanged: (selectedDisplay) {
             print('Filter changed to: $selectedDisplay');
             final selectedKey = categoryKeys.firstWhere(
@@ -359,6 +356,26 @@ class _CampaignPageState extends ConsumerState<CampaignPage>
         Expanded(
           child: campaignsState.when(
             data: (paginationState) {
+              // Check if General Campaign is selected and no campaigns found
+              if (selectedCategory == 'General Campaign' &&
+                  paginationState.campaigns.isEmpty) {
+                return Center(
+                  child: Text(
+                    'noGeneralCampaignsFound'.tr(),
+                    style: kBodyTitleR.copyWith(color: kSecondaryTextColor),
+                  ),
+                );
+              }
+
+              if (paginationState.campaigns.isEmpty) {
+                return Center(
+                  child: Text(
+                    'noCampaignsFound'.tr(),
+                    style: kBodyTitleR.copyWith(color: kSecondaryTextColor),
+                  ),
+                );
+              }
+
               return ListView.builder(
                 padding: const EdgeInsets.all(16),
                 controller: _generalCampaignsController,
@@ -373,7 +390,8 @@ class _CampaignPageState extends ConsumerState<CampaignPage>
                       delayMilliseconds: index * 50,
                       child: CampaignCard(
                         id: campaign.id ?? '',
-                        description: campaign.getDescription(preferredLanguage) ?? '',
+                        description:
+                            campaign.getDescription(preferredLanguage) ?? '',
                         title: campaign.getTitle(preferredLanguage) ?? '',
                         category: campaign.category ?? '',
                         date: formatDate(campaign.targetDate) ?? '',
@@ -434,82 +452,81 @@ class _CampaignPageState extends ConsumerState<CampaignPage>
     return Column(
       children: [
         if (isNonMember)
-              FutureBuilder<String?>(
-                future: secureStorage.getUserData().then((user) => user?.name),
-                builder: (context, nameSnapshot) {
-                  final userName = nameSnapshot.data ?? 'User';
-                  final memberTransText = 'memberTransactions'.tr();
-                  return ChoiceChipFilter(
-                    options: [userName, memberTransText],
-                    selectedOption:
-                        currentFilter ? memberTransText : userName,
-                    onSelectionChanged: (selected) {
-                      ref
-                          .read(transactionsFilterProvider.notifier)
-                          .setFilter(selected == memberTransText);
-                    },
-                  );
+          FutureBuilder<String?>(
+            future: secureStorage.getUserData().then((user) => user?.name),
+            builder: (context, nameSnapshot) {
+              final userName = nameSnapshot.data ?? 'User';
+              final memberTransText = 'memberTransactions'.tr();
+              return ChoiceChipFilter(
+                options: [userName, memberTransText],
+                selectedOption: currentFilter ? memberTransText : userName,
+                onSelectionChanged: (selected) {
+                  ref
+                      .read(transactionsFilterProvider.notifier)
+                      .setFilter(selected == memberTransText);
                 },
-              ),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-              child: Container(
-                height: 48,
-                decoration: BoxDecoration(
-                  color: kBackgroundColor,
-                  borderRadius: BorderRadius.circular(24),
-                  border: Border.all(color: kBorder),
+              );
+            },
+          ),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          child: Container(
+            height: 48,
+            decoration: BoxDecoration(
+              color: kBackgroundColor,
+              borderRadius: BorderRadius.circular(24),
+              border: Border.all(color: kBorder),
+            ),
+            child: Row(
+              children: [
+                // 🔍 Search field
+                Expanded(
+                  child: TextField(
+                    controller: _searchController,
+                    onChanged: (value) {
+                      ref
+                          .read(transactionSearchProvider.notifier)
+                          .setSearch(value);
+                    },
+                    decoration: InputDecoration(
+                      hintText: 'search'.tr(),
+                      hintStyle: kSmallTitleL.copyWith(color: kGrey),
+                      prefixIcon: const Icon(Icons.search, color: kGrey),
+                      border: InputBorder.none,
+                    ),
+                  ),
                 ),
-                child: Row(
-                  children: [
-                    // 🔍 Search field
-                    Expanded(
-                      child: TextField(
-                        controller: _searchController,
-                        onChanged: (value) {
-                          ref
-                              .read(transactionSearchProvider.notifier)
-                              .setSearch(value);
-                        },
-                        decoration: InputDecoration(
-                          hintText: 'search'.tr(),
-                          hintStyle: kSmallTitleL.copyWith(color: kGrey),
-                          prefixIcon: const Icon(Icons.search, color: kGrey),
-                          border: InputBorder.none,
-                        ),
-                      ),
-                    ),
 
-                    // │ Vertical divider
-                    Container(
-                      height: 24,
-                      width: 1,
-                      color: kBorder,
-                    ),
-
-                    // 🎛 Filter icon
-                    GestureDetector(
-                      onTap: () => _showFilterBottomSheet(context),
-                      behavior: HitTestBehavior.opaque,
-                      child: const Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 14),
-                        child: Icon(Icons.tune, color: kGrey),
-                      ),
-                    ),
-                  ],
+                // │ Vertical divider
+                Container(
+                  height: 24,
+                  width: 1,
+                  color: kBorder,
                 ),
-              ),
+
+                // 🎛 Filter icon
+                GestureDetector(
+                  onTap: () => _showFilterBottomSheet(context),
+                  behavior: HitTestBehavior.opaque,
+                  child: const Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 14),
+                    child: Icon(Icons.tune, color: kGrey),
+                  ),
+                ),
+              ],
             ),
-            SizedBox(
-              height: 10,
-            ),
-            Expanded(
-              child: currentFilter
-                  ? _buildMemberTransactionsView()
-                  : _buildUserTransactionsView(),
-            ),
-          ],
-        );
+          ),
+        ),
+        SizedBox(
+          height: 10,
+        ),
+        Expanded(
+          child: currentFilter
+              ? _buildMemberTransactionsView()
+              : _buildUserTransactionsView(),
+        ),
+      ],
+    );
   }
 
   void _showFilterBottomSheet(BuildContext context) {
@@ -741,28 +758,27 @@ class _CampaignPageState extends ConsumerState<CampaignPage>
     return Column(
       children: [
         if (isNonMember)
-              ChoiceChipFilter(
-                options: ['joined'.tr(), 'created'.tr()],
-                selectedOption: currentFilter ? 'created'.tr() : 'joined'.tr(),
-                onSelectionChanged: (selected) {
-                  ref
-                      .read(myCampaignsFilterProvider.notifier)
-                      .setFilter(selected == 'created'.tr());
-                },
-              ),
-            Expanded(
-              child: currentFilter
-                  ? _buildCreatedCampaignsView()
-                  : _buildJoinedCampaignsView(),
-            ),
-          ],
-        );
+          ChoiceChipFilter(
+            options: ['joined'.tr(), 'created'.tr()],
+            selectedOption: currentFilter ? 'created'.tr() : 'joined'.tr(),
+            onSelectionChanged: (selected) {
+              ref
+                  .read(myCampaignsFilterProvider.notifier)
+                  .setFilter(selected == 'created'.tr());
+            },
+          ),
+        Expanded(
+          child: currentFilter
+              ? _buildCreatedCampaignsView()
+              : _buildJoinedCampaignsView(),
+        ),
+      ],
+    );
   }
 
   Widget _buildCreatedCampaignsView() {
     final campaignsState = ref.watch(createdCampaignsProvider);
-      final preferredLanguage =
-                        GlobalVariables.getPreferredLanguage();
+    final preferredLanguage = GlobalVariables.getPreferredLanguage();
     return campaignsState.when(
       data: (paginationState) {
         if (paginationState.campaigns.isEmpty) {
@@ -837,8 +853,7 @@ class _CampaignPageState extends ConsumerState<CampaignPage>
 
   Widget _buildJoinedCampaignsView() {
     final donationsState = ref.watch(participatedCampaignsProvider);
-      final preferredLanguage =
-                        GlobalVariables.getPreferredLanguage();
+    final preferredLanguage = GlobalVariables.getPreferredLanguage();
     return donationsState.when(
       data: (paginationState) {
         final campaigns = paginationState.donations
@@ -919,8 +934,7 @@ class _CampaignPageState extends ConsumerState<CampaignPage>
   // ---------------- TAB 4 (APPROVALS) ---------------- //
   Widget _approvalsTab() {
     final approvalsState = ref.watch(pendingApprovalCampaignsProvider);
-      final preferredLanguage =
-                        GlobalVariables.getPreferredLanguage();
+    final preferredLanguage = GlobalVariables.getPreferredLanguage();
     return approvalsState.when(
       data: (paginationState) {
         if (paginationState.campaigns.isEmpty) {
@@ -957,8 +971,8 @@ class _CampaignPageState extends ConsumerState<CampaignPage>
                       context: context,
                       builder: (context) => ConfirmationDialog(
                         title: 'approveCampaign'.tr(),
-                        message:
-                            "approveCampaignConfirmation".tr(args: [campaign.getTitle(preferredLanguage) ?? '']),
+                        message: "approveCampaignConfirmation".tr(
+                            args: [campaign.getTitle(preferredLanguage) ?? '']),
                         confirmButtonText: 'approve'.tr(),
                         onConfirm: () async {
                           final approved = await ref
@@ -976,8 +990,8 @@ class _CampaignPageState extends ConsumerState<CampaignPage>
                     );
                   },
                   onReject: () {
-                    _showRejectDialog(
-                        context, campaign.id ?? '', campaign.getTitle(preferredLanguage) ?? '');
+                    _showRejectDialog(context, campaign.id ?? '',
+                        campaign.getTitle(preferredLanguage) ?? '');
                   },
                 ),
               ),
