@@ -632,6 +632,11 @@ class _HomePageState extends ConsumerState<HomePage> {
       builder: (context, snapshot) {
         final userName = snapshot.data ?? '';
 
+        // Filter endingCampaigns to only show "General Campaign" category
+        final generalCampaigns = homeData.endingCampaigns
+            .where((campaign) => campaign.category == 'General Campaign')
+            .toList();
+
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
@@ -1008,7 +1013,7 @@ class _HomePageState extends ConsumerState<HomePage> {
             //       ],
             //     ),
             //   ),
-            if (homeData.endingCampaigns.isEmpty)
+            if (generalCampaigns.isEmpty)
               Padding(
                 padding: const EdgeInsets.all(16),
                 child: Column(
@@ -1032,8 +1037,8 @@ class _HomePageState extends ConsumerState<HomePage> {
                           Container(
                             height:
                                 GlobalVariables.getPreferredLanguage() == 'ml'
-                                    ? 280
-                                    : 200,
+                                    ? 300
+                                    : 250,
                             child: ClipRRect(
                               borderRadius: const BorderRadius.only(
                                 topLeft: Radius.circular(16),
@@ -1071,7 +1076,7 @@ class _HomePageState extends ConsumerState<HomePage> {
                                           0.6,
                                       padding: const EdgeInsets.symmetric(
                                         horizontal: 18,
-                                        vertical: 20,
+                                        vertical: 16,
                                       ),
                                       decoration: BoxDecoration(
                                         gradient: LinearGradient(
@@ -1088,25 +1093,34 @@ class _HomePageState extends ConsumerState<HomePage> {
                                         crossAxisAlignment:
                                             CrossAxisAlignment.start,
                                         mainAxisAlignment:
-                                            MainAxisAlignment.center,
+                                            MainAxisAlignment.start,
                                         children: [
-                                          Text(
-                                            'noFundingCampaignsTitle'.tr(),
-                                            style: kBodyTitleSB.copyWith(
-                                              fontSize: 19,
-                                              fontWeight: FontWeight.bold,
-                                              color: kTextColor,
+                                          Padding(
+                                            padding:
+                                                const EdgeInsets.only(top: 8),
+                                            child: Text(
+                                              'noFundingCampaignsTitle'.tr(),
+                                              style: kBodyTitleSB.copyWith(
+                                                fontSize: 19,
+                                                fontWeight: FontWeight.bold,
+                                                color: kTextColor,
+                                              ),
                                             ),
                                           ),
                                           const SizedBox(height: 8),
-                                          Text(
-                                            'noFundingCampaignsSubtitle'.tr(),
-                                            style: kSmallTitleR.copyWith(
-                                              fontSize: 12,
-                                              color: kSecondaryTextColor,
+                                          Expanded(
+                                            child: SingleChildScrollView(
+                                              child: Text(
+                                                'noFundingCampaignsSubtitle'
+                                                    .tr(),
+                                                style: kSmallTitleR.copyWith(
+                                                  fontSize: 12,
+                                                  color: kSecondaryTextColor,
+                                                ),
+                                              ),
                                             ),
                                           ),
-                                          const SizedBox(height: 20),
+                                          const SizedBox(height: 12),
                                           LayoutBuilder(
                                             builder: (context, constraints) {
                                               return SizedBox(
@@ -1125,6 +1139,7 @@ class _HomePageState extends ConsumerState<HomePage> {
                                               );
                                             },
                                           ),
+                                          const SizedBox(height: 8),
                                         ],
                                       ),
                                     ),
@@ -1161,7 +1176,7 @@ class _HomePageState extends ConsumerState<HomePage> {
                   ],
                 ),
               ),
-            if (homeData.endingCampaigns.isNotEmpty)
+            if (generalCampaigns.isNotEmpty)
               Padding(
                 padding: const EdgeInsets.all(16),
                 child: Column(
@@ -1206,7 +1221,7 @@ class _HomePageState extends ConsumerState<HomePage> {
                             setState(() => _endingCampaignIndex = index);
                           },
                         ),
-                        items: homeData.endingCampaigns.map((campaign) {
+                        items: generalCampaigns.map((campaign) {
                           final preferredLanguage =
                               GlobalVariables.getPreferredLanguage();
                           return Padding(
@@ -1249,7 +1264,7 @@ class _HomePageState extends ConsumerState<HomePage> {
                         size: Size(8, 8),
                         unselectedSize: Size(7, 7),
                         currentItem: _endingCampaignIndex,
-                        count: homeData.endingCampaigns.length,
+                        count: generalCampaigns.length,
                         unselectedColor: Color(0xFFAEB9E1),
                         selectedColor: Color(0xFF0D74BC),
                       ),

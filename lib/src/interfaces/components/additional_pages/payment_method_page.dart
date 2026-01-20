@@ -12,7 +12,7 @@ class PaymentMethodPage extends ConsumerStatefulWidget {
   final String campaignTitle;
   final double amount;
   final VoidCallback onRazorpaySelected;
-  final Function(String email) onMswipeSelected;
+  final Function() onMswipeSelected;
 
   const PaymentMethodPage({
     Key? key,
@@ -28,48 +28,48 @@ class PaymentMethodPage extends ConsumerStatefulWidget {
 
 class _PaymentMethodPageState extends ConsumerState<PaymentMethodPage> {
   String _selectedGateway = 'mswipe';
-  bool _showEmailInput = true;
-  final TextEditingController _emailController = TextEditingController();
+  // bool _showEmailInput = true;
+  // final TextEditingController _emailController = TextEditingController();
 
   @override
   void dispose() {
-    _emailController.dispose();
+    // _emailController.dispose();
     super.dispose();
   }
 
-  bool _isValidEmail(String email) {
-    final emailRegex = RegExp(
-      r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$',
-    );
-    return emailRegex.hasMatch(email);
-  }
+  // bool _isValidEmail(String email) {
+  //   final emailRegex = RegExp(
+  //     r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$',
+  //   );
+  //   return emailRegex.hasMatch(email);
+  // }
 
   void _handleContinue() {
     if (_selectedGateway == 'razorpay') {
       log('Selected Razorpay', name: 'PaymentMethodPage');
       widget.onRazorpaySelected();
     } else if (_selectedGateway == 'mswipe') {
-      final email = _emailController.text.trim();
-      if (email.isEmpty) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('pleaseEnterEmail'.tr()),
-            backgroundColor: Colors.red,
-          ),
-        );
-        return;
-      }
-      if (!_isValidEmail(email)) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('pleaseEnterValidEmail'.tr()),
-            backgroundColor: Colors.red,
-          ),
-        );
-        return;
-      }
-      log('Selected Mswipe with email: $email', name: 'PaymentMethodPage');
-      widget.onMswipeSelected(email);
+      // final email = _emailController.text.trim();
+      // if (email.isEmpty) {
+      //   ScaffoldMessenger.of(context).showSnackBar(
+      //     SnackBar(
+      //       content: Text('pleaseEnterEmail'.tr()),
+      //       backgroundColor: Colors.red,
+      //     ),
+      //   );
+      //   return;
+      // }
+      // if (!_isValidEmail(email)) {
+      //   ScaffoldMessenger.of(context).showSnackBar(
+      //     SnackBar(
+      //       content: Text('pleaseEnterValidEmail'.tr()),
+      //       backgroundColor: Colors.red,
+      //     ),
+      //   );
+      //   return;
+      // }
+      log('Selected Mswipe with email: ', name: 'PaymentMethodPage');
+      widget.onMswipeSelected();
     }
   }
 
@@ -105,7 +105,7 @@ class _PaymentMethodPageState extends ConsumerState<PaymentMethodPage> {
                     onTap: () {
                       setState(() {
                         _selectedGateway = 'razorpay';
-                        _showEmailInput = false;
+                        // _showEmailInput = false;
                       });
                     },
                   ),
@@ -122,34 +122,34 @@ class _PaymentMethodPageState extends ConsumerState<PaymentMethodPage> {
                     onTap: () {
                       setState(() {
                         _selectedGateway = 'mswipe';
-                        _showEmailInput = true;
+                        // _showEmailInput = true;
                       });
                     },
                   ),
 
                   // Email Input for Mswipe
-                  if (_showEmailInput) ...[
-                    const SizedBox(height: 24),
-                    Text(
-                      'emailRequired'.tr(),
-                      style: kSmallTitleB.copyWith(color: kTextColor),
-                    ),
-                    const SizedBox(height: 8),
-                    InputField(
-                      type: CustomFieldType.email,
-                      hint: 'enterEmail'.tr(),
-                      controller: _emailController,
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'pleaseEnterEmail'.tr();
-                        }
-                        if (!_isValidEmail(value)) {
-                          return 'pleaseEnterValidEmail'.tr();
-                        }
-                        return null;
-                      },
-                    ),
-                  ],
+                  // if (_showEmailInput) ...[
+                  //   const SizedBox(height: 24),
+                  //   Text(
+                  //     'emailRequired'.tr(),
+                  //     style: kSmallTitleB.copyWith(color: kTextColor),
+                  //   ),
+                  //   const SizedBox(height: 8),
+                  //   InputField(
+                  //     type: CustomFieldType.email,
+                  //     hint: 'enterEmail'.tr(),
+                  //     controller: _emailController,
+                  //     validator: (value) {
+                  //       if (value == null || value.isEmpty) {
+                  //         return 'pleaseEnterEmail'.tr();
+                  //       }
+                  //       if (!_isValidEmail(value)) {
+                  //         return 'pleaseEnterValidEmail'.tr();
+                  //       }
+                  //       return null;
+                  //     },
+                  //   ),
+                  // ],
                 ],
               ),
             ),

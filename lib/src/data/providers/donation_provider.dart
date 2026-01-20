@@ -15,7 +15,7 @@ class DonationApi {
     required double amount,
     String currency = 'INR',
     String gateway = 'razorpay',
-    String? email,
+    // String? email,
     String? phone,
   }) async {
     final payload = {
@@ -27,9 +27,15 @@ class DonationApi {
 
     // Add email and phone for Mswipe gateway
     if (gateway == 'mswipe') {
-      if (email != null) payload['email'] = email;
+      // if (email != null) payload['email'] = email;
       if (phone != null) payload['phone'] = phone;
     }
+
+    // Debug log: request body being sent to createDonation API
+    log(
+      'POST /donation payload: $payload',
+      name: 'DonationApi',
+    );
 
     final response = await _apiProvider.post(
       '/donation',

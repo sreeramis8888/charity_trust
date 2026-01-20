@@ -165,8 +165,6 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
     }
   }
 
-
-
   Future<void> _openAppStore() async {
     log('_openAppStore: Attempting to open app store with link: $updateLink',
         name: 'SplashScreen');
@@ -225,7 +223,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
           await secureStorage.saveUserData(user);
           log('_checkAuthenticationAndLoadUser: User data saved to secure storage',
               name: 'SplashScreen');
-          
+
           // Set language preference in global variables
           if (user.preferredLanguage != null) {
             GlobalVariables.setPreferredLanguage(user.preferredLanguage!);
@@ -244,7 +242,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
             log('_checkAuthenticationAndLoadUser: Widget mounted, navigating based on API status: ${user.status}',
                 name: 'SplashScreen');
             _navigateBasedOnUserStatus(user.status);
-            
+
             // Handle pending deep link after navigation
             await Future.delayed(const Duration(milliseconds: 500));
             _handlePendingDeepLink();
@@ -260,7 +258,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
                 name: 'SplashScreen');
             log('WARNING: Using cached user data from secure storage instead of fresh API data',
                 name: 'SplashScreen');
-            
+
             // Set language preference in global variables
             if (user.preferredLanguage != null) {
               GlobalVariables.setPreferredLanguage(user.preferredLanguage!);
@@ -279,7 +277,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
               log('_checkAuthenticationAndLoadUser: Widget mounted, navigating based on local storage status: ${user.status}',
                   name: 'SplashScreen');
               _navigateBasedOnUserStatus(user.status);
-              
+
               // Handle pending deep link after navigation
               await Future.delayed(const Duration(milliseconds: 500));
               _handlePendingDeepLink();
@@ -371,7 +369,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
     try {
       final deepLinkService = ref.read(deepLinkServiceProvider);
       final pendingLink = deepLinkService.pendingDeepLink;
-      
+
       if (pendingLink != null) {
         log('_handlePendingDeepLink: Processing pending deep link: ${pendingLink.toString()}',
             name: 'SplashScreen');
