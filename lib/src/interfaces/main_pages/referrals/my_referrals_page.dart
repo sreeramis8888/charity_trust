@@ -534,7 +534,7 @@ class _MyReferralsPageState extends ConsumerState<MyReferralsPage>
                   const SizedBox(height: 8),
                   AnimatedDropdown<String>(
                     hint: 'selectStatus'.tr(),
-                    value: selectedStatus.isEmpty ? null : selectedStatus,
+                    value: selectedStatus.isEmpty ? '' : selectedStatus,
                     items: statusOptions.map((e) => e.$1).toList(),
                     onChanged: (value) {
                       setModalState(() {
@@ -542,6 +542,9 @@ class _MyReferralsPageState extends ConsumerState<MyReferralsPage>
                       });
                     },
                     itemLabel: (value) {
+                      if (value.isEmpty) {
+                        return 'all'.tr();
+                      }
                       return statusOptions.firstWhere((e) => e.$1 == value).$2;
                     },
                     height: 48,
