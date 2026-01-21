@@ -135,9 +135,9 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
               name: 'SplashScreen');
 
           // Show update dialog after setState completes
-          if (mounted) {
-            showUpdateDialog(versionResponse, context);
-          }
+          // if (mounted) {
+          //   showUpdateDialog(versionResponse, context);
+          // }
         } else {
           log('_checkAppVersion: App is up to date. Current: $currentVersion, New: $newVersion',
               name: 'SplashScreen');
@@ -166,47 +166,47 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
     }
   }
 
-  void showUpdateDialog(AppVersionResponse response, BuildContext context) {
-    showDialog(
-      context: context,
-      barrierDismissible:
-          !response.force, // Non-dismissible if force update is required
-      builder: (dialogContext) => AlertDialog(
-        title: Text('updateRequired'.tr()),
-        content: Text(response.updateMessage),
-        actions: [
-          if (!response.force)
-            TextButton(
-              onPressed: () {
-                Navigator.of(dialogContext).pop();
-              },
-              child: Text('cancel'.tr()),
-            ),
-          TextButton(
-            onPressed: () async {
-              log('Opening app store link: ${response.applink}',
-                  name: 'SplashScreen');
-              try {
-                final uri = Uri.parse(response.applink);
-                if (await canLaunchUrl(uri)) {
-                  await launchUrl(
-                    uri,
-                    mode: LaunchMode.externalApplication,
-                  );
-                } else {
-                  log('Could not launch app store link: ${response.applink}',
-                      name: 'SplashScreen');
-                }
-              } catch (e) {
-                log('Error launching app store link: $e', name: 'SplashScreen');
-              }
-            },
-            child: Text('updateNow'.tr()),
-          ),
-        ],
-      ),
-    );
-  }
+  // void showUpdateDialog(AppVersionResponse response, BuildContext context) {
+  //   showDialog(
+  //     context: context,
+  //     barrierDismissible:
+  //         !response.force, // Non-dismissible if force update is required
+  //     builder: (dialogContext) => AlertDialog(
+  //       title: Text('updateRequired'.tr()),
+  //       content: Text(response.updateMessage),
+  //       actions: [
+  //         if (!response.force)
+  //           TextButton(
+  //             onPressed: () {
+  //               Navigator.of(dialogContext).pop();
+  //             },
+  //             child: Text('cancel'.tr()),
+  //           ),
+  //         TextButton(
+  //           onPressed: () async {
+  //             log('Opening app store link: ${response.applink}',
+  //                 name: 'SplashScreen');
+  //             try {
+  //               final uri = Uri.parse(response.applink);
+  //               if (await canLaunchUrl(uri)) {
+  //                 await launchUrl(
+  //                   uri,
+  //                   mode: LaunchMode.externalApplication,
+  //                 );
+  //               } else {
+  //                 log('Could not launch app store link: ${response.applink}',
+  //                     name: 'SplashScreen');
+  //               }
+  //             } catch (e) {
+  //               log('Error launching app store link: $e', name: 'SplashScreen');
+  //             }
+  //           },
+  //           child: Text('updateNow'.tr()),
+  //         ),
+  //       ],
+  //     ),
+  //   );
+  // }
 
   Future<void> _openAppStore() async {
     log('_openAppStore: Attempting to open app store with link: $updateLink',
