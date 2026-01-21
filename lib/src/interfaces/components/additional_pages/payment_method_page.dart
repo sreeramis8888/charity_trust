@@ -114,7 +114,7 @@ class _PaymentMethodPageState extends ConsumerState<PaymentMethodPage> {
                   // Mswipe Option
                   _buildPaymentOption(
                     gateway: 'mswipe',
-                    title: 'Union Bank',
+                    title: 'Mswipe',
                     subtitle: 'No additional charges',
                     icon:
                         'assets/svg/mswipe_logo.svg', // You can use Image.asset or Icon

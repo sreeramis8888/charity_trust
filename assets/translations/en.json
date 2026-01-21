@@ -31,7 +31,7 @@
   "generalFunding": "General Funding",
   "zakat": "Zakat",
   "orphan": "Orphan",
-  "widow": "Widow",
+  "widow": "Widows & Elderly",
   "ghusalMayyit": "Ghusl Mayyit",
   "patientRelief": "Patient Relief",
   "foodKit": "Food Kit",
@@ -335,6 +335,6 @@
   "zakatPayable": "Zakat Payable",
   "noFundingCampaignsTitle": "Your Kindness Can Change Lives",
   "noFundingCampaignsSubtitle": "Help us make a difference in the lives of those in need.",
-  "noFundingCampaignsDescription": "Currently, funding campaigns are unavailable. You can still donate on the above campaigns.",
-  "noGeneralCampaignsFound": "No general campaigns found"
+  "noFundingCampaignsDescription": "Currently, emergency campaigns are unavailable. You can still donate on the above campaigns.",
+  "noGeneralCampaignsFound": "No emergency campaigns found"
 }
