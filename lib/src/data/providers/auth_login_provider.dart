@@ -36,7 +36,7 @@ class AuthLoginApi {
   ) async {
     return await _apiProvider.post(
       '$_endpoint/login',
-      {'phone': phone, 'fcm': fcmToken},
+      {'phone': phone, if (fcmToken != null && fcmToken != '') 'fcm': fcmToken},
       requireAuth: false,
     );
   }
