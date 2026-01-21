@@ -85,11 +85,6 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
 
   Future<void> _initializeApp() async {
     try {
-      log('_initializeApp: Starting notification permissions',
-          name: 'SplashScreen');
-      // Request notification permissions first
-      await handleNotificationPermissions(context, ref);
-
       log('_initializeApp: Starting version check', name: 'SplashScreen');
       // Check version first
       await _checkAppVersion();

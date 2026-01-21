@@ -241,22 +241,25 @@ class _PhoneNumberScreenState extends ConsumerState<PhoneNumberScreen> {
     try {
       ref.read(loadingProvider.notifier).startLoading();
 
-      // Request FCM token only if not already saved
+      // Request FCM token (optional - don't block if user declines)
       final secureStorage = ref.read(secureStorageServiceProvider);
       String? fcmToken;
       final existingFcmToken = await secureStorage.getFcmToken();
       if (existingFcmToken == null || existingFcmToken.isEmpty) {
-        await getFcmToken(context, ref);
+        // Request notification permission and FCM token
+        await handleNotificationPermissions(context, ref);
         fcmToken = await secureStorage.getFcmToken();
+        log('FCM token after request: ${fcmToken ?? "null"}', name: 'PhoneNumberScreen');
       } else {
         fcmToken = existingFcmToken;
+        log('Using existing FCM token', name: 'PhoneNumberScreen');
       }
 
       // TODO: Using backend API for OTP generation instead of Firebase
       // final firebaseAuthService = ref.read(firebaseAuthServiceProvider);
       final fullPhone = "+$countryCode$phoneNumber";
 
-      // Call backend Login function to generate OTP
+      // Call backend Login function to generate OTP (FCM token is optional)
       final authLoginApi = ref.read(authLoginApiProvider);
       final response = await authLoginApi.Login(fullPhone, fcmToken ?? '');
 
@@ -358,13 +361,16 @@ class _OTPScreenState extends ConsumerState<OTPScreen> {
       String? fcmToken;
       final existingFcmToken = await secureStorage.getFcmToken();
       if (existingFcmToken == null || existingFcmToken.isEmpty) {
-        await getFcmToken(context, ref);
+        // Request notification permission and FCM token
+        await handleNotificationPermissions(context, ref);
         fcmToken = await secureStorage.getFcmToken();
+        log('FCM token after request: ${fcmToken ?? "null"}', name: 'OTPScreen');
       } else {
         fcmToken = existingFcmToken;
+        log('Using existing FCM token', name: 'OTPScreen');
       }
 
-      // Call backend Login function to resend OTP
+      // Call backend Login function to resend OTP (FCM token is optional)
       final authLoginApi = ref.read(authLoginApiProvider);
       final response =
           await authLoginApi.Login(widget.fullPhone, fcmToken ?? '');
