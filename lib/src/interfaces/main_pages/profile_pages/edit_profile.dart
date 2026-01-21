@@ -10,6 +10,7 @@ import 'package:Annujoom/src/data/providers/loading_provider.dart';
 import 'package:Annujoom/src/data/services/snackbar_service.dart';
 import 'package:Annujoom/src/data/services/secure_storage_service.dart';
 import 'package:Annujoom/src/data/services/image_upload.dart';
+import 'package:Annujoom/src/data/services/notification_service/get_fcm.dart';
 import 'package:Annujoom/src/data/providers/user_provider.dart';
 import 'package:Annujoom/src/data/providers/location_provider.dart';
 import 'package:Annujoom/src/interfaces/components/input_field.dart';
@@ -313,13 +314,14 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
       if (result.user != null) {
         log('Profile updated successfully', name: 'EditProfilePage');
 
-        // Update local secure storage with complete user data
         await ref.read(secureStorageServiceProvider).saveUserData(updatedUser);
 
         SnackbarService().showSnackBar('profileUpdated'.tr());
 
         if (mounted) {
           Navigator.of(context).pop();
+          
+          await handleNotificationPermissions(context, ref);
         }
       } else {
         SnackbarService().showSnackBar(

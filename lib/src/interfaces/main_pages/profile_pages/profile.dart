@@ -12,18 +12,44 @@ import 'package:Annujoom/src/interfaces/main_pages/referrals/my_referrals_page.d
 import 'package:Annujoom/src/interfaces/components/confirmation_dialog.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:Annujoom/src/data/services/secure_storage_service.dart';
+import 'package:Annujoom/src/data/services/notification_service/get_fcm.dart';
 import 'package:Annujoom/src/data/providers/auth_login_provider.dart';
 import 'package:Annujoom/src/data/providers/auth_provider.dart';
 import 'package:Annujoom/src/data/providers/user_provider.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
+import 'dart:io';
 
-class ProfilePage extends ConsumerWidget {
+class ProfilePage extends ConsumerStatefulWidget {
   const ProfilePage({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<ProfilePage> createState() => _ProfilePageState();
+}
+
+class _ProfilePageState extends ConsumerState<ProfilePage> {
+  bool _notificationsEnabled = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _checkNotificationStatus();
+  }
+
+  Future<void> _checkNotificationStatus() async {
+    final settings = await FirebaseMessaging.instance.getNotificationSettings();
+    if (mounted) {
+      setState(() {
+        _notificationsEnabled = settings.authorizationStatus == AuthorizationStatus.authorized ||
+            settings.authorizationStatus == AuthorizationStatus.provisional;
+      });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final userDataAsync = ref.watch(fetchUserProfileProvider);
 
     return Scaffold(
@@ -53,6 +79,95 @@ class ProfilePage extends ConsumerWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                if (!_notificationsEnabled)
+                  anim.AnimatedWidgetWrapper(
+                    animationType: anim.AnimationType.fadeSlideInFromTop,
+                    duration: anim.AnimationDuration.fast,
+                    child: Container(
+                      margin: const EdgeInsets.only(bottom: 12),
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          colors: [
+                            kPrimaryColor.withOpacity(0.1),
+                            kPrimaryColor.withOpacity(0.05),
+                          ],
+                          begin: Alignment.centerLeft,
+                          end: Alignment.centerRight,
+                        ),
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(
+                          color: kPrimaryColor.withOpacity(0.2),
+                          width: 1,
+                        ),
+                      ),
+                      child: Row(
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.all(8),
+                            decoration: BoxDecoration(
+                              color: kPrimaryColor.withOpacity(0.15),
+                              shape: BoxShape.circle,
+                            ),
+                            child: const Icon(
+                              Icons.notifications_off_outlined,
+                              color: kPrimaryColor,
+                              size: 18,
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'notificationsDisabled'.tr(),
+                                  style: kSmallTitleSB.copyWith(
+                                    color: kTextColor,
+                                    fontSize: 13,
+                                  ),
+                                ),
+                                const SizedBox(height: 2),
+                                Text(
+                                  'enableToStayUpdated'.tr(),
+                                  style: kSmallerTitleR.copyWith(
+                                    color: kSecondaryTextColor,
+                                    fontSize: 11,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          TextButton(
+                            onPressed: () async {
+                              await handleNotificationPermissions(context, ref);
+                              await _checkNotificationStatus();
+                            },
+                            style: TextButton.styleFrom(
+                              backgroundColor: kPrimaryColor,
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 16,
+                                vertical: 8,
+                              ),
+                              minimumSize: Size.zero,
+                              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                            ),
+                            child: Text(
+                              'enable'.tr(),
+                              style: kSmallerTitleSB.copyWith(
+                                color: kWhite,
+                                fontSize: 12,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
                 anim.AnimatedWidgetWrapper(
                   animationType: anim.AnimationType.fadeSlideInFromTop,
                   duration: anim.AnimationDuration.normal,

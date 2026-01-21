@@ -336,5 +336,10 @@
   "noFundingCampaignsTitle": "Your Kindness Can Change Lives",
   "noFundingCampaignsSubtitle": "Help us make a difference in the lives of those in need.",
   "noFundingCampaignsDescription": "Currently, emergency campaigns are unavailable. You can still donate on the above campaigns.",
-  "noGeneralCampaignsFound": "No emergency campaigns found"
+  "noGeneralCampaignsFound": "No general campaigns found",
+  "notificationsDisabled": "Notifications Disabled",
+  "enableToStayUpdated": "Enable to stay updated with important news",
+  "enable": "Enable",
+  "couldNotOpenAppStore": "Could not open App Store",
+  "errorOpeningStore": "Error opening store"
 }

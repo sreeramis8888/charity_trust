@@ -6,7 +6,8 @@ import 'package:Annujoom/src/data/constants/color_constants.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:permission_handler/permission_handler.dart';
 
-Future<void> handleNotificationPermissions(BuildContext context, WidgetRef ref) async {
+Future<void> handleNotificationPermissions(
+    BuildContext context, WidgetRef ref) async {
   if (Platform.isIOS) {
     await _handleIOSPermissions(context, ref);
   } else {
@@ -34,7 +35,7 @@ Future<void> _handleIOSPermissions(BuildContext context, WidgetRef ref) async {
     }
   } else if (settings.authorizationStatus == AuthorizationStatus.denied) {
     if (context.mounted) {
-      _showNotificationPermissionDialog(context);
+      await _showNotificationPermissionDialog(context);
     }
   } else if (settings.authorizationStatus == AuthorizationStatus.authorized ||
       settings.authorizationStatus == AuthorizationStatus.provisional) {
@@ -42,14 +43,15 @@ Future<void> _handleIOSPermissions(BuildContext context, WidgetRef ref) async {
   }
 }
 
-Future<void> _handleAndroidPermissions(BuildContext context, WidgetRef ref) async {
+Future<void> _handleAndroidPermissions(
+    BuildContext context, WidgetRef ref) async {
   final status = await Permission.notification.status;
 
   if (status.isGranted) {
     await _setupFCM(context, ref);
   } else if (status.isPermanentlyDenied) {
     if (context.mounted) {
-      _showNotificationPermissionDialog(context);
+      await _showNotificationPermissionDialog(context);
     }
   } else {
     final result = await Permission.notification.request();
@@ -83,8 +85,8 @@ Future<void> getFcmToken(BuildContext context, WidgetRef ref) async {
   await handleNotificationPermissions(context, ref);
 }
 
-void _showNotificationPermissionDialog(BuildContext context) {
-  showDialog(
+Future<void> _showNotificationPermissionDialog(BuildContext context) async {
+  await showDialog(
     context: context,
     barrierDismissible: false,
     builder: (context) => Dialog(

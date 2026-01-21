@@ -15,6 +15,7 @@ import 'package:Annujoom/src/data/utils/install_checker.dart';
 import 'package:Annujoom/src/data/services/snackbar_service.dart';
 import 'package:Annujoom/src/data/services/deep_link_service.dart';
 import 'package:Annujoom/src/data/router/router.dart' as router;
+import 'package:Annujoom/src/interfaces/components/update_checker_widget.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -71,37 +72,39 @@ class MyApp extends ConsumerWidget {
 
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       notificationService.initialize();
-      // Initialize deep links after navigation is ready
       await deepLinkService.initialize();
     });
 
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      navigatorKey: NavigationService.navigatorKey,
-      scaffoldMessengerKey: SnackbarService.scaffoldMessengerKey,
-      onGenerateRoute: router.generateRoute,
-      initialRoute: 'Splash',
-      title: 'ANNUJOOM',
-      localizationsDelegates: context.localizationDelegates,
-      supportedLocales: context.supportedLocales,
-      locale: context.locale,
-      theme: ThemeData(
-        brightness: Brightness.light,
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: Colors.blue,
+    return UpdateCheckerWidget(
+      showUpdateDialog: true,
+      child: MaterialApp(
+        debugShowCheckedModeBanner: false,
+        navigatorKey: NavigationService.navigatorKey,
+        scaffoldMessengerKey: SnackbarService.scaffoldMessengerKey,
+        onGenerateRoute: router.generateRoute,
+        initialRoute: 'Splash',
+        title: 'ANNUJOOM',
+        localizationsDelegates: context.localizationDelegates,
+        supportedLocales: context.supportedLocales,
+        locale: context.locale,
+        theme: ThemeData(
           brightness: Brightness.light,
-        ),
-        fontFamily: 'Manrope',
-        useMaterial3: true,
-      ),
-      builder: (context, child) {
-        return SingleChildScrollView(
-          child: SizedBox(
-            height: MediaQuery.of(context).size.height,
-            child: child,
+          colorScheme: ColorScheme.fromSeed(
+            seedColor: Colors.blue,
+            brightness: Brightness.light,
           ),
-        );
-      },
+          fontFamily: 'Manrope',
+          useMaterial3: true,
+        ),
+        builder: (context, child) {
+          return SingleChildScrollView(
+            child: SizedBox(
+              height: MediaQuery.of(context).size.height,
+              child: child,
+            ),
+          );
+        },
+      ),
     );
   }
 }
