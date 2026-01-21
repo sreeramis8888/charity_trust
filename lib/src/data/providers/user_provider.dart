@@ -845,15 +845,14 @@ class IndirectReferralsNotifier extends _$IndirectReferralsNotifier {
       print('🟣 [IndirectReferralsNotifier] Added status parameter: $status');
     }
     if (dates['start_date'] != null && dates['start_date']!.isNotEmpty) {
-      queryParams
-          .add('start_date=${Uri.encodeComponent(dates['start_date']!)}');
+      queryParams.add('from_date=${Uri.encodeComponent(dates['start_date']!)}');
       print(
-          '🟣 [IndirectReferralsNotifier] Added start_date parameter: ${dates['start_date']}');
+          '🟣 [IndirectReferralsNotifier] Added from_date parameter: ${dates['start_date']}');
     }
     if (dates['end_date'] != null && dates['end_date']!.isNotEmpty) {
-      queryParams.add('end_date=${Uri.encodeComponent(dates['end_date']!)}');
+      queryParams.add('to_date=${Uri.encodeComponent(dates['end_date']!)}');
       print(
-          '🟣 [IndirectReferralsNotifier] Added end_date parameter: ${dates['end_date']}');
+          '🟣 [IndirectReferralsNotifier] Added to_date parameter: ${dates['end_date']}');
     }
 
     final queryString = queryParams.join('&');
@@ -870,7 +869,7 @@ class IndirectReferralsNotifier extends _$IndirectReferralsNotifier {
 
     if (response.success && response.data != null) {
       final responseData = response.data!['data'];
-      
+
       // Get total count from outer response for pagination
       final paginationTotalCount = response.data!['total_count'];
       final totalCountForPagination = paginationTotalCount is int
@@ -965,10 +964,10 @@ class IndirectReferralsNotifier extends _$IndirectReferralsNotifier {
       }
       if (dates['start_date'] != null && dates['start_date']!.isNotEmpty) {
         queryParams
-            .add('start_date=${Uri.encodeComponent(dates['start_date']!)}');
+            .add('from_date=${Uri.encodeComponent(dates['start_date']!)}');
       }
       if (dates['end_date'] != null && dates['end_date']!.isNotEmpty) {
-        queryParams.add('end_date=${Uri.encodeComponent(dates['end_date']!)}');
+        queryParams.add('to_date=${Uri.encodeComponent(dates['end_date']!)}');
       }
 
       final queryString = queryParams.join('&');
