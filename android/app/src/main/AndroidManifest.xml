@@ -40,6 +40,23 @@
       <action android:name="android.intent.action.PROCESS_TEXT"/>
       <data android:mimeType="text/plain"/>
     </intent>
+    <!-- UPI Payment Apps -->
+    <intent>
+      <action android:name="android.intent.action.VIEW"/>
+      <data android:scheme="upi"/>
+    </intent>
+    <!-- GPay -->
+    <package android:name="com.google.android.apps.nbu.paisa.user"/>
+    <!-- Paytm -->
+    <package android:name="net.one97.paytm"/>
+    <!-- PhonePe -->
+    <package android:name="com.phonepe.app"/>
+    <!-- CRED -->
+    <package android:name="com.dreamplug.androidapp"/>
+    <!-- BHIM -->
+    <package android:name="in.org.npci.upiapp"/>
+    <!-- Amazon Pay -->
+    <package android:name="com.amazon.mShop.android.shopping"/>
   </queries>
   <uses-permission android:name="android.permission.INTERNET"/>
 </manifest>
