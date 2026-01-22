@@ -320,8 +320,7 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
 
         if (mounted) {
           Navigator.of(context).pop();
-          
-          await handleNotificationPermissions(context, ref);
+   
         }
       } else {
         SnackbarService().showSnackBar(
