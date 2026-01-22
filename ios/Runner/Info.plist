@@ -78,6 +78,12 @@
 		<string>indusmobile</string>
 		<string>whatsapp</string>
 		<string>kotakbank</string>
+		<string>upi</string>
+		<string>gpay</string>
+		<string>googlepay</string>
+		<string>paytm</string>
+		<string>cred</string>
+		<string>freecharge</string>
 	</array>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>

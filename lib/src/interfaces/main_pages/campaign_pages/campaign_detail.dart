@@ -934,12 +934,12 @@ class _CampaignDetailPageState extends ConsumerState<CampaignDetailPage> {
                 label: 'donateOnWebsite'.tr(),
                 onPressed: () async {
                   const url = 'https://annujoomcharitabletrust.com/';
-                  if (await canLaunchUrl(Uri.parse(url))) {
+
                     await launchUrl(
                       Uri.parse(url),
                       mode: LaunchMode.externalApplication,
                     );
-                  }
+                 
                 },
                 buttonHeight: 48,
               ),

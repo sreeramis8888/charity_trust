@@ -166,7 +166,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
         name: 'SplashScreen');
     if (updateLink != null && updateLink!.isNotEmpty) {
       try {
-        if (await canLaunchUrl(Uri.parse(updateLink!))) {
+ 
           log('_openAppStore: URL is launchable, opening...',
               name: 'SplashScreen');
           await launchUrl(
@@ -174,10 +174,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
             mode: LaunchMode.externalApplication,
           );
           log('_openAppStore: URL launched successfully', name: 'SplashScreen');
-        } else {
-          log('Could not launch update link: $updateLink',
-              name: 'SplashScreen');
-        }
+     
       } catch (e) {
         log('Error opening app store: $e', name: 'SplashScreen');
       }

@@ -21,11 +21,8 @@ Future<void> openGoogleMaps(String location) async {
   final Uri googleMapsUrl =
       Uri.parse("https://www.google.com/maps/search/?api=1&query=$location");
 
-  if (await canLaunchUrl(googleMapsUrl)) {
     await launchUrl(googleMapsUrl);
-  } else {
-    print('Failed to load maps');
-  }
+ 
 }
 
 

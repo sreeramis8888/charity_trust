@@ -682,21 +682,12 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
         errorKey = 'couldNotOpenPlayStore';
       }
 
-      if (await canLaunchUrl(Uri.parse(appUrl))) {
+
         await launchUrl(
           Uri.parse(appUrl),
           mode: LaunchMode.externalApplication,
         );
-      } else {
-        if (context.mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(errorKey.tr()),
-              duration: const Duration(seconds: 2),
-            ),
-          );
-        }
-      }
+     
     } catch (e) {
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
