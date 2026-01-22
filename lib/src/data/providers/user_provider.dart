@@ -964,10 +964,10 @@ class IndirectReferralsNotifier extends _$IndirectReferralsNotifier {
       }
       if (dates['start_date'] != null && dates['start_date']!.isNotEmpty) {
         queryParams
-            .add('from_date=${Uri.encodeComponent(dates['start_date']!)}');
+            .add('start_date=${Uri.encodeComponent(dates['start_date']!)}');
       }
       if (dates['end_date'] != null && dates['end_date']!.isNotEmpty) {
-        queryParams.add('to_date=${Uri.encodeComponent(dates['end_date']!)}');
+        queryParams.add('end_date=${Uri.encodeComponent(dates['end_date']!)}');
       }
 
       final queryString = queryParams.join('&');
