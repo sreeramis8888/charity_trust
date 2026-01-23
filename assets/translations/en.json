@@ -341,5 +341,10 @@
   "enableToStayUpdated": "Enable to stay updated with important news",
   "enable": "Enable",
   "couldNotOpenAppStore": "Could not open App Store",
-  "errorOpeningStore": "Error opening store"
+  "errorOpeningStore": "Error opening store",
+  "legalCompliance": "Legal & Compliance",
+  "legalComplianceDescription": "We are officially licensed to operate, ensuring compliance with all the applicable regulations.",
+  "darpanCertificate": "DARPAN CERTIFICATE",
+  "viewPdf": "View Certificate",
+  "license": "License"
 }

@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:Annujoom/src/data/constants/color_constants.dart';
 import 'package:Annujoom/src/data/constants/style_constants.dart';
 import 'package:Annujoom/src/interfaces/animations/index.dart' as anim;
+import 'package:Annujoom/src/interfaces/main_pages/profile_pages/certificate_page.dart';
+import 'package:Annujoom/src/interfaces/components/primaryButton.dart';
 
 class AboutUsPage extends StatelessWidget {
   const AboutUsPage({super.key});
@@ -177,9 +179,96 @@ class AboutUsPage extends StatelessWidget {
                 ],
               ),
             ),
+            const SizedBox(height: 32),
+            anim.AnimatedWidgetWrapper(
+              animationType: anim.AnimationType.fadeSlideInFromBottom,
+              duration: anim.AnimationDuration.normal,
+              delayMilliseconds: 400,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        "legalCompliance".tr(),
+                        style: kSubHeadingM,
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 12),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 8),
+                    child: Text(
+                      "legalComplianceDescription".tr(),
+                      style: kSmallTitleR.copyWith(
+                        color: kSecondaryTextColor,
+                        fontSize: 13,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  _buildDarpanCertificateCard(context),
+                ],
+              ),
+            ),
             const SizedBox(height: 24),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildDarpanCertificateCard(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        color: kBackgroundColor.withOpacity(0.5),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: kStrokeColor.withOpacity(0.2),
+          width: 1,
+        ),
+      ),
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(
+                Icons.description,
+                color: kPrimaryColor,
+                size: 24,
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  "darpanCertificate".tr(),
+                  style: kBodyTitleSB.copyWith(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: kPrimaryColor,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          primaryButton(
+            label: "viewPdf".tr(),
+            onPressed: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => const CertificatePage(),
+                ),
+              );
+            },
+            buttonColor: kPrimaryColor,
+            labelColor: kWhite,
+            buttonHeight: 44,
+          ),
+        ],
       ),
     );
   }
