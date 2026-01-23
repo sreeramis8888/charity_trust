@@ -59,7 +59,7 @@ class _CampaignPageState extends ConsumerState<CampaignPage>
     );
     _setupScrollController(
       _userTransactionsController,
-      () => ref.read(participatedCampaignsProvider.notifier).loadNextPage(),
+      () => ref.read(myTransactionsProvider.notifier).loadNextPage(),
     );
     _setupScrollController(
       _memberTransactionsController,
@@ -641,10 +641,18 @@ class _CampaignPageState extends ConsumerState<CampaignPage>
   }
 
   Widget _buildUserTransactionsView() {
-    final participatedState = ref.watch(participatedCampaignsProvider);
+    final myTransactionsState = ref.watch(myTransactionsProvider);
 
-    return participatedState.when(
+    return myTransactionsState.when(
       data: (paginationState) {
+        if (paginationState.donations.isEmpty) {
+          return Center(
+            child: Text(
+              'noTransactionsFound'.tr(),
+              style: kBodyTitleR.copyWith(color: kSecondaryTextColor),
+            ),
+          );
+        }
         return ListView.builder(
           padding: const EdgeInsets.all(16),
           controller: _userTransactionsController,
@@ -680,7 +688,7 @@ class _CampaignPageState extends ConsumerState<CampaignPage>
             const SizedBox(height: 16),
             ElevatedButton(
               onPressed: () {
-                ref.read(participatedCampaignsProvider.notifier).refresh();
+                ref.read(myTransactionsProvider.notifier).refresh();
               },
               child: const Text('Retry'),
             ),

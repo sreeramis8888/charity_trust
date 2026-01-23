@@ -476,6 +476,52 @@ abstract class _$MemberDonationsNotifier
   }
 }
 
+@ProviderFor(MyTransactionsNotifier)
+const myTransactionsProvider = MyTransactionsNotifierProvider._();
+
+final class MyTransactionsNotifierProvider extends $AsyncNotifierProvider<
+    MyTransactionsNotifier, DonationPaginationState> {
+  const MyTransactionsNotifierProvider._()
+      : super(
+          from: null,
+          argument: null,
+          retry: null,
+          name: r'myTransactionsProvider',
+          isAutoDispose: true,
+          dependencies: null,
+          $allTransitiveDependencies: null,
+        );
+
+  @override
+  String debugGetCreateSourceHash() => _$myTransactionsNotifierHash();
+
+  @$internal
+  @override
+  MyTransactionsNotifier create() => MyTransactionsNotifier();
+}
+
+String _$myTransactionsNotifierHash() =>
+    r'f1a166dd9712bbdc434db699642311bfad13bbce';
+
+abstract class _$MyTransactionsNotifier
+    extends $AsyncNotifier<DonationPaginationState> {
+  FutureOr<DonationPaginationState> build();
+  @$mustCallSuper
+  @override
+  void runBuild() {
+    final created = build();
+    final ref = this.ref
+        as $Ref<AsyncValue<DonationPaginationState>, DonationPaginationState>;
+    final element = ref.element as $ClassProviderElement<
+        AnyNotifier<AsyncValue<DonationPaginationState>,
+            DonationPaginationState>,
+        AsyncValue<DonationPaginationState>,
+        Object?,
+        Object?>;
+    element.handleValue(ref, created);
+  }
+}
+
 @ProviderFor(createNewCampaign)
 const createNewCampaignProvider = CreateNewCampaignFamily._();
 

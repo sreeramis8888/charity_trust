@@ -59,7 +59,7 @@ class DonationModel {
       paymentMethod: json["payment_method"],
       paymentId: json["payment_id"],
       status: json["status"],
-      receipt: json["receipt"],
+      receipt: json["payment_url"],
       createdAt: _parseDate(json["createdAt"]),
       updatedAt: _parseDate(json["updatedAt"]),
     );
@@ -79,7 +79,7 @@ class DonationModel {
       "payment_method": paymentMethod,
       "payment_id": paymentId,
       "status": status,
-      "receipt": receipt,
+      "payment_url": receipt,
       "createdAt": createdAt?.toIso8601String(),
       "updatedAt": updatedAt?.toIso8601String(),
     };

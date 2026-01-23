@@ -104,7 +104,9 @@ class TransactionCard extends ConsumerWidget {
                 padding:
                     const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                 decoration: BoxDecoration(
-                  color: Color(0xFF2E7D32),
+                  color: r.toLowerCase() == 'pending'
+                      ? Colors.amber
+                      : Color(0xFF2E7D32), // Green for success/other statuses
                   borderRadius: BorderRadius.circular(20),
                 ),
                 child: Text(r, style: kSmallTitleSB.copyWith(color: kWhite)),

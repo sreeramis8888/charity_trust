@@ -7,8 +7,6 @@ import 'package:Annujoom/src/data/models/donation_model.dart';
 
 part 'campaigns_provider.g.dart';
 
-
-
 class CampaignsApi {
   static const String _endpoint = '/campaign';
   static const String _donationEndpoint = '/donation';
@@ -25,7 +23,7 @@ class CampaignsApi {
     final queryParams = {
       'page_no': pageNo,
       'limit': limit,
-      if (!myCampaigns)  'status': 'active',
+      if (!myCampaigns) 'status': 'active',
       if (myCampaigns) 'my_campaigns': true,
     };
 
@@ -105,6 +103,24 @@ class CampaignsApi {
 
     return await _apiProvider.get(
       '$_donationEndpoint/member-donations?$queryString',
+      requireAuth: true,
+    );
+  }
+
+  Future<ApiResponse<Map<String, dynamic>>> getMyTransactions({
+    int pageNo = 1,
+    int limit = 100,
+  }) async {
+    final queryParams = {
+      'page_no': pageNo,
+      'limit': limit,
+    };
+
+    final queryString =
+        queryParams.entries.map((e) => '${e.key}=${e.value}').join('&');
+
+    return await _apiProvider.get(
+      '$_donationEndpoint/my-transactions?$queryString',
       requireAuth: true,
     );
   }
@@ -460,7 +476,8 @@ class CreatedCampaignsNotifier extends _$CreatedCampaignsNotifier {
           campaigns: [...currentState.campaigns, ...campaignsList],
         );
       } else {
-        throw Exception(response.message ?? 'Failed to load more created campaigns');
+        throw Exception(
+            response.message ?? 'Failed to load more created campaigns');
       }
     });
   }
@@ -658,7 +675,120 @@ class MemberDonationsNotifier extends _$MemberDonationsNotifier {
           donations: [...currentState.donations, ...donationsList],
         );
       } else {
-        throw Exception(response.message ?? 'Failed to load more member donations');
+        throw Exception(
+            response.message ?? 'Failed to load more member donations');
+      }
+    });
+  }
+
+  Future<void> refresh() async {
+    state = const AsyncValue.loading();
+    state = await AsyncValue.guard(() => build());
+  }
+}
+
+// Helper function to convert new API response format to DonationModel
+DonationModel _convertMyTransactionToDonationModel(Map<String, dynamic> json) {
+  // Create a minimal CampaignModel with just the category
+  CampaignModel? campaignModel;
+  if (json['campaign_name'] != null) {
+    campaignModel = CampaignModel(
+      title: {'en': json['campaign_name'].toString()},
+      subtitle: {'en': ''},
+      description: {'en': ''},
+      coverImage: '',
+      category: json['campaign_name'].toString(),
+      targetAmount: 0,
+      collectedAmount: 0,
+      status: '',
+      approvalStatus: '',
+      reason: '',
+    );
+  }
+
+  return DonationModel(
+    id: json["_id"]?.toString(),
+    paymentId: json["payment_id"]?.toString(),
+    amount: (json["amount"] is int)
+        ? (json["amount"] as int).toDouble()
+        : json["amount"]?.toDouble(),
+    status: json["status"]?.toString(),
+    receipt: json["payment_url"]?.toString(),
+    campaign: campaignModel,
+    createdAt: json["createdAt"] != null
+        ? DateTime.tryParse(json["createdAt"].toString())
+        : null,
+  );
+}
+
+@riverpod
+class MyTransactionsNotifier extends _$MyTransactionsNotifier {
+  @override
+  Future<DonationPaginationState> build() async {
+    final campaignsApi = ref.watch(campaignsApiProvider);
+
+    final response = await campaignsApi.getMyTransactions(
+      pageNo: 1,
+      limit: 100,
+    );
+
+    if (response.success && response.data != null) {
+      // The new API returns data as a direct array, not nested
+      final data = response.data!['data'];
+      final List<DonationModel> donationsList = (data is List<dynamic>)
+          ? data
+              .map<DonationModel>((item) =>
+                  _convertMyTransactionToDonationModel(
+                      item as Map<String, dynamic>))
+              .toList()
+          : <DonationModel>[];
+
+      // Calculate total count from the list length
+      final totalCount = donationsList.length;
+
+      return DonationPaginationState(
+        currentPage: 1,
+        limit: 100,
+        totalCount: totalCount,
+        donations: donationsList,
+      );
+    } else {
+      throw Exception(response.message ?? 'Failed to fetch my transactions');
+    }
+  }
+
+  Future<void> loadNextPage() async {
+    if (!state.hasValue) return;
+
+    final currentState = state.value!;
+    if (!currentState.hasMore) return;
+    state = await AsyncValue.guard(() async {
+      final campaignsApi = ref.watch(campaignsApiProvider);
+      final nextPage = currentState.currentPage + 1;
+      final response = await campaignsApi.getMyTransactions(
+        pageNo: nextPage,
+        limit: currentState.limit,
+      );
+
+      if (response.success && response.data != null) {
+        final data = response.data!['data'];
+        final List<DonationModel> donationsList = (data is List<dynamic>)
+            ? data
+                .map<DonationModel>((item) =>
+                    _convertMyTransactionToDonationModel(
+                        item as Map<String, dynamic>))
+                .toList()
+            : <DonationModel>[];
+
+        final totalCount = donationsList.length;
+
+        return currentState.copyWith(
+          currentPage: nextPage,
+          totalCount: totalCount,
+          donations: [...currentState.donations, ...donationsList],
+        );
+      } else {
+        throw Exception(response.message ?? 'Failed to load more transactions');
       }
     });
   }
@@ -827,7 +957,6 @@ Future<CampaignPaginationState> categoryCampaigns(
     throw Exception(response.message ?? 'Failed to fetch campaigns');
   }
 }
-
 
 @riverpod
 Future<CampaignModel?> singleCampaign(

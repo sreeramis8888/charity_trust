@@ -124,6 +124,7 @@
   "apply": "Apply",
   "clearFilters": "Clear Filters",
   "noMemberTransactions": "No member transactions",
+  "noTransactionsFound": "No transactions found",
   "joined": "Joined",
   "created": "Created",
   "noCreatedCampaigns": "No created campaigns",
