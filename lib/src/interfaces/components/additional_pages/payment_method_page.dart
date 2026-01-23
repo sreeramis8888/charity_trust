@@ -94,23 +94,6 @@ class _PaymentMethodPageState extends ConsumerState<PaymentMethodPage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Razorpay Option
-                  _buildPaymentOption(
-                    gateway: 'razorpay',
-                    title: 'Razorpay',
-                    subtitle: '2% convenience fee applicable',
-                    icon:
-                        'assets/svg/razorpay_logo.svg', // You can use Image.asset or Icon
-                    isSelected: _selectedGateway == 'razorpay',
-                    onTap: () {
-                      setState(() {
-                        _selectedGateway = 'razorpay';
-                        // _showEmailInput = false;
-                      });
-                    },
-                  ),
-                  const SizedBox(height: 16),
-
                   // Mswipe Option
                   _buildPaymentOption(
                     gateway: 'mswipe',
@@ -126,6 +109,24 @@ class _PaymentMethodPageState extends ConsumerState<PaymentMethodPage> {
                       });
                     },
                   ),
+
+                  const SizedBox(height: 16),
+                  // Razorpay Option
+                  _buildPaymentOption(
+                    gateway: 'razorpay',
+                    title: 'Razorpay',
+                    subtitle: '2% convenience fee applicable',
+                    icon:
+                        'assets/svg/razorpay_logo.svg', // You can use Image.asset or Icon
+                    isSelected: _selectedGateway == 'razorpay',
+                    onTap: () {
+                      setState(() {
+                        _selectedGateway = 'razorpay';
+                        // _showEmailInput = false;
+                      });
+                    },
+                  ),
+                  // const SizedBox(height: 16),
 
                   // Email Input for Mswipe
                   // if (_showEmailInput) ...[
