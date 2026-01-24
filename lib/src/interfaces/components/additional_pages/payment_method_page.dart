@@ -27,7 +27,7 @@ class PaymentMethodPage extends ConsumerStatefulWidget {
 }
 
 class _PaymentMethodPageState extends ConsumerState<PaymentMethodPage> {
-  String _selectedGateway = 'mswipe';
+  String _selectedGateway = 'razorpay';
   // bool _showEmailInput = true;
   // final TextEditingController _emailController = TextEditingController();
 
@@ -95,22 +95,22 @@ class _PaymentMethodPageState extends ConsumerState<PaymentMethodPage> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   // Mswipe Option
-                  _buildPaymentOption(
-                    gateway: 'mswipe',
-                    title: 'Mswipe',
-                    subtitle: 'No additional charges',
-                    icon:
-                        'assets/svg/mswipe_logo.svg', // You can use Image.asset or Icon
-                    isSelected: _selectedGateway == 'mswipe',
-                    onTap: () {
-                      setState(() {
-                        _selectedGateway = 'mswipe';
-                        // _showEmailInput = true;
-                      });
-                    },
-                  ),
+                  // _buildPaymentOption(
+                  //   gateway: 'mswipe',
+                  //   title: 'Mswipe',
+                  //   subtitle: 'No additional charges',
+                  //   icon:
+                  //       'assets/svg/mswipe_logo.svg',
+                  //   isSelected: _selectedGateway == 'mswipe',
+                  //   onTap: () {
+                  //     setState(() {
+                  //       _selectedGateway = 'mswipe';
+                  //       // _showEmailInput = true;
+                  //     });
+                  //   },
+                  // ),
 
-                  const SizedBox(height: 16),
+                  // const SizedBox(height: 16),
                   // Razorpay Option
                   _buildPaymentOption(
                     gateway: 'razorpay',
