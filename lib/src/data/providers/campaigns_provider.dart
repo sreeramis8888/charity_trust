@@ -713,7 +713,7 @@ DonationModel _convertMyTransactionToDonationModel(Map<String, dynamic> json) {
         ? (json["amount"] as int).toDouble()
         : json["amount"]?.toDouble(),
     status: json["status"]?.toString(),
-    receipt: json["payment_url"]?.toString(),
+    receipt: json["receipt"]?.toString(),
     campaign: campaignModel,
     createdAt: json["createdAt"] != null
         ? DateTime.tryParse(json["createdAt"].toString())

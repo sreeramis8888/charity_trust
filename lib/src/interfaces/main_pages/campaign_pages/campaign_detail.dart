@@ -430,7 +430,7 @@ class _CampaignDetailPageState extends ConsumerState<CampaignDetailPage> {
     double amount,
     Map<String, dynamic> data,
   ) async {
-    final paymentUrl = data['payment_url'] as String?;
+    final paymentUrl = data['receipt'] as String?;
 
     if (paymentUrl == null) {
       log("Payment URL is null for Mswipe");
@@ -935,11 +935,10 @@ class _CampaignDetailPageState extends ConsumerState<CampaignDetailPage> {
                 onPressed: () async {
                   const url = 'https://annujoomcharitabletrust.com/';
 
-                    await launchUrl(
-                      Uri.parse(url),
-                      mode: LaunchMode.externalApplication,
-                    );
-                 
+                  await launchUrl(
+                    Uri.parse(url),
+                    mode: LaunchMode.externalApplication,
+                  );
                 },
                 buttonHeight: 48,
               ),
