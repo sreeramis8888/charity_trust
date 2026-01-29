@@ -10,9 +10,10 @@ import 'package:Annujoom/src/data/models/news_model.dart';
 import 'package:Annujoom/src/data/providers/news_provider.dart';
 import 'package:Annujoom/src/data/feature_tours/news_swipe_tour.dart';
 import 'package:Annujoom/src/data/feature_tours/feature_tour_provider.dart';
-import 'package:Annujoom/src/interfaces/animations/index.dart' as anim;
 import 'package:Annujoom/src/interfaces/components/feature_tour_overlay.dart';
 import 'package:shimmer/shimmer.dart';
+import 'package:carousel_slider/carousel_slider.dart';
+import 'package:page_view_dot_indicator/page_view_dot_indicator.dart';
 
 final currentNewsIndexProvider = StateProvider<int>((ref) => 0);
 
@@ -173,7 +174,7 @@ class _NewsModelDetailContentViewState
   }
 }
 
-class NewsContent extends ConsumerWidget {
+class NewsContent extends ConsumerStatefulWidget {
   final NewsModel newsItem;
 
   const NewsContent({
@@ -182,12 +183,22 @@ class NewsContent extends ConsumerWidget {
   }) : super(key: key);
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<NewsContent> createState() => _NewsContentState();
+}
+
+class _NewsContentState extends ConsumerState<NewsContent> {
+  int _currentMediaIndex = 0;
+
+  @override
+  Widget build(BuildContext context) {
     final formattedDate = DateFormat('MMM dd, yyyy, hh:mm a')
-        .format(newsItem.updatedAt!.toLocal());
+        .format(widget.newsItem.updatedAt!.toLocal());
     final preferredLanguage = GlobalVariables.getPreferredLanguage();
     final minsToRead = calculateReadingTimeAndWordCount(
-        newsItem.getContent(preferredLanguage) ?? '');
+        widget.newsItem.getContent(preferredLanguage));
+
+    final mediaList = widget.newsItem.media ?? [];
+    final hasMultipleMedia = mediaList.length > 1;
 
     return Stack(
       children: [
@@ -199,7 +210,7 @@ class NewsContent extends ConsumerWidget {
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 child: Text(
-                  newsItem.getTitle(preferredLanguage) ?? '',
+                  widget.newsItem.getTitle(preferredLanguage),
                   style: kBodyTitleB,
                 ),
               ),
@@ -209,30 +220,115 @@ class NewsContent extends ConsumerWidget {
                     const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16),
                 child: AspectRatio(
                   aspectRatio: 16 / 9,
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(4),
-                    child: Image.network(
-                      newsItem.media?[0] ?? '',
-                      fit: BoxFit.cover,
-                      loadingBuilder: (context, child, loadingProgress) {
-                        if (loadingProgress == null) return child;
-                        return ShimmerLoadingEffect(
-                          child: Container(
-                            width: double.infinity,
-                            color: Colors.grey[300],
-                          ),
-                        );
-                      },
-                      errorBuilder: (context, error, stackTrace) {
-                        return ShimmerLoadingEffect(
-                          child: Container(
-                            width: double.infinity,
-                            color: Colors.grey[300],
-                          ),
-                        );
-                      },
-                    ),
-                  ),
+                  child: hasMultipleMedia
+                      ? Stack(
+                          children: [
+                            ClipRRect(
+                              borderRadius: BorderRadius.circular(4),
+                              child: CarouselSlider(
+                                options: CarouselOptions(
+                                  height: double.infinity,
+                                  viewportFraction: 1,
+                                  enableInfiniteScroll: false,
+                                  autoPlay: false,
+                                  onPageChanged: (index, reason) {
+                                    setState(() {
+                                      _currentMediaIndex = index;
+                                    });
+                                  },
+                                ),
+                                items: mediaList.map((mediaUrl) {
+                                  return Image.network(
+                                    mediaUrl,
+                                    fit: BoxFit.cover,
+                                    width: double.infinity,
+                                    loadingBuilder:
+                                        (context, child, loadingProgress) {
+                                      if (loadingProgress == null) return child;
+                                      return ShimmerLoadingEffect(
+                                        child: Container(
+                                          width: double.infinity,
+                                          color: Colors.grey[300],
+                                        ),
+                                      );
+                                    },
+                                    errorBuilder: (context, error, stackTrace) {
+                                      return Container(
+                                        width: double.infinity,
+                                        color: Colors.grey[200],
+                                        child: Center(
+                                          child: Icon(
+                                            Icons.broken_image,
+                                            color: Colors.grey[600],
+                                            size: 48,
+                                          ),
+                                        ),
+                                      );
+                                    },
+                                  );
+                                }).toList(),
+                              ),
+                            ),
+                            if (hasMultipleMedia)
+                              Positioned(
+                                bottom: 12,
+                                left: 0,
+                                right: 0,
+                                child: Center(
+                                  child: PageViewDotIndicator(
+                                    size: Size(8, 8),
+                                    unselectedSize: Size(7, 7),
+                                    currentItem: _currentMediaIndex,
+                                    count: mediaList.length,
+                                    unselectedColor: Color(0xFFAEB9E1),
+                                    selectedColor: Color(0xFF0D74BC),
+                                  ),
+                                ),
+                              ),
+                          ],
+                        )
+                      : ClipRRect(
+                          borderRadius: BorderRadius.circular(4),
+                          child: mediaList.isNotEmpty
+                              ? Image.network(
+                                  mediaList[0],
+                                  fit: BoxFit.cover,
+                                  loadingBuilder:
+                                      (context, child, loadingProgress) {
+                                    if (loadingProgress == null) return child;
+                                    return ShimmerLoadingEffect(
+                                      child: Container(
+                                        width: double.infinity,
+                                        color: Colors.grey[300],
+                                      ),
+                                    );
+                                  },
+                                  errorBuilder: (context, error, stackTrace) {
+                                    return Container(
+                                      width: double.infinity,
+                                      color: Colors.grey[200],
+                                      child: Center(
+                                        child: Icon(
+                                          Icons.broken_image,
+                                          color: Colors.grey[600],
+                                          size: 48,
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                )
+                              : Container(
+                                  width: double.infinity,
+                                  color: Colors.grey[200],
+                                  child: Center(
+                                    child: Icon(
+                                      Icons.broken_image,
+                                      color: Colors.grey[600],
+                                      size: 48,
+                                    ),
+                                  ),
+                                ),
+                        ),
                 ),
               ),
               Padding(
@@ -262,11 +358,11 @@ class NewsContent extends ConsumerWidget {
                     SizedBox(
                       height: 10,
                     ),
-                    Text(newsItem.getSubtitle(preferredLanguage) ?? '',
+                    Text(widget.newsItem.getSubtitle(preferredLanguage),
                         style:
                             kSmallTitleL.copyWith(color: kSecondaryTextColor)),
                     const SizedBox(height: 16),
-                    Text(newsItem.getContent(preferredLanguage) ?? '',
+                    Text(widget.newsItem.getContent(preferredLanguage),
                         style:
                             kSmallTitleR.copyWith(color: kSecondaryTextColor)),
                   ],
