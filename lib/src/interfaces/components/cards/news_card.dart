@@ -16,8 +16,7 @@ class NewsCard extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final formattedDate = formatDate(news.updatedAt);
-      final preferredLanguage =
-                        GlobalVariables.getPreferredLanguage();
+    final preferredLanguage = GlobalVariables.getPreferredLanguage();
     return GestureDetector(
       onTap: () {
         final index = allNews.indexOf(news);
@@ -44,7 +43,7 @@ class NewsCard extends ConsumerWidget {
             ClipRRect(
               borderRadius: BorderRadius.circular(4),
               child: Image.network(
-                news.media ?? '',
+                news.media?[0] ?? '',
                 width: 85,
                 height: 85,
                 fit: BoxFit.cover,

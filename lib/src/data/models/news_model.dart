@@ -4,7 +4,7 @@ class NewsModel {
   final Map<String, String> title; // {"en": "...", "ml": "..."}
   final Map<String, String> subtitle; // {"en": "...", "ml": "..."}
   final Map<String, String> content; // {"en": "...", "ml": "..."}
-  final String? media;
+  final List<String>? media;
   final String? status;
   final String? link;
   final List<String>? bookmarked;
@@ -32,12 +32,18 @@ class NewsModel {
 
   /// Get subtitle in specified language, fallback to English, then first available
   String getSubtitle(String languageCode) {
-    return subtitle[languageCode] ?? subtitle['en'] ?? subtitle.values.firstOrNull ?? '';
+    return subtitle[languageCode] ??
+        subtitle['en'] ??
+        subtitle.values.firstOrNull ??
+        '';
   }
 
   /// Get content in specified language, fallback to English, then first available
   String getContent(String languageCode) {
-    return content[languageCode] ?? content['en'] ?? content.values.firstOrNull ?? '';
+    return content[languageCode] ??
+        content['en'] ??
+        content.values.firstOrNull ??
+        '';
   }
 
   factory NewsModel.fromJson(Map<String, dynamic> json) {
@@ -74,13 +80,26 @@ class NewsModel {
       contentMap = {'en': contentData};
     }
 
+    // Handle media - can be string, List<String>, or List<dynamic>
+    List<String>? mediaList;
+    final mediaData = json["media"];
+    if (mediaData != null) {
+      if (mediaData is String) {
+        // Single string - convert to list with one element
+        mediaList = [mediaData];
+      } else if (mediaData is List) {
+        // List of strings or dynamic - convert all to strings
+        mediaList = mediaData.map((e) => e.toString()).toList();
+      }
+    }
+
     return NewsModel(
       id: json["_id"]?.toString(),
       category: json["category"]?.toString(),
       title: titleMap.isNotEmpty ? titleMap : {'en': ''},
       subtitle: subtitleMap.isNotEmpty ? subtitleMap : {'en': ''},
       content: contentMap.isNotEmpty ? contentMap : {'en': ''},
-      media: json["media"]?.toString(),
+      media: mediaList,
       status: json["status"]?.toString(),
       link: json["link"]?.toString(),
       bookmarked: (json["bookmarked"] as List<dynamic>?)
@@ -118,7 +137,7 @@ class NewsModel {
     Map<String, String>? title,
     Map<String, String>? subtitle,
     Map<String, String>? content,
-    String? media,
+    List<String>? media,
     String? status,
     String? link,
     List<String>? bookmarked,

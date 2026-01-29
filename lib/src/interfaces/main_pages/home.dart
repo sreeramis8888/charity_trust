@@ -385,6 +385,7 @@ class _HomePageState extends ConsumerState<HomePage> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Text('errorLoadingHomeData'.tr()),
+              Text(error.toString()),
               SizedBox(height: 16),
               ElevatedButton(
                 onPressed: () {
@@ -1442,7 +1443,7 @@ class _HomePageState extends ConsumerState<HomePage> {
                     child: HomeNewsCard(
                       title: news.getTitle(preferredLanguage),
                       subtitle: news.getSubtitle(preferredLanguage),
-                      image: news.media ?? '',
+                      image: news.media?[0] ?? '',
                       onTap: () {
                         Navigator.of(context).push(
                           MaterialPageRoute(

@@ -185,9 +185,9 @@ class NewsContent extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final formattedDate = DateFormat('MMM dd, yyyy, hh:mm a')
         .format(newsItem.updatedAt!.toLocal());
-      final preferredLanguage =
-                        GlobalVariables.getPreferredLanguage();
-    final minsToRead = calculateReadingTimeAndWordCount(newsItem.getContent(preferredLanguage) ?? '');
+    final preferredLanguage = GlobalVariables.getPreferredLanguage();
+    final minsToRead = calculateReadingTimeAndWordCount(
+        newsItem.getContent(preferredLanguage) ?? '');
 
     return Stack(
       children: [
@@ -212,7 +212,7 @@ class NewsContent extends ConsumerWidget {
                   child: ClipRRect(
                     borderRadius: BorderRadius.circular(4),
                     child: Image.network(
-                      newsItem.media ?? '',
+                      newsItem.media?[0] ?? '',
                       fit: BoxFit.cover,
                       loadingBuilder: (context, child, loadingProgress) {
                         if (loadingProgress == null) return child;
