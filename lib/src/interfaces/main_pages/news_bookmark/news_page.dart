@@ -230,7 +230,7 @@ class _NewsContentState extends ConsumerState<NewsContent> {
                                   height: double.infinity,
                                   viewportFraction: 1,
                                   enableInfiniteScroll: false,
-                                  autoPlay: false,
+                                  autoPlay: true,
                                   onPageChanged: (index, reason) {
                                     setState(() {
                                       _currentMediaIndex = index;
