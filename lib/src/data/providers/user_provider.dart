@@ -193,7 +193,7 @@ Future<List<UserModel>> fetchUsersByRole(
       queryParts.add('role[]=${Uri.encodeComponent(role)}');
     }
     queryParts.add('page_no=${params.pageNo}');
-    queryParts.add('limit=15');
+    queryParts.add('limit=10');
 
     final search = params.search;
     if (search != null && search.isNotEmpty) {
@@ -845,7 +845,8 @@ class IndirectReferralsNotifier extends _$IndirectReferralsNotifier {
       print('🟣 [IndirectReferralsNotifier] Added status parameter: $status');
     }
     if (dates['start_date'] != null && dates['start_date']!.isNotEmpty) {
-      queryParams.add('start_date=${Uri.encodeComponent(dates['start_date']!)}');
+      queryParams
+          .add('start_date=${Uri.encodeComponent(dates['start_date']!)}');
       print(
           '🟣 [IndirectReferralsNotifier] Added start_date parameter: ${dates['start_date']}');
     }

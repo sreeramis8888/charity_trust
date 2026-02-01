@@ -11,6 +11,7 @@ import 'package:Annujoom/src/data/providers/user_provider.dart';
 import 'package:Annujoom/src/data/providers/location_provider.dart';
 import 'package:Annujoom/src/data/providers/auth_login_provider.dart';
 import 'package:Annujoom/src/data/providers/auth_provider.dart';
+import 'package:Annujoom/src/data/providers/api_provider.dart';
 import 'package:Annujoom/src/data/models/user_model.dart';
 import 'package:Annujoom/src/data/models/paginated_response.dart';
 import 'package:Annujoom/src/data/constants/global_variables.dart';
@@ -1209,33 +1210,89 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
                                         ? 'searchTrustee'.tr()
                                         : 'searchCharityMember'.tr(),
                                     onFetchPage: (pageNo, query) async {
-                                      final params = UsersListParams(
-                                        roles: recommendedByType == 'trustee'
-                                            ? [
-                                                'trustee',
-                                                'president',
-                                                'secretary',
-                                                'treasurer'
-                                              ]
-                                            : ['member'],
-                                        pageNo: pageNo,
-                                        search: query.isEmpty ? null : query,
-                                      );
-                                      final users = await ref.read(
-                                        fetchUsersByRoleProvider(params).future,
+                                      final apiProvider =
+                                          ref.read(apiProviderProvider);
+
+                                      // Build query string with multiple role[] parameters
+                                      final roles =
+                                          recommendedByType == 'trustee'
+                                              ? [
+                                                  'trustee',
+                                                  'president',
+                                                  'secretary',
+                                                  'treasurer'
+                                                ]
+                                              : ['member'];
+
+                                      final queryParts = <String>[];
+                                      for (final role in roles) {
+                                        queryParts.add(
+                                            'role[]=${Uri.encodeComponent(role)}');
+                                      }
+                                      queryParts.add('page_no=$pageNo');
+                                      queryParts.add('limit=10');
+
+                                      if (query.isNotEmpty) {
+                                        queryParts.add(
+                                            'search=${Uri.encodeComponent(query)}');
+                                      }
+
+                                      final queryString = queryParts.join('&');
+                                      final response = await apiProvider.get(
+                                        '/user?$queryString',
+                                        requireAuth: true,
                                       );
 
-                                      // Get total count from API response
-                                      // For now, we'll estimate based on page size
-                                      final totalCount = users.length < 15
-                                          ? (pageNo - 1) * 15 + users.length
-                                          : pageNo * 15 + 1;
+                                      if (response.success &&
+                                          response.data != null) {
+                                        final data = response.data!['data'];
+                                        final usersList =
+                                            data['users'] as List?;
+
+                                        // Get total count from API response (prefer root level, fallback to data level)
+                                        final totalCount =
+                                            response.data!['total_count'] ??
+                                                (data is Map
+                                                    ? data['total_count']
+                                                    : null);
+                                        final totalCountInt = totalCount is int
+                                            ? totalCount
+                                            : int.tryParse(
+                                                    totalCount?.toString() ??
+                                                        '0') ??
+                                                0;
+
+                                        final users = usersList != null
+                                            ? usersList
+                                                .map((item) =>
+                                                    UserModel.fromJson(item
+                                                        as Map<String,
+                                                            dynamic>))
+                                                .toList()
+                                            : <UserModel>[];
+
+                                        // Deduplicate users by _id to prevent duplicates
+                                        final uniqueUsers =
+                                            <String, UserModel>{};
+                                        for (final user in users) {
+                                          if (user.id != null) {
+                                            uniqueUsers[user.id!] = user;
+                                          }
+                                        }
+
+                                        return PaginatedResponse(
+                                          items: uniqueUsers.values.toList(),
+                                          totalCount: totalCountInt,
+                                          currentPage: pageNo,
+                                          limit: 10,
+                                        );
+                                      }
 
                                       return PaginatedResponse(
-                                        items: users,
-                                        totalCount: totalCount,
+                                        items: <UserModel>[],
+                                        totalCount: 0,
                                         currentPage: pageNo,
-                                        limit: 15,
+                                        limit: 10,
                                       );
                                     },
                                     itemLabel: (user) => user.name ?? 'Unknown',

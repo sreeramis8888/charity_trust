@@ -476,6 +476,17 @@ class _PaginatedModalSheetContentState<T>
         _hasMore = response.hasMore;
         _isLoading = false;
       });
+      
+      // Automatically load next page if hasMore is true and we have a full page of items
+      // This ensures the list is scrollable and pagination works smoothly
+      if (response.hasMore && response.items.length >= 10) {
+        // Use a post-frame callback to load next page after the UI updates
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (mounted && _hasMore && !_isLoading) {
+            _loadNextPage();
+          }
+        });
+      }
     } catch (e) {
       setState(() {
         _isLoading = false;
@@ -517,8 +528,13 @@ class _PaginatedModalSheetContentState<T>
   }
 
   void _onScroll() {
-    if (_scrollController.position.pixels >=
-        _scrollController.position.maxScrollExtent - 500) {
+    if (!_scrollController.hasClients) return;
+    
+    final maxScroll = _scrollController.position.maxScrollExtent;
+    final currentScroll = _scrollController.position.pixels;
+    
+    // Load next page when within 200px of bottom (more sensitive)
+    if (currentScroll >= maxScroll - 200) {
       _loadNextPage();
     }
   }
