@@ -165,10 +165,13 @@ class _NewsListPageState extends ConsumerState<NewsListPage> {
                       builder: (context, userIdSnapshot) {
                         final bookmarkCount = asyncNewsState.maybeWhen(
                           data: (paginationState) {
-                            if (userIdSnapshot.hasData && userIdSnapshot.data != null) {
+                            if (userIdSnapshot.hasData &&
+                                userIdSnapshot.data != null) {
                               return paginationState.news
                                   .where((news) =>
-                                      news.bookmarked?.contains(userIdSnapshot.data) ?? false)
+                                      news.bookmarked
+                                          ?.contains(userIdSnapshot.data) ??
+                                      false)
                                   .length;
                             }
                             return 0;
@@ -246,27 +249,27 @@ class _NewsListPageState extends ConsumerState<NewsListPage> {
                   SizedBox(
                     height: 15,
                   ),
-                  Expanded(
-                    child: ListView.builder(
-                      controller: _scrollController,
-                      itemCount: paginationState.news.length +
-                          (paginationState.hasMore ? 1 : 0),
-                      itemBuilder: (context, index) {
-                        if (index == paginationState.news.length) {
-                          return Padding(
-                            padding: EdgeInsets.all(16),
-                            child: Center(
-                              child: LoadingAnimation(),
-                            ),
-                          );
-                        }
-                        return NewsCard(
-                          news: paginationState.news[index],
-                          allNews: paginationState.news,
-                        );
-                      },
-                    ),
-                  ),
+                  // Expanded(
+                  //   child: ListView.builder(
+                  //     controller: _scrollController,
+                  //     itemCount: paginationState.news.length +
+                  //         (paginationState.hasMore ? 1 : 0),
+                  //     itemBuilder: (context, index) {
+                  //       if (index == paginationState.news.length) {
+                  //         return Padding(
+                  //           padding: EdgeInsets.all(16),
+                  //           child: Center(
+                  //             child: LoadingAnimation(),
+                  //           ),
+                  //         );
+                  //       }
+                  //       return NewsCard(
+                  //         news: paginationState.news[index],
+                  //         allNews: paginationState.news,
+                  //       );
+                  //     },
+                  //   ),
+                  // ),
                 ],
               );
             } else {

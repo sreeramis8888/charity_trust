@@ -5,6 +5,7 @@ import 'package:Annujoom/src/data/services/deep_link_service.dart';
 import 'package:Annujoom/src/interfaces/main_pages/home.dart';
 import 'package:Annujoom/src/interfaces/main_pages/campaign_pages/campaign.dart';
 import 'package:Annujoom/src/interfaces/main_pages/news_bookmark/news_list_page.dart';
+import 'package:Annujoom/src/interfaces/main_pages/news_bookmark/news_only_list.dart';
 import 'package:Annujoom/src/interfaces/main_pages/profile_pages/profile.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
@@ -23,12 +24,14 @@ class _NavBarState extends ConsumerState<NavBar> {
     HomePage(),
     CampaignPage(),
     NewsListPage(),
+    NewsOnlyList(),
     ProfilePage(),
   ];
 
   static const List<String> _inactiveIcons = [
     'assets/svg/inactive_home.svg',
     'assets/svg/inactive_campaign.svg',
+    'assets/svg/inactive_update.svg',
     'assets/svg/inactive_news.svg',
     'assets/svg/inactive_profile.svg',
   ];
@@ -36,6 +39,7 @@ class _NavBarState extends ConsumerState<NavBar> {
   static const List<String> _activeIcons = [
     'assets/svg/active_home.svg',
     'assets/svg/active_campaign.svg',
+    'assets/svg/active_update.svg',
     'assets/svg/active_news.svg',
     'assets/svg/active_profile.svg',
   ];
@@ -64,13 +68,14 @@ class _NavBarState extends ConsumerState<NavBar> {
   @override
   Widget build(BuildContext context) {
     // Watch for locale changes to trigger rebuild
-    context.locale; 
+    context.locale;
     final selectedIndex = ref.watch(selectedIndexProvider);
 
     final List<String> labels = [
       'home'.tr(),
       'campaigns'.tr(),
       'news'.tr(),
+      'news1'.tr(),
       'profile'.tr(),
     ];
 
@@ -105,7 +110,7 @@ class _NavBarState extends ConsumerState<NavBar> {
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 16),
                     child: Row(
-                      children: List.generate(4, (index) {
+                      children: List.generate(5, (index) {
                         final bool isSelected = selectedIndex == index;
                         return Expanded(
                           child: GestureDetector(
