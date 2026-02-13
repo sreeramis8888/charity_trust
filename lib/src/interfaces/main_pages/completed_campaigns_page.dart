@@ -16,8 +16,7 @@ class CompletedCampaignsPage extends ConsumerWidget {
     final promotionsAsync = ref.watch(
       promotionsListProvider(),
     );
-      final preferredLanguage =
-                        GlobalVariables.getPreferredLanguage();
+    final preferredLanguage = GlobalVariables.getPreferredLanguage();
     return Scaffold(
       backgroundColor: const Color(0xFFF2F2F2),
       appBar: AppBar(
@@ -54,8 +53,8 @@ class CompletedCampaignsPage extends ConsumerWidget {
                 child: HomeCompletedCampaignCard(
                   heading: promotion.getTitle(preferredLanguage) ?? '',
                   subtitle: promotion.getDescription(preferredLanguage) ?? '',
-                  goal: 0,
-                  collected: 0,
+                  goal: promotion.targetAmount,
+                  collected: promotion.collectedAmount,
                   posterImage: promotion.media ?? '',
                   isImagePoster: true,
                   onTap: () {},
