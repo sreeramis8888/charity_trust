@@ -13,6 +13,7 @@ class PaymentMethodPage extends ConsumerStatefulWidget {
   final double amount;
   final VoidCallback onRazorpaySelected;
   final Function() onMswipeSelected;
+  final Function() onEasebuzzSelected;
 
   const PaymentMethodPage({
     Key? key,
@@ -20,6 +21,7 @@ class PaymentMethodPage extends ConsumerStatefulWidget {
     required this.amount,
     required this.onRazorpaySelected,
     required this.onMswipeSelected,
+    required this.onEasebuzzSelected,
   }) : super(key: key);
 
   @override
@@ -48,6 +50,31 @@ class _PaymentMethodPageState extends ConsumerState<PaymentMethodPage> {
     if (_selectedGateway == 'razorpay') {
       log('Selected Razorpay', name: 'PaymentMethodPage');
       widget.onRazorpaySelected();
+    } else if (_selectedGateway == 'easebuzz') {
+      // else if (_selectedGateway == 'mswipe') {
+
+      // final email = _emailController.text.trim();
+      // if (email.isEmpty) {
+      //   ScaffoldMessenger.of(context).showSnackBar(
+      //     SnackBar(
+      //       content: Text('pleaseEnterEmail'.tr()),
+      //       backgroundColor: Colors.red,
+      //     ),
+      //   );
+      //   return;
+      // }
+      // if (!_isValidEmail(email)) {
+      //   ScaffoldMessenger.of(context).showSnackBar(
+      //     SnackBar(
+      //       content: Text('pleaseEnterValidEmail'.tr()),
+      //       backgroundColor: Colors.red,
+      //     ),
+      //   );
+      //   return;
+      // }
+      log('Selected Easebuzz with email: ', name: 'PaymentMethodPage');
+      // widget.onMswipeSelected();
+      widget.onEasebuzzSelected();
     } else if (_selectedGateway == 'mswipe') {
       // final email = _emailController.text.trim();
       // if (email.isEmpty) {
@@ -68,8 +95,9 @@ class _PaymentMethodPageState extends ConsumerState<PaymentMethodPage> {
       //   );
       //   return;
       // }
-      log('Selected Mswipe with email: ', name: 'PaymentMethodPage');
+      log('Selected Msipe with email: ', name: 'PaymentMethodPage');
       widget.onMswipeSelected();
+      // widget.onEasebuzzSelected();
     }
   }
 
@@ -95,22 +123,36 @@ class _PaymentMethodPageState extends ConsumerState<PaymentMethodPage> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   // Mswipe Option
-                  // _buildPaymentOption(
-                  //   gateway: 'mswipe',
-                  //   title: 'Mswipe',
-                  //   subtitle: 'No additional charges',
-                  //   icon:
-                  //       'assets/svg/mswipe_logo.svg',
-                  //   isSelected: _selectedGateway == 'mswipe',
-                  //   onTap: () {
-                  //     setState(() {
-                  //       _selectedGateway = 'mswipe';
-                  //       // _showEmailInput = true;
-                  //     });
-                  //   },
-                  // ),
+                  _buildPaymentOption(
+                    gateway: 'easebuzz',
+                    title: 'Easebuzz',
+                    subtitle: 'No additional charges',
+                    icon: 'assets/svg/mswipe_logo.svg',
+                    isSelected: _selectedGateway == 'easebuzz',
+                    onTap: () {
+                      setState(() {
+                        _selectedGateway = 'easebuzz';
+                        // _showEmailInput = true;
+                      });
+                    },
+                  ),
 
-                  // const SizedBox(height: 16),
+                  // //mswipe
+                  _buildPaymentOption(
+                    gateway: 'mswipe',
+                    title: 'Mswipe',
+                    subtitle: 'No additional charges',
+                    icon: 'assets/svg/mswipe_logo.svg',
+                    isSelected: _selectedGateway == 'mswipe',
+                    onTap: () {
+                      setState(() {
+                        _selectedGateway = 'mswipe';
+                        // _showEmailInput = true;
+                      });
+                    },
+                  ),
+
+                  const SizedBox(height: 16),
                   // Razorpay Option
                   _buildPaymentOption(
                     gateway: 'razorpay',

@@ -76,6 +76,39 @@ class DonationApi {
 
     return response;
   }
+
+  //Easebuzz
+  Future<ApiResponse<Map<String, dynamic>>> verifyEasebuzzPayment({
+    required String transactionId,
+    required String hash,
+    required double amount,
+    required String productInfo,
+    required String firstName,
+    required String email, // Changed to required as per backend validation
+    required String status,
+    required String key, // [NEW] Required by backend validation
+  }) async {
+    final response = await _apiProvider.post(
+      '/donation/easebuzz-verify',
+      {
+        'txnid': transactionId,
+        'hash': hash,
+        'amount': amount,
+        'productinfo': productInfo,
+        'firstname': firstName,
+        'email': email,
+        'status': status,
+        'key': key, // [NEW] Added to payload
+      },
+      requireAuth: true,
+    );
+
+    if (response.success) {
+      log('Easebuzz payment verified successfully', name: 'DonationApi');
+    }
+
+    return response;
+  }
 }
 
 @riverpod
@@ -144,6 +177,43 @@ class DonationNotifier extends _$DonationNotifier {
         return {'verified': true};
       } else {
         throw Exception(response.message ?? 'Failed to verify payment');
+      }
+    });
+
+    return state.hasValue && (state.value?['verified'] as bool? ?? false);
+  }
+
+  // [NEW] Added wrapper for Easebuzz verification
+  Future<bool> verifyEasebuzzPayment({
+    required String transactionId,
+    required String hash,
+    required double amount,
+    required String productInfo,
+    required String firstName,
+    required String email,
+    required String status,
+    required String key,
+  }) async {
+    state = const AsyncValue.loading();
+    state = await AsyncValue.guard(() async {
+      final donationApi = ref.watch(donationApiProvider);
+      final response = await donationApi.verifyEasebuzzPayment(
+        transactionId: transactionId,
+        hash: hash,
+        amount: amount,
+        productInfo: productInfo,
+        firstName: firstName,
+        email: email,
+        status: status,
+        key: key,
+      );
+
+      if (response.success) {
+        log('Easebuzz Payment verified', name: 'DonationNotifier');
+        return {'verified': true};
+      } else {
+        throw Exception(
+            response.message ?? 'Failed to verify Easebuzz payment');
       }
     });
 

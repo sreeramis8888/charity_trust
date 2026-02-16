@@ -16,23 +16,25 @@ class MswipeService {
         NavigationDelegate(
           onNavigationRequest: (NavigationRequest request) {
             final uri = Uri.parse(request.url);
-            
-            log('Navigation request: ${request.url}, scheme: ${uri.scheme}', name: 'MswipeService');
-            
+
+            log('Navigation request: ${request.url}, scheme: ${uri.scheme}',
+                name: 'MswipeService');
+
             // Check if it's a UPI or other app deep link
-            if (uri.scheme == 'upi' || 
-                uri.scheme == 'gpay' || 
-                uri.scheme == 'phonepe' || 
+            if (uri.scheme == 'upi' ||
+                uri.scheme == 'gpay' ||
+                uri.scheme == 'phonepe' ||
                 uri.scheme == 'paytm' ||
                 uri.scheme == 'paytmmp' ||
                 uri.scheme == 'tez' ||
                 uri.scheme == 'cred' ||
                 uri.scheme == 'credpay') {
-              log('Launching external app: ${request.url}', name: 'MswipeService');
+              log('Launching external app: ${request.url}',
+                  name: 'MswipeService');
               _launchUrl(request.url);
               return NavigationDecision.prevent;
             }
-            
+
             return NavigationDecision.navigate;
           },
           onPageStarted: (String url) {
@@ -40,7 +42,7 @@ class MswipeService {
           },
           onPageFinished: (String url) {
             log('Mswipe page finished: $url', name: 'MswipeService');
-            
+
             // iOS-specific: Inject JavaScript to intercept link clicks
             if (Platform.isIOS) {
               Future.delayed(Duration(milliseconds: 500), () {
@@ -54,19 +56,20 @@ class MswipeService {
           },
         ),
       );
-    
+
     // Enable JavaScript console logging
     if (Platform.isIOS) {
       _controller.setOnConsoleMessage((JavaScriptConsoleMessage message) {
-        log('WebView Console [${message.level.name}]: ${message.message}', name: 'MswipeService');
+        log('WebView Console [${message.level.name}]: ${message.message}',
+            name: 'MswipeService');
       });
     }
-    
+
     _controller.loadRequest(Uri.parse(paymentUrl));
 
     return _controller;
   }
-  
+
   void _injectLinkInterceptor() {
     _controller.runJavaScript('''
       (function() {
@@ -151,10 +154,10 @@ class MswipeService {
     try {
       final uri = Uri.parse(url);
       log('Attempting to launch: $url', name: 'MswipeService');
-      
+
       final canLaunch = await canLaunchUrl(uri);
       log('Can launch URL: $canLaunch', name: 'MswipeService');
-      
+
       if (canLaunch) {
         final launched = await launchUrl(
           uri,
@@ -163,7 +166,7 @@ class MswipeService {
         log('Launch result: $launched', name: 'MswipeService');
       } else {
         log('Cannot launch URL: $url', name: 'MswipeService');
-        
+
         // iOS fallback: Try with platformDefault mode
         if (Platform.isIOS) {
           try {
