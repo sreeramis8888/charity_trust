@@ -9,10 +9,10 @@ import 'package:flutter_dotenv/flutter_dotenv.dart'; // [NEW]
 
 class EasebuzzService {
   late WebViewController _controller;
-  VoidCallback? _onPaymentComplete;
+  Function(Map<String, dynamic>?)? _onPaymentComplete;
   bool _isVerifying = false;
 
-  void setOnPaymentComplete(VoidCallback callback) {
+  void setOnPaymentComplete(Function(Map<String, dynamic>?) callback) {
     _onPaymentComplete = callback;
   }
 
@@ -198,16 +198,16 @@ class EasebuzzService {
         } else {
           log('Transaction status not success or invalid data structure',
               name: 'EasebuzzService');
-          _onPaymentComplete?.call();
+          _onPaymentComplete?.call(null);
         }
       } else {
         log('Easebuzz API Network Error: ${response.statusCode}',
             name: 'EasebuzzService');
-        _onPaymentComplete?.call();
+        _onPaymentComplete?.call(null);
       }
     } catch (e) {
       log('Error during manual verification: $e', name: 'EasebuzzService');
-      _onPaymentComplete?.call();
+      _onPaymentComplete?.call(null);
     }
   }
 
@@ -228,10 +228,20 @@ class EasebuzzService {
       debugPrint(
           'EasebuzzService: Backend Sync Response: ${response.statusCode} - ${response.body}');
 
-      _onPaymentComplete?.call();
+      if (response.statusCode == 200) {
+        final resData = jsonDecode(response.body);
+        if (resData['status'] == 200 || resData['status'] == true) {
+          final donationData = resData['data'];
+          _onPaymentComplete?.call(donationData);
+        } else {
+          _onPaymentComplete?.call(null);
+        }
+      } else {
+        _onPaymentComplete?.call(null);
+      }
     } catch (e) {
       debugPrint('EasebuzzService: Backend Sync Error: $e');
-      _onPaymentComplete?.call();
+      _onPaymentComplete?.call(null);
     }
   }
 
@@ -252,10 +262,23 @@ class EasebuzzService {
 
       debugPrint(
           'EasebuzzService: Interception Sync Response: ${response.statusCode} - ${response.body}');
-      _onPaymentComplete?.call();
+
+      if (response.statusCode == 200) {
+        final resData = jsonDecode(response.body);
+        // Interception might return different structure depending on backend
+        // But assuming same endpoint:
+        if (resData['status'] == 200 || resData['status'] == true) {
+          final donationData = resData['data'];
+          _onPaymentComplete?.call(donationData);
+        } else {
+          _onPaymentComplete?.call(null);
+        }
+      } else {
+        _onPaymentComplete?.call(null);
+      }
     } catch (e) {
       debugPrint('EasebuzzService: Interception Sync Error: $e');
-      _onPaymentComplete?.call();
+      _onPaymentComplete?.call(null);
     }
   }
 

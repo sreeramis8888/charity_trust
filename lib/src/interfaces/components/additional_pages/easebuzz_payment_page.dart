@@ -5,6 +5,8 @@ import 'package:webview_flutter/webview_flutter.dart';
 import 'package:Annujoom/src/data/constants/color_constants.dart';
 import 'package:Annujoom/src/data/providers/easebuzz_provider.dart';
 
+import 'package:Annujoom/src/interfaces/components/additional_pages/payment_success_page.dart'; // [NEW]
+
 class EasebuzzPaymentPage extends ConsumerStatefulWidget {
   final String paymentUrl;
   final String donationId;
@@ -36,10 +38,28 @@ class _EasebuzzPaymentPageState extends ConsumerState<EasebuzzPaymentPage> {
       paymentData: widget.paymentData,
     );
 
-    easebuzzService.setOnPaymentComplete(() {
-      if (mounted) {
+    easebuzzService.setOnPaymentComplete((result) {
+      if (!mounted) return;
+
+      if (result != null) {
+        // Success: Navigate to Success Page
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) => PaymentSuccessPage(
+              amount: double.tryParse(result['amount']?.toString() ?? '0') ??
+                  widget.amount,
+              paymentId: result['payment_id'] ??
+                  result['gateway_payment_id'] ??
+                  widget.orderId,
+              orderId: widget.donationId,
+              receipt: result['receipt'],
+            ),
+          ),
+        );
+      } else {
+        // Failure/Cancel: Just pop
         Navigator.pop(context);
-        // Optional: Navigate to transaction success page if desired
       }
     });
 
