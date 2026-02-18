@@ -10,6 +10,7 @@ class EasebuzzPaymentPage extends ConsumerStatefulWidget {
   final String donationId;
   final String orderId;
   final double amount;
+  final Map<String, dynamic>? paymentData; // [NEW] Accept full payment data
 
   const EasebuzzPaymentPage({
     Key? key,
@@ -17,6 +18,7 @@ class EasebuzzPaymentPage extends ConsumerStatefulWidget {
     required this.donationId,
     required this.orderId,
     required this.amount,
+    this.paymentData, // [NEW]
   }) : super(key: key);
 
   @override
@@ -31,7 +33,15 @@ class _EasebuzzPaymentPageState extends ConsumerState<EasebuzzPaymentPage> {
     final webViewController = easebuzzService.initializeWebView(
       paymentUrl: widget.paymentUrl,
       donationId: widget.donationId,
+      paymentData: widget.paymentData,
     );
+
+    easebuzzService.setOnPaymentComplete(() {
+      if (mounted) {
+        Navigator.pop(context);
+        // Optional: Navigate to transaction success page if desired
+      }
+    });
 
     return Scaffold(
       appBar: AppBar(
@@ -41,10 +51,7 @@ class _EasebuzzPaymentPageState extends ConsumerState<EasebuzzPaymentPage> {
           icon: const Icon(Icons.arrow_back_ios, color: kTextColor),
           onPressed: () => Navigator.pop(context),
         ),
-        title: Text(
-          'Payment',
-          style: kBodyTitleM,
-        ),
+        title: Text('Payment', style: kBodyTitleM),
       ),
       body: WebViewWidget(controller: webViewController),
     );
@@ -52,8 +59,7 @@ class _EasebuzzPaymentPageState extends ConsumerState<EasebuzzPaymentPage> {
 
   @override
   void dispose() {
-    final easebuzzService = ref.read(easebuzzServiceProvider);
-    easebuzzService.dispose();
+    // Avoid using ref.read in dispose as it might be unmounted
     super.dispose();
   }
 }

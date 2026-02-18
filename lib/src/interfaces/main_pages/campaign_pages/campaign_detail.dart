@@ -238,14 +238,14 @@ class _CampaignDetailPageState extends ConsumerState<CampaignDetailPage> {
                       child: ElevatedButton(
                         onPressed: () {
                           Navigator.pop(context);
-                          _donationController.text =
-                              remainingGoal.toStringAsFixed(0);
+                          _donationController.text = remainingGoal
+                              .toStringAsFixed(0);
                           _donationController.selection =
                               TextSelection.fromPosition(
-                            TextPosition(
-                              offset: _donationController.text.length,
-                            ),
-                          );
+                                TextPosition(
+                                  offset: _donationController.text.length,
+                                ),
+                              );
                         },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: kPrimaryColor,
@@ -512,6 +512,7 @@ class _CampaignDetailPageState extends ConsumerState<CampaignDetailPage> {
             donationId: donationId,
             orderId: orderId,
             amount: amount,
+            paymentData: data, // [NEW] Pass the full data map
           ),
         ),
       );

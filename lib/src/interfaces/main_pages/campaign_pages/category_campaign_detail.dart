@@ -19,8 +19,7 @@ class CategoryCampaignDetailPage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final campaignsAsync = ref.watch(categoryCampaignsProvider(category));
-      final preferredLanguage =
-                        GlobalVariables.getPreferredLanguage();
+    final preferredLanguage = GlobalVariables.getPreferredLanguage();
     return campaignsAsync.when(
       data: (paginationState) {
         if (paginationState.campaigns.isEmpty) {

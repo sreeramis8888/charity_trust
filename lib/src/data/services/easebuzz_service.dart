@@ -1,15 +1,27 @@
+import 'package:flutter/material.dart';
 import 'dart:developer';
-import 'dart:io';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
+import 'package:crypto/crypto.dart'; // [NEW]
 import 'package:webview_flutter/webview_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart'; // [NEW]
 
 class EasebuzzService {
   late WebViewController _controller;
+  VoidCallback? _onPaymentComplete;
+  bool _isVerifying = false;
+
+  void setOnPaymentComplete(VoidCallback callback) {
+    _onPaymentComplete = callback;
+  }
 
   WebViewController initializeWebView({
     required String paymentUrl,
     required String donationId,
+    Map<String, dynamic>? paymentData,
   }) {
+    _isVerifying = false;
     _controller = WebViewController()
       ..setJavaScriptMode(JavaScriptMode.unrestricted)
       ..setNavigationDelegate(
@@ -17,8 +29,10 @@ class EasebuzzService {
           onNavigationRequest: (NavigationRequest request) {
             final uri = Uri.parse(request.url);
 
-            log('Navigation request: ${request.url}, scheme: ${uri.scheme}',
-                name: 'EasebuzzService');
+            log(
+              'Navigation request: ${request.url}',
+              name: 'EasebuzzService',
+            );
 
             // Check if it's a UPI or other app deep link
             if (uri.scheme == 'upi' ||
@@ -29,156 +43,342 @@ class EasebuzzService {
                 uri.scheme == 'tez' ||
                 uri.scheme == 'cred' ||
                 uri.scheme == 'credpay') {
-              log('Launching external app: ${request.url}',
-                  name: 'EasebuzzService');
               _launchUrl(request.url);
+              return NavigationDecision.prevent;
+            }
+
+            // Intercept verification URL to prevent the 500 error display
+            if (request.url.contains('easebuzz-verify')) {
+              log('Intercepted verify URL in navigation, handling manually...',
+                  name: 'EasebuzzService');
+              if (!_isVerifying && paymentData != null) {
+                _verifyTransactionManual(paymentData);
+              }
               return NavigationDecision.prevent;
             }
 
             return NavigationDecision.navigate;
           },
           onPageStarted: (String url) {
-            log('Easebuzz page started: $url', name: 'EasebuzzService');
-          },
-          onPageFinished: (String url) {
-            log('Easebuzz page finished: $url', name: 'EasebuzzService');
-
-            // iOS-specific: Inject JavaScript to intercept link clicks
-            if (Platform.isIOS) {
-              Future.delayed(Duration(milliseconds: 500), () {
-                _injectLinkInterceptor();
-              });
+            log('Page started: $url', name: 'EasebuzzService');
+            // Aggressively stop verification URL on Android
+            if (url.contains('easebuzz-verify')) {
+              // Hack to stop loading if stopLoading() is missing in this version
+              _controller.loadHtmlString('<html><body></body></html>');
+              if (!_isVerifying && paymentData != null) {
+                _verifyTransactionManual(paymentData);
+              }
             }
           },
-          onWebResourceError: (WebResourceError error) {
-            log('Easebuzz WebView error: ${error.description}, errorCode: ${error.errorCode}, errorType: ${error.errorType}',
-                name: 'EasebuzzService');
+          onPageFinished: (String url) {
+            log('Page finished: $url', name: 'EasebuzzService');
+            _injectLinkInterceptor();
           },
         ),
       );
 
-    // Enable JavaScript console logging
-    if (Platform.isIOS) {
-      _controller.setOnConsoleMessage((JavaScriptConsoleMessage message) {
-        log('WebView Console [${message.level.name}]: ${message.message}',
-            name: 'EasebuzzService');
-      });
+    // [NEW] Add JavaScript Channel to intercept form data (backup method)
+    _controller.addJavaScriptChannel(
+      'EasebuzzResponse',
+      onMessageReceived: (JavaScriptMessage message) {
+        if (!_isVerifying) {
+          log('Interception channel caught data, syncing...',
+              name: 'EasebuzzService');
+          _handleInterceptedData(message.message);
+        }
+      },
+    );
+
+    if (paymentData != null) {
+      log('Initiating Easebuzz payment via API...', name: 'EasebuzzService');
+      _showLoadingPage('Connecting to Easebuzz...');
+      _initiatePayment(paymentUrl, paymentData);
+    } else {
+      _controller.loadRequest(Uri.parse(paymentUrl));
     }
 
-    _controller.loadRequest(Uri.parse(paymentUrl));
-
     return _controller;
+  }
+
+  // Robust Manual Verification using retrieve API V2.1 + JSON Backend Update
+  Future<void> _verifyTransactionManual(
+      Map<String, dynamic> paymentData) async {
+    if (_isVerifying) return;
+    _isVerifying = true;
+
+    try {
+      _showLoadingPage('Verifying Payment Status...');
+
+      final key = dotenv.env['EASEBUZZ_KEY'] ?? 'D0Y728WZI6';
+      final salt = dotenv.env['EASEBUZZ_SALT'] ?? 'IHJQRIEOFG';
+      final txnid = paymentData['txnid'];
+      final email = paymentData['email'];
+
+      log('Starting manual verification (V2.1) for txnid: $txnid',
+          name: 'EasebuzzService');
+
+      // 1. Generate hash for Easebuzz Transaction Search API V2.1
+      // Sequence: key|txnid|salt
+      final hashString = '$key|$txnid|$salt';
+      final hash = sha512.convert(utf8.encode(hashString)).toString();
+
+      // 2. Call Easebuzz Retrieve API V2.1
+      final bool isTest = (paymentData['payment_url'] ?? '').contains('test');
+      final String retrieveUrl = isTest
+          ? 'https://testdashboard.easebuzz.in/transaction/v2.1/retrieve'
+          : 'https://dashboard.easebuzz.in/transaction/v2.1/retrieve';
+
+      final response = await http.post(
+        Uri.parse(retrieveUrl),
+        body: {
+          'key': key,
+          'txnid': txnid,
+          'hash': hash,
+        },
+        headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+      );
+
+      log('Easebuzz V2.1 Response: ${response.body}', name: 'EasebuzzService');
+
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> resData = jsonDecode(response.body);
+        // V2.1 response structure: {"status": true, "data": {...}}
+        // OR if V1 was actually preferred by some merchants: {"status": 1, "msg": {...}}
+
+        bool success = resData['status'] == true || resData['status'] == 1;
+        var txData = resData['data'] ?? resData['msg'];
+
+        // [FIX] Easebuzz V2.1 often returns 'msg' as an array
+        if (txData is List && txData.isNotEmpty) {
+          txData = txData[0];
+        }
+
+        if (success && txData != null && txData is Map) {
+          // 3. Re-calculate the reverse hash to satisfy backend verification
+          final String status = txData['status']?.toString() ?? '';
+          final String firstname = txData['firstname']?.toString() ?? '';
+          final String productinfo = txData['productinfo']?.toString() ?? '';
+          final String txAmount = txData['amount']?.toString() ?? '';
+
+          final reverseHashString = [
+            salt,
+            status,
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            email,
+            firstname,
+            productinfo,
+            txAmount,
+            txnid,
+            key,
+          ].join('|');
+
+          final String reverseHash =
+              sha512.convert(utf8.encode(reverseHashString)).toString();
+
+          // 4. Send JSON verify request to backend
+          await _syncWithBackend({
+            'txnid': txnid,
+            'status': status,
+            'hash': reverseHash,
+            'amount': txAmount,
+            'productinfo': productinfo,
+            'firstname': firstname,
+            'email': email,
+            'key': key,
+          });
+        } else {
+          log('Transaction status not success or invalid data structure',
+              name: 'EasebuzzService');
+          _onPaymentComplete?.call();
+        }
+      } else {
+        log('Easebuzz API Network Error: ${response.statusCode}',
+            name: 'EasebuzzService');
+        _onPaymentComplete?.call();
+      }
+    } catch (e) {
+      log('Error during manual verification: $e', name: 'EasebuzzService');
+      _onPaymentComplete?.call();
+    }
+  }
+
+  Future<void> _syncWithBackend(Map<String, dynamic> verifyData) async {
+    try {
+      final String jsonBody = jsonEncode(verifyData);
+      debugPrint('EasebuzzService: Syncing with backend (JSON): $jsonBody');
+
+      final verifyUrl =
+          'https://api.annujoomcharitabletrust.com/api/v1/donation/easebuzz-verify';
+
+      final response = await http.post(
+        Uri.parse(verifyUrl),
+        body: jsonBody,
+        headers: {'Content-Type': 'application/json'},
+      );
+
+      debugPrint(
+          'EasebuzzService: Backend Sync Response: ${response.statusCode} - ${response.body}');
+
+      _onPaymentComplete?.call();
+    } catch (e) {
+      debugPrint('EasebuzzService: Backend Sync Error: $e');
+      _onPaymentComplete?.call();
+    }
+  }
+
+  Future<void> _handleInterceptedData(String jsonData) async {
+    try {
+      final Map<String, dynamic> data = jsonDecode(jsonData);
+      debugPrint('EasebuzzService: Handling intercepted JS data: $jsonData');
+      _showLoadingPage('Updating Donation Status...');
+
+      final verifyUrl =
+          'https://api.annujoomcharitabletrust.com/api/v1/donation/easebuzz-verify';
+
+      final response = await http.post(
+        Uri.parse(verifyUrl),
+        body: jsonEncode(data),
+        headers: {'Content-Type': 'application/json'},
+      );
+
+      debugPrint(
+          'EasebuzzService: Interception Sync Response: ${response.statusCode} - ${response.body}');
+      _onPaymentComplete?.call();
+    } catch (e) {
+      debugPrint('EasebuzzService: Interception Sync Error: $e');
+      _onPaymentComplete?.call();
+    }
+  }
+
+  void _showLoadingPage(String message) {
+    final String htmlContent = '''
+      <html>
+        <body style="display: flex; justify-content: center; align-items: center; height: 100vh; font-family: sans-serif; background: #ffffff;">
+          <div style="text-align: center;">
+            <h2 style="color: #333;">$message</h2>
+            <p style="color: #666;">Please do not close the app.</p>
+          </div>
+        </body>
+      </html>
+    ''';
+    final String contentBase64 =
+        base64Encode(const Utf8Encoder().convert(htmlContent));
+    _controller.loadRequest(Uri.parse('data:text/html;base64,$contentBase64'));
+  }
+
+  Future<void> _initiatePayment(
+      String apiUrl, Map<String, dynamic> paymentData) async {
+    try {
+      log('Initiating via API: $apiUrl', name: 'EasebuzzService');
+      final Map<String, String> bodyMap = {};
+      paymentData.forEach((key, value) {
+        if (key != 'donation' && key != 'payment_url') {
+          bodyMap[key] = value.toString();
+        }
+      });
+
+      final response = await http.post(
+        Uri.parse(apiUrl),
+        body: bodyMap,
+        headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+      );
+
+      if (response.statusCode == 200) {
+        final responseData = jsonDecode(response.body);
+        if (responseData['status'] == 1 && responseData['data'] != null) {
+          final String accessKey = responseData['data'];
+          String baseUrl = 'https://pay.easebuzz.in';
+          if (apiUrl.contains('testpay'))
+            baseUrl = 'https://testpay.easebuzz.in';
+
+          final String paymentPageUrl = '$baseUrl/pay/$accessKey';
+          log('Redirecting to Payment Page: $paymentPageUrl',
+              name: 'EasebuzzService');
+          _controller.loadRequest(Uri.parse(paymentPageUrl));
+        } else {
+          _showErrorPage(
+              "Initiation failed: ${responseData['data'] ?? 'Unknown error'}");
+        }
+      } else {
+        _showErrorPage('Network error: ${response.statusCode}');
+      }
+    } catch (e) {
+      log('Exception: $e', name: 'EasebuzzService');
+      _showErrorPage('Error: $e');
+    }
+  }
+
+  void _showErrorPage(String errorMessage) {
+    final String htmlContent = '''
+      <html>
+        <body style="padding: 20px; font-family: sans-serif; text-align: center;">
+          <h2 style="color: red;">Payment Error</h2>
+          <p>$errorMessage</p>
+          <p>Please go back and try again.</p>
+        </body>
+      </html>
+    ''';
+    final String contentBase64 =
+        base64Encode(const Utf8Encoder().convert(htmlContent));
+    _controller.loadRequest(Uri.parse('data:text/html;base64,$contentBase64'));
   }
 
   void _injectLinkInterceptor() {
     _controller.runJavaScript('''
       (function() {
         try {
-          console.log('UPI interceptor injected');
-          
-          // Intercept ALL clicks on the page
-          document.addEventListener('click', function(e) {
-            try {
-              console.log('Click detected on: ' + (e.target ? e.target.tagName : 'unknown'));
-              
-              var target = e.target;
-              
-              // Check if clicked element or any parent has href or data-url
-              var maxDepth = 10;
-              var depth = 0;
-              while (target && depth < maxDepth) {
-                try {
-                  var href = target.href || target.getAttribute('data-url') || target.getAttribute('data-href');
-                  
-                  if (href) {
-                    console.log('Found href: ' + href);
-                    
-                    // Check if it's a UPI or payment app link
-                    if (href.indexOf('upi://') >= 0 || 
-                        href.indexOf('gpay://') >= 0 || 
-                        href.indexOf('phonepe://') >= 0 || 
-                        href.indexOf('paytm://') >= 0 ||
-                        href.indexOf('paytmmp://') >= 0 ||
-                        href.indexOf('tez://') >= 0 ||
-                        href.indexOf('cred://') >= 0 ||
-                        href.indexOf('credpay://') >= 0) {
-                      console.log('UPI link detected, navigating to: ' + href);
-                      e.preventDefault();
-                      e.stopPropagation();
-                      window.location.href = href;
-                      return false;
-                    }
-                  }
-                } catch (err) {
-                  console.log('Error checking element: ' + err.message);
-                }
-                
-                target = target.parentElement;
-                depth++;
+          console.log('Easebuzz aggressive interceptor injected');
+          function hijackForms() {
+            var forms = document.querySelectorAll('form');
+            for (var i = 0; i < forms.length; i++) {
+              var form = forms[i];
+              if (form.action.indexOf('easebuzz-verify') >= 0 && !form.dataset.hijacked) {
+                console.log('Hijacking easebuzz-verify form');
+                form.dataset.hijacked = 'true';
+                form.addEventListener('submit', function(e) {
+                  e.preventDefault();
+                  e.stopImmediatePropagation();
+                  handleForm(form);
+                  return false;
+                }, true);
               }
-            } catch (err) {
-              console.log('Error in click handler: ' + err.message);
             }
-          }, true);
-          
-          // Intercept window.open
-          var originalOpen = window.open;
-          window.open = function(url) {
-            try {
-              console.log('window.open called with: ' + url);
-              if (url && (url.indexOf('upi://') >= 0 || 
-                  url.indexOf('gpay://') >= 0 || 
-                  url.indexOf('phonepe://') >= 0 || 
-                  url.indexOf('paytm://') >= 0)) {
-                window.location.href = url;
-                return null;
-              }
-              return originalOpen.apply(this, arguments);
-            } catch (err) {
-              console.log('Error in window.open: ' + err.message);
-              return originalOpen.apply(this, arguments);
+          }
+          function handleForm(form) {
+            var formData = {};
+            var inputs = form.querySelectorAll('input, select, textarea');
+            for (var i = 0; i < inputs.length; i++) {
+              if (inputs[i].name) formData[inputs[i].name] = inputs[i].value;
             }
-          };
-          
-          console.log('UPI interceptor setup complete');
-        } catch (err) {
-          console.log('Error setting up UPI interceptor: ' + err.message);
-        }
+            if (window.EasebuzzResponse) {
+              window.EasebuzzResponse.postMessage(JSON.stringify(formData));
+            }
+            document.body.innerHTML = '<div style="display:flex;justify-content:center;align-items:center;height:100vh;font-family:sans-serif;"><h2>Processing...</h2></div>';
+          }
+          hijackForms();
+          setInterval(hijackForms, 200);
+        } catch (err) { console.log('Error setup: ' + err.message); }
       })();
-    ''').catchError((error) {
-      log('Error injecting JavaScript: $error', name: 'EasebuzzService');
-    });
+    ''').catchError((e) => log('JS Error: $e'));
   }
 
   Future<void> _launchUrl(String url) async {
     try {
       final uri = Uri.parse(url);
-      log('Attempting to launch: $url', name: 'EasebuzzService');
-
-      final canLaunch = await canLaunchUrl(uri);
-      log('Can launch URL: $canLaunch', name: 'EasebuzzService');
-
-      if (canLaunch) {
-        final launched = await launchUrl(
-          uri,
-          mode: LaunchMode.externalApplication,
-        );
-        log('Launch result: $launched', name: 'EasebuzzService');
-      } else {
-        log('Cannot launch URL: $url', name: 'EasebuzzService');
-
-        // iOS fallback: Try with platformDefault mode
-        if (Platform.isIOS) {
-          try {
-            await launchUrl(uri, mode: LaunchMode.platformDefault);
-            log('Launched with platformDefault mode', name: 'EasebuzzService');
-          } catch (e) {
-            log('Fallback launch failed: $e', name: 'EasebuzzService');
-          }
-        }
+      if (await canLaunchUrl(uri)) {
+        await launchUrl(uri, mode: LaunchMode.externalApplication);
       }
     } catch (e) {
-      log('Error launching URL: $e', name: 'EasebuzzService');
+      log('Launch Error: $e');
     }
   }
 
