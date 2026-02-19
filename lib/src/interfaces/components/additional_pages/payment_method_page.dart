@@ -75,31 +75,30 @@ class _PaymentMethodPageState extends ConsumerState<PaymentMethodPage> {
       log('Selected Easebuzz with email: ', name: 'PaymentMethodPage');
       // widget.onMswipeSelected();
       widget.onEasebuzzSelected();
+    } else if (_selectedGateway == 'mswipe') {
+      // final email = _emailController.text.trim();
+      // if (email.isEmpty) {
+      //   ScaffoldMessenger.of(context).showSnackBar(
+      //     SnackBar(
+      //       content: Text('pleaseEnterEmail'.tr()),
+      //       backgroundColor: Colors.red,
+      //     ),
+      //   );
+      //   return;
+      // }
+      // if (!_isValidEmail(email)) {
+      //   ScaffoldMessenger.of(context).showSnackBar(
+      //     SnackBar(
+      //       content: Text('pleaseEnterValidEmail'.tr()),
+      //       backgroundColor: Colors.red,
+      //     ),
+      //   );
+      //   return;
+      // }
+      log('Selected Msipe with email: ', name: 'PaymentMethodPage');
+      widget.onMswipeSelected();
+      // widget.onEasebuzzSelected();
     }
-    // else if (_selectedGateway == 'mswipe') {
-    //   // final email = _emailController.text.trim();
-    //   // if (email.isEmpty) {
-    //   //   ScaffoldMessenger.of(context).showSnackBar(
-    //   //     SnackBar(
-    //   //       content: Text('pleaseEnterEmail'.tr()),
-    //   //       backgroundColor: Colors.red,
-    //   //     ),
-    //   //   );
-    //   //   return;
-    //   // }
-    //   // if (!_isValidEmail(email)) {
-    //   //   ScaffoldMessenger.of(context).showSnackBar(
-    //   //     SnackBar(
-    //   //       content: Text('pleaseEnterValidEmail'.tr()),
-    //   //       backgroundColor: Colors.red,
-    //   //     ),
-    //   //   );
-    //   //   return;
-    //   // }
-    //   log('Selected Msipe with email: ', name: 'PaymentMethodPage');
-    //   widget.onMswipeSelected();
-    //   // widget.onEasebuzzSelected();
-    // }
   }
 
   @override
@@ -138,21 +137,6 @@ class _PaymentMethodPageState extends ConsumerState<PaymentMethodPage> {
                     },
                   ),
 
-                  // //mswipe
-                  // _buildPaymentOption(
-                  //   gateway: 'mswipe',
-                  //   title: 'Mswipe',
-                  //   subtitle: 'No additional charges',
-                  //   icon: 'assets/svg/mswipe_logo.svg',
-                  //   isSelected: _selectedGateway == 'mswipe',
-                  //   onTap: () {
-                  //     setState(() {
-                  //       _selectedGateway = 'mswipe';
-                  //       // _showEmailInput = true;
-                  //     });
-                  //   },
-                  // ),
-
                   const SizedBox(height: 16),
                   // Razorpay Option
                   _buildPaymentOption(
@@ -169,7 +153,22 @@ class _PaymentMethodPageState extends ConsumerState<PaymentMethodPage> {
                       });
                     },
                   ),
-                  // const SizedBox(height: 16),
+                  const SizedBox(height: 16),
+
+                  // //mswipe
+                  _buildPaymentOption(
+                    gateway: 'mswipe',
+                    title: 'Mswipe',
+                    subtitle: 'No additional charges',
+                    icon: 'assets/svg/mswipe_logo.svg',
+                    isSelected: _selectedGateway == 'mswipe',
+                    onTap: () {
+                      setState(() {
+                        _selectedGateway = 'mswipe';
+                        // _showEmailInput = true;
+                      });
+                    },
+                  ),
 
                   // Email Input for Mswipe
                   // if (_showEmailInput) ...[
