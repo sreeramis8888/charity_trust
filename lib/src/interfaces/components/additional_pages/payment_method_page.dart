@@ -122,12 +122,12 @@ class _PaymentMethodPageState extends ConsumerState<PaymentMethodPage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Mswipe Option
+                  // Ease buzz Option
                   _buildPaymentOption(
                     gateway: 'easebuzz',
                     title: 'Easebuzz',
                     subtitle: 'No additional charges',
-                    icon: 'assets/svg/mswipe_logo.svg',
+                    icon: 'assets/svg/annujoom_logo.svg',
                     isSelected: _selectedGateway == 'easebuzz',
                     onTap: () {
                       setState(() {
@@ -143,8 +143,7 @@ class _PaymentMethodPageState extends ConsumerState<PaymentMethodPage> {
                     gateway: 'razorpay',
                     title: 'Razorpay',
                     subtitle: '2% convenience fee applicable',
-                    icon:
-                        'assets/svg/razorpay_logo.svg', // You can use Image.asset or Icon
+                    icon: 'assets/png/razorpay.png',
                     isSelected: _selectedGateway == 'razorpay',
                     onTap: () {
                       setState(() {
@@ -160,7 +159,7 @@ class _PaymentMethodPageState extends ConsumerState<PaymentMethodPage> {
                     gateway: 'mswipe',
                     title: 'Mswipe',
                     subtitle: 'No additional charges',
-                    icon: 'assets/svg/mswipe_logo.svg',
+                    icon: 'assets/png/union_bank.png',
                     isSelected: _selectedGateway == 'mswipe',
                     onTap: () {
                       setState(() {
@@ -251,9 +250,9 @@ class _PaymentMethodPageState extends ConsumerState<PaymentMethodPage> {
                 Container(
                   width: 60,
                   height: 60,
-                  child: gateway == 'razorpay'
-                      ? Image.asset('assets/png/razorpay.png')
-                      : Image.asset('assets/png/union_bank.png'),
+                  child: icon.endsWith('.svg')
+                      ? SvgPicture.asset(icon)
+                      : Image.asset(icon),
                 ),
                 const SizedBox(width: 16),
 
