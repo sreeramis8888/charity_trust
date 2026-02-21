@@ -1519,7 +1519,7 @@ class _HomePageState extends ConsumerState<HomePage> {
                   }).toList(),
                 ),
               ),
-            if (homeData.videoPromotions.isNotEmpty) const SizedBox(height: 12),
+            if (homeData.videoPromotions.isNotEmpty) const SizedBox(height: 22),
             if (homeData.videoPromotions.isNotEmpty)
               Center(
                 child: PageViewDotIndicator(

@@ -6,6 +6,7 @@ import 'package:crypto/crypto.dart'; // [NEW]
 import 'package:webview_flutter/webview_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart'; // [NEW]
+import 'dart:io' show Platform;
 
 class EasebuzzService {
   late WebViewController _controller;
@@ -23,59 +24,66 @@ class EasebuzzService {
   }) {
     _isVerifying = false;
     _controller = WebViewController()
-      ..setJavaScriptMode(JavaScriptMode.unrestricted)
-      ..setNavigationDelegate(
-        NavigationDelegate(
-          onNavigationRequest: (NavigationRequest request) {
-            final uri = Uri.parse(request.url);
+      ..setJavaScriptMode(JavaScriptMode.unrestricted);
 
-            log(
-              'Navigation request: ${request.url}',
-              name: 'EasebuzzService',
-            );
+    // Mock Safari User-Agent on iOS to show 'Pay by any UPI app' intent option
+    if (Platform.isIOS) {
+      _controller.setUserAgent(
+          'Mozilla/5.0 (iPhone; CPU iPhone OS 16_0 like Mac Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.0 Mobile/15E148 Safari/604.1');
+    }
 
-            // Check if it's a UPI or other app deep link
-            if (uri.scheme == 'upi' ||
-                uri.scheme == 'gpay' ||
-                uri.scheme == 'phonepe' ||
-                uri.scheme == 'paytm' ||
-                uri.scheme == 'paytmmp' ||
-                uri.scheme == 'tez' ||
-                uri.scheme == 'cred' ||
-                uri.scheme == 'credpay') {
-              _launchUrl(request.url);
-              return NavigationDecision.prevent;
+    _controller.setNavigationDelegate(
+      NavigationDelegate(
+        onNavigationRequest: (NavigationRequest request) {
+          final uri = Uri.parse(request.url);
+
+          log(
+            'Navigation request: ${request.url}',
+            name: 'EasebuzzService',
+          );
+
+          // Check if it's a UPI or other app deep link
+          if (uri.scheme == 'upi' ||
+              uri.scheme == 'gpay' ||
+              uri.scheme == 'phonepe' ||
+              uri.scheme == 'paytm' ||
+              uri.scheme == 'paytmmp' ||
+              uri.scheme == 'tez' ||
+              uri.scheme == 'cred' ||
+              uri.scheme == 'credpay') {
+            _launchUrl(request.url);
+            return NavigationDecision.prevent;
+          }
+
+          // Intercept verification URL to prevent the 500 error display
+          if (request.url.contains('easebuzz-verify')) {
+            log('Intercepted verify URL in navigation, handling manually...',
+                name: 'EasebuzzService');
+            if (!_isVerifying && paymentData != null) {
+              _verifyTransactionManual(paymentData);
             }
+            return NavigationDecision.prevent;
+          }
 
-            // Intercept verification URL to prevent the 500 error display
-            if (request.url.contains('easebuzz-verify')) {
-              log('Intercepted verify URL in navigation, handling manually...',
-                  name: 'EasebuzzService');
-              if (!_isVerifying && paymentData != null) {
-                _verifyTransactionManual(paymentData);
-              }
-              return NavigationDecision.prevent;
+          return NavigationDecision.navigate;
+        },
+        onPageStarted: (String url) {
+          log('Page started: $url', name: 'EasebuzzService');
+          // Aggressively stop verification URL on Android
+          if (url.contains('easebuzz-verify')) {
+            // Hack to stop loading if stopLoading() is missing in this version
+            _controller.loadHtmlString('<html><body></body></html>');
+            if (!_isVerifying && paymentData != null) {
+              _verifyTransactionManual(paymentData);
             }
-
-            return NavigationDecision.navigate;
-          },
-          onPageStarted: (String url) {
-            log('Page started: $url', name: 'EasebuzzService');
-            // Aggressively stop verification URL on Android
-            if (url.contains('easebuzz-verify')) {
-              // Hack to stop loading if stopLoading() is missing in this version
-              _controller.loadHtmlString('<html><body></body></html>');
-              if (!_isVerifying && paymentData != null) {
-                _verifyTransactionManual(paymentData);
-              }
-            }
-          },
-          onPageFinished: (String url) {
-            log('Page finished: $url', name: 'EasebuzzService');
-            _injectLinkInterceptor();
-          },
-        ),
-      );
+          }
+        },
+        onPageFinished: (String url) {
+          log('Page finished: $url', name: 'EasebuzzService');
+          _injectLinkInterceptor();
+        },
+      ),
+    );
 
     // [NEW] Add JavaScript Channel to intercept form data (backup method)
     _controller.addJavaScriptChannel(
