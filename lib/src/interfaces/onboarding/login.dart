@@ -154,17 +154,17 @@ class _PhoneNumberScreenState extends ConsumerState<PhoneNumberScreen> {
                                   },
                                   flagsButtonPadding: const EdgeInsets.only(
                                       left: 10, right: 10.0),
-                                  showDropdownIcon: false,
-                                  // dropdownIcon: const Icon(
-                                  //   Icons.arrow_drop_down_outlined,
-                                  //   color: kTextColor,
-                                  // ),
-                                  // dropdownIconPosition: IconPosition.trailing,
-                                  // dropdownTextStyle: const TextStyle(
-                                  //   color: kTextColor,
-                                  //   fontSize: 15,
-                                  //   fontWeight: FontWeight.w400,
-                                  // ),
+                                  showDropdownIcon: true,
+                                  dropdownIcon: const Icon(
+                                    Icons.arrow_drop_down_outlined,
+                                    color: kTextColor,
+                                  ),
+                                  dropdownIconPosition: IconPosition.trailing,
+                                  dropdownTextStyle: const TextStyle(
+                                    color: kTextColor,
+                                    fontSize: 15,
+                                    fontWeight: FontWeight.w400,
+                                  ),
                                 ),
                                 // Overlay to block taps on flag area (prevents country dropdown)
                                 // Positioned(
