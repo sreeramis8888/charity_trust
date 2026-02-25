@@ -167,22 +167,22 @@ class _PhoneNumberScreenState extends ConsumerState<PhoneNumberScreen> {
                                   // ),
                                 ),
                                 // Overlay to block taps on flag area (prevents country dropdown)
-                                Positioned(
-                                  left: 0,
-                                  top: 0,
-                                  width:
-                                      100, // Approximate width of flag + country code area
-                                  height: 50, // Height of the input field
-                                  child: GestureDetector(
-                                    onTap: () {
-                                      // Do nothing - block the tap
-                                    },
-                                    behavior: HitTestBehavior.translucent,
-                                    child: Container(
-                                      color: Colors.transparent,
-                                    ),
-                                  ),
-                                ),
+                                // Positioned(
+                                //   left: 0,
+                                //   top: 0,
+                                //   width:
+                                //       100, // Approximate width of flag + country code area
+                                //   height: 50, // Height of the input field
+                                //   child: GestureDetector(
+                                //     onTap: () {
+                                //       // Do nothing - block the tap
+                                //     },
+                                //     behavior: HitTestBehavior.translucent,
+                                //     child: Container(
+                                //       color: Colors.transparent,
+                                //     ),
+                                //   ),
+                                // ),
                               ],
                             ),
                           ),
@@ -249,7 +249,8 @@ class _PhoneNumberScreenState extends ConsumerState<PhoneNumberScreen> {
         // Request notification permission and FCM token
         await handleNotificationPermissions(context, ref);
         fcmToken = await secureStorage.getFcmToken();
-        log('FCM token after request: ${fcmToken ?? "null"}', name: 'PhoneNumberScreen');
+        log('FCM token after request: ${fcmToken ?? "null"}',
+            name: 'PhoneNumberScreen');
       } else {
         fcmToken = existingFcmToken;
         log('Using existing FCM token', name: 'PhoneNumberScreen');
@@ -364,7 +365,8 @@ class _OTPScreenState extends ConsumerState<OTPScreen> {
         // Request notification permission and FCM token
         await handleNotificationPermissions(context, ref);
         fcmToken = await secureStorage.getFcmToken();
-        log('FCM token after request: ${fcmToken ?? "null"}', name: 'OTPScreen');
+        log('FCM token after request: ${fcmToken ?? "null"}',
+            name: 'OTPScreen');
       } else {
         fcmToken = existingFcmToken;
         log('Using existing FCM token', name: 'OTPScreen');
