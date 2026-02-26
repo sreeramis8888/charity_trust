@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:developer';
 import 'package:Annujoom/src/data/constants/color_constants.dart';
 import 'package:Annujoom/src/data/constants/style_constants.dart';
@@ -144,10 +145,11 @@ class _PhoneNumberScreenState extends ConsumerState<PhoneNumberScreen> {
                                       horizontal: 10.0,
                                     ),
                                   ),
-                                  // onCountryChanged: (value) {
-                                  //   ref.read(countryCodeProvider.notifier).state =
-                                  //       value.dialCode;
-                                  // },
+                                  onCountryChanged: (value) {
+                                    ref
+                                        .read(countryCodeProvider.notifier)
+                                        .state = value.dialCode;
+                                  },
                                   initialCountryCode: 'IN',
                                   onChanged: (phone) {
                                     print(phone.completeNumber);
@@ -229,8 +231,7 @@ class _PhoneNumberScreenState extends ConsumerState<PhoneNumberScreen> {
   }
 
   Future<void> _handleOtpGeneration(BuildContext context, WidgetRef ref) async {
-    // final countryCode = ref.read(countryCodeProvider);
-    const countryCode = '91'; // Always use India country code
+    final countryCode = ref.read(countryCodeProvider) ?? '91';
     final phoneNumber = _mobileController.text;
 
     if (phoneNumber.isEmpty) {
@@ -279,7 +280,7 @@ class _PhoneNumberScreenState extends ConsumerState<PhoneNumberScreen> {
           MaterialPageRoute(
             builder: (context) => OTPScreen(
               fullPhone: fullPhone,
-              countryCode: countryCode, // Always '91'
+              countryCode: countryCode,
               // verificationId: verificationId, // Not needed for backend OTP
               // resendToken: resendToken, // Not needed for backend OTP
             ),
