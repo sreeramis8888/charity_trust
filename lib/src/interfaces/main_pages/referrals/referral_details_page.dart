@@ -104,7 +104,7 @@ class _ReferralDetailsPageState extends ConsumerState<ReferralDetailsPage> {
                           _showRejectConfirmation(reasonController.text.trim());
                         } else {
                           ScaffoldMessenger.of(context).showSnackBar(
-                             SnackBar(
+                            SnackBar(
                               content: Text('provideRejectionReasonError'.tr()),
                             ),
                           );
@@ -245,23 +245,25 @@ class _ReferralDetailsPageState extends ConsumerState<ReferralDetailsPage> {
                     Center(
                       child: Column(
                         children: [
-                          Container(
-                            width: 100,
-                            height: 100,
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
+                          ClipOval(
+                            child: Container(
+                              width: 100,
+                              height: 100,
                               color: Colors.grey[300],
-                              image: widget.user.image != null
-                                  ? DecorationImage(
-                                      image: NetworkImage(widget.user.image!),
+                              child: widget.user.image != null &&
+                                      widget.user.image!.isNotEmpty
+                                  ? Image.network(
+                                      widget.user.image!,
                                       fit: BoxFit.cover,
+                                      errorBuilder:
+                                          (context, error, stackTrace) {
+                                        return Icon(Icons.person,
+                                            size: 50, color: Colors.grey[600]);
+                                      },
                                     )
-                                  : null,
+                                  : Icon(Icons.person,
+                                      size: 50, color: Colors.grey[600]),
                             ),
-                            child: widget.user.image == null
-                                ? Icon(Icons.person,
-                                    size: 50, color: Colors.grey[600])
-                                : null,
                           ),
                           const SizedBox(height: 16),
                           if (widget.isPending)
@@ -272,7 +274,7 @@ class _ReferralDetailsPageState extends ConsumerState<ReferralDetailsPage> {
                                 color: const Color(0xFFFF9800),
                                 borderRadius: BorderRadius.circular(20),
                               ),
-                              child:  Text(
+                              child: Text(
                                 'pendingLabel'.tr(),
                                 style: TextStyle(
                                   color: Colors.white,
@@ -286,13 +288,23 @@ class _ReferralDetailsPageState extends ConsumerState<ReferralDetailsPage> {
                               padding: const EdgeInsets.symmetric(
                                   horizontal: 12, vertical: 6),
                               decoration: BoxDecoration(
-                                color: Color(int.parse(
+                                color: Color(int.tryParse(
                                         '0xFF${_getStatusColor(widget.user.status).substring(1)}') ??
                                     0xFF9E9E9E),
                                 borderRadius: BorderRadius.circular(20),
                               ),
                               child: Text(
-                                (widget.user.status?.toLowerCase() == 'pending' ? 'pendingLabel'.tr() : (widget.user.status?.toLowerCase() == 'active' ? 'active'.tr() : (widget.user.status?.toLowerCase() == 'rejected' ? 'rejectedLabel'.tr() : (widget.user.status?.toUpperCase() ?? 'unknownStatus'.tr())))),
+                                (widget.user.status?.toLowerCase() == 'pending'
+                                    ? 'pendingLabel'.tr()
+                                    : (widget.user.status?.toLowerCase() ==
+                                            'active'
+                                        ? 'active'.tr()
+                                        : (widget.user.status?.toLowerCase() ==
+                                                'rejected'
+                                            ? 'rejectedLabel'.tr()
+                                            : (widget.user.status
+                                                    ?.toUpperCase() ??
+                                                'unknownStatus'.tr())))),
                                 style: const TextStyle(
                                   color: Colors.white,
                                   fontSize: 12,
@@ -341,7 +353,8 @@ class _ReferralDetailsPageState extends ConsumerState<ReferralDetailsPage> {
                     Expanded(
                       child: primaryButton(
                         label: 'accept'.tr(),
-                        onPressed: _isProcessing ? null : _showApproveConfirmation,
+                        onPressed:
+                            _isProcessing ? null : _showApproveConfirmation,
                         buttonColor: const Color(0xFF009B0A),
                         isLoading: _isProcessing,
                         buttonHeight: 48,

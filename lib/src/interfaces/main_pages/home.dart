@@ -1443,7 +1443,9 @@ class _HomePageState extends ConsumerState<HomePage> {
                     child: HomeNewsCard(
                       title: news.getTitle(preferredLanguage),
                       subtitle: news.getSubtitle(preferredLanguage),
-                      image: news.media?[0] ?? '',
+                      image: (news.media != null && news.media!.isNotEmpty)
+                          ? news.media!.first
+                          : '',
                       onTap: () {
                         Navigator.of(context).push(
                           MaterialPageRoute(

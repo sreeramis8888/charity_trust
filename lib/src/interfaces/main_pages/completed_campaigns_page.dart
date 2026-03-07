@@ -7,6 +7,7 @@ import 'package:Annujoom/src/data/models/promotions_model.dart';
 import 'package:Annujoom/src/data/providers/promotions_provider.dart';
 import 'package:Annujoom/src/interfaces/components/loading_indicator.dart';
 import 'package:Annujoom/src/interfaces/components/cards/index.dart';
+import 'package:Annujoom/src/interfaces/main_pages/campaign_pages/completed_campaign_details.dart';
 
 class CompletedCampaignsPage extends ConsumerWidget {
   const CompletedCampaignsPage({super.key});
@@ -51,13 +52,22 @@ class CompletedCampaignsPage extends ConsumerWidget {
               return Padding(
                 padding: const EdgeInsets.only(bottom: 20),
                 child: HomeCompletedCampaignCard(
-                  heading: promotion.getTitle(preferredLanguage) ?? '',
-                  subtitle: promotion.getDescription(preferredLanguage) ?? '',
+                  heading: promotion.getTitle(preferredLanguage),
+                  subtitle: promotion.getDescription(preferredLanguage),
                   goal: promotion.targetAmount,
                   collected: promotion.collectedAmount,
                   posterImage: promotion.media ?? '',
                   isImagePoster: true,
-                  onTap: () {},
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => CompletedCampaignDetailsPage(
+                          promotion: promotion,
+                        ),
+                      ),
+                    );
+                  },
                 ),
               );
             },

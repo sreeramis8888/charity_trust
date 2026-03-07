@@ -132,6 +132,7 @@
   "noCreatedCampaigns": "No created campaigns",
   "noJoinedCampaigns": "No joined campaigns",
   "noCampaignsPending": "No campaigns pending approval",
+  "noCampaignsFound": "No campaigns found",
   "approveCampaign": "Approve Campaign",
   "approveCampaignConfirmation": "Are you sure you want to approve \"{}\"?",
   "approve": "Approve",
