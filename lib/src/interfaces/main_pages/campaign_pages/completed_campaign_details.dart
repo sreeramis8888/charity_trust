@@ -106,7 +106,7 @@ class CompletedCampaignDetailsPage extends ConsumerWidget {
                   const Icon(Icons.check, color: Color(0xFF009000), size: 20),
                   const SizedBox(width: 8),
                   Text(
-                    'Campaign Completed', // Or localize
+                    'campaignCompleted'.tr(), // Or localize
                     style: kBodyTitleM.copyWith(
                         color: const Color(0xFF009000), fontSize: 13),
                   ),
@@ -121,7 +121,7 @@ class CompletedCampaignDetailsPage extends ConsumerWidget {
               children: [
                 RichText(
                   text: TextSpan(
-                    text: 'Goal: ',
+                    text: 'goalLabel'.tr(),
                     style:
                         kBodyTitleR.copyWith(color: kTextColor, fontSize: 16),
                     children: [
@@ -135,7 +135,7 @@ class CompletedCampaignDetailsPage extends ConsumerWidget {
                 ),
                 RichText(
                   text: TextSpan(
-                    text: 'Collected: ',
+                    text: 'collectedLabel'.tr(),
                     style: kBodyTitleR.copyWith(
                         color: kSecondaryTextColor, fontSize: 16),
                     children: [
@@ -157,7 +157,7 @@ class CompletedCampaignDetailsPage extends ConsumerWidget {
 
             // About Campaign
             Text(
-              'About Campaign', // Or localize
+              'aboutCampaign'.tr(), // Or localize
               style: kBodyTitleSB.copyWith(fontSize: 14),
             ),
             const SizedBox(height: 12),
@@ -169,13 +169,13 @@ class CompletedCampaignDetailsPage extends ConsumerWidget {
             const SizedBox(height: 24),
 
             // Dates List
-            _buildDateRow('Start Date', startStr),
+            _buildDateRow('startDate', startStr),
             const SizedBox(height: 12),
-            _buildDateRow('Target Date', targetStr),
+            _buildDateRow('targetDate', targetStr),
             const SizedBox(height: 12),
-            _buildDateRow('Completion Date', endStr),
+            _buildDateRow('completionDate', endStr),
             const SizedBox(height: 16),
-            _buildDateRow('Time Taken', timeTaken),
+            _buildDateRow('timeTaken', timeTaken),
 
             const SizedBox(height: 48),
 
@@ -194,7 +194,7 @@ class CompletedCampaignDetailsPage extends ConsumerWidget {
                   ),
                 ),
                 child: Text(
-                  'Share', // Or localize
+                  'share'.tr(), // Or localize
                   style: kBodyTitleR.copyWith(color: kTextColor),
                 ),
               ),
@@ -212,7 +212,7 @@ class CompletedCampaignDetailsPage extends ConsumerWidget {
         SizedBox(
           width: 150, // Fixed width for alignment as seen in design
           child: Text(
-            label,
+            label.tr(),
             style: kBodyTitleSB.copyWith(color: kTextColor, fontSize: 14),
           ),
         ),

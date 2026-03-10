@@ -122,6 +122,9 @@
   "search": "Search",
   "filter": "Filter",
   "startDate": "Start Date",
+  "targetDate": "Target Date",
+  "completionDate": "Completion Date",
+  "timeTaken": "Time Taken",
   "endDate": "End Date",
   "apply": "Apply",
   "clearFilters": "Clear Filters",
@@ -263,6 +266,8 @@
   "yourReferralLink": "Your Referral Link",
   "linkCopied": "Link copied to clipboard",
   "shareVia": "Share Via",
+  "share": "Share",
+  "campaignCompleted": "Campaign Completed",
   "email": "Email",
   "whatsapp": "WhatsApp",
   "more": "More Options",
@@ -350,5 +355,6 @@
   "legalComplianceDescription": "We are officially licensed to operate, ensuring compliance with all the applicable regulations.",
   "darpanCertificate": "DARPAN CERTIFICATE",
   "viewPdf": "View Certificate",
-  "license": "License"
+  "license": "License",
+  "aboutCampaign": "About Campaign"
 }
