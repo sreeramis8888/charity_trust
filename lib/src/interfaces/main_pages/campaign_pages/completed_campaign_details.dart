@@ -6,6 +6,7 @@ import 'package:Annujoom/src/data/constants/color_constants.dart';
 import 'package:Annujoom/src/data/constants/style_constants.dart';
 import 'package:Annujoom/src/data/constants/global_variables.dart';
 import 'package:intl/intl.dart';
+import 'package:share_plus/share_plus.dart';
 
 class CompletedCampaignDetailsPage extends ConsumerWidget {
   final Promotions promotion;
@@ -184,8 +185,32 @@ class CompletedCampaignDetailsPage extends ConsumerWidget {
               width: double.infinity,
               height: 50,
               child: OutlinedButton(
-                onPressed: () {
-                  // TODO: Implement Share functionality
+                onPressed: () async {
+                  const androidLink =
+                      'https://play.google.com/store/apps/details?id=com.annujoomconnect';
+                  const iosLink =
+                      'https://apps.apple.com/in/app/annujoom-connect/id6756281138';
+
+                  final message = '$title\n\n'
+                      '$description\n\n'
+                      '${'goalLabel'.tr()}: ₹$goalAmount\n'
+                      '${'collectedLabel'.tr()}: ₹$collectedAmount\n'
+                      '${'timeTaken'.tr()}: $timeTaken\n\n'
+                      'Android: $androidLink\n\n'
+                      'iOS: $iosLink';
+
+                  try {
+                    await Share.share(message, subject: title);
+                  } catch (e) {
+                    if (context.mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text('Error sharing: $e'),
+                          backgroundColor: Colors.red,
+                        ),
+                      );
+                    }
+                  }
                 },
                 style: OutlinedButton.styleFrom(
                   side: const BorderSide(color: kTextColor),

@@ -1404,7 +1404,7 @@ class _HomePageState extends ConsumerState<HomePage> {
                           onTap: () {
                             ref
                                 .read(selectedIndexProvider.notifier)
-                                .updateIndex(2);
+                                .updateIndex(3);
                           },
                           child: Text(
                             'seeAll'.tr(),
