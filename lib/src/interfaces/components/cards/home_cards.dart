@@ -236,7 +236,7 @@ class HomeCompletedCampaignCard extends StatelessWidget {
                         ),
                         Text(
                           "collectedLabel".tr() +
-                              ": ${formatCurrency(collected)} ✅",
+                              ": ${formatCurrency((collected != null && goal != null && (double.tryParse(collected.toString()) ?? 0) > (double.tryParse(goal.toString()) ?? 0)) ? goal : collected)} ✅",
                           style: kSmallTitleM.copyWith(
                             color: kWhite,
                           ),
@@ -561,7 +561,7 @@ class HomeGradientCampaignCard extends StatelessWidget {
                     Row(
                       children: [
                         Text(
-                          "₹$raised",
+                          "₹${raised > goal ? goal : raised}",
                           style: kSmallTitleM.copyWith(
                               color: const Color(0xFFFFD400)),
                         ),
@@ -596,7 +596,7 @@ class HomeGradientCampaignCard extends StatelessWidget {
                     Row(
                       children: [
                         Text(
-                          "₹$raised",
+                          "₹${raised > goal ? goal : raised}",
                           style: kSmallTitleM.copyWith(
                               color: const Color(0xFFFFD400)),
                         ),

@@ -25,8 +25,14 @@ class CompletedCampaignDetailsPage extends ConsumerWidget {
     final goalAmount = promotion.targetAmount != null
         ? formatter.format(promotion.targetAmount)
         : '0';
-    final collectedAmount = promotion.collectedAmount != null
-        ? formatter.format(promotion.collectedAmount)
+    final displayCollectedAmount = (promotion.collectedAmount != null &&
+            promotion.targetAmount != null &&
+            promotion.collectedAmount! > promotion.targetAmount!)
+        ? promotion.targetAmount
+        : promotion.collectedAmount;
+
+    final collectedAmount = displayCollectedAmount != null
+        ? formatter.format(displayCollectedAmount)
         : '0';
 
     // Date calculations
