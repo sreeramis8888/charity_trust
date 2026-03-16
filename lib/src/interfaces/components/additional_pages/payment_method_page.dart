@@ -122,22 +122,23 @@ class _PaymentMethodPageState extends ConsumerState<PaymentMethodPage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Ease buzz Option
-                  _buildPaymentOption(
-                    gateway: 'easebuzz',
-                    title: 'Easebuzz',
-                    subtitle: 'No additional charges',
-                    icon: 'assets/svg/annujoom_logo.svg',
-                    isSelected: _selectedGateway == 'easebuzz',
-                    onTap: () {
-                      setState(() {
-                        _selectedGateway = 'easebuzz';
-                        // _showEmailInput = true;
-                      });
-                    },
-                  ),
+                  // // Ease buzz Option
+                  // _buildPaymentOption(
+                  //   gateway: 'easebuzz',
+                  //   title: 'Easebuzz',
+                  //   subtitle: 'No additional charges',
+                  //   icon: 'assets/svg/annujoom_logo.svg',
+                  //   isSelected: _selectedGateway == 'easebuzz',
+                  //   onTap: () {
+                  //     setState(() {
+                  //       _selectedGateway = 'easebuzz';
+                  //       // _showEmailInput = true;
+                  //     });
+                  //   },
+                  // ),
+                  //
+                  // const SizedBox(height: 16),
 
-                  const SizedBox(height: 16),
                   // Razorpay Option
                   _buildPaymentOption(
                     gateway: 'razorpay',
