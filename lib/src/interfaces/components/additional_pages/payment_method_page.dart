@@ -156,19 +156,19 @@ class _PaymentMethodPageState extends ConsumerState<PaymentMethodPage> {
                   const SizedBox(height: 16),
 
                   // //mswipe
-                  // _buildPaymentOption(
-                  //   gateway: 'mswipe',
-                  //   title: 'Mswipe',
-                  //   subtitle: 'No additional charges',
-                  //   icon: 'assets/png/union_bank.png',
-                  //   isSelected: _selectedGateway == 'mswipe',
-                  //   onTap: () {
-                  //     setState(() {
-                  //       _selectedGateway = 'mswipe';
-                  //       // _showEmailInput = true;
-                  //     });
-                  //   },
-                  // ),
+                  _buildPaymentOption(
+                    gateway: 'mswipe',
+                    title: 'Mswipe',
+                    subtitle: 'No additional charges',
+                    icon: 'assets/png/union_bank.png',
+                    isSelected: _selectedGateway == 'mswipe',
+                    onTap: () {
+                      setState(() {
+                        _selectedGateway = 'mswipe';
+                        // _showEmailInput = true;
+                      });
+                    },
+                  ),
 
                   // Email Input for Mswipe
                   // if (_showEmailInput) ...[
