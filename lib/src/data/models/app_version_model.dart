@@ -6,13 +6,19 @@ class AppVersionResponse {
   final String applink;
   final String updateMessage;
   final bool? isPaymentEnabled;
+  final bool? isMswipeEnabled;
+  final bool? isRazorpayEnabled;
+  final bool? isEasebuzzEnabled;
 
-  AppVersionResponse( {
+  AppVersionResponse({
     required this.version,
     required this.force,
     required this.applink,
     required this.updateMessage,
-    this.isPaymentEnabled
+    this.isPaymentEnabled,
+    this.isMswipeEnabled,
+    this.isRazorpayEnabled,
+    this.isEasebuzzEnabled,
   });
 
   factory AppVersionResponse.fromJson(Map<String, dynamic> json) {
@@ -24,7 +30,9 @@ class AppVersionResponse {
       applink: platform['applink'],
       updateMessage: platform['updateMessage'],
       isPaymentEnabled: platform['paymentEnabled'],
-      
+      isMswipeEnabled: platform['mswipe_enabled'],
+      isRazorpayEnabled: platform['razorpay_enabled'],
+      isEasebuzzEnabled: platform['easebuzz_enabled'],
     );
   }
 }

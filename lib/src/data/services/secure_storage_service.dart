@@ -11,11 +11,41 @@ class SecureStorageService {
   static const String _userDataKey = 'user_data';
   static const String _fcmTokenKey = 'fcm_token';
   static const String _preferredLanguageKey = 'preferred_language';
+  static const String _mswipeEnabledKey = 'mswipe_enabled';
+  static const String _razorpayEnabledKey = 'razorpay_enabled';
+  static const String _easebuzzEnabledKey = 'easebuzz_enabled';
 
   final FlutterSecureStorage _storage;
 
   SecureStorageService({FlutterSecureStorage? storage})
       : _storage = storage ?? const FlutterSecureStorage();
+
+  Future<void> saveMswipeEnabled(bool value) async {
+    await _storage.write(key: _mswipeEnabledKey, value: value.toString());
+  }
+
+  Future<bool?> getMswipeEnabled() async {
+    final value = await _storage.read(key: _mswipeEnabledKey);
+    return value != null ? value == 'true' : null;
+  }
+
+  Future<void> saveRazorpayEnabled(bool value) async {
+    await _storage.write(key: _razorpayEnabledKey, value: value.toString());
+  }
+
+  Future<bool?> getRazorpayEnabled() async {
+    final value = await _storage.read(key: _razorpayEnabledKey);
+    return value != null ? value == 'true' : null;
+  }
+
+  Future<void> saveEasebuzzEnabled(bool value) async {
+    await _storage.write(key: _easebuzzEnabledKey, value: value.toString());
+  }
+
+  Future<bool?> getEasebuzzEnabled() async {
+    final value = await _storage.read(key: _easebuzzEnabledKey);
+    return value != null ? value == 'true' : null;
+  }
 
   Future<void> saveBearerToken(String token) async {
     await _storage.write(key: _bearerTokenKey, value: token);

@@ -1,4 +1,5 @@
 import 'dart:developer';
+import 'package:Annujoom/src/data/services/secure_storage_service.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -32,6 +33,36 @@ class _PaymentMethodPageState extends ConsumerState<PaymentMethodPage> {
   String _selectedGateway = 'razorpay';
   // bool _showEmailInput = true;
   // final TextEditingController _emailController = TextEditingController();
+  SecureStorageService secureStorageService = SecureStorageService();
+  bool isMswipeEnabled = false;
+  bool isRazorpayEnabled = false;
+  bool isEasebuzzEnabled = false;
+
+  @override
+  void initState() {
+    super.initState();
+    secureStorageService.getMswipeEnabled().then((value) {
+      if (value != null) {
+        setState(() {
+          isMswipeEnabled = value;
+        });
+      }
+    });
+    secureStorageService.getRazorpayEnabled().then((value) {
+      if (value != null) {
+        setState(() {
+          isRazorpayEnabled = value;
+        });
+      }
+    });
+    secureStorageService.getEasebuzzEnabled().then((value) {
+      if (value != null) {
+        setState(() {
+          isEasebuzzEnabled = value;
+        });
+      }
+    });
+  }
 
   @override
   void dispose() {
@@ -122,53 +153,55 @@ class _PaymentMethodPageState extends ConsumerState<PaymentMethodPage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // // Ease buzz Option
-                  // _buildPaymentOption(
-                  //   gateway: 'easebuzz',
-                  //   title: 'Easebuzz',
-                  //   subtitle: 'No additional charges',
-                  //   icon: 'assets/svg/annujoom_logo.svg',
-                  //   isSelected: _selectedGateway == 'easebuzz',
-                  //   onTap: () {
-                  //     setState(() {
-                  //       _selectedGateway = 'easebuzz';
-                  //       // _showEmailInput = true;
-                  //     });
-                  //   },
-                  // ),
-                  //
-                  // const SizedBox(height: 16),
+                  if (isEasebuzzEnabled)
+                    _buildPaymentOption(
+                      gateway: 'easebuzz',
+                      title: 'Easebuzz',
+                      subtitle: 'No additional charges',
+                      icon: 'assets/svg/annujoom_logo.svg',
+                      isSelected: _selectedGateway == 'easebuzz',
+                      onTap: () {
+                        setState(() {
+                          _selectedGateway = 'easebuzz';
+                          // _showEmailInput = true;
+                        });
+                      },
+                    ),
+
+                  const SizedBox(height: 16),
 
                   // Razorpay Option
-                  _buildPaymentOption(
-                    gateway: 'razorpay',
-                    title: 'Razorpay',
-                    subtitle: '2% convenience fee applicable',
-                    icon: 'assets/png/razorpay.png',
-                    isSelected: _selectedGateway == 'razorpay',
-                    onTap: () {
-                      setState(() {
-                        _selectedGateway = 'razorpay';
-                        // _showEmailInput = false;
-                      });
-                    },
-                  ),
+                  if (isRazorpayEnabled)
+                    _buildPaymentOption(
+                      gateway: 'razorpay',
+                      title: 'Razorpay',
+                      subtitle: '2% convenience fee applicable',
+                      icon: 'assets/png/razorpay.png',
+                      isSelected: _selectedGateway == 'razorpay',
+                      onTap: () {
+                        setState(() {
+                          _selectedGateway = 'razorpay';
+                          // _showEmailInput = false;
+                        });
+                      },
+                    ),
                   const SizedBox(height: 16),
 
                   // //mswipe
-                  _buildPaymentOption(
-                    gateway: 'mswipe',
-                    title: 'Mswipe',
-                    subtitle: 'No additional charges',
-                    icon: 'assets/png/union_bank.png',
-                    isSelected: _selectedGateway == 'mswipe',
-                    onTap: () {
-                      setState(() {
-                        _selectedGateway = 'mswipe';
-                        // _showEmailInput = true;
-                      });
-                    },
-                  ),
+                  if (isMswipeEnabled)
+                    _buildPaymentOption(
+                      gateway: 'mswipe',
+                      title: 'Mswipe',
+                      subtitle: 'No additional charges',
+                      icon: 'assets/png/union_bank.png',
+                      isSelected: _selectedGateway == 'mswipe',
+                      onTap: () {
+                        setState(() {
+                          _selectedGateway = 'mswipe';
+                          // _showEmailInput = true;
+                        });
+                      },
+                    ),
 
                   // Email Input for Mswipe
                   // if (_showEmailInput) ...[

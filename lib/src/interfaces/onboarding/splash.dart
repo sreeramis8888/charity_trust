@@ -114,6 +114,21 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
       final versionResponse = await versionCheckService.checkVersion();
 
       if (versionResponse != null) {
+        // Save checkout flags to secure storage
+        final secureStorage = ref.read(secureStorageServiceProvider);
+        if (versionResponse.isMswipeEnabled != null) {
+          await secureStorage
+              .saveMswipeEnabled(versionResponse.isMswipeEnabled!);
+        }
+        if (versionResponse.isRazorpayEnabled != null) {
+          await secureStorage
+              .saveRazorpayEnabled(versionResponse.isRazorpayEnabled!);
+        }
+        if (versionResponse.isEasebuzzEnabled != null) {
+          await secureStorage
+              .saveEasebuzzEnabled(versionResponse.isEasebuzzEnabled!);
+        }
+
         // Get current app version
         final packageInfo = await PackageInfo.fromPlatform();
         final currentVersion = int.tryParse(packageInfo.buildNumber) ?? 0;
@@ -166,15 +181,13 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
         name: 'SplashScreen');
     if (updateLink != null && updateLink!.isNotEmpty) {
       try {
- 
-          log('_openAppStore: URL is launchable, opening...',
-              name: 'SplashScreen');
-          await launchUrl(
-            Uri.parse(updateLink!),
-            mode: LaunchMode.externalApplication,
-          );
-          log('_openAppStore: URL launched successfully', name: 'SplashScreen');
-     
+        log('_openAppStore: URL is launchable, opening...',
+            name: 'SplashScreen');
+        await launchUrl(
+          Uri.parse(updateLink!),
+          mode: LaunchMode.externalApplication,
+        );
+        log('_openAppStore: URL launched successfully', name: 'SplashScreen');
       } catch (e) {
         log('Error opening app store: $e', name: 'SplashScreen');
       }
