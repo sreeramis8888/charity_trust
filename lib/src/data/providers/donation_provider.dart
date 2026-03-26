@@ -78,6 +78,22 @@ class DonationApi {
   }
 
   //Easebuzz
+  Future<ApiResponse<Map<String, dynamic>>> fetchEasebuzzPaymentDetails({
+    required String transactionId,
+  }) async {
+    final response = await _apiProvider.get(
+      '/donation/easebuzz-payment-details/$transactionId',
+      requireAuth: true,
+    );
+
+    if (response.success) {
+      log('Easebuzz payment details fetched successfully',
+          name: 'DonationApi');
+    }
+
+    return response;
+  }
+
   Future<ApiResponse<Map<String, dynamic>>> verifyEasebuzzPayment({
     required String transactionId,
     required String hash,
@@ -218,5 +234,34 @@ class DonationNotifier extends _$DonationNotifier {
     });
 
     return state.hasValue && (state.value?['verified'] as bool? ?? false);
+  }
+
+  Future<Map<String, dynamic>?> fetchEasebuzzPaymentDetails({
+    required String transactionId,
+  }) async {
+    state = const AsyncValue.loading();
+    state = await AsyncValue.guard(() async {
+      final donationApi = ref.watch(donationApiProvider);
+      final response = await donationApi.fetchEasebuzzPaymentDetails(
+        transactionId: transactionId,
+      );
+
+      if (response.success && response.data != null) {
+        final data = response.data!['data'] as Map<String, dynamic>?;
+        if (data != null) {
+          log('Easebuzz payment details fetched', name: 'DonationNotifier');
+          return data;
+        }
+        throw Exception('No donation data in response');
+      } else {
+        throw Exception(
+            response.message ?? 'Failed to fetch Easebuzz payment details');
+      }
+    });
+
+    if (state.hasValue) {
+      return state.value;
+    }
+    return null;
   }
 }

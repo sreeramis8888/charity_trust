@@ -390,8 +390,10 @@ class _ReceiptDetails extends StatelessWidget {
           children: [
             _row("Order ID", orderId ?? "N/A"),
             const SizedBox(height: 8),
-            _row("Payment ID", paymentId ?? "N/A"),
-            const SizedBox(height: 8),
+            if (paymentId != null) ...[
+              _row("Payment ID", paymentId!),
+              const SizedBox(height: 8),
+            ],
             _row("Date", date),
             const SizedBox(height: 8),
             _row("Status", "Completed"),

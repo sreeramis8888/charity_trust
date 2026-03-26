@@ -238,14 +238,14 @@ class _CampaignDetailPageState extends ConsumerState<CampaignDetailPage> {
                       child: ElevatedButton(
                         onPressed: () {
                           Navigator.pop(context);
-                          _donationController.text = remainingGoal
-                              .toStringAsFixed(0);
+                          _donationController.text =
+                              remainingGoal.toStringAsFixed(0);
                           _donationController.selection =
                               TextSelection.fromPosition(
-                                TextPosition(
-                                  offset: _donationController.text.length,
-                                ),
-                              );
+                            TextPosition(
+                              offset: _donationController.text.length,
+                            ),
+                          );
                         },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: kPrimaryColor,
@@ -353,6 +353,9 @@ class _CampaignDetailPageState extends ConsumerState<CampaignDetailPage> {
       );
 
       // Step 1: Create donation with selected gateway
+      log(
+        "createDonation request body: { campaignId: '${widget.id ?? ''}', amount: $amount, gateway: '$_selectedGateway', phone: '$_userPhone' }",
+      );
       final response = await donationApi.createDonation(
         campaignId: widget.id ?? '',
         amount: amount,
@@ -371,16 +374,16 @@ class _CampaignDetailPageState extends ConsumerState<CampaignDetailPage> {
       }
 
       final data = response.data!['data'] as Map<String, dynamic>?;
+      log('[API POST data ] $data');
+
       String? orderId;
       String? donationId;
 
-      if (_selectedGateway == 'easebuzz' &&
-          data != null &&
-          data.containsKey('donation')) {
-        final donationData = data['donation'] as Map<String, dynamic>?;
+      if (_selectedGateway == 'easebuzz') {
+        // Easebuzz response is flat: { payment_url, txnid, amount, ... }
         orderId =
-            data['txnid'] as String? ?? donationData?['payment_id'] as String?;
-        donationId = donationData?['_id'] as String?;
+            data?['payment_url'] as String?; // payment_url used for WebView
+        donationId = data?['txnid'] as String?; // txnid used as transaction ref
       } else {
         orderId = data?['payment_id'] as String?;
         donationId = data?['_id'] as String?;
@@ -411,18 +414,7 @@ class _CampaignDetailPageState extends ConsumerState<CampaignDetailPage> {
           }
         }
       } else if (_selectedGateway == 'easebuzz') {
-        if (data != null && donationId != null) {
-          await _processEasebuzzPayment(orderId, donationId, amount, data);
-        } else {
-          log("Missing data or donationId for Easebuzz payment");
-          _showSnackBar(
-            'failedToProcessPayment'.tr(),
-            type: SnackbarType.error,
-          );
-          if (mounted) {
-            setState(() => _isProcessing = false);
-          }
-        }
+        await _processEasebuzzPayment(orderId, donationId ?? '', amount);
       } else {
         if (donationId != null) {
           await _processRazorpayPayment(orderId, donationId, amount);
@@ -483,39 +475,69 @@ class _CampaignDetailPageState extends ConsumerState<CampaignDetailPage> {
   }
 
   Future<void> _processEasebuzzPayment(
-    String orderId,
-    String donationId,
+    String paymentUrl,
+    String transactionId,
     double amount,
-    Map<String, dynamic> data,
   ) async {
-    final paymentUrl = data['payment_url'] as String?;
-
-    if (paymentUrl == null) {
-      log("Payment URL is null for Easebuzz");
-      _showSnackBar('failedToGetPaymentUrl'.tr(), type: SnackbarType.error);
-      if (mounted) {
-        setState(() => _isProcessing = false);
-      }
-      return;
-    }
-
     log("Opening Easebuzz payment page with URL: $paymentUrl");
 
     if (mounted) {
       _donationController.clear();
       _donationFocusNode.unfocus();
+      setState(() => _isProcessing = false);
 
-      Navigator.of(context).pushReplacement(
+      await Navigator.of(context).push(
         MaterialPageRoute(
           builder: (_) => EasebuzzPaymentPage(
             paymentUrl: paymentUrl,
-            donationId: donationId,
-            orderId: orderId,
-            amount: amount,
-            paymentData: data, // [NEW] Pass the full data map
           ),
         ),
       );
+
+      if (mounted && transactionId.isNotEmpty) {
+        setState(() => _isProcessing = true);
+        try {
+          final donationApi = ref.read(donationApiProvider);
+          final response = await donationApi.fetchEasebuzzPaymentDetails(
+            transactionId: transactionId,
+          );
+
+          if (response.success && response.data != null) {
+            final data = response.data!['data'] as Map<String, dynamic>?;
+            if (data != null && data['status'] == 'success') {
+              final receipt = data['receipt'] as String?;
+
+              ref.invalidate(generalCampaignsProvider);
+              ref.invalidate(participatedCampaignsProvider);
+
+              Navigator.of(context).pushReplacement(
+                MaterialPageRoute(
+                  builder: (_) => PaymentSuccessPage(
+                    orderId: transactionId,
+                    paymentId: null, // Easebuzz uses only transactionId
+                    amount: amount,
+                    receipt: receipt,
+                  ),
+                ),
+              );
+              return;
+            }
+          }
+
+          Navigator.of(context).pushReplacement(
+            MaterialPageRoute(builder: (_) => const PaymentFailurePage()),
+          );
+        } catch (e) {
+          log("Error checking Easebuzz payment: $e");
+          Navigator.of(context).pushReplacement(
+            MaterialPageRoute(builder: (_) => const PaymentFailurePage()),
+          );
+        } finally {
+          if (mounted) {
+            setState(() => _isProcessing = false);
+          }
+        }
+      }
     }
   }
 
