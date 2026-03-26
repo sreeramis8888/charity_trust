@@ -1,6 +1,8 @@
-import 'dart:math';
 import 'package:Annujoom/src/data/constants/color_constants.dart';
+import 'package:Annujoom/src/data/providers/file_opener_provider.dart';
 import 'package:Annujoom/src/data/providers/receipt_provider.dart';
+import 'package:Annujoom/src/data/services/snackbar_service.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -482,19 +484,12 @@ class _DownloadButton extends ConsumerWidget {
               try {
                 final filePath =
                     await ref.read(downloadReceiptProvider(receiptUrl!).future);
-                if (context.mounted) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text('Receipt downloaded to: $filePath'),
-                    ),
-                  );
-                }
+                await ref.read(openPdfProvider(filePath).future);
               } catch (e) {
-                if (context.mounted) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('Failed to download: $e')),
-                  );
-                }
+                SnackbarService().showSnackBar(
+                  'failedToOpenReceipt'.tr(args: [e.toString()]),
+                  type: SnackbarType.error,
+                );
               }
             },
       style: ElevatedButton.styleFrom(
