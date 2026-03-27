@@ -153,7 +153,7 @@ class _PaymentMethodPageState extends ConsumerState<PaymentMethodPage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  if (isEasebuzzEnabled)
+                  if (!isEasebuzzEnabled)
                     _buildPaymentOption(
                       gateway: 'easebuzz',
                       title: 'Easebuzz',

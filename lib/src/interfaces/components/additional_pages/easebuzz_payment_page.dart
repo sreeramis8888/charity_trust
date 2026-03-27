@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 import 'package:Annujoom/src/data/constants/color_constants.dart';
 
+import 'package:url_launcher/url_launcher.dart';
+
 class EasebuzzPaymentPage extends StatefulWidget {
   final String paymentUrl;
 
@@ -31,6 +33,32 @@ class _EasebuzzPaymentPageState extends State<EasebuzzPaymentPage> {
           onPageFinished: (_) => setState(() => _isLoading = false),
           onWebResourceError: (error) {
             log('Easebuzz WebView error: ${error.description}');
+          },
+          onNavigationRequest: (NavigationRequest request) async {
+            final url = request.url;
+            final uri = Uri.parse(url);
+            log('Easebuzz WebView: navigating to $url, scheme: ${uri.scheme}');
+
+            // Handle common UPI and payment schemes
+            if (uri.scheme == 'upi' ||
+                uri.scheme == 'phonepe' ||
+                uri.scheme == 'paytm' ||
+                uri.scheme == 'paytmmp' ||
+                uri.scheme == 'tez' ||
+                uri.scheme == 'gpay' ||
+                uri.scheme == 'intent' ||
+                uri.scheme == 'cred' ||
+                uri.scheme == 'credpay') {
+              try {
+                if (await canLaunchUrl(uri)) {
+                  await launchUrl(uri, mode: LaunchMode.externalApplication);
+                  return NavigationDecision.prevent;
+                }
+              } catch (e) {
+                log('Error launching UPI app: $e');
+              }
+            }
+            return NavigationDecision.navigate;
           },
         ),
       )
