@@ -153,7 +153,7 @@ class _PaymentMethodPageState extends ConsumerState<PaymentMethodPage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  if (!isEasebuzzEnabled)
+                  if (isEasebuzzEnabled)
                     _buildPaymentOption(
                       gateway: 'easebuzz',
                       title: 'Easebuzz',
@@ -163,6 +163,24 @@ class _PaymentMethodPageState extends ConsumerState<PaymentMethodPage> {
                       onTap: () {
                         setState(() {
                           _selectedGateway = 'easebuzz';
+                          // _showEmailInput = true;
+                        });
+                      },
+                    ),
+
+                  const SizedBox(height: 16),
+
+                  // //mswipe
+                  if (isMswipeEnabled)
+                    _buildPaymentOption(
+                      gateway: 'mswipe',
+                      title: 'Mswipe',
+                      subtitle: 'No additional charges',
+                      icon: 'assets/png/union_bank.png',
+                      isSelected: _selectedGateway == 'mswipe',
+                      onTap: () {
+                        setState(() {
+                          _selectedGateway = 'mswipe';
                           // _showEmailInput = true;
                         });
                       },
@@ -186,22 +204,6 @@ class _PaymentMethodPageState extends ConsumerState<PaymentMethodPage> {
                       },
                     ),
                   const SizedBox(height: 16),
-
-                  // //mswipe
-                  if (isMswipeEnabled)
-                    _buildPaymentOption(
-                      gateway: 'mswipe',
-                      title: 'Mswipe',
-                      subtitle: 'No additional charges',
-                      icon: 'assets/png/union_bank.png',
-                      isSelected: _selectedGateway == 'mswipe',
-                      onTap: () {
-                        setState(() {
-                          _selectedGateway = 'mswipe';
-                          // _showEmailInput = true;
-                        });
-                      },
-                    ),
 
                   // Email Input for Mswipe
                   // if (_showEmailInput) ...[
