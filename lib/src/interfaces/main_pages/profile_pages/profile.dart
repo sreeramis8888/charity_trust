@@ -1,6 +1,7 @@
 import 'package:Annujoom/src/data/constants/color_constants.dart';
 import 'package:Annujoom/src/data/constants/style_constants.dart';
 import 'package:Annujoom/src/data/constants/global_variables.dart';
+import 'package:Annujoom/src/data/services/webview_services.dart';
 import 'package:Annujoom/src/interfaces/animations/index.dart' as anim;
 import 'package:Annujoom/src/interfaces/components/loading_indicator.dart';
 import 'package:Annujoom/src/interfaces/main_pages/profile_pages/my_participations.dart';
@@ -42,8 +43,9 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
     final settings = await FirebaseMessaging.instance.getNotificationSettings();
     if (mounted) {
       setState(() {
-        _notificationsEnabled = settings.authorizationStatus == AuthorizationStatus.authorized ||
-            settings.authorizationStatus == AuthorizationStatus.provisional;
+        _notificationsEnabled =
+            settings.authorizationStatus == AuthorizationStatus.authorized ||
+                settings.authorizationStatus == AuthorizationStatus.provisional;
       });
     }
   }
@@ -85,7 +87,8 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                     duration: anim.AnimationDuration.fast,
                     child: Container(
                       margin: const EdgeInsets.only(bottom: 12),
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 16, vertical: 12),
                       decoration: BoxDecoration(
                         gradient: LinearGradient(
                           colors: [
@@ -441,6 +444,109 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                         child: _tile(Icons.delete_outline, "deleteAccount".tr(),
                             isDestructive: true),
                       ),
+                      _divider(),
+                      // Footer
+                      Padding(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 15.0, vertical: 10),
+                        child: Row(
+                          children: [
+                            Expanded(
+                              child: GestureDetector(
+                                onTap: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => const WebViewScreen(
+                                        url: 'https://www.skybertech.com/',
+                                        title: 'Skybertech',
+                                      ),
+                                    ),
+                                  );
+                                },
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(10),
+                                    border:
+                                        Border.all(color: Color(0xFFDADADA)),
+                                    // color: kWhite,
+                                  ),
+                                  child: Column(
+                                    children: [
+                                      const Padding(
+                                        padding: EdgeInsets.only(
+                                            top: 10, left: 22, right: 22),
+                                        child: Text(
+                                          'Powered by',
+                                          style: TextStyle(
+                                              fontSize: 12, color: kBlack),
+                                        ),
+                                      ),
+                                      SizedBox(
+                                        height: 80,
+                                        width: 100,
+                                        child: Image.asset(
+                                          'assets/png/skybertech.png',
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 10),
+                            Expanded(
+                              child: GestureDetector(
+                                onTap: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => const WebViewScreen(
+                                        url: 'https://www.xyvin.com/',
+                                        title: 'Xyvin Technologies',
+                                      ),
+                                    ),
+                                  );
+                                },
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(10),
+                                    border:
+                                        Border.all(color: Color(0xFFDADADA)),
+                                    // color: Color.fromARGB(255, 197, 195, 195),
+                                  ),
+                                  child: Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 15, vertical: 8),
+                                    child: Column(
+                                      children: [
+                                        const Padding(
+                                          padding: EdgeInsets.only(
+                                              top: 2, bottom: 3),
+                                          child: Text(
+                                            'Developed by',
+                                            style: TextStyle(
+                                                fontSize: 12, color: kBlack),
+                                          ),
+                                        ),
+                                        const SizedBox(height: 5),
+                                        SizedBox(
+                                          height: 60,
+                                          width: 120,
+                                          child: Image.asset(
+                                            fit: BoxFit.contain,
+                                            'assets/png/xyvin.png',
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
                     ],
                   ),
                 )
@@ -678,16 +784,15 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
         appUrl = 'https://apps.apple.com/in/app/annujoom-connect/id6756281138';
         errorKey = 'couldNotOpenAppStore';
       } else {
-        appUrl = 'https://play.google.com/store/apps/details?id=com.annujoomconnect';
+        appUrl =
+            'https://play.google.com/store/apps/details?id=com.annujoomconnect';
         errorKey = 'couldNotOpenPlayStore';
       }
 
-
-        await launchUrl(
-          Uri.parse(appUrl),
-          mode: LaunchMode.externalApplication,
-        );
-     
+      await launchUrl(
+        Uri.parse(appUrl),
+        mode: LaunchMode.externalApplication,
+      );
     } catch (e) {
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
