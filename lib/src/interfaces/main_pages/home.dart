@@ -1348,7 +1348,7 @@ class _HomePageState extends ConsumerState<HomePage> {
                               padding:
                                   const EdgeInsets.symmetric(horizontal: 16.0),
                               child: HomeCompletedCampaignCard(
-                                targetDate: promotion.targetDate,
+                                targetDate: promotion.endDate,
                                 heading: promotion.getTitle(preferredLanguage),
                                 subtitle:
                                     promotion.getDescription(preferredLanguage),

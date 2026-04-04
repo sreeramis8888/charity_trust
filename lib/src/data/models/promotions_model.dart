@@ -79,7 +79,7 @@ class Promotions {
           ? DateTime.tryParse(json['start_date'].toString())
           : null,
       targetDate: json['target_date'] != null
-          ? DateTime.tryParse(json['start_date'].toString())
+          ? DateTime.tryParse(json['target_date'].toString())
           : null,
       endDate: json['end_date'] != null
           ? DateTime.tryParse(json['end_date'].toString())
