@@ -1173,6 +1173,21 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
                                 Text("charityMember".tr()),
                               ],
                             ),
+                            Row(
+                              children: [
+                                Radio<String>(
+                                  value: 'self',
+                                  groupValue: recommendedByType,
+                                  onChanged: (value) {
+                                    setState(() {
+                                      recommendedByType = value;
+                                      selectedRecommendedBy = null;
+                                    });
+                                  },
+                                ),
+                                Text("self".tr()),
+                              ],
+                            ),
                           ],
                         ),
                       ),
@@ -1192,172 +1207,179 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
                           builder: (field) => Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text(
-                                recommendedByType == 'trustee'
-                                    ? "chooseTrustee".tr() + " *"
-                                    : "chooseCharityMember".tr() + " *",
-                                style: kSmallTitleR,
-                              ),
-                              const SizedBox(height: 6),
-                              GestureDetector(
-                                onTap: () async {
-                                  await ModalSheet.showPaginated<UserModel>(
-                                    context: context,
-                                    title: recommendedByType == 'trustee'
-                                        ? 'chooseTrustee'.tr()
-                                        : 'chooseCharityMember'.tr(),
-                                    searchHint: recommendedByType == 'trustee'
-                                        ? 'searchTrustee'.tr()
-                                        : 'searchCharityMember'.tr(),
-                                    onFetchPage: (pageNo, query) async {
-                                      final apiProvider =
-                                          ref.read(apiProviderProvider);
+                              if (recommendedByType != 'self') ...[
+                                Text(
+                                  recommendedByType == 'trustee'
+                                      ? "chooseTrustee".tr() + " *"
+                                      : "chooseCharityMember".tr() + " *",
+                                  style: kSmallTitleR,
+                                ),
+                              ],
+                              if (recommendedByType != 'self') ...[
+                                const SizedBox(height: 6),
+                                GestureDetector(
+                                  onTap: () async {
+                                    await ModalSheet.showPaginated<UserModel>(
+                                      context: context,
+                                      title: recommendedByType == 'trustee'
+                                          ? 'chooseTrustee'.tr()
+                                          : 'chooseCharityMember'.tr(),
+                                      searchHint: recommendedByType == 'trustee'
+                                          ? 'searchTrustee'.tr()
+                                          : 'searchCharityMember'.tr(),
+                                      onFetchPage: (pageNo, query) async {
+                                        final apiProvider =
+                                            ref.read(apiProviderProvider);
 
-                                      // Build query string with multiple role[] parameters
-                                      final roles =
-                                          recommendedByType == 'trustee'
-                                              ? [
-                                                  'trustee',
-                                                  'president',
-                                                  'secretary',
-                                                  'treasurer'
-                                                ]
-                                              : ['member'];
+                                        // Build query string with multiple role[] parameters
+                                        final roles =
+                                            recommendedByType == 'trustee'
+                                                ? [
+                                                    'trustee',
+                                                    'president',
+                                                    'secretary',
+                                                    'treasurer'
+                                                  ]
+                                                : ['member'];
 
-                                      final queryParts = <String>[];
-                                      for (final role in roles) {
-                                        queryParts.add(
-                                            'role[]=${Uri.encodeComponent(role)}');
-                                      }
-                                      queryParts.add('page_no=$pageNo');
-                                      queryParts.add('limit=10');
+                                        final queryParts = <String>[];
+                                        for (final role in roles) {
+                                          queryParts.add(
+                                              'role[]=${Uri.encodeComponent(role)}');
+                                        }
+                                        queryParts.add('page_no=$pageNo');
+                                        queryParts.add('limit=10');
 
-                                      if (query.isNotEmpty) {
-                                        queryParts.add(
-                                            'search=${Uri.encodeComponent(query)}');
-                                      }
+                                        if (query.isNotEmpty) {
+                                          queryParts.add(
+                                              'search=${Uri.encodeComponent(query)}');
+                                        }
 
-                                      final queryString = queryParts.join('&');
-                                      final response = await apiProvider.get(
-                                        '/user?$queryString',
-                                        requireAuth: true,
-                                      );
+                                        final queryString =
+                                            queryParts.join('&');
+                                        final response = await apiProvider.get(
+                                          '/user?$queryString',
+                                          requireAuth: true,
+                                        );
 
-                                      if (response.success &&
-                                          response.data != null) {
-                                        final data = response.data!['data'];
-                                        final usersList =
-                                            data['users'] as List?;
+                                        if (response.success &&
+                                            response.data != null) {
+                                          final data = response.data!['data'];
+                                          final usersList =
+                                              data['users'] as List?;
 
-                                        // Get total count from API response (prefer root level, fallback to data level)
-                                        final totalCount =
-                                            response.data!['total_count'] ??
-                                                (data is Map
-                                                    ? data['total_count']
-                                                    : null);
-                                        final totalCountInt = totalCount is int
-                                            ? totalCount
-                                            : int.tryParse(
-                                                    totalCount?.toString() ??
-                                                        '0') ??
-                                                0;
+                                          // Get total count from API response (prefer root level, fallback to data level)
+                                          final totalCount =
+                                              response.data!['total_count'] ??
+                                                  (data is Map
+                                                      ? data['total_count']
+                                                      : null);
+                                          final totalCountInt = totalCount
+                                                  is int
+                                              ? totalCount
+                                              : int.tryParse(
+                                                      totalCount?.toString() ??
+                                                          '0') ??
+                                                  0;
 
-                                        final users = usersList != null
-                                            ? usersList
-                                                .map((item) =>
-                                                    UserModel.fromJson(item
-                                                        as Map<String,
-                                                            dynamic>))
-                                                .toList()
-                                            : <UserModel>[];
+                                          final users = usersList != null
+                                              ? usersList
+                                                  .map((item) =>
+                                                      UserModel.fromJson(item
+                                                          as Map<String,
+                                                              dynamic>))
+                                                  .toList()
+                                              : <UserModel>[];
 
-                                        // Deduplicate users by _id to prevent duplicates
-                                        final uniqueUsers =
-                                            <String, UserModel>{};
-                                        for (final user in users) {
-                                          if (user.id != null) {
-                                            uniqueUsers[user.id!] = user;
+                                          // Deduplicate users by _id to prevent duplicates
+                                          final uniqueUsers =
+                                              <String, UserModel>{};
+                                          for (final user in users) {
+                                            if (user.id != null) {
+                                              uniqueUsers[user.id!] = user;
+                                            }
                                           }
+
+                                          return PaginatedResponse(
+                                            items: uniqueUsers.values.toList(),
+                                            totalCount: totalCountInt,
+                                            currentPage: pageNo,
+                                            limit: 10,
+                                          );
                                         }
 
                                         return PaginatedResponse(
-                                          items: uniqueUsers.values.toList(),
-                                          totalCount: totalCountInt,
+                                          items: <UserModel>[],
+                                          totalCount: 0,
                                           currentPage: pageNo,
                                           limit: 10,
                                         );
-                                      }
-
-                                      return PaginatedResponse(
-                                        items: <UserModel>[],
-                                        totalCount: 0,
-                                        currentPage: pageNo,
-                                        limit: 10,
-                                      );
-                                    },
-                                    itemLabel: (user) => user.name ?? 'Unknown',
-                                    onItemSelected: (user) {
-                                      setState(() {
-                                        selectedRecommendedBy = user;
-                                        field.didChange(user);
-                                      });
-                                    },
-                                    itemBuilder: (user) => Text(
-                                      user.name ?? 'Unknown',
-                                      style: const TextStyle(
-                                        fontSize: 14,
-                                        color: Colors.black,
-                                        fontWeight: FontWeight.w400,
-                                      ),
-                                    ),
-                                  );
-                                },
-                                child: Container(
-                                  height: 52,
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 14),
-                                  decoration: BoxDecoration(
-                                    color: Colors.white,
-                                    borderRadius: BorderRadius.circular(12),
-                                    border:
-                                        Border.all(color: Colors.grey.shade300),
-                                  ),
-                                  child: Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Text(
-                                        selectedRecommendedBy?.name ??
-                                            (recommendedByType == 'trustee'
-                                                ? 'searchTrustee'.tr()
-                                                : 'searchCharityMember'.tr()),
-                                        style: TextStyle(
-                                          color: selectedRecommendedBy == null
-                                              ? Colors.grey.shade600
-                                              : Colors.black,
+                                      },
+                                      itemLabel: (user) =>
+                                          user.name ?? 'Unknown',
+                                      onItemSelected: (user) {
+                                        setState(() {
+                                          selectedRecommendedBy = user;
+                                          field.didChange(user);
+                                        });
+                                      },
+                                      itemBuilder: (user) => Text(
+                                        user.name ?? 'Unknown',
+                                        style: const TextStyle(
                                           fontSize: 14,
+                                          color: Colors.black,
+                                          fontWeight: FontWeight.w400,
                                         ),
                                       ),
-                                      Icon(
-                                        Icons.keyboard_arrow_down,
-                                        color: Colors.grey.shade600,
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                              if (field.hasError)
-                                Padding(
-                                  padding: const EdgeInsets.only(
-                                      top: 4.0, left: 4.0),
-                                  child: Text(
-                                    field.errorText ?? '',
-                                    style: const TextStyle(
-                                      fontSize: 12,
-                                      color: Colors.red,
+                                    );
+                                  },
+                                  child: Container(
+                                    height: 52,
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 14),
+                                    decoration: BoxDecoration(
+                                      color: Colors.white,
+                                      borderRadius: BorderRadius.circular(12),
+                                      border: Border.all(
+                                          color: Colors.grey.shade300),
+                                    ),
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Text(
+                                          selectedRecommendedBy?.name ??
+                                              (recommendedByType == 'trustee'
+                                                  ? 'searchTrustee'.tr()
+                                                  : 'searchCharityMember'.tr()),
+                                          style: TextStyle(
+                                            color: selectedRecommendedBy == null
+                                                ? Colors.grey.shade600
+                                                : Colors.black,
+                                            fontSize: 14,
+                                          ),
+                                        ),
+                                        Icon(
+                                          Icons.keyboard_arrow_down,
+                                          color: Colors.grey.shade600,
+                                        ),
+                                      ],
                                     ),
                                   ),
                                 ),
+                                if (field.hasError)
+                                  Padding(
+                                    padding: const EdgeInsets.only(
+                                        top: 4.0, left: 4.0),
+                                    child: Text(
+                                      field.errorText ?? '',
+                                      style: const TextStyle(
+                                        fontSize: 12,
+                                        color: Colors.red,
+                                      ),
+                                    ),
+                                  ),
+                              ]
                             ],
                           ),
                         ),

@@ -356,5 +356,6 @@
   "darpanCertificate": "DARPAN CERTIFICATE",
   "viewPdf": "View Certificate",
   "license": "License",
-  "aboutCampaign": "About Campaign"
+  "aboutCampaign": "About Campaign",
+  "self": "Self"
 }
