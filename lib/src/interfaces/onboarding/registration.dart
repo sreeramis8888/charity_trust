@@ -105,7 +105,8 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
           firstErrorKey = 'district';
         } else if (!isSameAsPhone && whatsappController.text.trim().isEmpty) {
           firstErrorKey = 'whatsapp';
-        } else if (selectedRecommendedBy == null) {
+        } else if (selectedRecommendedBy == null &&
+            recommendedByType != 'self') {
           firstErrorKey = 'recommendedBy';
         }
 
@@ -267,8 +268,11 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
         'preferred_language': GlobalVariables.preferredLanguage,
         'whatsapp_no': "+$whatsappCountryCode${whatsappNumber}",
         'dob': formattedDob,
-        'recommended_by':
-            recommendedByType == 'trustee' ? 'trustee' : 'charity-member',
+        'recommended_by': recommendedByType == 'trustee'
+            ? 'trustee'
+            : recommendedByType == 'self'
+                ? 'self'
+                : 'charity-member',
         if (recommendedByType == 'trustee')
           'under_trustee': selectedRecommendedBy?.id
         else
@@ -306,6 +310,9 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
                 'charityMemberName': selectedRecommendedBy!.name,
               },
             );
+          } else if (recommendedByType == 'self') {
+            Navigator.of(context).pushReplacementNamed('navbar');
+            // NavigationService().pushNamedAndRemoveUntil('navbar');
           } else {
             Navigator.of(context).pushReplacementNamed('requestSent');
           }
@@ -1199,6 +1206,7 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
                         child: FormField<UserModel>(
                           key: _fieldKeys['recommendedBy'],
                           validator: (value) {
+                            if (recommendedByType == 'self') return null;
                             if (value == null) {
                               return 'required'.tr();
                             }

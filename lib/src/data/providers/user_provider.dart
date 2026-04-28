@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:developer';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:Annujoom/src/data/models/user_model.dart';
@@ -96,6 +97,8 @@ Future<({UserModel? user, String? error})> updateUserProfile(
       ..removeWhere((key, value) => value == "" || value == null);
 
     log("Cleaned data: $cleanedData");
+    log("API Body (JSON):\n${const JsonEncoder.withIndent('  ').convert(cleanedData)}",
+        name: 'updateUserProfile');
 
     final apiProvider = ref.watch(apiProviderProvider);
     final response = await apiProvider.patch(
