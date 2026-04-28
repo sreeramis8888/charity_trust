@@ -22,9 +22,15 @@ Future<void> main() async {
 
   final checker = InstallChecker();
   await checker.checkFirstInstall();
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
+  try {
+    if (Firebase.apps.isEmpty) {
+      await Firebase.initializeApp(
+        options: DefaultFirebaseOptions.currentPlatform,
+      );
+    }
+  } catch (e) {
+    // Firebase already initialized (e.g. during hot restart)
+  }
   FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterFatalError;
   PlatformDispatcher.instance.onError = (error, stack) {
     FirebaseCrashlytics.instance.recordError(error, stack, fatal: true);
@@ -38,7 +44,6 @@ Future<void> main() async {
 
   final secureStorage = SecureStorageService();
   String preferredLanguage = 'en';
-  
   try {
     final userData = await secureStorage.getUserData();
     preferredLanguage = userData?.preferredLanguage ?? 'en';
