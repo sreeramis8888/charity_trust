@@ -1135,6 +1135,47 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
                             ],
                           ),
                         ),
+                      SizedBox(
+                        height: 20,
+                      ),
+                      anim.AnimatedWidgetWrapper(
+                        animationType: anim.AnimationType.fadeSlideInFromLeft,
+                        duration: anim.AnimationDuration.normal,
+                        delayMilliseconds: 1750,
+                        child: Text('chooseLogintype'.tr(),
+                            style: kSmallTitleR.copyWith(color: kRed)),
+                      ),
+                      SizedBox(
+                        height: 20,
+                      ),
+
+                      anim.AnimatedWidgetWrapper(
+                        animationType: anim.AnimationType.fadeSlideInFromLeft,
+                        duration: anim.AnimationDuration.normal,
+                        delayMilliseconds: 1750,
+                        child: Text('loginType1'.tr(),
+                            style: kSmallTitleR.copyWith(
+                                color: kRed, fontStyle: FontStyle.italic)),
+                      ),
+
+                      anim.AnimatedWidgetWrapper(
+                        animationType: anim.AnimationType.fadeSlideInFromLeft,
+                        duration: anim.AnimationDuration.normal,
+                        delayMilliseconds: 1750,
+                        child: Text('loginType2'.tr(),
+                            style: kSmallTitleR.copyWith(
+                                color: kRed, fontStyle: FontStyle.italic)),
+                      ),
+
+                      anim.AnimatedWidgetWrapper(
+                        animationType: anim.AnimationType.fadeSlideInFromLeft,
+                        duration: anim.AnimationDuration.normal,
+                        delayMilliseconds: 1750,
+                        child: Text('loginType3'.tr(),
+                            style: kSmallTitleR.copyWith(
+                                color: kRed, fontStyle: FontStyle.italic)),
+                      ),
+
                       const SizedBox(height: 20),
                       anim.AnimatedWidgetWrapper(
                         animationType: anim.AnimationType.fadeSlideInFromLeft,
