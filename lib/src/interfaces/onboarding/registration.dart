@@ -57,7 +57,7 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
   String? selectedDistrictName;
   String? selectedGender;
   XFile? profileImage;
-  String? recommendedByType = 'trustee';
+  String? recommendedByType = 'self';
   UserModel? selectedRecommendedBy;
   bool isSameAsPhone = true;
   // String whatsappCountryCode="91";
@@ -1194,6 +1194,21 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
                             Row(
                               children: [
                                 Radio<String>(
+                                  value: 'self',
+                                  groupValue: recommendedByType,
+                                  onChanged: (value) {
+                                    setState(() {
+                                      recommendedByType = value;
+                                      selectedRecommendedBy = null;
+                                    });
+                                  },
+                                ),
+                                Text("self".tr()),
+                              ],
+                            ),
+                            Row(
+                              children: [
+                                Radio<String>(
                                   value: 'trustee',
                                   groupValue: recommendedByType,
                                   onChanged: (value) {
@@ -1219,21 +1234,6 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
                                   },
                                 ),
                                 Text("charityMember".tr()),
-                              ],
-                            ),
-                            Row(
-                              children: [
-                                Radio<String>(
-                                  value: 'self',
-                                  groupValue: recommendedByType,
-                                  onChanged: (value) {
-                                    setState(() {
-                                      recommendedByType = value;
-                                      selectedRecommendedBy = null;
-                                    });
-                                  },
-                                ),
-                                Text("self".tr()),
                               ],
                             ),
                           ],
