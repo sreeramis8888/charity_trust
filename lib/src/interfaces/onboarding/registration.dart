@@ -1153,6 +1153,15 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
                         animationType: anim.AnimationType.fadeSlideInFromLeft,
                         duration: anim.AnimationDuration.normal,
                         delayMilliseconds: 1750,
+                        child: Text('loginType3'.tr(),
+                            style: kSmallTitleR.copyWith(
+                                color: kRed, fontStyle: FontStyle.italic)),
+                      ),
+
+                      anim.AnimatedWidgetWrapper(
+                        animationType: anim.AnimationType.fadeSlideInFromLeft,
+                        duration: anim.AnimationDuration.normal,
+                        delayMilliseconds: 1750,
                         child: Text('loginType1'.tr(),
                             style: kSmallTitleR.copyWith(
                                 color: kRed, fontStyle: FontStyle.italic)),
@@ -1163,15 +1172,6 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
                         duration: anim.AnimationDuration.normal,
                         delayMilliseconds: 1750,
                         child: Text('loginType2'.tr(),
-                            style: kSmallTitleR.copyWith(
-                                color: kRed, fontStyle: FontStyle.italic)),
-                      ),
-
-                      anim.AnimatedWidgetWrapper(
-                        animationType: anim.AnimationType.fadeSlideInFromLeft,
-                        duration: anim.AnimationDuration.normal,
-                        delayMilliseconds: 1750,
-                        child: Text('loginType3'.tr(),
                             style: kSmallTitleR.copyWith(
                                 color: kRed, fontStyle: FontStyle.italic)),
                       ),
