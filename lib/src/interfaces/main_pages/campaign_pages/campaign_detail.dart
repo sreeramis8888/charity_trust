@@ -59,7 +59,7 @@ class _CampaignDetailPageState extends ConsumerState<CampaignDetailPage> {
   late Future<void> _campaignLoadFuture;
   String _userPhone = '+919876543210';
   String _userEmail = 'user@example.com';
-  String _selectedGateway = 'razorpay';
+  String _selectedGateway = 'mswipe';
 
   @override
   void initState() {
