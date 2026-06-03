@@ -193,7 +193,7 @@ class _PaymentMethodPageState extends ConsumerState<PaymentMethodPage> {
                     _buildPaymentOption(
                       gateway: 'razorpay',
                       title: 'Razorpay',
-                      subtitle: '2% convenience fee applicable',
+                      subtitle: 'No additional charges',
                       icon: 'assets/png/razorpay.png',
                       isSelected: _selectedGateway == 'razorpay',
                       onTap: () {
@@ -330,9 +330,7 @@ class _PaymentMethodPageState extends ConsumerState<PaymentMethodPage> {
               subtitle,
               style: kSmallerTitleR.copyWith(
                 fontStyle: FontStyle.italic,
-                color: gateway == 'razorpay'
-                    ? const Color(0xFFFF9500)
-                    : kSecondaryTextColor,
+                color: kSecondaryTextColor,
                 fontSize: 12,
               ),
             ),
@@ -343,9 +341,9 @@ class _PaymentMethodPageState extends ConsumerState<PaymentMethodPage> {
   }
 
   Widget _buildAmountSummary() {
-    final convenienceFeePercentage = _selectedGateway == 'razorpay' ? 2.0 : 0.0;
-    final convenienceFee = (widget.amount * convenienceFeePercentage) / 100;
-    final totalAmount = widget.amount + convenienceFee;
+    // final convenienceFeePercentage = _selectedGateway == 'razorpay' ? 2.0 : 0.0;
+    // final convenienceFee = (widget.amount * convenienceFeePercentage) / 100;
+    final totalAmount = widget.amount;
 
     return Container(
       padding: const EdgeInsets.all(8),
@@ -364,22 +362,22 @@ class _PaymentMethodPageState extends ConsumerState<PaymentMethodPage> {
               ),
             ],
           ),
-          if (convenienceFee > 0) ...[
-            const SizedBox(height: 12),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  'convenienceFee'.tr() + ' :',
-                  style: kSmallTitleL.copyWith(color: kTextColor),
-                ),
-                Text(
-                  '₹${convenienceFee.toStringAsFixed(2)}',
-                  style: kSmallTitleL.copyWith(color: kTextColor),
-                ),
-              ],
-            ),
-          ],
+          // if (convenienceFee > 0) ...[
+          //   const SizedBox(height: 12),
+          //   Row(
+          //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          //     children: [
+          //       Text(
+          //         'convenienceFee'.tr() + ' :',
+          //         style: kSmallTitleL.copyWith(color: kTextColor),
+          //       ),
+          //       Text(
+          //         '₹${convenienceFee.toStringAsFixed(2)}',
+          //         style: kSmallTitleL.copyWith(color: kTextColor),
+          //       ),
+          //     ],
+          //   ),
+          // ],
           const SizedBox(height: 12),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
