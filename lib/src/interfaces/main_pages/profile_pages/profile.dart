@@ -9,6 +9,7 @@ import 'package:Annujoom/src/interfaces/main_pages/profile_pages/about_us.dart';
 import 'package:Annujoom/src/interfaces/main_pages/profile_pages/refer_friend_page.dart';
 import 'package:Annujoom/src/interfaces/main_pages/profile_pages/change_phone_number.dart';
 import 'package:Annujoom/src/interfaces/main_pages/profile_pages/zakat_calculator.dart';
+import 'package:Annujoom/src/interfaces/main_pages/profile_pages/quran_page.dart';
 import 'package:Annujoom/src/interfaces/main_pages/referrals/my_referrals_page.dart';
 import 'package:Annujoom/src/interfaces/components/confirmation_dialog.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -427,6 +428,17 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                           );
                         },
                         child: _tile(Icons.calculate, "zakatCalculator".tr()),
+                      ),
+                      _divider(),
+                      GestureDetector(
+                        onTap: () {
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (context) => const QuranPage(),
+                            ),
+                          );
+                        },
+                        child: _tile(Icons.menu_book, "quran".tr()),
                       ),
                       _divider(),
                       GestureDetector(
