@@ -21,17 +21,20 @@ class RazorpayService {
   }
 
   void _handlePaymentSuccess(PaymentSuccessResponse response) {
-    log('Payment Success callback triggered: ${response.paymentId}', name: 'RazorpayService');
+    log('Payment Success callback triggered: ${response.paymentId}',
+        name: 'RazorpayService');
     if (_onPaymentSuccess != null) {
       log('Calling onPaymentSuccess callback', name: 'RazorpayService');
       _onPaymentSuccess!(response);
     } else {
-      log('WARNING: onPaymentSuccess callback is null', name: 'RazorpayService');
+      log('WARNING: onPaymentSuccess callback is null',
+          name: 'RazorpayService');
     }
   }
 
   void _handlePaymentError(PaymentFailureResponse response) {
-    log('Payment Error callback triggered: ${response.message}', name: 'RazorpayService');
+    log('Payment Error callback triggered: ${response.message}',
+        name: 'RazorpayService');
     if (_onPaymentError != null) {
       log('Calling onPaymentError callback', name: 'RazorpayService');
       _onPaymentError!(response);
@@ -41,12 +44,14 @@ class RazorpayService {
   }
 
   void _handleExternalWallet(ExternalWalletResponse response) {
-    log('External Wallet callback triggered: ${response.walletName}', name: 'RazorpayService');
+    log('External Wallet callback triggered: ${response.walletName}',
+        name: 'RazorpayService');
     if (_onExternalWallet != null) {
       log('Calling onExternalWallet callback', name: 'RazorpayService');
       _onExternalWallet!(response);
     } else {
-      log('WARNING: onExternalWallet callback is null', name: 'RazorpayService');
+      log('WARNING: onExternalWallet callback is null',
+          name: 'RazorpayService');
     }
   }
 
@@ -59,6 +64,39 @@ class RazorpayService {
     _onPaymentSuccess = onSuccess;
     _onPaymentError = onError;
     _onExternalWallet = onExternalWallet;
+  }
+
+  void openSubscriptionCheckout({
+    required String subscriptionId,
+    required String razorpayKey,
+    required String email,
+    required String phone,
+    String? description,
+  }) {
+    final options = {
+      'key': razorpayKey,
+      'subscription_id': subscriptionId,
+      'name': 'Annujoom',
+      'description': description ?? 'Subscription',
+      'prefill': {
+        'email': email,
+        'contact': phone,
+      },
+      'theme': {
+        'color': '#1e3a81',
+      },
+    };
+
+    try {
+      log(
+        'Opening Razorpay subscription checkout: $options',
+        name: 'RazorpayService',
+      );
+      _razorpay.open(options);
+    } catch (e) {
+      log('Error opening Razorpay subscription: $e', name: 'RazorpayService');
+      rethrow;
+    }
   }
 
   void openCheckout({
@@ -84,7 +122,8 @@ class RazorpayService {
     };
 
     try {
-      log('Opening Razorpay checkout with options: $options', name: 'RazorpayService');
+      log('Opening Razorpay checkout with options: $options',
+          name: 'RazorpayService');
       _razorpay.open(options);
     } catch (e) {
       log('Error opening Razorpay: $e', name: 'RazorpayService');

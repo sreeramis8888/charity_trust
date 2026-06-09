@@ -1,13 +1,15 @@
 import 'dart:developer';
-import 'package:flutter/material.dart';
 import 'package:Annujoom/src/data/constants/color_constants.dart';
+import 'package:Annujoom/src/data/services/navigation_service.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 
 enum SnackbarType { success, error, warning, info }
 
 class SnackbarService {
   static final scaffoldMessengerKey = GlobalKey<ScaffoldMessengerState>();
 
-  ScaffoldFeatureController<SnackBar, SnackBarClosedReason> showSnackBar(
+  void showSnackBar(
     String message, {
     IconData icon = Icons.check_circle,
     Color? backgroundColor,
@@ -61,8 +63,27 @@ class SnackbarService {
       duration: Duration(seconds: 4),
     );
 
-    log('Snackbar shown: ${scaffoldMessengerKey.currentState?.mounted}');
-    return scaffoldMessengerKey.currentState!.showSnackBar(snackBar);
+    void presentSnackBar() {
+      final messenger = scaffoldMessengerKey.currentState;
+      if (messenger != null && messenger.mounted) {
+        messenger.showSnackBar(snackBar);
+        return;
+      }
+
+      final navContext = NavigationService.navigatorKey.currentContext;
+      if (navContext != null && navContext.mounted) {
+        ScaffoldMessenger.of(navContext).showSnackBar(snackBar);
+        return;
+      }
+
+      log('Snackbar skipped: no active ScaffoldMessenger', name: 'SnackbarService');
+    }
+
+    if (SchedulerBinding.instance.schedulerPhase == SchedulerPhase.idle) {
+      presentSnackBar();
+    } else {
+      SchedulerBinding.instance.addPostFrameCallback((_) => presentSnackBar());
+    }
   }
 
   // Widget _iconBox(IconData icon, Color color) => Container(

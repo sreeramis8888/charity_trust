@@ -103,14 +103,17 @@ class ApiProvider {
   }) async {
     try {
       final headers = await _buildHeaders(requireAuth: requireAuth);
+      final encodedBody = json.encode(data);
+      log(name: 'API POST', '$baseUrl$endpoint');
+      log(name: 'API POST request body', encodedBody);
       final response = await _client.post(
         Uri.parse('$baseUrl$endpoint'),
         headers: headers,
-        body: json.encode(data),
+        body: encodedBody,
       );
-      log(name: 'API POST', '$baseUrl$endpoint');
       final decoded = json.decode(response.body);
-      log(name: 'API POST data ', '${decoded['data']}');
+      log(name: 'API POST status', '${response.statusCode}');
+      log(name: 'API POST response data', '${decoded['data']}');
       log(name: 'API POST message', '${decoded['message']}');
       if (response.statusCode == 200 || response.statusCode == 201) {
         return ApiResponse.success(decoded, response.statusCode);
