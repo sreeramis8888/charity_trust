@@ -331,6 +331,8 @@
   "perWeek": "per week",
   "perMonth": "per month",
   "subscribe": "Subscribe",
+  "submit": "Submit",
+  "pleaseSelectPlan": "Please select a plan",
   "pleaseSelectCampaignAndPlan": "Please select a campaign and a plan",
   "subscriptionFailed": "Subscription failed",
   "subscriptionApiNotAvailable": "Subscription is not enabled on the server yet. Please deploy the latest backend with subscription support.",

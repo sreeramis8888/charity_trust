@@ -27,7 +27,6 @@ class SubscriptionPage extends ConsumerStatefulWidget {
 class _SubscriptionPageState extends ConsumerState<SubscriptionPage> {
   CampaignModel? _selectedCampaign;
   SubscriptionPlan? _selectedPlan;
-  bool _isProcessing = false;
 
   String _getLocalizedCategory(String category) {
     switch (category) {
@@ -50,16 +49,137 @@ class _SubscriptionPageState extends ConsumerState<SubscriptionPage> {
     }
   }
 
-  Future<void> _handleSubscribe() async {
+  void _showPlanBottomSheet(CampaignModel campaign) {
+    final plans = ref.read(subscriptionPlansProvider);
+    final weeklyPlans = plans.where((plan) => plan.isWeekly).toList();
+    final monthlyPlans = plans.where((plan) => plan.isMonthly).toList();
+    final preferredLanguage = GlobalVariables.getPreferredLanguage();
+    SubscriptionPlan? sheetSelectedPlan = _selectedPlan;
+    bool sheetProcessing = false;
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (sheetContext) {
+        return StatefulBuilder(
+          builder: (context, setSheetState) {
+            return Padding(
+              padding: EdgeInsets.only(
+                bottom: MediaQuery.of(sheetContext).viewInsets.bottom,
+              ),
+              child: Container(
+                decoration: const BoxDecoration(
+                  color: kWhite,
+                  borderRadius: BorderRadius.vertical(top: Radius.circular(22)),
+                ),
+                child: SafeArea(
+                  child: ConstrainedBox(
+                    constraints: BoxConstraints(
+                      maxHeight: MediaQuery.of(sheetContext).size.height * 0.85,
+                    ),
+                    child: SingleChildScrollView(
+                      padding: const EdgeInsets.fromLTRB(18, 12, 18, 18),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Center(
+                            child: Container(
+                              width: 40,
+                              height: 4,
+                              decoration: BoxDecoration(
+                                color: const Color(0xFFDADADA),
+                                borderRadius: BorderRadius.circular(2),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 16),
+                          Text('selectPlan'.tr(), style: kBodyTitleM),
+                          const SizedBox(height: 6),
+                          Text(
+                            campaign.getTitle(preferredLanguage),
+                            style: kSmallerTitleR.copyWith(
+                              color: kSecondaryTextColor,
+                            ),
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          const SizedBox(height: 18),
+                          Text('weeklyPlans'.tr(), style: kSmallerTitleSB),
+                          const SizedBox(height: 8),
+                          _PlanGrid(
+                            plans: weeklyPlans,
+                            selectedPlan: sheetSelectedPlan,
+                            amountSuffix: 'perWeek'.tr(),
+                            onSelect: (plan) {
+                              setSheetState(() => sheetSelectedPlan = plan);
+                            },
+                          ),
+                          const SizedBox(height: 18),
+                          Text('monthlyPlans'.tr(), style: kSmallerTitleSB),
+                          const SizedBox(height: 8),
+                          _PlanGrid(
+                            plans: monthlyPlans,
+                            selectedPlan: sheetSelectedPlan,
+                            amountSuffix: 'perMonth'.tr(),
+                            onSelect: (plan) {
+                              setSheetState(() => sheetSelectedPlan = plan);
+                            },
+                          ),
+                          const SizedBox(height: 20),
+                          primaryButton(
+                            label: 'submit'.tr(),
+                            isLoading: sheetProcessing,
+                            onPressed: sheetProcessing
+                                ? null
+                                : () async {
+                                    if (sheetSelectedPlan == null) {
+                                      SnackbarService().showSnackBar(
+                                        'pleaseSelectPlan'.tr(),
+                                        type: SnackbarType.warning,
+                                      );
+                                      return;
+                                    }
+
+                                    setSheetState(() => sheetProcessing = true);
+                                    setState(() {
+                                      _selectedCampaign = campaign;
+                                      _selectedPlan = sheetSelectedPlan;
+                                    });
+
+                                    final success = await _handleSubscribe();
+                                    if (!sheetContext.mounted) return;
+
+                                    if (success) {
+                                      Navigator.of(sheetContext).pop();
+                                    } else {
+                                      setSheetState(
+                                          () => sheetProcessing = false);
+                                    }
+                                  },
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+
+  Future<bool> _handleSubscribe() async {
     if (_selectedCampaign?.id == null || _selectedPlan == null) {
       SnackbarService().showSnackBar(
         'pleaseSelectCampaignAndPlan'.tr(),
         type: SnackbarType.warning,
       );
-      return;
+      return false;
     }
-
-    setState(() => _isProcessing = true);
 
     try {
       final subscriptionApi = ref.read(subscriptionApiProvider);
@@ -91,6 +211,7 @@ class _SubscriptionPageState extends ConsumerState<SubscriptionPage> {
         phone: userData?.phone ?? '',
         amount: _selectedPlan!.amount.toDouble(),
       );
+      return true;
     } catch (e) {
       log('Subscription error: $e', name: 'SubscriptionPage');
       if (mounted) {
@@ -98,8 +219,8 @@ class _SubscriptionPageState extends ConsumerState<SubscriptionPage> {
           '${'subscriptionFailed'.tr()}: $e',
           type: SnackbarType.error,
         );
-        setState(() => _isProcessing = false);
       }
+      return false;
     }
   }
 
@@ -142,7 +263,6 @@ class _SubscriptionPageState extends ConsumerState<SubscriptionPage> {
           '${'externalWalletSelected'.tr()}: ${response.walletName}',
           type: SnackbarType.info,
         );
-        setState(() => _isProcessing = false);
       },
     );
 
@@ -158,9 +278,6 @@ class _SubscriptionPageState extends ConsumerState<SubscriptionPage> {
   @override
   Widget build(BuildContext context) {
     final campaignsAsync = ref.watch(staticCampaignsForSubscriptionProvider);
-    final plans = ref.watch(subscriptionPlansProvider);
-    final weeklyPlans = plans.where((plan) => plan.isWeekly).toList();
-    final monthlyPlans = plans.where((plan) => plan.isMonthly).toList();
     final preferredLanguage = GlobalVariables.getPreferredLanguage();
 
     return Scaffold(
@@ -194,68 +311,18 @@ class _SubscriptionPageState extends ConsumerState<SubscriptionPage> {
             );
           }
 
-          return Column(
+          return ListView(
+            padding: const EdgeInsets.fromLTRB(18, 12, 18, 24),
             children: [
-              Expanded(
-                child: SingleChildScrollView(
-                  padding: const EdgeInsets.fromLTRB(18, 12, 18, 24),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text('selectCampaign'.tr(), style: kBodyTitleM),
-                      const SizedBox(height: 10),
-                      ...campaigns.map(
-                        (campaign) => _CampaignOptionTile(
-                          campaign: campaign,
-                          title: campaign.getTitle(preferredLanguage),
-                          categoryLabel:
-                              _getLocalizedCategory(campaign.category),
-                          isSelected: _selectedCampaign?.id == campaign.id,
-                          onTap: () {
-                            setState(() => _selectedCampaign = campaign);
-                          },
-                        ),
-                      ),
-                      const SizedBox(height: 24),
-                      Text('selectPlan'.tr(), style: kBodyTitleM),
-                      const SizedBox(height: 10),
-                      Text('weeklyPlans'.tr(), style: kSmallerTitleSB),
-                      const SizedBox(height: 8),
-                      _PlanGrid(
-                        plans: weeklyPlans,
-                        selectedPlan: _selectedPlan,
-                        amountSuffix: 'perWeek'.tr(),
-                        onSelect: (plan) {
-                          setState(() => _selectedPlan = plan);
-                        },
-                      ),
-                      const SizedBox(height: 18),
-                      Text('monthlyPlans'.tr(), style: kSmallerTitleSB),
-                      const SizedBox(height: 8),
-                      _PlanGrid(
-                        plans: monthlyPlans,
-                        selectedPlan: _selectedPlan,
-                        amountSuffix: 'perMonth'.tr(),
-                        onSelect: (plan) {
-                          setState(() => _selectedPlan = plan);
-                        },
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              Container(
-                padding: const EdgeInsets.fromLTRB(18, 12, 18, 24),
-                decoration: const BoxDecoration(
-                  color: kWhite,
-                  border: Border(
-                    top: BorderSide(color: Color(0xFFDADADA)),
-                  ),
-                ),
-                child: primaryButton(
-                  label: 'subscribe'.tr(),
-                  isLoading: _isProcessing,
-                  onPressed: _isProcessing ? null : _handleSubscribe,
+              Text('selectCampaign'.tr(), style: kBodyTitleM),
+              const SizedBox(height: 10),
+              ...campaigns.map(
+                (campaign) => _CampaignOptionTile(
+                  campaign: campaign,
+                  title: campaign.getTitle(preferredLanguage),
+                  categoryLabel: _getLocalizedCategory(campaign.category),
+                  isSelected: _selectedCampaign?.id == campaign.id,
+                  onTap: () => _showPlanBottomSheet(campaign),
                 ),
               ),
             ],
@@ -349,13 +416,10 @@ class _CampaignOptionTile extends StatelessWidget {
                     ],
                   ),
                 ),
-                Icon(
-                  isSelected
-                      ? Icons.radio_button_checked
-                      : Icons.radio_button_off,
-                  color: isSelected
-                      ? const Color(0xFF0601B4)
-                      : kSecondaryTextColor,
+                const Icon(
+                  Icons.arrow_forward_ios_rounded,
+                  size: 16,
+                  color: kSecondaryTextColor,
                 ),
               ],
             ),
@@ -403,7 +467,7 @@ class _PlanGrid extends StatelessWidget {
             decoration: BoxDecoration(
               color: isSelected
                   ? const Color(0xFF0601B4).withOpacity(0.08)
-                  : kWhite,
+                  : kBackgroundColor,
               borderRadius: BorderRadius.circular(12),
               border: Border.all(
                 color: isSelected
@@ -417,9 +481,7 @@ class _PlanGrid extends StatelessWidget {
                 Text(
                   '₹${plan.amount}',
                   style: kBodyTitleSB.copyWith(
-                    color: isSelected
-                        ? const Color(0xFF0601B4)
-                        : kTextColor,
+                    color: isSelected ? const Color(0xFF0601B4) : kTextColor,
                   ),
                 ),
                 const SizedBox(height: 4),
