@@ -22,6 +22,7 @@ import 'package:Annujoom/src/data/utils/launch_url.dart';
 import 'package:Annujoom/src/data/utils/date_formatter.dart';
 import 'package:Annujoom/src/data/services/notification_service/get_fcm.dart';
 import 'package:Annujoom/src/interfaces/components/primaryButton.dart';
+import 'package:Annujoom/src/interfaces/components/home_quick_access_row.dart';
 import 'package:Annujoom/src/interfaces/components/confirmation_dialog.dart';
 import 'package:Annujoom/src/data/providers/auth_login_provider.dart';
 import 'package:Annujoom/src/data/providers/auth_provider.dart';
@@ -1273,6 +1274,7 @@ class _HomePageState extends ConsumerState<HomePage> {
                   ],
                 ),
               ),
+            const HomeQuickAccessRow(),
             if (homeData.posterPromotions.isNotEmpty)
               Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 16),
