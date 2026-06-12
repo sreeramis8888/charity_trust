@@ -5,6 +5,7 @@ import 'package:Annujoom/src/data/models/subscription_model.dart';
 import 'package:Annujoom/src/data/providers/subscription_provider.dart';
 import 'package:Annujoom/src/data/utils/date_formatter.dart';
 import 'package:Annujoom/src/interfaces/components/loading_indicator.dart';
+import 'package:Annujoom/src/interfaces/main_pages/profile_pages/subscription_detail_page.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -96,13 +97,24 @@ class MySubscriptionsPage extends ConsumerWidget {
               itemCount: subscriptions.length,
               separatorBuilder: (_, __) => const SizedBox(height: 10),
               itemBuilder: (context, index) {
+                final subscription = subscriptions[index];
                 return _SubscriptionCard(
-                  subscription: subscriptions[index],
-                  campaignTitle:
-                      subscriptions[index].getTitle(preferredLanguage),
-                  statusLabel: _localizedStatus(subscriptions[index].status),
-                  statusColor: _statusColor(subscriptions[index].status),
-                  periodLabel: _periodLabel(subscriptions[index].period),
+                  subscription: subscription,
+                  campaignTitle: subscription.getTitle(preferredLanguage),
+                  statusLabel: _localizedStatus(subscription.status),
+                  statusColor: _statusColor(subscription.status),
+                  periodLabel: _periodLabel(subscription.period),
+                  onTap: subscription.id == null
+                      ? null
+                      : () {
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (context) => SubscriptionDetailPage(
+                                subscriptionId: subscription.id!,
+                              ),
+                            ),
+                          );
+                        },
                 );
               },
             ),
@@ -140,6 +152,7 @@ class _SubscriptionCard extends StatelessWidget {
   final String statusLabel;
   final Color statusColor;
   final String periodLabel;
+  final VoidCallback? onTap;
 
   const _SubscriptionCard({
     required this.subscription,
@@ -147,14 +160,20 @@ class _SubscriptionCard extends StatelessWidget {
     required this.statusLabel,
     required this.statusColor,
     required this.periodLabel,
+    this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return Material(
+      color: kWhite,
+      borderRadius: BorderRadius.circular(16),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(16),
+        onTap: onTap,
+        child: Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: kWhite,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: const Color(0xFFDADADA)),
       ),
@@ -219,7 +238,30 @@ class _SubscriptionCard extends StatelessWidget {
             const SizedBox(height: 6),
             _detailRow('createdOn'.tr(), formatDate(subscription.createdAt)),
           ],
+          if (onTap != null) ...[
+            const SizedBox(height: 10),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                Text(
+                  'viewDetails'.tr(),
+                  style: kSmallerTitleSB.copyWith(
+                    color: const Color(0xFF0601B4),
+                    fontSize: 12,
+                  ),
+                ),
+                const SizedBox(width: 4),
+                const Icon(
+                  Icons.arrow_forward_ios_rounded,
+                  size: 12,
+                  color: Color(0xFF0601B4),
+                ),
+              ],
+            ),
+          ],
         ],
+      ),
+        ),
       ),
     );
   }

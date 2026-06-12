@@ -130,6 +130,86 @@ final class MySubscriptionsProvider extends $FunctionalProvider<
 
 String _$mySubscriptionsHash() => r'942b160b0c4e8077729934760c46ecff01f9ec65';
 
+@ProviderFor(subscriptionDetail)
+const subscriptionDetailProvider = SubscriptionDetailFamily._();
+
+final class SubscriptionDetailProvider extends $FunctionalProvider<
+        AsyncValue<SubscriptionModel>,
+        SubscriptionModel,
+        FutureOr<SubscriptionModel>>
+    with
+        $FutureModifier<SubscriptionModel>,
+        $FutureProvider<SubscriptionModel> {
+  const SubscriptionDetailProvider._(
+      {required SubscriptionDetailFamily super.from,
+      required String super.argument})
+      : super(
+          retry: null,
+          name: r'subscriptionDetailProvider',
+          isAutoDispose: true,
+          dependencies: null,
+          $allTransitiveDependencies: null,
+        );
+
+  @override
+  String debugGetCreateSourceHash() => _$subscriptionDetailHash();
+
+  @override
+  String toString() {
+    return r'subscriptionDetailProvider'
+        ''
+        '($argument)';
+  }
+
+  @$internal
+  @override
+  $FutureProviderElement<SubscriptionModel> $createElement(
+          $ProviderPointer pointer) =>
+      $FutureProviderElement(pointer);
+
+  @override
+  FutureOr<SubscriptionModel> create(Ref ref) {
+    final argument = this.argument as String;
+    return subscriptionDetail(
+      ref,
+      argument,
+    );
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other is SubscriptionDetailProvider && other.argument == argument;
+  }
+
+  @override
+  int get hashCode {
+    return argument.hashCode;
+  }
+}
+
+String _$subscriptionDetailHash() =>
+    r'b0dc3498d5880716469bc30c24de9e4e62d0b2f1';
+
+final class SubscriptionDetailFamily extends $Family
+    with $FunctionalFamilyOverride<FutureOr<SubscriptionModel>, String> {
+  const SubscriptionDetailFamily._()
+      : super(
+          retry: null,
+          name: r'subscriptionDetailProvider',
+          dependencies: null,
+          $allTransitiveDependencies: null,
+          isAutoDispose: true,
+        );
+
+  SubscriptionDetailProvider call(
+    String subscriptionId,
+  ) =>
+      SubscriptionDetailProvider._(argument: subscriptionId, from: this);
+
+  @override
+  String toString() => r'subscriptionDetailProvider';
+}
+
 @ProviderFor(staticCampaignsForSubscription)
 const staticCampaignsForSubscriptionProvider =
     StaticCampaignsForSubscriptionProvider._();

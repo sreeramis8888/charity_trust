@@ -102,6 +102,15 @@ class SubscriptionApi {
       requireAuth: true,
     );
   }
+
+  Future<ApiResponse<Map<String, dynamic>>> getSubscriptionById(
+    String id,
+  ) async {
+    return _apiProvider.get(
+      '$_endpoint/user-subscription/$id',
+      requireAuth: true,
+    );
+  }
 }
 
 @riverpod
@@ -134,6 +143,26 @@ Future<List<SubscriptionModel>> mySubscriptions(Ref ref) async {
         (item) => SubscriptionModel.fromJson(item as Map<String, dynamic>),
       )
       .toList();
+}
+
+@riverpod
+Future<SubscriptionModel> subscriptionDetail(
+  Ref ref,
+  String subscriptionId,
+) async {
+  final subscriptionApi = ref.watch(subscriptionApiProvider);
+  final response = await subscriptionApi.getSubscriptionById(subscriptionId);
+
+  if (!response.success || response.data == null) {
+    throw Exception(response.message ?? 'Failed to load subscription details');
+  }
+
+  final data = response.data!['data'] as Map<String, dynamic>?;
+  if (data == null) {
+    throw Exception('Invalid subscription details response');
+  }
+
+  return SubscriptionModel.fromJson(data);
 }
 
 @riverpod

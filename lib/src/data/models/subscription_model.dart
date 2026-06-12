@@ -10,7 +10,14 @@ class SubscriptionModel {
   final DateTime? startDate;
   final DateTime? endDate;
   final Map<String, String> campaignTitle;
+  final Map<String, String>? campaignDescription;
+  final String? campaignCategory;
+  final String? campaignCoverImage;
+  final String? userName;
+  final String? userEmail;
+  final String? customerId;
   final DateTime? createdAt;
+  final DateTime? updatedAt;
 
   SubscriptionModel({
     this.id,
@@ -24,7 +31,14 @@ class SubscriptionModel {
     this.startDate,
     this.endDate,
     required this.campaignTitle,
+    this.campaignDescription,
+    this.campaignCategory,
+    this.campaignCoverImage,
+    this.userName,
+    this.userEmail,
+    this.customerId,
     this.createdAt,
+    this.updatedAt,
   });
 
   String getTitle(String languageCode) {
@@ -34,18 +48,48 @@ class SubscriptionModel {
         '';
   }
 
+  String getDescription(String languageCode) {
+    final description = campaignDescription;
+    if (description == null || description.isEmpty) return '';
+    return description[languageCode] ??
+        description['en'] ??
+        description.values.firstOrNull ??
+        '';
+  }
+
+  static Map<String, String> _parseLocalizedMap(dynamic data) {
+    if (data is Map) {
+      return Map<String, String>.from(
+        data.map((k, v) => MapEntry(k.toString(), v.toString())),
+      );
+    }
+    if (data is String) {
+      return {'en': data};
+    }
+    return {};
+  }
+
   factory SubscriptionModel.fromJson(Map<String, dynamic> json) {
     Map<String, String> titleMap = {};
+    Map<String, String>? descriptionMap;
+    String? category;
+    String? coverImage;
+
     final campaign = json['campaign'];
     if (campaign is Map<String, dynamic>) {
-      final titleData = campaign['title'];
-      if (titleData is Map) {
-        titleMap = Map<String, String>.from(
-          titleData.map((k, v) => MapEntry(k.toString(), v.toString())),
-        );
-      } else if (titleData is String) {
-        titleMap = {'en': titleData};
-      }
+      titleMap = _parseLocalizedMap(campaign['title']);
+      final description = _parseLocalizedMap(campaign['description']);
+      descriptionMap = description.isEmpty ? null : description;
+      category = campaign['category']?.toString();
+      coverImage = campaign['cover_image']?.toString();
+    }
+
+    String? userName;
+    String? userEmail;
+    final user = json['user'];
+    if (user is Map<String, dynamic>) {
+      userName = user['name']?.toString();
+      userEmail = user['email']?.toString();
     }
 
     return SubscriptionModel(
@@ -66,8 +110,17 @@ class SubscriptionModel {
           ? DateTime.tryParse(json['end_date'].toString())
           : null,
       campaignTitle: titleMap,
+      campaignDescription: descriptionMap,
+      campaignCategory: category,
+      campaignCoverImage: coverImage,
+      userName: userName,
+      userEmail: userEmail,
+      customerId: json['customer_id']?.toString(),
       createdAt: json['createdAt'] != null
           ? DateTime.tryParse(json['createdAt'].toString())
+          : null,
+      updatedAt: json['updatedAt'] != null
+          ? DateTime.tryParse(json['updatedAt'].toString())
           : null,
     );
   }
