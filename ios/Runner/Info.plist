@@ -94,6 +94,8 @@
 		<key>NSAllowsArbitraryLoads</key>
 		<true/>
 	</dict>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>Your location is used to calculate the Qibla direction for prayer.</string>
 	<key>NSCameraUsageDescription</key>
 	<string>This app uses the camera to take photos for profile and campaign uploads.</string>
 	<key>NSContactsUsageDescription</key>
