@@ -211,6 +211,54 @@ class _QiblaError extends StatelessWidget {
   }
 }
 
+class _QiblaStatusBanner extends StatelessWidget {
+  final bool isFacingQibla;
+
+  const _QiblaStatusBanner({required this.isFacingQibla});
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 250),
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+      decoration: BoxDecoration(
+        color: isFacingQibla ? kPrimaryColor.withOpacity(0.12) : kWhite,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: isFacingQibla
+              ? kPrimaryColor.withOpacity(0.35)
+              : const Color(0xFFE8E8E8),
+        ),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.only(top: 1),
+            child: Icon(
+              isFacingQibla ? Icons.check_circle : Icons.explore,
+              color: isFacingQibla ? kPrimaryColor : kSecondaryTextColor,
+              size: 20,
+            ),
+          ),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Text(
+              isFacingQibla ? 'qiblaFacingQibla'.tr() : 'qiblaInstruction'.tr(),
+              style: kSmallerTitleSB.copyWith(
+                color: isFacingQibla ? kPrimaryColor : kSecondaryTextColor,
+                fontSize: 13,
+                height: 1.35,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
 class _QiblaCompassView extends StatelessWidget {
   const _QiblaCompassView();
 
@@ -234,79 +282,57 @@ class _QiblaCompassView extends StatelessWidget {
         final isFacingQibla =
             _angleDifference(qiblah.direction, qiblah.qiblah) < 8;
 
+        final compassSize =
+            (MediaQuery.sizeOf(context).width - 48).clamp(220.0, 300.0);
+
         return SingleChildScrollView(
           padding: const EdgeInsets.fromLTRB(24, 16, 24, 32),
           child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              AnimatedContainer(
-                duration: const Duration(milliseconds: 250),
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-                decoration: BoxDecoration(
-                  color:
-                      isFacingQibla ? kPrimaryColor.withOpacity(0.12) : kWhite,
-                  borderRadius: BorderRadius.circular(24),
-                  border: Border.all(
-                    color: isFacingQibla
-                        ? kPrimaryColor.withOpacity(0.35)
-                        : const Color(0xFFE8E8E8),
-                  ),
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(
-                      isFacingQibla ? Icons.check_circle : Icons.explore,
-                      color:
-                          isFacingQibla ? kPrimaryColor : kSecondaryTextColor,
-                      size: 20,
-                    ),
-                    const SizedBox(width: 8),
-                    Text(
-                      isFacingQibla
-                          ? 'qiblaFacingQibla'.tr()
-                          : 'qiblaInstruction'.tr(),
-                      textAlign: TextAlign.center,
-                      style: kSmallerTitleSB.copyWith(
-                        color:
-                            isFacingQibla ? kPrimaryColor : kSecondaryTextColor,
-                        fontSize: 13,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
+              _QiblaStatusBanner(isFacingQibla: isFacingQibla),
               const SizedBox(height: 28),
-              SizedBox(
-                width: 300,
-                height: 300,
-                child: Stack(
-                  alignment: Alignment.center,
-                  children: [
-                    Transform.rotate(
-                      angle: (qiblah.direction * (pi / 180) * -1),
-                      child: const _CompassDial(),
-                    ),
-                    Transform.rotate(
-                      angle: (qiblah.qiblah * (pi / 180) * -1),
-                      child: const _QiblaNeedle(),
-                    ),
-                    Container(
-                      width: 18,
-                      height: 18,
-                      decoration: BoxDecoration(
-                        color: kWhite,
-                        shape: BoxShape.circle,
-                        border: Border.all(color: kPrimaryColor, width: 3),
+              Center(
+                child: SizedBox(
+                  width: compassSize,
+                  height: compassSize,
+                  child: FittedBox(
+                    fit: BoxFit.contain,
+                    child: SizedBox(
+                      width: 280,
+                      height: 280,
+                      child: Stack(
+                        alignment: Alignment.center,
+                        children: [
+                          Transform.rotate(
+                            angle: (qiblah.direction * (pi / 180) * -1),
+                            child: const _CompassDial(),
+                          ),
+                          Transform.rotate(
+                            angle: (qiblah.qiblah * (pi / 180) * -1),
+                            child: const _QiblaNeedle(),
+                          ),
+                          Container(
+                            width: 18,
+                            height: 18,
+                            decoration: BoxDecoration(
+                              color: kWhite,
+                              shape: BoxShape.circle,
+                              border:
+                                  Border.all(color: kPrimaryColor, width: 3),
+                            ),
+                          ),
+                        ],
                       ),
                     ),
-                  ],
+                  ),
                 ),
               ),
               const SizedBox(height: 24),
               Text(
                 '${'qiblaAngle'.tr()}: ${qiblah.offset.toStringAsFixed(1)}°',
                 style: kBodyTitleM,
+                textAlign: TextAlign.center,
               ),
               const SizedBox(height: 8),
               Text(
@@ -536,11 +562,16 @@ class _QiblaBearingViewState extends State<_QiblaBearingView> {
       return const _QiblaLoading();
     }
 
+    final compassSize =
+        (MediaQuery.sizeOf(context).width - 48).clamp(220.0, 300.0);
+
     return SingleChildScrollView(
       padding: const EdgeInsets.fromLTRB(24, 16, 24, 32),
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Container(
+            width: double.infinity,
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
               color: kWhite,
@@ -550,28 +581,41 @@ class _QiblaBearingViewState extends State<_QiblaBearingView> {
             child: Text(
               'qiblaNoSensor'.tr(),
               textAlign: TextAlign.center,
-              style: kSmallerTitleR.copyWith(color: kSecondaryTextColor),
+              style: kSmallerTitleR.copyWith(
+                color: kSecondaryTextColor,
+                height: 1.35,
+              ),
             ),
           ),
           const SizedBox(height: 28),
-          SizedBox(
-            width: 260,
-            height: 260,
-            child: Stack(
-              alignment: Alignment.center,
-              children: [
-                const _CompassDial(),
-                Transform.rotate(
-                  angle: _bearing! * pi / 180,
-                  child: const _QiblaNeedle(),
+          Center(
+            child: SizedBox(
+              width: compassSize,
+              height: compassSize,
+              child: FittedBox(
+                fit: BoxFit.contain,
+                child: SizedBox(
+                  width: 280,
+                  height: 280,
+                  child: Stack(
+                    alignment: Alignment.center,
+                    children: [
+                      const _CompassDial(),
+                      Transform.rotate(
+                        angle: _bearing! * pi / 180,
+                        child: const _QiblaNeedle(),
+                      ),
+                    ],
+                  ),
                 ),
-              ],
+              ),
             ),
           ),
           const SizedBox(height: 24),
           Text(
             '${'qiblaAngle'.tr()}: ${_bearing!.toStringAsFixed(1)}°',
             style: kBodyTitleM,
+            textAlign: TextAlign.center,
           ),
           const SizedBox(height: 8),
           Text(
@@ -580,6 +624,7 @@ class _QiblaBearingViewState extends State<_QiblaBearingView> {
             style: kSmallerTitleR.copyWith(
               color: kSecondaryTextColor,
               fontSize: 13,
+              height: 1.35,
             ),
           ),
         ],
