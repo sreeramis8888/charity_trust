@@ -1,7 +1,7 @@
 import 'package:Annujoom/src/data/constants/color_constants.dart';
 import 'package:Annujoom/src/data/constants/style_constants.dart';
 import 'package:Annujoom/src/interfaces/main_pages/profile_pages/quran_page.dart';
-import 'package:Annujoom/src/interfaces/main_pages/profile_pages/subscription_page.dart';
+import 'package:Annujoom/src/interfaces/main_pages/subscription/subscription_page.dart';
 import 'package:Annujoom/src/interfaces/main_pages/profile_pages/zakat_calculator.dart';
 import 'package:Annujoom/src/interfaces/main_pages/qibla_page.dart';
 import 'package:easy_localization/easy_localization.dart';

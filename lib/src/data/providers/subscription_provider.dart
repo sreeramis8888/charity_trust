@@ -28,6 +28,37 @@ const subscriptionPlanTypes = [
   'MONTHLY_500',
 ];
 
+const subscriptionPlanIds = <String, String>{
+  'WEEKLY_20': 'plan_SlZY9ACQxyckOm',
+  'WEEKLY_50': 'plan_SlZbVbMc1ieaHN',
+  'WEEKLY_100': 'plan_SlZd9l3rY2oH3S',
+  'MONTHLY_100': 'plan_SlZec6HYkExh2f',
+  'MONTHLY_200': 'plan_SlZfSq2lX4xT4J',
+  'MONTHLY_500': 'plan_SlZgXrXME6rHql',
+};
+
+String subscriptionPlanIdFor(String planType) {
+  return subscriptionPlanIds[planType] ?? planType;
+}
+
+class SubscriptionCheckoutDetails {
+  final double amount;
+  final String planType;
+  final String billingPeriod;
+  final String subscriptionId;
+  final String planId;
+  final DateTime startDate;
+
+  const SubscriptionCheckoutDetails({
+    required this.amount,
+    required this.planType,
+    required this.billingPeriod,
+    required this.subscriptionId,
+    required this.planId,
+    required this.startDate,
+  });
+}
+
 class SubscriptionPlan {
   final String planType;
   final String period;

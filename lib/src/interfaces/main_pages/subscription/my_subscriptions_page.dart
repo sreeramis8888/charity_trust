@@ -5,7 +5,7 @@ import 'package:Annujoom/src/data/models/subscription_model.dart';
 import 'package:Annujoom/src/data/providers/subscription_provider.dart';
 import 'package:Annujoom/src/data/utils/date_formatter.dart';
 import 'package:Annujoom/src/interfaces/components/loading_indicator.dart';
-import 'package:Annujoom/src/interfaces/main_pages/profile_pages/subscription_detail_page.dart';
+import 'package:Annujoom/src/interfaces/main_pages/subscription/subscription_detail_page.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -172,95 +172,97 @@ class _SubscriptionCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(16),
         onTap: onTap,
         child: Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: const Color(0xFFDADADA)),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: const Color(0xFFDADADA)),
+          ),
+          child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Expanded(
-                child: Text(
-                  campaignTitle,
-                  style: kSmallerTitleSB,
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ),
-              const SizedBox(width: 8),
-              Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                decoration: BoxDecoration(
-                  color: statusColor.withOpacity(0.12),
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                child: Text(
-                  statusLabel,
-                  style: kSmallerTitleSB.copyWith(
-                    color: statusColor,
-                    fontSize: 11,
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Expanded(
+                    child: Text(
+                      campaignTitle,
+                      style: kSmallerTitleSB,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
                   ),
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 12),
-          Row(
-            children: [
-              _infoChip(
-                Icons.payments_outlined,
-                '₹${subscription.amount.toStringAsFixed(0)} $periodLabel',
-              ),
-              const SizedBox(width: 8),
-              _infoChip(
-                Icons.calendar_today_outlined,
-                subscription.planType.replaceAll('_', ' '),
-              ),
-            ],
-          ),
-          if (subscription.startDate != null) ...[
-            const SizedBox(height: 10),
-            _detailRow('startDate'.tr(), formatDate(subscription.startDate)),
-          ],
-          if (subscription.nextBillingDate != null) ...[
-            const SizedBox(height: 6),
-            _detailRow(
-              'nextBillingDate'.tr(),
-              formatDate(subscription.nextBillingDate),
-            ),
-          ],
-          if (subscription.createdAt != null) ...[
-            const SizedBox(height: 6),
-            _detailRow('createdOn'.tr(), formatDate(subscription.createdAt)),
-          ],
-          if (onTap != null) ...[
-            const SizedBox(height: 10),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                Text(
-                  'viewDetails'.tr(),
-                  style: kSmallerTitleSB.copyWith(
-                    color: const Color(0xFF0601B4),
-                    fontSize: 12,
+                  const SizedBox(width: 8),
+                  Container(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: statusColor.withOpacity(0.12),
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: Text(
+                      statusLabel,
+                      style: kSmallerTitleSB.copyWith(
+                        color: statusColor,
+                        fontSize: 11,
+                      ),
+                    ),
                   ),
-                ),
-                const SizedBox(width: 4),
-                const Icon(
-                  Icons.arrow_forward_ios_rounded,
-                  size: 12,
-                  color: Color(0xFF0601B4),
+                ],
+              ),
+              const SizedBox(height: 12),
+              Row(
+                children: [
+                  _infoChip(
+                    Icons.payments_outlined,
+                    '₹${subscription.amount.toStringAsFixed(0)} $periodLabel',
+                  ),
+                  const SizedBox(width: 8),
+                  _infoChip(
+                    Icons.calendar_today_outlined,
+                    subscription.planType.replaceAll('_', ' '),
+                  ),
+                ],
+              ),
+              if (subscription.startDate != null) ...[
+                const SizedBox(height: 10),
+                _detailRow(
+                    'startDate'.tr(), formatDate(subscription.startDate)),
+              ],
+              if (subscription.nextBillingDate != null) ...[
+                const SizedBox(height: 6),
+                _detailRow(
+                  'nextBillingDate'.tr(),
+                  formatDate(subscription.nextBillingDate),
                 ),
               ],
-            ),
-          ],
-        ],
-      ),
+              if (subscription.createdAt != null) ...[
+                const SizedBox(height: 6),
+                _detailRow(
+                    'createdOn'.tr(), formatDate(subscription.createdAt)),
+              ],
+              if (onTap != null) ...[
+                const SizedBox(height: 10),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    Text(
+                      'viewDetails'.tr(),
+                      style: kSmallerTitleSB.copyWith(
+                        color: const Color(0xFF0601B4),
+                        fontSize: 12,
+                      ),
+                    ),
+                    const SizedBox(width: 4),
+                    const Icon(
+                      Icons.arrow_forward_ios_rounded,
+                      size: 12,
+                      color: Color(0xFF0601B4),
+                    ),
+                  ],
+                ),
+              ],
+            ],
+          ),
         ),
       ),
     );

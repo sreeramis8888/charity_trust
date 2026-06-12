@@ -8,8 +8,8 @@ import 'package:Annujoom/src/data/providers/razorpay_provider.dart';
 import 'package:Annujoom/src/data/providers/subscription_provider.dart';
 import 'package:Annujoom/src/data/providers/user_provider.dart';
 import 'package:Annujoom/src/data/services/snackbar_service.dart';
-import 'package:Annujoom/src/interfaces/components/additional_pages/payment_failed_page.dart';
-import 'package:Annujoom/src/interfaces/components/additional_pages/payment_success_page.dart';
+import 'package:Annujoom/src/interfaces/main_pages/subscription/subscription_failed_page.dart';
+import 'package:Annujoom/src/interfaces/main_pages/subscription/subscription_success_page.dart';
 import 'package:Annujoom/src/interfaces/components/loading_indicator.dart';
 import 'package:Annujoom/src/interfaces/components/primaryButton.dart';
 import 'package:easy_localization/easy_localization.dart';
@@ -27,6 +27,7 @@ class SubscriptionPage extends ConsumerStatefulWidget {
 class _SubscriptionPageState extends ConsumerState<SubscriptionPage> {
   CampaignModel? _selectedCampaign;
   SubscriptionPlan? _selectedPlan;
+  SubscriptionCheckoutDetails? _checkoutDetails;
 
   String _getLocalizedCategory(String category) {
     switch (category) {
@@ -204,12 +205,20 @@ class _SubscriptionPageState extends ConsumerState<SubscriptionPage> {
       final subscriptionData = CreateSubscriptionResponse.fromJson(data);
       final userData = await ref.read(fetchUserProfileProvider.future);
 
+      _checkoutDetails = SubscriptionCheckoutDetails(
+        amount: _selectedPlan!.amount.toDouble(),
+        planType: _selectedPlan!.planType,
+        billingPeriod: _selectedPlan!.period,
+        subscriptionId: subscriptionData.subscriptionId,
+        planId: subscriptionPlanIdFor(_selectedPlan!.planType),
+        startDate: DateTime.now(),
+      );
+
       await _openRazorpaySubscription(
         subscriptionId: subscriptionData.subscriptionId,
         razorpayKey: subscriptionData.razorpayKey,
         email: userData?.email ?? '',
         phone: userData?.phone ?? '',
-        amount: _selectedPlan!.amount.toDouble(),
       );
       return true;
     } catch (e) {
@@ -229,7 +238,6 @@ class _SubscriptionPageState extends ConsumerState<SubscriptionPage> {
     required String razorpayKey,
     required String email,
     required String phone,
-    required double amount,
   }) async {
     final razorpayService = ref.read(razorpayServiceProvider);
     final campaignTitle = _selectedCampaign?.getTitle(
@@ -239,23 +247,27 @@ class _SubscriptionPageState extends ConsumerState<SubscriptionPage> {
 
     razorpayService.setCallbacks(
       onSuccess: (PaymentSuccessResponse response) {
-        if (mounted) {
-          Navigator.of(context).pushReplacement(
-            MaterialPageRoute(
-              builder: (_) => PaymentSuccessPage(
-                paymentId: response.paymentId,
-                amount: amount,
-              ),
+        final checkoutDetails = _checkoutDetails;
+        if (!mounted || checkoutDetails == null) return;
+
+        Navigator.of(context).pushReplacement(
+          MaterialPageRoute(
+            builder: (_) => SubscriptionSuccessPage(
+              details: checkoutDetails,
             ),
-          );
-        }
+          ),
+        );
       },
       onError: (PaymentFailureResponse response) {
-        if (mounted) {
-          Navigator.of(context).pushReplacement(
-            MaterialPageRoute(builder: (_) => const PaymentFailurePage()),
-          );
-        }
+        if (!mounted) return;
+
+        Navigator.of(context).pushReplacement(
+          MaterialPageRoute(
+            builder: (_) => SubscriptionFailedPage(
+              errorMessage: response.message,
+            ),
+          ),
+        );
       },
       onExternalWallet: (ExternalWalletResponse response) {
         if (!mounted) return;

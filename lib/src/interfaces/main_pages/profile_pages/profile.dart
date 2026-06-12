@@ -10,8 +10,8 @@ import 'package:Annujoom/src/interfaces/main_pages/profile_pages/refer_friend_pa
 import 'package:Annujoom/src/interfaces/main_pages/profile_pages/change_phone_number.dart';
 import 'package:Annujoom/src/interfaces/main_pages/profile_pages/zakat_calculator.dart';
 import 'package:Annujoom/src/interfaces/main_pages/profile_pages/quran_page.dart';
-import 'package:Annujoom/src/interfaces/main_pages/profile_pages/subscription_page.dart';
-import 'package:Annujoom/src/interfaces/main_pages/profile_pages/my_subscriptions_page.dart';
+import 'package:Annujoom/src/interfaces/main_pages/subscription/subscription_page.dart';
+import 'package:Annujoom/src/interfaces/main_pages/subscription/my_subscriptions_page.dart';
 import 'package:Annujoom/src/interfaces/main_pages/referrals/my_referrals_page.dart';
 import 'package:Annujoom/src/interfaces/components/confirmation_dialog.dart';
 import 'package:url_launcher/url_launcher.dart';
