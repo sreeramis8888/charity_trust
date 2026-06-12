@@ -1,5 +1,5 @@
 {
-  "greeting": "Welcome",
+  "greeting": "Assalamualaikkum",
   "tagline": "Connect, Contribute, Make a Difference",
   "fundingCampaigns": "Emergency Campaigns",
   "seeAll": "See All >",
@@ -427,8 +427,8 @@
   "license": "License",
   "aboutCampaign": "About Campaign",
   "self": "Self",
-  "chooseLogintype":"Choose your login type : ",
-  "loginType1":"* Trustee login requires trustee approval",
-  "loginType2":"* Charity member login requires OTP verification",
-  "loginType3":"* Self login provides instant access without any verification"
+  "chooseLogintype": "Choose your login type : ",
+  "loginType1": "* Trustee login requires trustee approval",
+  "loginType2": "* Charity member login requires OTP verification",
+  "loginType3": "* Self login provides instant access without any verification"
 }
