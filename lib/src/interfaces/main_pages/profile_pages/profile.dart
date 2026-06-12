@@ -11,6 +11,7 @@ import 'package:Annujoom/src/interfaces/main_pages/profile_pages/change_phone_nu
 import 'package:Annujoom/src/interfaces/main_pages/profile_pages/zakat_calculator.dart';
 import 'package:Annujoom/src/interfaces/main_pages/profile_pages/quran_page.dart';
 import 'package:Annujoom/src/interfaces/main_pages/profile_pages/subscription_page.dart';
+import 'package:Annujoom/src/interfaces/main_pages/profile_pages/my_subscriptions_page.dart';
 import 'package:Annujoom/src/interfaces/main_pages/referrals/my_referrals_page.dart';
 import 'package:Annujoom/src/interfaces/components/confirmation_dialog.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -351,6 +352,20 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                   ),
                   child: Column(
                     children: [
+                      GestureDetector(
+                        onTap: () {
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (context) => const MySubscriptionsPage(),
+                            ),
+                          );
+                        },
+                        child: _tile(
+                          Icons.subscriptions_outlined,
+                          "viewMySubscriptions".tr(),
+                        ),
+                      ),
+                      _divider(),
                       GestureDetector(
                         onTap: () {
                           Navigator.of(context).push(

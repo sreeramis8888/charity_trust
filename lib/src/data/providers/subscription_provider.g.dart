@@ -92,6 +92,44 @@ final class SubscriptionPlansProvider extends $FunctionalProvider<
 
 String _$subscriptionPlansHash() => r'38b92d1d5e1f43c719378eb037f29d280f98a4b7';
 
+@ProviderFor(mySubscriptions)
+const mySubscriptionsProvider = MySubscriptionsProvider._();
+
+final class MySubscriptionsProvider extends $FunctionalProvider<
+        AsyncValue<List<SubscriptionModel>>,
+        List<SubscriptionModel>,
+        FutureOr<List<SubscriptionModel>>>
+    with
+        $FutureModifier<List<SubscriptionModel>>,
+        $FutureProvider<List<SubscriptionModel>> {
+  const MySubscriptionsProvider._()
+      : super(
+          from: null,
+          argument: null,
+          retry: null,
+          name: r'mySubscriptionsProvider',
+          isAutoDispose: true,
+          dependencies: null,
+          $allTransitiveDependencies: null,
+        );
+
+  @override
+  String debugGetCreateSourceHash() => _$mySubscriptionsHash();
+
+  @$internal
+  @override
+  $FutureProviderElement<List<SubscriptionModel>> $createElement(
+          $ProviderPointer pointer) =>
+      $FutureProviderElement(pointer);
+
+  @override
+  FutureOr<List<SubscriptionModel>> create(Ref ref) {
+    return mySubscriptions(ref);
+  }
+}
+
+String _$mySubscriptionsHash() => r'942b160b0c4e8077729934760c46ecff01f9ec65';
+
 @ProviderFor(staticCampaignsForSubscription)
 const staticCampaignsForSubscriptionProvider =
     StaticCampaignsForSubscriptionProvider._();

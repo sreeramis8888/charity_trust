@@ -1,6 +1,7 @@
 import 'dart:developer';
 
 import 'package:Annujoom/src/data/models/campaign_model.dart';
+import 'package:Annujoom/src/data/models/subscription_model.dart';
 import 'package:Annujoom/src/data/providers/api_provider.dart';
 import 'package:Annujoom/src/data/providers/campaigns_provider.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -114,6 +115,25 @@ List<SubscriptionPlan> subscriptionPlans(Ref ref) {
   return subscriptionPlanTypes
       .map(SubscriptionPlan.fromPlanType)
       .toList(growable: false);
+}
+
+@riverpod
+Future<List<SubscriptionModel>> mySubscriptions(Ref ref) async {
+  final subscriptionApi = ref.watch(subscriptionApiProvider);
+  final response = await subscriptionApi.getMySubscriptions();
+
+  if (!response.success || response.data == null) {
+    throw Exception(response.message ?? 'Failed to load subscriptions');
+  }
+
+  final list = response.data!['data'] as List<dynamic>?;
+  if (list == null) return [];
+
+  return list
+      .map(
+        (item) => SubscriptionModel.fromJson(item as Map<String, dynamic>),
+      )
+      .toList();
 }
 
 @riverpod

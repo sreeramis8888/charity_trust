@@ -173,7 +173,7 @@ final class UpdateUserProfileProvider extends $FunctionalProvider<
   }
 }
 
-String _$updateUserProfileHash() => r'839720ab2d65d4b99629cde45b4a3d67af07f4c9';
+String _$updateUserProfileHash() => r'2589397952801f92690721b281ac2d0e61361fe6';
 
 final class UpdateUserProfileFamily extends $Family
     with
