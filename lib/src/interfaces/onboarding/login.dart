@@ -54,7 +54,10 @@ class _PhoneNumberScreenState extends ConsumerState<PhoneNumberScreen> {
   Widget build(BuildContext context) {
     final isLoading = ref.watch(loadingProvider);
 
-    final bottomInset = MediaQuery.of(context).viewInsets.bottom;
+    double bottomInset = 0.0;
+    try {
+      bottomInset = MediaQuery.maybeOf(context)?.viewInsets.bottom ?? 0.0;
+    } catch (_) {}
 
     return Scaffold(
         resizeToAvoidBottomInset: false,
@@ -395,7 +398,10 @@ class _OTPScreenState extends ConsumerState<OTPScreen> {
   @override
   Widget build(BuildContext context) {
     final isLoading = ref.watch(loadingProvider);
-    final bottomInset = MediaQuery.of(context).viewInsets.bottom;
+    double bottomInset = 0.0;
+    try {
+      bottomInset = MediaQuery.maybeOf(context)?.viewInsets.bottom ?? 0.0;
+    } catch (_) {}
 
     return Scaffold(
       resizeToAvoidBottomInset: false,

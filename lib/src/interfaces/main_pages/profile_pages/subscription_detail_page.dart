@@ -3,19 +3,32 @@ import 'package:Annujoom/src/data/constants/global_variables.dart';
 import 'package:Annujoom/src/data/constants/style_constants.dart';
 import 'package:Annujoom/src/data/models/subscription_model.dart';
 import 'package:Annujoom/src/data/providers/subscription_provider.dart';
+import 'package:Annujoom/src/data/services/snackbar_service.dart';
 import 'package:Annujoom/src/data/utils/date_formatter.dart';
+import 'package:Annujoom/src/interfaces/components/confirmation_dialog.dart';
 import 'package:Annujoom/src/interfaces/components/loading_indicator.dart';
+import 'package:Annujoom/src/interfaces/components/primaryButton.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class SubscriptionDetailPage extends ConsumerWidget {
+enum _SubscriptionAction { pause, resume, cancel }
+
+class SubscriptionDetailPage extends ConsumerStatefulWidget {
   final String subscriptionId;
 
   const SubscriptionDetailPage({
     super.key,
     required this.subscriptionId,
   });
+
+  @override
+  ConsumerState<SubscriptionDetailPage> createState() =>
+      _SubscriptionDetailPageState();
+}
+
+class _SubscriptionDetailPageState extends ConsumerState<SubscriptionDetailPage> {
+  _SubscriptionAction? _loadingAction;
 
   String _localizedStatus(String status) {
     switch (status) {
@@ -72,9 +85,80 @@ class SubscriptionDetailPage extends ConsumerWidget {
     }
   }
 
+  bool _canPause(String status) {
+    return !['paused', 'cancelled'].contains(status);
+  }
+
+  bool _canResume(String status) => status == 'paused';
+
+  bool _canCancel(String status) => status != 'cancelled';
+
+  void _confirmAction(
+    _SubscriptionAction action, {
+    required String title,
+    required String message,
+    required String confirmText,
+  }) {
+    showDialog(
+      context: context,
+      builder: (dialogContext) => ConfirmationDialog(
+        title: title,
+        message: message,
+        confirmButtonText: confirmText,
+        onConfirm: () => _performAction(action),
+      ),
+    );
+  }
+
+  Future<void> _performAction(_SubscriptionAction action) async {
+    if (!mounted) return;
+
+    setState(() => _loadingAction = action);
+
+    try {
+      final api = ref.read(subscriptionApiProvider);
+      final response = switch (action) {
+        _SubscriptionAction.pause =>
+          await api.pauseSubscription(widget.subscriptionId),
+        _SubscriptionAction.resume =>
+          await api.resumeSubscription(widget.subscriptionId),
+        _SubscriptionAction.cancel =>
+          await api.cancelSubscription(widget.subscriptionId),
+      };
+
+      if (!response.success) {
+        throw Exception(response.message ?? 'Subscription action failed');
+      }
+
+      ref.invalidate(mySubscriptionsProvider);
+      await ref.refresh(
+        subscriptionDetailProvider(widget.subscriptionId).future,
+      );
+
+      if (mounted) {
+        SnackbarService().showSnackBar(
+          'subscriptionActionSuccess'.tr(),
+          type: SnackbarType.success,
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        SnackbarService().showSnackBar(
+          '${'subscriptionActionFailed'.tr()}: $e',
+          type: SnackbarType.error,
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _loadingAction = null);
+      }
+    }
+  }
+
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final detailAsync = ref.watch(subscriptionDetailProvider(subscriptionId));
+  Widget build(BuildContext context) {
+    final detailAsync =
+        ref.watch(subscriptionDetailProvider(widget.subscriptionId));
     final preferredLanguage = GlobalVariables.getPreferredLanguage();
 
     return Scaffold(
@@ -94,14 +178,81 @@ class SubscriptionDetailPage extends ConsumerWidget {
         title: Text('subscriptionDetails'.tr(), style: kSubHeadingM),
       ),
       body: detailAsync.when(
-        data: (subscription) => _SubscriptionDetailBody(
-          subscription: subscription,
-          preferredLanguage: preferredLanguage,
-          statusLabel: _localizedStatus(subscription.status),
-          statusColor: _statusColor(subscription.status),
-          categoryLabel: subscription.campaignCategory != null
-              ? _localizedCategory(subscription.campaignCategory!)
-              : null,
+        data: (subscription) => Column(
+          children: [
+            Expanded(
+              child: _SubscriptionDetailBody(
+                subscription: subscription,
+                preferredLanguage: preferredLanguage,
+                statusLabel: _localizedStatus(subscription.status),
+                statusColor: _statusColor(subscription.status),
+                categoryLabel: subscription.campaignCategory != null
+                    ? _localizedCategory(subscription.campaignCategory!)
+                    : null,
+              ),
+            ),
+            if (_canPause(subscription.status) ||
+                _canResume(subscription.status) ||
+                _canCancel(subscription.status))
+              Container(
+                padding: const EdgeInsets.fromLTRB(18, 12, 18, 24),
+                decoration: const BoxDecoration(
+                  color: kWhite,
+                  border: Border(top: BorderSide(color: Color(0xFFDADADA))),
+                ),
+                child: Column(
+                  children: [
+                    if (_canPause(subscription.status)) ...[
+                      primaryButton(
+                        label: 'subscriptionPause'.tr(),
+                        buttonColor: const Color(0xFFFF8800),
+                        isLoading: _loadingAction == _SubscriptionAction.pause,
+                        onPressed: _loadingAction != null
+                            ? null
+                            : () => _confirmAction(
+                                  _SubscriptionAction.pause,
+                                  title: 'subscriptionPause'.tr(),
+                                  message: 'pauseSubscriptionConfirmation'.tr(),
+                                  confirmText: 'subscriptionPause'.tr(),
+                                ),
+                      ),
+                      const SizedBox(height: 10),
+                    ],
+                    if (_canResume(subscription.status)) ...[
+                      primaryButton(
+                        label: 'subscriptionResume'.tr(),
+                        buttonColor: const Color(0xFF00C851),
+                        isLoading: _loadingAction == _SubscriptionAction.resume,
+                        onPressed: _loadingAction != null
+                            ? null
+                            : () => _confirmAction(
+                                  _SubscriptionAction.resume,
+                                  title: 'subscriptionResume'.tr(),
+                                  message:
+                                      'resumeSubscriptionConfirmation'.tr(),
+                                  confirmText: 'subscriptionResume'.tr(),
+                                ),
+                      ),
+                      const SizedBox(height: 10),
+                    ],
+                    if (_canCancel(subscription.status))
+                      primaryButton(
+                        label: 'subscriptionCancel'.tr(),
+                        buttonColor: const Color(0xFFFF4D4F),
+                        isLoading: _loadingAction == _SubscriptionAction.cancel,
+                        onPressed: _loadingAction != null
+                            ? null
+                            : () => _confirmAction(
+                                  _SubscriptionAction.cancel,
+                                  title: 'subscriptionCancel'.tr(),
+                                  message: 'cancelSubscriptionConfirmation'.tr(),
+                                  confirmText: 'subscriptionCancel'.tr(),
+                                ),
+                      ),
+                  ],
+                ),
+              ),
+          ],
         ),
         loading: () => const Center(child: LoadingAnimation()),
         error: (error, _) => Center(
@@ -117,8 +268,9 @@ class SubscriptionDetailPage extends ConsumerWidget {
                 ),
                 const SizedBox(height: 16),
                 TextButton(
-                  onPressed: () =>
-                      ref.invalidate(subscriptionDetailProvider(subscriptionId)),
+                  onPressed: () => ref.invalidate(
+                    subscriptionDetailProvider(widget.subscriptionId),
+                  ),
                   child: Text('retry'.tr()),
                 ),
               ],

@@ -111,6 +111,32 @@ class SubscriptionApi {
       requireAuth: true,
     );
   }
+
+  Future<ApiResponse<Map<String, dynamic>>> pauseSubscription(String id) async {
+    return _apiProvider.post(
+      '$_endpoint/user-subscription/$id/pause',
+      {},
+      requireAuth: true,
+    );
+  }
+
+  Future<ApiResponse<Map<String, dynamic>>> resumeSubscription(
+      String id) async {
+    return _apiProvider.post(
+      '$_endpoint/user-subscription/$id/resume',
+      {},
+      requireAuth: true,
+    );
+  }
+
+  Future<ApiResponse<Map<String, dynamic>>> cancelSubscription(
+      String id) async {
+    return _apiProvider.post(
+      '$_endpoint/user-subscription/$id/cancel',
+      {},
+      requireAuth: true,
+    );
+  }
 }
 
 @riverpod
