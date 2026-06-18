@@ -893,6 +893,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.1.0"
+  hadith:
+    dependency: "direct main"
+    description:
+      name: hadith
+      sha256: "33664295777e22ce016a0e2eafac936fa9c27a3f7419014a332df6353bef4077"
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.0.1"
   http:
     dependency: "direct main"
     description:

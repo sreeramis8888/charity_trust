@@ -10,6 +10,7 @@ import 'package:Annujoom/src/interfaces/main_pages/profile_pages/refer_friend_pa
 import 'package:Annujoom/src/interfaces/main_pages/profile_pages/change_phone_number.dart';
 import 'package:Annujoom/src/interfaces/main_pages/profile_pages/zakat_calculator.dart';
 import 'package:Annujoom/src/interfaces/main_pages/profile_pages/quran_page.dart';
+import 'package:Annujoom/src/interfaces/main_pages/profile_pages/hadith_page.dart';
 import 'package:Annujoom/src/interfaces/main_pages/subscription/subscription_page.dart';
 import 'package:Annujoom/src/interfaces/main_pages/subscription/my_subscriptions_page.dart';
 import 'package:Annujoom/src/interfaces/main_pages/referrals/my_referrals_page.dart';
@@ -466,6 +467,17 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                           );
                         },
                         child: _tile(Icons.menu_book, "quran".tr()),
+                      ),
+                      _divider(),
+                      GestureDetector(
+                        onTap: () {
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (context) => const HadithPage(),
+                            ),
+                          );
+                        },
+                        child: _tile(Icons.auto_stories, "hadith".tr()),
                       ),
                       _divider(),
                       GestureDetector(

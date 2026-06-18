@@ -87,6 +87,7 @@ dependencies:
   google_fonts: ^6.2.1
   flutter_qiblah: ^3.2.0
   geolocator: ^14.0.2
+  hadith: ^1.0.1
 
 dev_dependencies:
   flutter_test:
@@ -116,6 +117,12 @@ flutter:
     - assets/png/
     - assets/jpg/
     - assets/translations/
+    - assets/hadith/abudawud/
+    - assets/hadith/bukhari/
+    - assets/hadith/ibnmajah/
+    - assets/hadith/muslim/
+    - assets/hadith/nasai/
+    - assets/hadith/tirmidhi/
     - .env
     - shorebird.yaml
 
