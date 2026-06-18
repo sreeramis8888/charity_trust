@@ -1,8 +1,8 @@
 import 'package:Annujoom/src/data/constants/color_constants.dart';
 import 'package:Annujoom/src/data/constants/style_constants.dart';
+import 'package:Annujoom/src/interfaces/main_pages/profile_pages/hadith_page.dart';
 import 'package:Annujoom/src/interfaces/main_pages/profile_pages/quran_page.dart';
 import 'package:Annujoom/src/interfaces/main_pages/subscription/subscription_page.dart';
-import 'package:Annujoom/src/interfaces/main_pages/profile_pages/zakat_calculator.dart';
 import 'package:Annujoom/src/interfaces/main_pages/qibla_page.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
@@ -22,12 +22,12 @@ class HomeQuickAccessRow extends StatelessWidget {
           Expanded(
             child: _QuickAccessCard(
               height: _cardHeight,
-              icon: Icons.calculate_outlined,
-              label: 'homeZakatCalculator'.tr(),
+              icon: Icons.autorenew,
+              label: 'homeSubscriptions'.tr(),
               onTap: () {
                 Navigator.of(context).push(
                   MaterialPageRoute(
-                    builder: (context) => const ZakatCalculatorPage(),
+                    builder: (context) => const SubscriptionPage(),
                   ),
                 );
               },
@@ -52,12 +52,12 @@ class HomeQuickAccessRow extends StatelessWidget {
           Expanded(
             child: _QuickAccessCard(
               height: _cardHeight,
-              icon: Icons.explore_outlined,
-              label: 'homeQiblaFinder'.tr(),
+              icon: Icons.auto_stories,
+              label: 'hadith'.tr(),
               onTap: () {
                 Navigator.of(context).push(
                   MaterialPageRoute(
-                    builder: (context) => const QiblaPage(),
+                    builder: (context) => const HadithPage(),
                   ),
                 );
               },
@@ -67,12 +67,12 @@ class HomeQuickAccessRow extends StatelessWidget {
           Expanded(
             child: _QuickAccessCard(
               height: _cardHeight,
-              icon: Icons.autorenew,
-              label: 'homeSubscriptions'.tr(),
+              icon: Icons.explore_outlined,
+              label: 'homeQiblaFinder'.tr(),
               onTap: () {
                 Navigator.of(context).push(
                   MaterialPageRoute(
-                    builder: (context) => const SubscriptionPage(),
+                    builder: (context) => const QiblaPage(),
                   ),
                 );
               },
