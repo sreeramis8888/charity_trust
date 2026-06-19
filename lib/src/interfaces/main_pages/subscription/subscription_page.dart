@@ -8,6 +8,7 @@ import 'package:Annujoom/src/data/providers/razorpay_provider.dart';
 import 'package:Annujoom/src/data/providers/subscription_provider.dart';
 import 'package:Annujoom/src/data/providers/user_provider.dart';
 import 'package:Annujoom/src/data/services/snackbar_service.dart';
+import 'package:Annujoom/src/interfaces/main_pages/subscription/my_subscriptions_page.dart';
 import 'package:Annujoom/src/interfaces/main_pages/subscription/subscription_failed_page.dart';
 import 'package:Annujoom/src/interfaces/main_pages/subscription/subscription_success_page.dart';
 import 'package:Annujoom/src/interfaces/components/loading_indicator.dart';
@@ -307,6 +308,27 @@ class _SubscriptionPageState extends ConsumerState<SubscriptionPage> {
           onPressed: () => Navigator.of(context).pop(),
         ),
         title: Text('subscription'.tr(), style: kSubHeadingM),
+        actions: [
+          Center(
+            child: InkWell(
+              onTap: () {
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (context) => const MySubscriptionsPage(),
+                  ),
+                );
+              },
+              child: Text(
+                'viewActiveSubscriptions'.tr(),
+                style: TextStyle(
+                  color: Colors.blue,
+                  fontSize: 16,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
       body: campaignsAsync.when(
         data: (campaigns) {

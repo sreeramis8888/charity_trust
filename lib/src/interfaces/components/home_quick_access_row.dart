@@ -6,6 +6,7 @@ import 'package:Annujoom/src/interfaces/main_pages/subscription/subscription_pag
 import 'package:Annujoom/src/interfaces/main_pages/qibla_page.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 class HomeQuickAccessRow extends StatelessWidget {
   const HomeQuickAccessRow({super.key});
@@ -22,7 +23,7 @@ class HomeQuickAccessRow extends StatelessWidget {
           Expanded(
             child: _QuickAccessCard(
               height: _cardHeight,
-              icon: Icons.autorenew,
+              svgPath: 'assets/svg/subscription.svg',
               label: 'homeSubscriptions'.tr(),
               onTap: () {
                 Navigator.of(context).push(
@@ -37,7 +38,7 @@ class HomeQuickAccessRow extends StatelessWidget {
           Expanded(
             child: _QuickAccessCard(
               height: _cardHeight,
-              icon: Icons.menu_book_outlined,
+              svgPath: 'assets/svg/quran.svg',
               label: 'quran'.tr(),
               onTap: () {
                 Navigator.of(context).push(
@@ -52,7 +53,7 @@ class HomeQuickAccessRow extends StatelessWidget {
           Expanded(
             child: _QuickAccessCard(
               height: _cardHeight,
-              icon: Icons.auto_stories,
+              svgPath: 'assets/svg/hadith.svg',
               label: 'hadith'.tr(),
               onTap: () {
                 Navigator.of(context).push(
@@ -67,7 +68,7 @@ class HomeQuickAccessRow extends StatelessWidget {
           Expanded(
             child: _QuickAccessCard(
               height: _cardHeight,
-              icon: Icons.explore_outlined,
+              svgPath: 'assets/svg/Qibla.svg',
               label: 'homeQiblaFinder'.tr(),
               onTap: () {
                 Navigator.of(context).push(
@@ -86,13 +87,13 @@ class HomeQuickAccessRow extends StatelessWidget {
 
 class _QuickAccessCard extends StatelessWidget {
   final double height;
-  final IconData icon;
+  final String svgPath;
   final String label;
   final VoidCallback onTap;
 
   const _QuickAccessCard({
     required this.height,
-    required this.icon,
+    required this.svgPath,
     required this.label,
     required this.onTap,
   });
@@ -134,10 +135,16 @@ class _QuickAccessCard extends StatelessWidget {
                       color: kPrimaryColor.withOpacity(0.1),
                       shape: BoxShape.circle,
                     ),
-                    child: Icon(
-                      icon,
-                      color: kPrimaryColor,
-                      size: 20,
+                    child: Center(
+                      child: SvgPicture.asset(
+                        svgPath,
+                        colorFilter: const ColorFilter.mode(
+                          kPrimaryColor,
+                          BlendMode.srcIn,
+                        ),
+                        width: 20,
+                        height: 20,
+                      ),
                     ),
                   ),
                   const SizedBox(height: 12),

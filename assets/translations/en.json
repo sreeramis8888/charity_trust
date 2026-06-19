@@ -385,9 +385,9 @@
   "hadiths": "hadiths",
   "hadithLoadError": "Unable to load hadith data. Please try again.",
   "homeZakatCalculator": "Zakat\nCalculator",
-  "homeQiblaFinder": "Qibla\nFinder",
-  "homeSubscriptions": "Sub-\nscriptions",
-  "qiblaFinder": "Qibla Finder",
+  "homeQiblaFinder": "Qibla",
+  "homeSubscriptions": "Auto Pay",
+  "qiblaFinder": "Qibla",
   "qiblaInstruction": "Hold your phone flat. Rotate until the arrow points up.",
   "qiblaFacingQibla": "You are facing the Qibla",
   "qiblaAngle": "Qibla angle",
@@ -440,5 +440,6 @@
   "chooseLogintype": "Choose your login type : ",
   "loginType1": "* Trustee login requires trustee approval",
   "loginType2": "* Charity member login requires OTP verification",
-  "loginType3": "* Self login provides instant access without any verification"
+  "loginType3": "* Self login provides instant access without any verification",
+  "viewActiveSubscriptions": "View active"
 }
