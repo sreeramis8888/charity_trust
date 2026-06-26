@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:developer';
 import 'package:Annujoom/src/interfaces/components/additional_pages/mswipe_payment_page.dart';
 import 'package:easy_localization/easy_localization.dart';
@@ -21,7 +22,7 @@ import 'package:Annujoom/src/data/services/secure_storage_service.dart';
 import 'package:Annujoom/src/interfaces/components/additional_pages/payment_success_page.dart';
 import 'package:Annujoom/src/interfaces/components/additional_pages/payment_failed_page.dart';
 import 'package:Annujoom/src/interfaces/components/additional_pages/payment_method_page.dart';
-import 'package:Annujoom/src/interfaces/components/additional_pages/easebuzz_payment_page.dart';
+import 'package:easebuzz_flutter/easebuzz_flutter.dart';
 
 class CampaignDetailPage extends ConsumerStatefulWidget {
   final String? id;
@@ -479,65 +480,120 @@ class _CampaignDetailPageState extends ConsumerState<CampaignDetailPage> {
     String transactionId,
     double amount,
   ) async {
-    log("Opening Easebuzz payment page with URL: $paymentUrl");
+    log("Opening Easebuzz payment SDK with URL: $paymentUrl");
+
+    String? accessKey;
+    try {
+      final uri = Uri.parse(paymentUrl);
+      final segments = uri.pathSegments.where((s) => s.isNotEmpty).toList();
+      if (segments.isNotEmpty) {
+        accessKey = segments.last;
+      }
+    } catch (e) {
+      log('Error parsing access key: $e');
+    }
+
+    if (accessKey == null || accessKey.isEmpty) {
+      log("Failed to extract access key from Easebuzz payment URL");
+      _showSnackBar('failedToGetPaymentUrl'.tr(), type: SnackbarType.error);
+      if (mounted) {
+        setState(() => _isProcessing = false);
+      }
+      return;
+    }
+
+    final payMode = paymentUrl.contains('testpay.easebuzz.in') ? 'test' : 'production';
+    final easebuzzPlugin = EasebuzzFlutter();
 
     if (mounted) {
       _donationController.clear();
       _donationFocusNode.unfocus();
       setState(() => _isProcessing = false);
+    }
 
-      await Navigator.of(context).push(
-        MaterialPageRoute(
-          builder: (_) => EasebuzzPaymentPage(
-            paymentUrl: paymentUrl,
-          ),
-        ),
-      );
+    String? sdkResponseString;
+    try {
+      log("Calling Easebuzz SDK: payWithEasebuzz($accessKey, $payMode)");
+      sdkResponseString = await easebuzzPlugin.payWithEasebuzz(accessKey, payMode);
+      log("Easebuzz SDK Raw Response String: $sdkResponseString");
+    } catch (e) {
+      log("Error launching Easebuzz SDK: $e");
+      _showSnackBar('failedToProcessPayment'.tr(), type: SnackbarType.error);
+      return;
+    }
 
-      if (mounted && transactionId.isNotEmpty) {
-        setState(() => _isProcessing = true);
-        try {
-          final donationApi = ref.read(donationApiProvider);
-          final response = await donationApi.fetchEasebuzzPaymentDetails(
-            transactionId: transactionId,
-          );
+    Map<String, dynamic>? sdkResponse;
+    if (sdkResponseString != null && sdkResponseString.isNotEmpty) {
+      try {
+        sdkResponse = jsonDecode(sdkResponseString) as Map<String, dynamic>;
+      } catch (e) {
+        log("Error decoding Easebuzz SDK response: $e");
+      }
+    }
 
-          if (response.success && response.data != null) {
-            final data = response.data!['data'] as Map<String, dynamic>?;
-            if (data != null && data['status'] == 'success') {
-              final receipt = data['receipt'] as String?;
+    if (sdkResponse != null) {
+      final result = sdkResponse['result'] as String?;
+      log("Easebuzz payment result: $result");
 
-              ref.invalidate(generalCampaignsProvider);
-              ref.invalidate(participatedCampaignsProvider);
+      final isSuccess = result == 'payment_successfull' || result == 'payment_success';
+      final isCancelled = result == 'user_cancelled' || result == 'back_pressed';
 
-              Navigator.of(context).pushReplacement(
-                MaterialPageRoute(
-                  builder: (_) => PaymentSuccessPage(
-                    orderId: transactionId,
-                    paymentId: null, // Easebuzz uses only transactionId
-                    amount: amount,
-                    receipt: receipt,
+      if (isSuccess) {
+        if (mounted && transactionId.isNotEmpty) {
+          setState(() => _isProcessing = true);
+          try {
+            final donationApi = ref.read(donationApiProvider);
+            final response = await donationApi.fetchEasebuzzPaymentDetails(
+              transactionId: transactionId,
+            );
+
+            if (response.success && response.data != null) {
+              final data = response.data!['data'] as Map<String, dynamic>?;
+              if (data != null && data['status'] == 'success') {
+                final receipt = data['receipt'] as String?;
+
+                ref.invalidate(generalCampaignsProvider);
+                ref.invalidate(participatedCampaignsProvider);
+
+                Navigator.of(context).pushReplacement(
+                  MaterialPageRoute(
+                    builder: (_) => PaymentSuccessPage(
+                      orderId: transactionId,
+                      paymentId: null, // Easebuzz uses only transactionId
+                      amount: amount,
+                      receipt: receipt,
+                    ),
                   ),
-                ),
-              );
-              return;
+                );
+                return;
+              }
+            }
+            Navigator.of(context).pushReplacement(
+              MaterialPageRoute(builder: (_) => const PaymentFailurePage()),
+            );
+          } catch (e) {
+            log("Error checking Easebuzz payment: $e");
+            Navigator.of(context).pushReplacement(
+              MaterialPageRoute(builder: (_) => const PaymentFailurePage()),
+            );
+          } finally {
+            if (mounted) {
+              setState(() => _isProcessing = false);
             }
           }
-
-          Navigator.of(context).pushReplacement(
-            MaterialPageRoute(builder: (_) => const PaymentFailurePage()),
-          );
-        } catch (e) {
-          log("Error checking Easebuzz payment: $e");
-          Navigator.of(context).pushReplacement(
-            MaterialPageRoute(builder: (_) => const PaymentFailurePage()),
-          );
-        } finally {
-          if (mounted) {
-            setState(() => _isProcessing = false);
-          }
         }
+      } else if (isCancelled) {
+        log("Payment cancelled by user");
+        _showSnackBar('Payment cancelled by user', type: SnackbarType.warning);
+      } else {
+        log("Payment failed or cancelled: $result");
+        Navigator.of(context).pushReplacement(
+          MaterialPageRoute(builder: (_) => const PaymentFailurePage()),
+        );
       }
+    } else {
+      log("Received null or invalid response from Easebuzz SDK");
+      _showSnackBar('failedToProcessPayment'.tr(), type: SnackbarType.error);
     }
   }
 

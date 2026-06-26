@@ -88,6 +88,7 @@ dependencies:
   flutter_qiblah: ^3.2.0
   geolocator: ^14.0.2
   hadith: ^1.0.1
+  easebuzz_flutter: ^0.0.8
 
 dev_dependencies:
   flutter_test:
