@@ -1,5 +1,5 @@
 /// Formats currency values to show as L (Lakh) or Cr (Crore) when appropriate
-/// 
+///
 /// Examples:
 /// - 50000 -> "₹50,000"
 /// - 100000 -> "₹1L"
@@ -7,11 +7,17 @@
 /// - 10000000 -> "₹1Cr"
 /// - 125000000 -> "₹12.5Cr"
 String formatCurrency(dynamic value) {
+  // Handle null values
+  if (value == null) {
+    return '₹0';
+  }
+
   if (value is String) {
     // If it's already a formatted string like "₹50,000", return as is
     if (value.startsWith('₹')) {
       return value;
     }
+
     // Try to parse string to number
     value = int.tryParse(value.replaceAll(RegExp(r'[^\d]'), '')) ?? 0;
   }
@@ -34,6 +40,9 @@ String formatCurrency(dynamic value) {
     return '₹${(lakhs * 10).toInt() / 10}L';
   } else {
     // Regular format with commas
-    return '₹${amount.toString().replaceAllMapped(RegExp(r'\B(?=(\d{3})+(?!\d))'), (m) => ',')}';
+    return '₹${amount.toString().replaceAllMapped(
+          RegExp(r'\B(?=(\d{3})+(?!\d))'),
+          (match) => ',',
+        )}';
   }
 }
