@@ -16,7 +16,10 @@ import 'package:Annujoom/src/data/providers/donation_provider.dart';
 import 'package:Annujoom/src/data/providers/razorpay_provider.dart';
 import 'package:Annujoom/src/data/providers/mswipe_provider.dart';
 import 'package:Annujoom/src/data/providers/campaigns_provider.dart'
-    show generalCampaignsProvider, participatedCampaignsProvider, campaignsApiProvider;
+    show
+        generalCampaignsProvider,
+        participatedCampaignsProvider,
+        campaignsApiProvider;
 import 'package:Annujoom/src/data/services/deep_link_service.dart';
 import 'package:Annujoom/src/data/services/snackbar_service.dart';
 import 'package:Annujoom/src/data/services/secure_storage_service.dart';
@@ -843,12 +846,10 @@ class _CampaignDetailPageState extends ConsumerState<CampaignDetailPage> {
 
   Widget _buildDetailContent(BuildContext context) {
     final hasGoal = widget.goal != null && widget.goal! > 0;
-    final hasDueDate = widget.date != null &&
-        widget.date!.isNotEmpty &&
-        widget.date != '-';
-    final progress = hasGoal
-        ? ((widget.raised ?? 0) / widget.goal!).clamp(0.0, 1.0)
-        : 0.0;
+    final hasDueDate =
+        widget.date != null && widget.date!.isNotEmpty && widget.date != '-';
+    final progress =
+        hasGoal ? ((widget.raised ?? 0) / widget.goal!).clamp(0.0, 1.0) : 0.0;
     final percentage = (progress * 100).toInt();
 
     return Column(
@@ -1084,28 +1085,12 @@ class _CampaignDetailPageState extends ConsumerState<CampaignDetailPage> {
           animationType: anim.AnimationType.fadeSlideInFromBottom,
           duration: anim.AnimationDuration.normal,
           delayMilliseconds: 500,
-          child: Row(
-            children: [
-              if (widget.id != null && widget.id!.isNotEmpty) ...[
-                Expanded(
-                  child: primaryButton(
-                    label: 'share'.tr(),
-                    onPressed: _shareCampaign,
-                    buttonColor: kWhite,
-                    labelColor: kTextColor,
-                    sideColor: kTertiary,
-                  ),
-                ),
-                const SizedBox(width: 12),
-              ],
-              Expanded(
-                child: primaryButton(
-                  label: _isProcessing ? "processing".tr() : "donateNow".tr(),
-                  onPressed: _isProcessing ? null : _handleDonation,
-                  buttonColor: kPrimaryColor,
-                ),
-              ),
-            ],
+          child: Expanded(
+            child: primaryButton(
+              label: _isProcessing ? "processing".tr() : "donateNow".tr(),
+              onPressed: _isProcessing ? null : _handleDonation,
+              buttonColor: kPrimaryColor,
+            ),
           ),
         ),
         const SizedBox(height: 24),
