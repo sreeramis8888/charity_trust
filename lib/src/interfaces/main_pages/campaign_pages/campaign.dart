@@ -394,10 +394,12 @@ class _CampaignPageState extends ConsumerState<CampaignPage>
                             campaign.getDescription(preferredLanguage) ?? '',
                         title: campaign.getTitle(preferredLanguage) ?? '',
                         category: campaign.category ?? '',
-                        date: formatDate(campaign.targetDate) ?? '',
+                        date: campaign.targetDate != null
+                            ? formatDate(campaign.targetDate)
+                            : '',
                         image: campaign.coverImage ?? '',
                         raised: campaign.collectedAmount?.toInt() ?? 0,
-                        goal: campaign.targetAmount?.toInt() ?? 0,
+                        goal: campaign.targetAmount?.toInt(),
                         onDetails: () {
                           Navigator.of(context).pushNamed(
                             'CampaignDetail',
@@ -406,10 +408,12 @@ class _CampaignPageState extends ConsumerState<CampaignPage>
                               'title': campaign.title ?? '',
                               'description': campaign.description ?? '',
                               'category': campaign.category ?? '',
-                              'date': formatDate(campaign.targetDate) ?? '',
+                              'date': campaign.targetDate != null
+                                  ? formatDate(campaign.targetDate)
+                                  : '',
                               'image': campaign.coverImage ?? '',
                               'raised': campaign.collectedAmount?.toInt() ?? 0,
-                              'goal': campaign.targetAmount?.toInt() ?? 0,
+                              'goal': campaign.targetAmount?.toInt(),
                             },
                           );
                         },
@@ -814,10 +818,12 @@ class _CampaignPageState extends ConsumerState<CampaignPage>
                   description: campaign.getDescription(preferredLanguage) ?? '',
                   title: campaign.getTitle(preferredLanguage) ?? '',
                   category: campaign.category ?? '',
-                  date: formatDate(campaign.targetDate) ?? '',
+                  date: campaign.targetDate != null
+                      ? formatDate(campaign.targetDate)
+                      : '',
                   image: campaign.coverImage ?? '',
                   raised: campaign.collectedAmount?.toInt() ?? 0,
-                  goal: campaign.targetAmount?.toInt() ?? 0,
+                  goal: campaign.targetAmount?.toInt(),
                   onDetails: () {
                     Navigator.of(context).pushNamed(
                       'CampaignDetail',
@@ -826,10 +832,12 @@ class _CampaignPageState extends ConsumerState<CampaignPage>
                         'title': campaign.title ?? '',
                         'description': campaign.description ?? '',
                         'category': campaign.category ?? '',
-                        'date': formatDate(campaign.targetDate) ?? '',
+                        'date': campaign.targetDate != null
+                            ? formatDate(campaign.targetDate)
+                            : '',
                         'image': campaign.coverImage ?? '',
                         'raised': campaign.collectedAmount?.toInt() ?? 0,
-                        'goal': campaign.targetAmount?.toInt() ?? 0,
+                        'goal': campaign.targetAmount?.toInt(),
                       },
                     );
                   },
@@ -894,10 +902,12 @@ class _CampaignPageState extends ConsumerState<CampaignPage>
                   description: campaign.getDescription(preferredLanguage) ?? '',
                   title: campaign.getTitle(preferredLanguage) ?? '',
                   category: campaign.category ?? '',
-                  date: formatDate(campaign.targetDate) ?? '',
+                  date: campaign.targetDate != null
+                      ? formatDate(campaign.targetDate)
+                      : '',
                   image: campaign.coverImage ?? '',
                   raised: campaign.collectedAmount?.toInt() ?? 0,
-                  goal: campaign.targetAmount?.toInt() ?? 0,
+                  goal: campaign.targetAmount?.toInt(),
                   onDetails: () {
                     Navigator.of(context).pushNamed(
                       'CampaignDetail',
@@ -906,10 +916,12 @@ class _CampaignPageState extends ConsumerState<CampaignPage>
                         'title': campaign.title ?? '',
                         'description': campaign.description ?? '',
                         'category': campaign.category ?? '',
-                        'date': formatDate(campaign.targetDate) ?? '',
+                        'date': campaign.targetDate != null
+                            ? formatDate(campaign.targetDate)
+                            : '',
                         'image': campaign.coverImage ?? '',
                         'raised': campaign.collectedAmount?.toInt() ?? 0,
-                        'goal': campaign.targetAmount?.toInt() ?? 0,
+                        'goal': campaign.targetAmount?.toInt(),
                       },
                     );
                   },
@@ -967,11 +979,13 @@ class _CampaignPageState extends ConsumerState<CampaignPage>
                   description: campaign.getDescription(preferredLanguage) ?? '',
                   title: campaign.getTitle(preferredLanguage) ?? '',
                   category: campaign.category ?? '',
-                  date: formatDate(campaign.targetDate) ?? '',
+                  date: campaign.targetDate != null
+                      ? formatDate(campaign.targetDate)
+                      : '',
                   startDate: formatDate(campaign.startDate),
                   image: campaign.coverImage ?? '',
                   raised: campaign.collectedAmount?.toInt() ?? 0,
-                  goal: campaign.targetAmount?.toInt() ?? 0,
+                  goal: campaign.targetAmount?.toInt(),
                   onDetails: () {},
                   isApprovalCard: true,
                   onApprove: () {

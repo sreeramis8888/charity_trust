@@ -821,12 +821,6 @@ class _CampaignDetailPageState extends ConsumerState<CampaignDetailPage> {
   }
 
   Widget _buildRegularDetailPage(BuildContext context) {
-    final progress = ((widget.raised ?? 0) / (widget.goal ?? 1)).clamp(
-      0.0,
-      1.0,
-    );
-    final percentage = (progress * 100).toInt();
-
     return Scaffold(
       appBar: AppBar(
         backgroundColor: kWhite,
@@ -848,10 +842,13 @@ class _CampaignDetailPageState extends ConsumerState<CampaignDetailPage> {
   }
 
   Widget _buildDetailContent(BuildContext context) {
-    final progress = ((widget.raised ?? 0) / (widget.goal ?? 1)).clamp(
-      0.0,
-      1.0,
-    );
+    final hasGoal = widget.goal != null && widget.goal! > 0;
+    final hasDueDate = widget.date != null &&
+        widget.date!.isNotEmpty &&
+        widget.date != '-';
+    final progress = hasGoal
+        ? ((widget.raised ?? 0) / widget.goal!).clamp(0.0, 1.0)
+        : 0.0;
     final percentage = (progress * 100).toInt();
 
     return Column(
@@ -885,7 +882,7 @@ class _CampaignDetailPageState extends ConsumerState<CampaignDetailPage> {
         const SizedBox(height: 16),
         if (widget.category == 'General Campaign' &&
             widget.raised != null &&
-            widget.goal != null)
+            hasGoal)
           anim.AnimatedWidgetWrapper(
             animationType: anim.AnimationType.fadeSlideInFromBottom,
             duration: anim.AnimationDuration.normal,
@@ -900,11 +897,11 @@ class _CampaignDetailPageState extends ConsumerState<CampaignDetailPage> {
           ),
         if (widget.category == 'General Campaign' &&
             widget.raised != null &&
-            widget.goal != null)
+            hasGoal)
           const SizedBox(height: 12),
         if (widget.category == 'General Campaign' &&
             widget.raised != null &&
-            widget.goal != null)
+            hasGoal)
           anim.AnimatedWidgetWrapper(
             animationType: anim.AnimationType.fadeSlideInFromBottom,
             duration: anim.AnimationDuration.normal,
@@ -920,9 +917,23 @@ class _CampaignDetailPageState extends ConsumerState<CampaignDetailPage> {
               ],
             ),
           ),
-        if (widget.category == 'General Campaign' && widget.date != null)
+        if (widget.category == 'General Campaign' &&
+            widget.raised != null &&
+            !hasGoal) ...[
+          anim.AnimatedWidgetWrapper(
+            animationType: anim.AnimationType.fadeSlideInFromBottom,
+            duration: anim.AnimationDuration.normal,
+            delayMilliseconds: 200,
+            child: Text(
+              '₹${widget.raised} ${'raised'.tr()}',
+              style: kBodyTitleM.copyWith(color: const Color(0xFF009000)),
+            ),
+          ),
+          const SizedBox(height: 12),
+        ],
+        if (widget.category == 'General Campaign' && hasDueDate)
           const SizedBox(height: 16),
-        if (widget.category == 'General Campaign' && widget.date != null)
+        if (widget.category == 'General Campaign' && hasDueDate)
           anim.AnimatedWidgetWrapper(
             animationType: anim.AnimationType.fadeSlideInFromRight,
             duration: anim.AnimationDuration.normal,
@@ -951,7 +962,7 @@ class _CampaignDetailPageState extends ConsumerState<CampaignDetailPage> {
                       const Icon(Icons.calendar_month, color: kWhite, size: 14),
                       const SizedBox(width: 6),
                       Text(
-                        (widget.date ?? '').toUpperCase(),
+                        widget.date!.toUpperCase(),
                         style: kSmallerTitleB.copyWith(color: kWhite),
                       ),
                     ],

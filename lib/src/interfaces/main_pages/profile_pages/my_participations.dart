@@ -359,10 +359,12 @@ class _MyParticipationsPageState extends ConsumerState<MyParticipationsPage>
                   description: campaign.getDescription(preferredLanguage) ?? '',
                   title: campaign.getTitle(preferredLanguage) ?? '',
                   category: campaign.category ?? '',
-                  date: formatDate(campaign.targetDate) ?? '',
+                  date: campaign.targetDate != null
+                      ? formatDate(campaign.targetDate)
+                      : '',
                   image: campaign.coverImage ?? '',
                   raised: campaign.collectedAmount?.toInt() ?? 0,
-                  goal: campaign.targetAmount?.toInt() ?? 0,
+                  goal: campaign.targetAmount?.toInt(),
                   onDetails: () {
                     Navigator.of(context).pushNamed(
                       'CampaignDetail',
@@ -371,10 +373,12 @@ class _MyParticipationsPageState extends ConsumerState<MyParticipationsPage>
                         'title': campaign.title ?? '',
                         'description': campaign.description ?? '',
                         'category': campaign.category ?? '',
-                        'date': formatDate(campaign.targetDate) ?? '',
+                        'date': campaign.targetDate != null
+                            ? formatDate(campaign.targetDate)
+                            : '',
                         'image': campaign.coverImage ?? '',
                         'raised': campaign.collectedAmount?.toInt() ?? 0,
-                        'goal': campaign.targetAmount?.toInt() ?? 0,
+                        'goal': campaign.targetAmount?.toInt(),
                       },
                     );
                   },

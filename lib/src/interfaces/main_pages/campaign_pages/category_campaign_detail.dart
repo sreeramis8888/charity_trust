@@ -55,7 +55,9 @@ class CategoryCampaignDetailPage extends ConsumerWidget {
           title: campaign.getTitle(preferredLanguage),
           description: campaign.getDescription(preferredLanguage),
           category: campaign.category,
-          date: formatDate(campaign.targetDate),
+          date: campaign.targetDate != null
+              ? formatDate(campaign.targetDate)
+              : '',
           image: campaign.coverImage,
           raised: campaign.collectedAmount?.toInt(),
           goal: campaign.targetAmount?.toInt(),

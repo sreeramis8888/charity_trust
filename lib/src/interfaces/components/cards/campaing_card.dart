@@ -14,7 +14,7 @@ class CampaignCard extends StatelessWidget {
   final String? startDate;
   final String? image;
   final int raised;
-  final int goal;
+  final int? goal;
   final VoidCallback onDetails;
   final VoidCallback? onDonate;
   final bool isMyCampaign;
@@ -41,9 +41,15 @@ class CampaignCard extends StatelessWidget {
     this.onReject,
   });
 
+  bool get _hasDueDate => date.isNotEmpty && date != '-';
+
+  bool get _hasGoal => goal != null && goal! > 0;
+
   @override
   Widget build(BuildContext context) {
-    final percent = goal > 0 ? (raised / goal) : 0.0;
+    final hasGoal = _hasGoal;
+    final hasDueDate = _hasDueDate;
+    final percent = hasGoal ? (raised / goal!).clamp(0.0, 1.0) : 0.0;
     final isGeneralCampaign = category == 'General Campaign';
 
     return Container(
@@ -71,13 +77,13 @@ class CampaignCard extends StatelessWidget {
                   color: const Color(0xFFDBDBDB),
                   textStyle: kSmallerTitleR.copyWith(fontSize: 10),
                 ),
-              if (isGeneralCampaign && !isApprovalCard)
+              if (isGeneralCampaign && !isApprovalCard && hasDueDate)
                 TextPill(
                   text: "${'dueDate'.tr()}:  $date",
                   color: const Color(0xFFDBDBDB),
                   textStyle: kSmallerTitleR.copyWith(fontSize: 10),
                 ),
-              if (isApprovalCard)
+              if (isApprovalCard && hasDueDate)
                 TextPill(
                   text: "${'dueDate'.tr()}: $date",
                   color: const Color(0xFFDBDBDB),
@@ -121,44 +127,53 @@ class CampaignCard extends StatelessWidget {
           ),
           if (isGeneralCampaign && !isApprovalCard) ...[
             const SizedBox(height: 16),
-            LinearProgressIndicator(
-              color: Color(0xFFFFD400),
-              minHeight: 8,
-              borderRadius: BorderRadius.circular(10),
-              value: percent,
-              backgroundColor: Color(0xFFCFCFCF),
-            ),
-            const SizedBox(height: 8),
+            if (hasGoal) ...[
+              LinearProgressIndicator(
+                color: Color(0xFFFFD400),
+                minHeight: 8,
+                borderRadius: BorderRadius.circular(10),
+                value: percent,
+                backgroundColor: Color(0xFFCFCFCF),
+              ),
+              const SizedBox(height: 8),
+            ],
             Wrap(
               crossAxisAlignment: WrapCrossAlignment.start,
               spacing: 6,
               runSpacing: 4,
               children: [
                 Text(
-                  "₹$raised",
+                  hasGoal ? "₹${raised > goal! ? goal : raised}" : "₹$raised",
                   style: kBodyTitleM.copyWith(color: Color(0xFF009000)),
                   maxLines: 3,
                 ),
-                Text(
-                  "raisedOf".tr(),
-                  style: kBodyTitleR,
-                  maxLines: 3,
-                ),
-                Text(
-                  "₹$goal",
-                  style: kBodyTitleSB,
-                  maxLines: 3,
-                ),
-                Text(
-                  "goal".tr(),
-                  style: kBodyTitleR,
-                  maxLines: 3,
-                ),
-                Text(
-                  "${(percent * 100).toInt()}%",
-                  style: kSmallTitleR,
-                  maxLines: 3,
-                ),
+                if (hasGoal) ...[
+                  Text(
+                    "raisedOf".tr(),
+                    style: kBodyTitleR,
+                    maxLines: 3,
+                  ),
+                  Text(
+                    "₹$goal",
+                    style: kBodyTitleSB,
+                    maxLines: 3,
+                  ),
+                  Text(
+                    "goal".tr(),
+                    style: kBodyTitleR,
+                    maxLines: 3,
+                  ),
+                  Text(
+                    "${(percent * 100).toInt()}%",
+                    style: kSmallTitleR,
+                    maxLines: 3,
+                  ),
+                ] else
+                  Text(
+                    "raised".tr(),
+                    style: kBodyTitleR,
+                    maxLines: 3,
+                  ),
               ],
             ),
           ] else
