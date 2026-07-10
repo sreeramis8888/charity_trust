@@ -454,19 +454,20 @@ class HomeGradientCampaignCard extends StatelessWidget {
     this.category,
   });
 
-  String _displayDueDate(bool isGeneralCampaign) {
+  String _displayDueDate() {
     if (dueDate.isEmpty || dueDate == '-') return '';
-    if (isGeneralCampaign) return dueDate;
-    return "noDueDate".tr();
+    return dueDate;
   }
+
+  bool get _hasDueDate => dueDate.isNotEmpty && dueDate != '-';
 
   @override
   Widget build(BuildContext context) {
     final isGeneralCampaign = category == 'General Campaign';
     final hasGoal = goal != null && goal! > 0;
     final percent = hasGoal ? (raised / goal!).clamp(0.0, 1.0) : 0.0;
-    final displayDueDate = _displayDueDate(isGeneralCampaign);
-    final hasDueDate = displayDueDate.isNotEmpty;
+    final displayDueDate = _displayDueDate();
+    final hasDueDate = _hasDueDate;
 
     return Stack(
       children: [
@@ -488,18 +489,19 @@ class HomeGradientCampaignCard extends StatelessWidget {
                 children: [
                   Row(
                     children: [
-                      if (isGeneralCampaign)
+                      if (isGeneralCampaign && hasDueDate)
                         Padding(
                           padding: const EdgeInsets.only(right: 6),
                           child: _WarningBadge(),
                         ),
-                      Text(
-                        "dueDate".tr(),
-                        style: kSmallerTitleSB.copyWith(
-                          fontSize: 10,
-                          color: kWhite,
+                      if (hasDueDate)
+                        Text(
+                          "dueDate".tr(),
+                          style: kSmallerTitleSB.copyWith(
+                            fontSize: 10,
+                            color: kWhite,
+                          ),
                         ),
-                      ),
                     ],
                   ),
                   if (hasDueDate)
