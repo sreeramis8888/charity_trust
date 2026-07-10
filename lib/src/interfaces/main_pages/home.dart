@@ -1234,8 +1234,10 @@ class _HomePageState extends ConsumerState<HomePage> {
                                   campaign.getDescription(preferredLanguage),
                               image: campaign.coverImage,
                               raised: campaign.collectedAmount.toInt(),
-                              goal: campaign.targetAmount.toInt(),
-                              dueDate: formatDate(campaign.targetDate),
+                              goal: campaign.targetAmount?.toInt(),
+                              dueDate: campaign.targetDate != null
+                                  ? formatDate(campaign.targetDate)
+                                  : '',
                               category: campaign.category,
                               onViewDetails: () {
                                 Navigator.of(context).pushNamed(
@@ -1250,7 +1252,7 @@ class _HomePageState extends ConsumerState<HomePage> {
                                     'date': formatDate(campaign.targetDate),
                                     'image': campaign.coverImage,
                                     'raised': campaign.collectedAmount.toInt(),
-                                    'goal': campaign.targetAmount.toInt(),
+                                    'goal': campaign.targetAmount?.toInt(),
                                   },
                                 );
                               },

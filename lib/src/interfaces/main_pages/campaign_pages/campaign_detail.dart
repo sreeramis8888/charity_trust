@@ -502,7 +502,8 @@ class _CampaignDetailPageState extends ConsumerState<CampaignDetailPage> {
       return;
     }
 
-    final payMode = paymentUrl.contains('testpay.easebuzz.in') ? 'test' : 'production';
+    final payMode =
+        paymentUrl.contains('testpay.easebuzz.in') ? 'test' : 'production';
     final easebuzzPlugin = EasebuzzFlutter();
 
     if (mounted) {
@@ -514,7 +515,8 @@ class _CampaignDetailPageState extends ConsumerState<CampaignDetailPage> {
     String? sdkResponseString;
     try {
       log("Calling Easebuzz SDK: payWithEasebuzz($accessKey, $payMode)");
-      sdkResponseString = await easebuzzPlugin.payWithEasebuzz(accessKey, payMode);
+      sdkResponseString =
+          await easebuzzPlugin.payWithEasebuzz(accessKey, payMode);
       log("Easebuzz SDK Raw Response String: $sdkResponseString");
     } catch (e) {
       log("Error launching Easebuzz SDK: $e");
@@ -535,8 +537,10 @@ class _CampaignDetailPageState extends ConsumerState<CampaignDetailPage> {
       final result = sdkResponse['result'] as String?;
       log("Easebuzz payment result: $result");
 
-      final isSuccess = result == 'payment_successfull' || result == 'payment_success';
-      final isCancelled = result == 'user_cancelled' || result == 'back_pressed';
+      final isSuccess =
+          result == 'payment_successfull' || result == 'payment_success';
+      final isCancelled =
+          result == 'user_cancelled' || result == 'back_pressed';
 
       if (isSuccess) {
         if (mounted && transactionId.isNotEmpty) {

@@ -7,7 +7,7 @@ class CampaignModel {
   final String category;
   final DateTime? startDate;
   final DateTime? targetDate;
-  final double targetAmount;
+  final double? targetAmount;
   final double collectedAmount;
   final String status;
   final String approvalStatus;
@@ -27,7 +27,7 @@ class CampaignModel {
     required this.category,
     this.startDate,
     this.targetDate,
-    required this.targetAmount,
+    this.targetAmount,
     required this.collectedAmount,
     required this.status,
     required this.approvalStatus,
@@ -100,7 +100,9 @@ class CampaignModel {
           json['start_date'] != null ? DateTime.tryParse(json['start_date']) : null,
       targetDate:
           json['target_date'] != null ? DateTime.tryParse(json['target_date']) : null,
-      targetAmount: (json['target_amount'] ?? 0).toDouble(),
+      targetAmount: json['target_amount'] != null
+          ? (json['target_amount'] as num).toDouble()
+          : null,
       collectedAmount: (json['collected_amount'] ?? 0).toDouble(),
       status: json['status'] ?? 'pending',
       approvalStatus: json['approval_status'] ?? 'pending',
