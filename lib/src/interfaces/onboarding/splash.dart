@@ -379,8 +379,8 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
       if (pendingLink != null) {
         log('_handlePendingDeepLink: Processing pending deep link: ${pendingLink.toString()}',
             name: 'SplashScreen');
+        // handleDeepLink clears pending + dedupes; do not clear here first
         deepLinkService.handleDeepLink(pendingLink);
-        deepLinkService.clearPendingDeepLink();
       } else {
         log('_handlePendingDeepLink: No pending deep link to process',
             name: 'SplashScreen');

@@ -17,6 +17,8 @@
         <category android:name="android.intent.category.DEFAULT"/>
         <category android:name="android.intent.category.BROWSABLE"/>
         <data android:scheme="https" android:host="app.annujoomcharitabletrust.com" android:pathPrefix="/app"/>
+        <data android:scheme="https" android:host="api.annujoomcharitabletrust.com" android:pathPrefix="/app"/>
+        <data android:scheme="https" android:host="dev-api.annujoomcharitabletrust.com" android:pathPrefix="/app"/>
       </intent-filter>
       <!-- Custom scheme (optional - for testing) -->
       <intent-filter>

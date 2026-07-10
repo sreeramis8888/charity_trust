@@ -55,10 +55,12 @@ class _NavBarState extends ConsumerState<NavBar> {
   void _checkPendingDeepLink() {
     try {
       final deepLinkService = ref.read(deepLinkServiceProvider);
-      if (deepLinkService.pendingDeepLink != null) {
+      // Only handle if still pending — DeepLinkService clears this as soon as
+      // handling starts, so splash + stream cannot double-open the same link.
+      final pending = deepLinkService.pendingDeepLink;
+      if (pending != null) {
         log('Processing pending deep link in NavBar', name: 'NavBar');
-        deepLinkService.handleDeepLink(deepLinkService.pendingDeepLink!);
-        deepLinkService.clearPendingDeepLink();
+        deepLinkService.handleDeepLink(pending);
       }
     } catch (e) {
       log('Error checking pending deep link: $e', name: 'NavBar');

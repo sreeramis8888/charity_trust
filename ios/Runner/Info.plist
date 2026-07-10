@@ -139,6 +139,8 @@
 	<key>com.apple.developer.associated-domains</key>
 	<array>
 		<string>applinks:app.annujoomcharitabletrust.com</string>
+		<string>applinks:api.annujoomcharitabletrust.com</string>
+		<string>applinks:dev-api.annujoomcharitabletrust.com</string>
 	</array>
 </dict>
 </plist>

@@ -16,13 +16,15 @@ import 'package:Annujoom/src/data/providers/donation_provider.dart';
 import 'package:Annujoom/src/data/providers/razorpay_provider.dart';
 import 'package:Annujoom/src/data/providers/mswipe_provider.dart';
 import 'package:Annujoom/src/data/providers/campaigns_provider.dart'
-    show generalCampaignsProvider, participatedCampaignsProvider;
+    show generalCampaignsProvider, participatedCampaignsProvider, campaignsApiProvider;
+import 'package:Annujoom/src/data/services/deep_link_service.dart';
 import 'package:Annujoom/src/data/services/snackbar_service.dart';
 import 'package:Annujoom/src/data/services/secure_storage_service.dart';
 import 'package:Annujoom/src/interfaces/components/additional_pages/payment_success_page.dart';
 import 'package:Annujoom/src/interfaces/components/additional_pages/payment_failed_page.dart';
 import 'package:Annujoom/src/interfaces/components/additional_pages/payment_method_page.dart';
 import 'package:easebuzz_flutter/easebuzz_flutter.dart';
+import 'package:share_plus/share_plus.dart';
 
 class CampaignDetailPage extends ConsumerStatefulWidget {
   final String? id;
@@ -113,6 +115,68 @@ class _CampaignDetailPageState extends ConsumerState<CampaignDetailPage> {
   void _showSnackBar(String message, {SnackbarType type = SnackbarType.info}) {
     if (!mounted) return;
     SnackbarService().showSnackBar(message, type: type);
+  }
+
+  Future<void> _shareCampaign() async {
+    final campaignId = widget.id;
+    if (campaignId == null || campaignId.isEmpty) {
+      _showSnackBar(
+        'Unable to share this campaign',
+        type: SnackbarType.error,
+      );
+      return;
+    }
+
+    try {
+      final campaignsApi = ref.read(campaignsApiProvider);
+      final response = await campaignsApi.getCampaignShareLink(campaignId);
+
+      String shareUrl = ref
+          .read(deepLinkServiceProvider)
+          .generateDeepLink('campaign', id: campaignId);
+
+      if (response.success && response.data != null) {
+        final data = response.data!['data'] as Map<String, dynamic>?;
+        if (data != null) {
+          shareUrl = data['share_url'] as String? ?? shareUrl;
+        }
+      }
+
+      final title = widget.title ?? 'campaignDetails'.tr();
+      final description = widget.description?.trim() ?? '';
+      final message = StringBuffer()
+        ..writeln(title)
+        ..writeln();
+
+      if (description.isNotEmpty) {
+        message.writeln(description);
+        message.writeln();
+      }
+
+      // Single deep link: opens campaign in-app if installed, else store via backend HTML.
+      message.write(shareUrl);
+
+      await Share.share(message.toString(), subject: title);
+    } catch (e) {
+      log('Error sharing campaign: $e');
+      _showSnackBar(
+        'Error sharing campaign',
+        type: SnackbarType.error,
+      );
+    }
+  }
+
+  List<Widget> _buildShareActions() {
+    if (widget.id == null || widget.id!.isEmpty) {
+      return const [];
+    }
+
+    return [
+      IconButton(
+        icon: const Icon(Icons.share_outlined, color: kTextColor),
+        onPressed: _shareCampaign,
+      ),
+    ];
   }
 
   Future<void> _verifyFailedPayment(String? orderId, String? donationId) async {
@@ -738,6 +802,7 @@ class _CampaignDetailPageState extends ConsumerState<CampaignDetailPage> {
           child: const Icon(Icons.arrow_back_ios, color: kTextColor, size: 20),
         ),
         title: Text('campaignDetails'.tr(), style: kBodyTitleM),
+        actions: _buildShareActions(),
       ),
       backgroundColor: kBackgroundColor,
       body: FutureBuilder<void>(
@@ -772,6 +837,7 @@ class _CampaignDetailPageState extends ConsumerState<CampaignDetailPage> {
           onPressed: () => Navigator.pop(context),
         ),
         title: Text('campaignDetails'.tr(), style: kBodyTitleM),
+        actions: _buildShareActions(),
       ),
       backgroundColor: kBackgroundColor,
       body: SingleChildScrollView(
@@ -1009,18 +1075,18 @@ class _CampaignDetailPageState extends ConsumerState<CampaignDetailPage> {
           delayMilliseconds: 500,
           child: Row(
             children: [
-              // Expanded(
-              //   child: primaryButton(
-              //     label: "Share",
-              //     onPressed: () {
-              //       _showSnackBar("Share functionality coming soon", type: SnackbarType.info);
-              //     },
-              //     buttonColor: kWhite,
-              //     labelColor: kTextColor,
-              //     sideColor: kTertiary,
-              //   ),
-              // ),
-              // const SizedBox(width: 12),
+              if (widget.id != null && widget.id!.isNotEmpty) ...[
+                Expanded(
+                  child: primaryButton(
+                    label: 'share'.tr(),
+                    onPressed: _shareCampaign,
+                    buttonColor: kWhite,
+                    labelColor: kTextColor,
+                    sideColor: kTertiary,
+                  ),
+                ),
+                const SizedBox(width: 12),
+              ],
               Expanded(
                 child: primaryButton(
                   label: _isProcessing ? "processing".tr() : "donateNow".tr(),
@@ -1047,6 +1113,7 @@ class _CampaignDetailPageState extends ConsumerState<CampaignDetailPage> {
           onPressed: () => Navigator.pop(context),
         ),
         title: Text('campaignDetails'.tr(), style: kBodyTitleM),
+        actions: _buildShareActions(),
       ),
       backgroundColor: kBackgroundColor,
       body: Center(

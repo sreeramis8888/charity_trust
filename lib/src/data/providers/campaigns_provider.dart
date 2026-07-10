@@ -186,6 +186,15 @@ class CampaignsApi {
       requireAuth: true,
     );
   }
+
+  Future<ApiResponse<Map<String, dynamic>>> getCampaignShareLink(
+    String campaignId,
+  ) async {
+    return await _apiProvider.get(
+      '$_endpoint/$campaignId/share',
+      requireAuth: false,
+    );
+  }
 }
 
 @riverpod

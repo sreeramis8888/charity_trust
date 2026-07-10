@@ -62,7 +62,8 @@ class CampaignCard extends StatelessWidget {
                 TextPill(
                   text: _getLocalizedCategory(category),
                   color: const Color(0xFFFF6900),
-                  textStyle: kSmallerTitleR.copyWith(fontSize: 10, color: kWhite),
+                  textStyle:
+                      kSmallerTitleR.copyWith(fontSize: 10, color: kWhite),
                 ),
               if (isApprovalCard && startDate != null)
                 TextPill(
@@ -218,6 +219,7 @@ class CampaignCard extends StatelessWidget {
       ),
     );
   }
+
   String _getLocalizedCategory(String category) {
     switch (category) {
       case 'General Campaign':
