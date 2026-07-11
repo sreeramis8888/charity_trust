@@ -1085,12 +1085,10 @@ class _CampaignDetailPageState extends ConsumerState<CampaignDetailPage> {
           animationType: anim.AnimationType.fadeSlideInFromBottom,
           duration: anim.AnimationDuration.normal,
           delayMilliseconds: 500,
-          child: Expanded(
-            child: primaryButton(
-              label: _isProcessing ? "processing".tr() : "donateNow".tr(),
-              onPressed: _isProcessing ? null : _handleDonation,
-              buttonColor: kPrimaryColor,
-            ),
+          child: primaryButton(
+            label: _isProcessing ? "processing".tr() : "donateNow".tr(),
+            onPressed: _isProcessing ? null : _handleDonation,
+            buttonColor: kPrimaryColor,
           ),
         ),
         const SizedBox(height: 24),
