@@ -225,7 +225,14 @@ Route<dynamic> generateRoute(RouteSettings? settings) {
       break;
 
     default:
-      if (settings?.name?.startsWith('/app') == true) {
+      // Platform deeplinks may inject full URLs or /app paths as route names.
+      // Swallow them so DeepLinkService can navigate after Splash.
+      final routeName = settings?.name ?? '';
+      final isDeepLinkRoute = routeName.startsWith('/app') ||
+          routeName.startsWith('https://') ||
+          routeName.startsWith('http://') ||
+          routeName.startsWith('annujoom://');
+      if (isDeepLinkRoute) {
         return PageRouteBuilder(
           opaque: false,
           settings: settings,
