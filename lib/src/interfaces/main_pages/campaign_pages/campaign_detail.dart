@@ -614,39 +614,121 @@ class _CampaignDetailPageState extends ConsumerState<CampaignDetailPage> {
           setState(() => _isProcessing = true);
           try {
             final donationApi = ref.read(donationApiProvider);
-            final response = await donationApi.fetchEasebuzzPaymentDetails(
-              transactionId: transactionId,
-            );
 
-            if (response.success && response.data != null) {
-              final data = response.data!['data'] as Map<String, dynamic>?;
-              if (data != null && data['status'] == 'success') {
-                final receipt = data['receipt'] as String?;
-
-                ref.invalidate(generalCampaignsProvider);
-                ref.invalidate(participatedCampaignsProvider);
-
-                Navigator.of(context).pushReplacement(
-                  MaterialPageRoute(
-                    builder: (_) => PaymentSuccessPage(
-                      orderId: transactionId,
-                      paymentId: null, // Easebuzz uses only transactionId
-                      amount: amount,
-                      receipt: receipt,
-                    ),
-                  ),
-                );
-                return;
+            final sdkMap = sdkResponse;
+            Map<String, dynamic> paymentData = {};
+            final rawResponse = sdkMap['payment_response'];
+            if (rawResponse != null) {
+              if (rawResponse is Map) {
+                paymentData = Map<String, dynamic>.from(rawResponse);
+              } else if (rawResponse is String) {
+                try {
+                  paymentData = jsonDecode(rawResponse) as Map<String, dynamic>;
+                } catch (e) {
+                  log("Error parsing payment_response string: $e");
+                }
               }
             }
+
+            String? pick(String key) {
+              final fromPayment = paymentData[key]?.toString().trim();
+              if (fromPayment != null && fromPayment.isNotEmpty) {
+                return fromPayment;
+              }
+              final fromSdk = sdkMap[key]?.toString().trim();
+              if (fromSdk != null && fromSdk.isNotEmpty) return fromSdk;
+              return null;
+            }
+
+            final txnid = pick('txnid') ?? transactionId;
+            final hash = pick('hash');
+            final keyVal = pick('key');
+            final statusVal = pick('status');
+            final productInfo = pick('productinfo');
+            final firstName = pick('firstname');
+            final email = pick('email') ??
+                (_userEmail.trim().isNotEmpty ? _userEmail.trim() : null);
+
+            // Prefer exact Easebuzz amount string so reverse-hash matches.
+            final rawAmount = pick('amount');
+            final amountStr =
+                (rawAmount != null && double.tryParse(rawAmount) != null)
+                    ? rawAmount
+                    : amount.toStringAsFixed(2);
+
+            if (hash == null ||
+                keyVal == null ||
+                statusVal == null ||
+                productInfo == null ||
+                firstName == null ||
+                email == null) {
+              log(
+                "Missing Easebuzz verify fields. "
+                "hash=${hash != null}, key=${keyVal != null}, "
+                "status=${statusVal != null}, productinfo=${productInfo != null}, "
+                "firstname=${firstName != null}, email=${email != null}",
+              );
+              if (mounted) {
+                Navigator.of(context).pushReplacement(
+                  MaterialPageRoute(builder: (_) => const PaymentFailurePage()),
+                );
+              }
+              return;
+            }
+
+            log("Verifying Easebuzz payment with backend. TxnId: $txnid");
+            final verifyResponse = await donationApi.verifyEasebuzzPayment(
+              transactionId: txnid,
+              hash: hash,
+              amount: amountStr,
+              productInfo: productInfo,
+              firstName: firstName,
+              email: email,
+              status: statusVal,
+              key: keyVal,
+            );
+
+            log("Verification API response success: ${verifyResponse.success}");
+
+            if (verifyResponse.success) {
+              final response = await donationApi.fetchEasebuzzPaymentDetails(
+                transactionId: txnid,
+              );
+
+              if (response.success && response.data != null) {
+                final data = response.data!['data'] as Map<String, dynamic>?;
+                if (data != null && data['status'] == 'success') {
+                  final receipt = data['receipt'] as String?;
+
+                  ref.invalidate(generalCampaignsProvider);
+                  ref.invalidate(participatedCampaignsProvider);
+
+                  if (!mounted) return;
+                  Navigator.of(context).pushReplacement(
+                    MaterialPageRoute(
+                      builder: (_) => PaymentSuccessPage(
+                        orderId: txnid,
+                        paymentId: null,
+                        amount: amount,
+                        receipt: receipt,
+                      ),
+                    ),
+                  );
+                  return;
+                }
+              }
+            }
+            if (!mounted) return;
             Navigator.of(context).pushReplacement(
               MaterialPageRoute(builder: (_) => const PaymentFailurePage()),
             );
           } catch (e) {
             log("Error checking Easebuzz payment: $e");
-            Navigator.of(context).pushReplacement(
-              MaterialPageRoute(builder: (_) => const PaymentFailurePage()),
-            );
+            if (mounted) {
+              Navigator.of(context).pushReplacement(
+                MaterialPageRoute(builder: (_) => const PaymentFailurePage()),
+              );
+            }
           } finally {
             if (mounted) {
               setState(() => _isProcessing = false);

@@ -130,6 +130,39 @@ class ApiProvider {
     }
   }
 
+  /// POST with application/x-www-form-urlencoded.
+  /// Returns raw response body (e.g. HTML from Easebuzz verify) without JSON parsing.
+  Future<ApiResponse<String>> postFormUrlEncoded(
+    String endpoint,
+    Map<String, String> data, {
+    bool requireAuth = true,
+  }) async {
+    try {
+      final headers = await _buildHeaders(requireAuth: requireAuth);
+      headers['Content-Type'] = 'application/x-www-form-urlencoded';
+      log(name: 'API POST FORM', '$baseUrl$endpoint');
+      log(name: 'API POST FORM body', '$data');
+      final response = await _client.post(
+        Uri.parse('$baseUrl$endpoint'),
+        headers: headers,
+        body: data,
+      );
+      log(name: 'API POST FORM status', '${response.statusCode}');
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        return ApiResponse.success(response.body, response.statusCode);
+      }
+      return ApiResponse.error(
+        'Request failed with status ${response.statusCode}',
+        response.statusCode,
+      );
+    } catch (e, stackTrace) {
+      await CrashlyticsService.logError(e, stackTrace);
+      await CrashlyticsService.setCustomKey('api_endpoint', endpoint);
+      await CrashlyticsService.setCustomKey('api_method', 'POST_FORM');
+      return ApiResponse.error('Failed to connect to the server: $e');
+    }
+  }
+
   Future<ApiResponse<Map<String, dynamic>>> patch(
     String endpoint,
     Map<String, dynamic>? data, {

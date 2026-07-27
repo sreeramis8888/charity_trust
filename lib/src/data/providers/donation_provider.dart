@@ -97,14 +97,15 @@ class DonationApi {
   Future<ApiResponse<Map<String, dynamic>>> verifyEasebuzzPayment({
     required String transactionId,
     required String hash,
-    required double amount,
+    /// Exact amount string from Easebuzz (e.g. "100.00") — must match signed hash.
+    required String amount,
     required String productInfo,
     required String firstName,
-    required String email, // Changed to required as per backend validation
+    required String email,
     required String status,
-    required String key, // [NEW] Required by backend validation
+    required String key,
   }) async {
-    final response = await _apiProvider.post(
+    final response = await _apiProvider.postFormUrlEncoded(
       '/donation/easebuzz-verify',
       {
         'txnid': transactionId,
@@ -114,16 +115,38 @@ class DonationApi {
         'firstname': firstName,
         'email': email,
         'status': status,
-        'key': key, // [NEW] Added to payload
+        'key': key,
       },
       requireAuth: true,
     );
 
-    if (response.success) {
-      log('Easebuzz payment verified successfully', name: 'DonationApi');
+    if (!response.success || response.data == null) {
+      log(
+        'Easebuzz verification failed: ${response.message}',
+        name: 'DonationApi',
+      );
+      return ApiResponse.error(
+        response.message ?? 'Failed to verify Easebuzz payment',
+        response.statusCode,
+      );
     }
 
-    return response;
+    // Backend returns success.html / failure.html (or empty 200 on validation miss).
+    final body = response.data!;
+    final isSuccessPage = body.contains('Payment Successful');
+    if (isSuccessPage) {
+      log('Easebuzz payment verified successfully', name: 'DonationApi');
+      return ApiResponse.success({'verified': true}, response.statusCode);
+    }
+
+    log(
+      'Easebuzz verification did not return success page. Body length: ${body.length}',
+      name: 'DonationApi',
+    );
+    return ApiResponse.error(
+      'Failed to verify Easebuzz payment',
+      response.statusCode,
+    );
   }
 }
 
@@ -199,11 +222,10 @@ class DonationNotifier extends _$DonationNotifier {
     return state.hasValue && (state.value?['verified'] as bool? ?? false);
   }
 
-  // [NEW] Added wrapper for Easebuzz verification
   Future<bool> verifyEasebuzzPayment({
     required String transactionId,
     required String hash,
-    required double amount,
+    required String amount,
     required String productInfo,
     required String firstName,
     required String email,
