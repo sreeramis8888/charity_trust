@@ -742,6 +742,11 @@ class _HomePageState extends ConsumerState<HomePage> {
                           'image': 'assets/png/food_kit.png',
                           'category': 'Food Kit'
                         },
+                        {
+                          'title': 'sadaqahJariyah'.tr(),
+                          'image': 'assets/png/sadaqah_jariyah.png',
+                          'category': 'Sadaqah Jariyah'
+                        },
                       ].map((category) {
                         return AnimatedWidgetWrapper(
                           animationType: AnimationType.fadeScaleUp,
