@@ -834,7 +834,7 @@ class _HomePageState extends ConsumerState<HomePage> {
                           }).toList(),
                         ),
                       ),
-                      const SizedBox(height: 12),
+                      const SizedBox(height: 5),
                       Center(
                         child: PageViewDotIndicator(
                           size: Size(8, 8),
