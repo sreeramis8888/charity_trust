@@ -71,6 +71,7 @@ class _HomePageState extends ConsumerState<HomePage> {
 
   void _precacheImages() {
     final categoryImages = [
+      'assets/png/WelcomeBanner.png',
       'assets/png/general_campaign.png',
       'assets/jpg/general_funding.jpg',
       'assets/png/zakat.png',
@@ -679,153 +680,174 @@ class _HomePageState extends ConsumerState<HomePage> {
               ),
             ),
             Padding(
-              padding: const EdgeInsets.only(top: 24, left: 0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  SizedBox(
-                    height: 120,
-                    child: CarouselSlider(
-                      carouselController: _categoryCarouselController,
-                      options: CarouselOptions(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(16),
+                child: Image.asset(
+                  'assets/png/WelcomeBanner.png',
+                  width: double.infinity,
+                  fit: BoxFit.cover,
+                ),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.only(top: 16, left: 0),
+              child: Builder(
+                builder: (context) {
+                  final categoryItems = [
+                    {
+                      'title': 'generalCampaign'.tr(),
+                      'image': 'assets/png/general_campaign.png',
+                      'category': 'General Campaign'
+                    },
+                    {
+                      'title': 'generalFunding'.tr(),
+                      'image': 'assets/jpg/general_funding.jpg',
+                      'category': 'General Funding'
+                    },
+                    {
+                      'title': 'zakat'.tr(),
+                      'image': 'assets/png/zakat.png',
+                      'category': 'Zakat'
+                    },
+                    {
+                      'title': 'orphan'.tr(),
+                      'image': 'assets/jpg/orphan.jpg',
+                      'category': 'Orphan'
+                    },
+                    {
+                      'title': 'widow'.tr(),
+                      'image': 'assets/png/widow.png',
+                      'category': 'Widow'
+                    },
+                    {
+                      'title': 'ghusalMayyit'.tr(),
+                      'image': 'assets/png/ghusal_mayyt.png',
+                      'category': 'Ghusl Mayyit'
+                    },
+                    {
+                      'title': 'patientRelief'.tr(),
+                      'image': 'assets/png/patient_relief.png',
+                      'category': 'Patient Relief'
+                    },
+                    {
+                      'title': 'foodKit'.tr(),
+                      'image': 'assets/png/food_kit.png',
+                      'category': 'Food Kit'
+                    },
+                    {
+                      'title': 'sadaqahJariyah'.tr(),
+                      'image': 'assets/png/sadaqah_jariyah.png',
+                      'category': 'Sadaqah Jariyah'
+                    },
+                  ];
+
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      SizedBox(
                         height: 120,
-                        viewportFraction: 0.25,
-                        autoPlay: true,
-                        autoPlayInterval: const Duration(seconds: 3),
-                        autoPlayAnimationDuration:
-                            const Duration(milliseconds: 800),
-                        enableInfiniteScroll: true,
-                        initialPage: 0,
-                        padEnds: false,
-                        onPageChanged: (index, reason) {
-                          setState(() => _categoryIndex = index);
-                        },
-                      ),
-                      items: [
-                        {
-                          'title': 'generalCampaign'.tr(),
-                          'image': 'assets/png/general_campaign.png',
-                          'category': 'General Campaign'
-                        },
-                        {
-                          'title': 'generalFunding'.tr(),
-                          'image': 'assets/jpg/general_funding.jpg',
-                          'category': 'General Funding'
-                        },
-                        {
-                          'title': 'zakat'.tr(),
-                          'image': 'assets/png/zakat.png',
-                          'category': 'Zakat'
-                        },
-                        {
-                          'title': 'orphan'.tr(),
-                          'image': 'assets/jpg/orphan.jpg',
-                          'category': 'Orphan'
-                        },
-                        {
-                          'title': 'widow'.tr(),
-                          'image': 'assets/png/widow.png',
-                          'category': 'Widow'
-                        },
-                        {
-                          'title': 'ghusalMayyit'.tr(),
-                          'image': 'assets/png/ghusal_mayyt.png',
-                          'category': 'Ghusl Mayyit'
-                        },
-                        {
-                          'title': 'patientRelief'.tr(),
-                          'image': 'assets/png/patient_relief.png',
-                          'category': 'Patient Relief'
-                        },
-                        {
-                          'title': 'foodKit'.tr(),
-                          'image': 'assets/png/food_kit.png',
-                          'category': 'Food Kit'
-                        },
-                        {
-                          'title': 'sadaqahJariyah'.tr(),
-                          'image': 'assets/png/sadaqah_jariyah.png',
-                          'category': 'Sadaqah Jariyah'
-                        },
-                      ].map((category) {
-                        return AnimatedWidgetWrapper(
-                          animationType: AnimationType.fadeScaleUp,
-                          duration: AnimationDuration.normal,
-                          curveType: AnimationCurveType.easeOut,
-                          child: Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 6),
-                            child: GestureDetector(
-                              onTap: () {
-                                _handleCategoryTap(
-                                    context, category['category'] as String);
-                              },
-                              child: Column(
-                                children: [
-                                  Container(
-                                    width: 70,
-                                    height: 70,
-                                    decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(16),
-                                      boxShadow: [
-                                        BoxShadow(
-                                          color: Colors.black.withOpacity(0.1),
-                                          blurRadius: 8,
-                                          offset: const Offset(0, 2),
-                                        )
-                                      ],
-                                    ),
-                                    child: ClipRRect(
-                                      borderRadius: BorderRadius.circular(16),
-                                      child: Image.asset(
-                                        category['image'] as String,
-                                        fit: BoxFit.cover,
-                                        cacheWidth: 140,
-                                        cacheHeight: 140,
-                                        errorBuilder:
-                                            (context, error, stackTrace) {
-                                          return Container(
-                                            color: Colors.grey[300],
-                                            child: const Icon(
-                                                Icons.image_not_supported),
-                                          );
-                                        },
-                                      ),
-                                    ),
-                                  ),
-                                  const SizedBox(height: 8),
-                                  SizedBox(
-                                    width: 80,
-                                    child: Text(
-                                      category['title'] as String,
-                                      textAlign: TextAlign.center,
-                                      style: kSmallTitleR.copyWith(
-                                        fontSize: 10,
-                                        color: kTextColor,
-                                      ),
-                                      maxLines: 2,
-                                      overflow: TextOverflow.ellipsis,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
+                        child: CarouselSlider(
+                          carouselController: _categoryCarouselController,
+                          options: CarouselOptions(
+                            height: 120,
+                            viewportFraction: 0.25,
+                            autoPlay: true,
+                            autoPlayInterval: const Duration(seconds: 3),
+                            autoPlayAnimationDuration:
+                                const Duration(milliseconds: 800),
+                            enableInfiniteScroll: true,
+                            initialPage: 0,
+                            padEnds: false,
+                            onPageChanged: (index, reason) {
+                              setState(() => _categoryIndex = index);
+                            },
                           ),
-                        );
-                      }).toList(),
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-                  Center(
-                    child: PageViewDotIndicator(
-                      size: Size(8, 8),
-                      unselectedSize: Size(7, 7),
-                      currentItem: _categoryIndex,
-                      count: 8,
-                      unselectedColor: Color(0xFFAEB9E1),
-                      selectedColor: Color(0xFF0D74BC),
-                    ),
-                  ),
-                ],
+                          items: categoryItems.map((category) {
+                            return AnimatedWidgetWrapper(
+                              animationType: AnimationType.fadeScaleUp,
+                              duration: AnimationDuration.normal,
+                              curveType: AnimationCurveType.easeOut,
+                              child: Padding(
+                                padding:
+                                    const EdgeInsets.symmetric(horizontal: 6),
+                                child: GestureDetector(
+                                  onTap: () {
+                                    _handleCategoryTap(context,
+                                        category['category'] as String);
+                                  },
+                                  child: Column(
+                                    children: [
+                                      Container(
+                                        width: 70,
+                                        height: 70,
+                                        decoration: BoxDecoration(
+                                          borderRadius:
+                                              BorderRadius.circular(16),
+                                          boxShadow: [
+                                            BoxShadow(
+                                              color:
+                                                  Colors.black.withOpacity(0.1),
+                                              blurRadius: 8,
+                                              offset: const Offset(0, 2),
+                                            )
+                                          ],
+                                        ),
+                                        child: ClipRRect(
+                                          borderRadius:
+                                              BorderRadius.circular(16),
+                                          child: Image.asset(
+                                            category['image'] as String,
+                                            fit: BoxFit.cover,
+                                            cacheWidth: 140,
+                                            cacheHeight: 140,
+                                            errorBuilder:
+                                                (context, error, stackTrace) {
+                                              return Container(
+                                                color: Colors.grey[300],
+                                                child: const Icon(
+                                                    Icons.image_not_supported),
+                                              );
+                                            },
+                                          ),
+                                        ),
+                                      ),
+                                      const SizedBox(height: 8),
+                                      SizedBox(
+                                        width: 80,
+                                        child: Text(
+                                          category['title'] as String,
+                                          textAlign: TextAlign.center,
+                                          style: kSmallTitleR.copyWith(
+                                            fontSize: 10,
+                                            color: kTextColor,
+                                          ),
+                                          maxLines: 2,
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            );
+                          }).toList(),
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      Center(
+                        child: PageViewDotIndicator(
+                          size: Size(8, 8),
+                          unselectedSize: Size(7, 7),
+                          currentItem: _categoryIndex % categoryItems.length,
+                          count: categoryItems.length,
+                          unselectedColor: Color(0xFFAEB9E1),
+                          selectedColor: Color(0xFF0D74BC),
+                        ),
+                      ),
+                    ],
+                  );
+                },
               ),
             ),
             if (GlobalVariables.getUserRole() != 'member')

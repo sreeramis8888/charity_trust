@@ -1,6 +1,7 @@
 import 'package:Annujoom/src/data/constants/color_constants.dart';
 import 'package:Annujoom/src/data/constants/style_constants.dart';
 import 'package:Annujoom/src/interfaces/main_pages/profile_pages/hadith_page.dart';
+import 'package:Annujoom/src/interfaces/main_pages/profile_pages/dua_page.dart';
 import 'package:Annujoom/src/interfaces/main_pages/profile_pages/quran_page.dart';
 import 'package:Annujoom/src/interfaces/main_pages/subscription/subscription_page.dart';
 import 'package:Annujoom/src/interfaces/main_pages/qibla_page.dart';
@@ -74,6 +75,21 @@ class HomeQuickAccessRow extends StatelessWidget {
                 Navigator.of(context).push(
                   MaterialPageRoute(
                     builder: (context) => const QiblaPage(),
+                  ),
+                );
+              },
+            ),
+          ),
+          const SizedBox(width: 8),
+          Expanded(
+            child: _QuickAccessCard(
+              height: _cardHeight,
+              svgPath: 'assets/svg/dua.svg',
+              label: 'dua'.tr(),
+              onTap: () {
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (context) => const DuaPage(),
                   ),
                 );
               },

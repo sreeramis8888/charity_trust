@@ -383,6 +383,7 @@
   "errorLoadingCampaigns": "Error loading campaigns",
   "quran": "Quran",
   "hadith": "Hadith",
+  "dua": "Dua",
   "hadiths": "hadiths",
   "hadithLoadError": "Unable to load hadith data. Please try again.",
   "homeZakatCalculator": "Zakat\nCalculator",
