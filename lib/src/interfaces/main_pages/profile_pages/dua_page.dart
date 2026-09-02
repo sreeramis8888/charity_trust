@@ -15,14 +15,12 @@ class DuaPage extends StatefulWidget {
 class _DuaPageState extends State<DuaPage> {
   static const _pdfAssetPath = 'assets/pdf/edited_azkar_malayalam.pdf';
 
-  late final PdfControllerPinch _pdfController;
-  int _currentPage = 1;
-  int _totalPages = 0;
+  late final PdfController _pdfController;
 
   @override
   void initState() {
     super.initState();
-    _pdfController = PdfControllerPinch(
+    _pdfController = PdfController(
       document: PdfDocument.openAsset(_pdfAssetPath),
     );
   }
@@ -54,19 +52,10 @@ class _DuaPageState extends State<DuaPage> {
       body: Column(
         children: [
           Expanded(
-            child: PdfViewPinch(
+            child: PdfView(
               controller: _pdfController,
-              onDocumentLoaded: (document) {
-                setState(() {
-                  _totalPages = document.pagesCount;
-                });
-              },
-              onPageChanged: (page) {
-                setState(() {
-                  _currentPage = page;
-                });
-              },
-              builders: PdfViewPinchBuilders<DefaultBuilderOptions>(
+              scrollDirection: Axis.vertical,
+              builders: PdfViewBuilders<DefaultBuilderOptions>(
                 options: const DefaultBuilderOptions(),
                 documentLoaderBuilder: (_) => const Center(
                   child: LoadingAnimation(),
@@ -79,7 +68,8 @@ class _DuaPageState extends State<DuaPage> {
                     padding: const EdgeInsets.all(24),
                     child: Text(
                       error.toString(),
-                      style: kSmallerTitleR.copyWith(color: kSecondaryTextColor),
+                      style:
+                          kSmallerTitleR.copyWith(color: kSecondaryTextColor),
                       textAlign: TextAlign.center,
                     ),
                   ),
@@ -87,17 +77,27 @@ class _DuaPageState extends State<DuaPage> {
               ),
             ),
           ),
-          if (_totalPages > 0)
-            Container(
-              width: double.infinity,
-              color: kWhite,
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-              child: Text(
-                '$_currentPage / $_totalPages',
-                style: kSmallerTitleR.copyWith(color: kSecondaryTextColor),
-                textAlign: TextAlign.center,
-              ),
-            ),
+          PdfPageNumber(
+            controller: _pdfController,
+            builder: (_, loadingState, page, pagesCount) {
+              if (loadingState != PdfLoadingState.success ||
+                  pagesCount == null) {
+                return const SizedBox.shrink();
+              }
+
+              return Container(
+                width: double.infinity,
+                color: kWhite,
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                child: Text(
+                  '$page / $pagesCount',
+                  style: kSmallerTitleR.copyWith(color: kSecondaryTextColor),
+                  textAlign: TextAlign.center,
+                ),
+              );
+            },
+          ),
         ],
       ),
     );
