@@ -73,11 +73,6 @@ class _HomePageState extends ConsumerState<HomePage> {
     final categoryImages = [
       'assets/png/WelcomeBanner.png',
       'assets/png/general_campaign.png',
-      'assets/jpg/general_funding.jpg',
-      'assets/png/zakat.png',
-      'assets/jpg/orphan.jpg',
-      'assets/png/widow.png',
-      'assets/png/ghusal_mayyt.png',
       'assets/jpg/nofundingcampaigns.jpg'
     ];
     for (var image in categoryImages) {
@@ -697,47 +692,38 @@ class _HomePageState extends ConsumerState<HomePage> {
                   final categoryItems = [
                     {
                       'title': 'generalCampaign'.tr(),
-                      'image': 'assets/png/general_campaign.png',
                       'category': 'General Campaign'
                     },
                     {
                       'title': 'generalFunding'.tr(),
-                      'image': 'assets/jpg/general_funding.jpg',
                       'category': 'General Funding'
                     },
                     {
                       'title': 'zakat'.tr(),
-                      'image': 'assets/png/zakat.png',
                       'category': 'Zakat'
                     },
                     {
                       'title': 'orphan'.tr(),
-                      'image': 'assets/jpg/orphan.jpg',
                       'category': 'Orphan'
                     },
                     {
                       'title': 'widow'.tr(),
-                      'image': 'assets/png/widow.png',
                       'category': 'Widow'
                     },
                     {
                       'title': 'ghusalMayyit'.tr(),
-                      'image': 'assets/png/ghusal_mayyt.png',
                       'category': 'Ghusl Mayyit'
                     },
                     {
                       'title': 'patientRelief'.tr(),
-                      'image': 'assets/png/patient_relief.png',
                       'category': 'Patient Relief'
                     },
                     {
                       'title': 'foodKit'.tr(),
-                      'image': 'assets/png/food_kit.png',
                       'category': 'Food Kit'
                     },
                     {
                       'title': 'sadaqahJariyah'.tr(),
-                      'image': 'assets/png/sadaqah_jariyah.png',
                       'category': 'Sadaqah Jariyah'
                     },
                   ];
@@ -764,6 +750,8 @@ class _HomePageState extends ConsumerState<HomePage> {
                             },
                           ),
                           items: categoryItems.map((category) {
+                            final categoryName =
+                                category['category'] as String;
                             return AnimatedWidgetWrapper(
                               animationType: AnimationType.fadeScaleUp,
                               duration: AnimationDuration.normal,
@@ -773,8 +761,7 @@ class _HomePageState extends ConsumerState<HomePage> {
                                     const EdgeInsets.symmetric(horizontal: 6),
                                 child: GestureDetector(
                                   onTap: () {
-                                    _handleCategoryTap(context,
-                                        category['category'] as String);
+                                    _handleCategoryTap(context, categoryName);
                                   },
                                   child: Column(
                                     children: [
@@ -796,19 +783,8 @@ class _HomePageState extends ConsumerState<HomePage> {
                                         child: ClipRRect(
                                           borderRadius:
                                               BorderRadius.circular(16),
-                                          child: Image.asset(
-                                            category['image'] as String,
-                                            fit: BoxFit.cover,
-                                            cacheWidth: 140,
-                                            cacheHeight: 140,
-                                            errorBuilder:
-                                                (context, error, stackTrace) {
-                                              return Container(
-                                                color: Colors.grey[300],
-                                                child: const Icon(
-                                                    Icons.image_not_supported),
-                                              );
-                                            },
+                                          child: _CategoryNetworkImage(
+                                            category: categoryName,
                                           ),
                                         ),
                                       ),
@@ -839,7 +815,8 @@ class _HomePageState extends ConsumerState<HomePage> {
                         child: PageViewDotIndicator(
                           size: Size(8, 8),
                           unselectedSize: Size(7, 7),
-                          currentItem: _categoryIndex % categoryItems.length,
+                          currentItem:
+                              _categoryIndex % categoryItems.length,
                           count: categoryItems.length,
                           unselectedColor: Color(0xFFAEB9E1),
                           selectedColor: Color(0xFF0D74BC),
@@ -1570,6 +1547,65 @@ class _HomePageState extends ConsumerState<HomePage> {
           ],
         );
       },
+    );
+  }
+}
+
+class _CategoryNetworkImage extends ConsumerWidget {
+  final String category;
+
+  const _CategoryNetworkImage({required this.category});
+
+  Widget _placeholder() {
+    return Container(
+      color: Colors.grey[300],
+      child: const Icon(Icons.image_not_supported),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    if (category == 'General Campaign') {
+      return Image.asset(
+        'assets/png/general_campaign.png',
+        fit: BoxFit.cover,
+        width: 70,
+        height: 70,
+        errorBuilder: (_, __, ___) => _placeholder(),
+      );
+    }
+
+    final campaignsAsync = ref.watch(categoryCampaignsProvider(category));
+
+    return campaignsAsync.when(
+      data: (paginationState) {
+        final coverImage = paginationState.campaigns.isNotEmpty
+            ? paginationState.campaigns.first.coverImage
+            : '';
+
+        if (coverImage.isEmpty) {
+          return _placeholder();
+        }
+
+        return Image.network(
+          coverImage,
+          fit: BoxFit.cover,
+          width: 70,
+          height: 70,
+          errorBuilder: (_, __, ___) => _placeholder(),
+        );
+      },
+      loading: () => Container(
+        color: Colors.grey[200],
+        child: const Center(
+          child: SizedBox(
+            width: 18,
+            height: 18,
+            child: CircularProgressIndicator(strokeWidth: 2),
+          ),
+        ),
+      ),
+      error: (_, __) => _placeholder(),
     );
   }
 }

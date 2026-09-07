@@ -489,7 +489,8 @@ class HomeGradientCampaignCard extends StatelessWidget {
                 children: [
                   Row(
                     children: [
-                      if (isGeneralCampaign && hasDueDate)
+                      // if (isGeneralCampaign && hasDueDate)
+                      if (isGeneralCampaign )
                         Padding(
                           padding: const EdgeInsets.only(right: 6),
                           child: _WarningBadge(),
@@ -636,7 +637,7 @@ class HomeGradientCampaignCard extends StatelessWidget {
                 children: [
                   Expanded(
                     child: primaryButton(
-                      label: "viewDetails".tr(),
+                      label: "donateNow".tr(),
                       onPressed: onViewDetails,
                       buttonColor: kWhite.withOpacity(0.2),
                       labelColor: kWhite,
