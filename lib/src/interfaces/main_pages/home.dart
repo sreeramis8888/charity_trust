@@ -71,7 +71,7 @@ class _HomePageState extends ConsumerState<HomePage> {
 
   void _precacheImages() {
     final categoryImages = [
-      'assets/png/WelcomeBanner.png',
+      'assets/jpg/WelcomeBanner.jpeg',
       'assets/png/general_campaign.png',
       'assets/jpg/nofundingcampaigns.jpg'
     ];
@@ -679,7 +679,7 @@ class _HomePageState extends ConsumerState<HomePage> {
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(16),
                 child: Image.asset(
-                  'assets/png/WelcomeBanner.png',
+                  'assets/jpg/WelcomeBanner.jpeg',
                   width: double.infinity,
                   fit: BoxFit.cover,
                 ),
