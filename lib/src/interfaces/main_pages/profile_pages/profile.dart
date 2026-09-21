@@ -6,6 +6,7 @@ import 'package:Annujoom/src/interfaces/animations/index.dart' as anim;
 import 'package:Annujoom/src/interfaces/components/loading_indicator.dart';
 import 'package:Annujoom/src/interfaces/main_pages/profile_pages/my_participations.dart';
 import 'package:Annujoom/src/interfaces/main_pages/profile_pages/about_us.dart';
+import 'package:Annujoom/src/interfaces/main_pages/profile_pages/documents_page.dart';
 import 'package:Annujoom/src/interfaces/main_pages/profile_pages/refer_friend_page.dart';
 import 'package:Annujoom/src/interfaces/main_pages/profile_pages/change_phone_number.dart';
 import 'package:Annujoom/src/interfaces/main_pages/profile_pages/zakat_calculator.dart';
@@ -394,6 +395,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                               : "myParticipations".tr(),
                         ),
                       ),
+                      
                       if (userData.role != null &&
                           userData.role != 'member') ...[
                         _divider(),
@@ -408,6 +410,20 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                           child: _tile(Icons.people, "referrals".tr()),
                         ),
                       ],
+                      _divider(),
+                      GestureDetector(
+                        onTap: () {
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (context) => const DocumentsPage(),
+                            ),
+                          );
+                        },
+                        child: _tile(
+                          Icons.description_outlined,
+                          "documents".tr(),
+                        ),
+                      ),
                       _divider(),
                       GestureDetector(
                         onTap: () {
