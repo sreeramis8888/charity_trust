@@ -191,8 +191,11 @@ class _NewsContentState extends ConsumerState<NewsContent> {
 
   @override
   Widget build(BuildContext context) {
-    final formattedDate = DateFormat('MMM dd, yyyy, hh:mm a')
-        .format(widget.newsItem.updatedAt!.toLocal());
+    final dateToShow =
+        widget.newsItem.updatedAt ?? widget.newsItem.createdAt;
+    final formattedDate = dateToShow != null
+        ? DateFormat('MMM dd, yyyy, hh:mm a').format(dateToShow.toLocal())
+        : '-';
     final preferredLanguage = GlobalVariables.getPreferredLanguage();
     final minsToRead = calculateReadingTimeAndWordCount(
         widget.newsItem.getContent(preferredLanguage));

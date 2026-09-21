@@ -26,6 +26,8 @@ const subscriptionPlanTypes = [
   'MONTHLY_100',
   'MONTHLY_200',
   'MONTHLY_500',
+  'MONTHLY_1000',
+  'MONTHLY_2000',
 ];
 
 const subscriptionPlanIds = <String, String>{
@@ -35,6 +37,8 @@ const subscriptionPlanIds = <String, String>{
   'MONTHLY_100': 'plan_SlZec6HYkExh2f',
   'MONTHLY_200': 'plan_SlZfSq2lX4xT4J',
   'MONTHLY_500': 'plan_SlZgXrXME6rHql',
+  'MONTHLY_1000': 'plan_TeeFm9CMV0dMed',
+  'MONTHLY_2000': 'plan_TeeH0v0nP8jIjH',
 };
 
 String subscriptionPlanIdFor(String planType) {

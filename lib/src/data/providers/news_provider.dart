@@ -1,11 +1,11 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_riverpod/legacy.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:Annujoom/src/data/providers/api_provider.dart';
 import 'package:Annujoom/src/data/models/news_model.dart';
 import 'package:Annujoom/src/data/services/secure_storage_service.dart';
 
 part 'news_provider.g.dart';
-
 
 class NewsApi {
   static const String _endpoint = '/news';
@@ -18,11 +18,15 @@ class NewsApi {
     int pageNo = 1,
     int limit = 10,
     bool bookmarked = false,
+    String? startDate,
+    String? endDate,
   }) async {
     final queryParams = {
       'page_no': pageNo,
       'limit': limit,
       if (bookmarked) 'bookmarked': true,
+      if (startDate != null && startDate.isNotEmpty) 'start_date': startDate,
+      if (endDate != null && endDate.isNotEmpty) 'end_date': endDate,
     };
 
     final queryString =
@@ -60,6 +64,13 @@ NewsApi newsApi(Ref ref) {
   final apiProvider = ref.watch(apiProviderProvider);
   return NewsApi(apiProvider: apiProvider);
 }
+
+/// Date filter for the news list (`yyyy-MM-dd` values for the API).
+final newsDateFilterProvider =
+    StateProvider<Map<String, String?>>((ref) => {
+          'start_date': null,
+          'end_date': null,
+        });
 
 class PaginationState {
   final int currentPage;
@@ -170,10 +181,13 @@ class NewsListNotifier extends _$NewsListNotifier {
   @override
   Future<PaginationState> build() async {
     final newsApi = ref.watch(newsApiProvider);
+    final dates = ref.watch(newsDateFilterProvider);
     final response = await newsApi.getNewsForUser(
       pageNo: 1,
       limit: 10,
       bookmarked: false,
+      startDate: dates['start_date'],
+      endDate: dates['end_date'],
     );
 
     if (response.success && response.data != null) {
@@ -203,14 +217,17 @@ class NewsListNotifier extends _$NewsListNotifier {
     final currentState = state.value!;
     if (!currentState.hasMore) return;
 
-    state = const AsyncValue.loading();
-    state = await AsyncValue.guard(() async {
-      final newsApi = ref.watch(newsApiProvider);
+    // Keep current list visible while fetching the next page.
+    try {
+      final newsApi = ref.read(newsApiProvider);
+      final dates = ref.read(newsDateFilterProvider);
       final nextPage = currentState.currentPage + 1;
       final response = await newsApi.getNewsForUser(
         pageNo: nextPage,
         limit: currentState.limit,
         bookmarked: false,
+        startDate: dates['start_date'],
+        endDate: dates['end_date'],
       );
 
       if (response.success && response.data != null) {
@@ -223,16 +240,18 @@ class NewsListNotifier extends _$NewsListNotifier {
             (response.data!['data']?['statistics'] as List<dynamic>?) ?? [];
         final totalCount = response.data!['total_count'] as int? ?? 0;
 
-        return currentState.copyWith(
-          currentPage: nextPage,
-          totalCount: totalCount,
-          news: [...currentState.news, ...newsList],
-          statistics: statistics,
+        state = AsyncValue.data(
+          currentState.copyWith(
+            currentPage: nextPage,
+            totalCount: totalCount,
+            news: [...currentState.news, ...newsList],
+            statistics: statistics,
+          ),
         );
-      } else {
-        throw Exception(response.message ?? 'Failed to load more news');
       }
-    });
+    } catch (_) {
+      // Keep existing page data on pagination failure.
+    }
   }
 
   Future<void> refresh() async {
@@ -268,6 +287,7 @@ class NewsListNotifier extends _$NewsListNotifier {
         state = AsyncValue.data(
           currentState.copyWith(news: updatedNews),
         );
+        ref.invalidate(bookmarkedNewsListProvider);
       } else {
         throw Exception(response.message ?? 'Failed to toggle bookmark');
       }
@@ -281,28 +301,30 @@ class NewsListNotifier extends _$NewsListNotifier {
 class BookmarkedNewsListNotifier extends _$BookmarkedNewsListNotifier {
   @override
   Future<PaginationState> build() async {
-    final allNewsState = ref.watch(newsListProvider);
-    final secureStorageService = ref.watch(secureStorageServiceProvider);
-    final userId = await secureStorageService.getUserId();
+    // Fetch bookmarks independently so an active news date filter does not
+    // hide bookmarked items outside that range.
+    final newsApi = ref.watch(newsApiProvider);
+    final response = await newsApi.getBookmarkedNews(pageNo: 1, limit: 10);
 
-    return allNewsState.when(
-      data: (paginationState) {
-        final bookmarkedNewsList = paginationState.news
-            .where((news) => news.bookmarked?.contains(userId) ?? false)
-            .toList();
+    if (response.success && response.data != null) {
+      final newsList = (response.data!['data']?['news'] as List<dynamic>?)
+              ?.map((item) => NewsModel.fromJson(item as Map<String, dynamic>))
+              .toList() ??
+          [];
+      final statistics =
+          (response.data!['data']?['statistics'] as List<dynamic>?) ?? [];
+      final totalCount = response.data!['total_count'] as int? ?? 0;
 
-        return PaginationState(
-          currentPage: 1,
-          limit: 10,
-          totalCount: bookmarkedNewsList.length,
-          news: bookmarkedNewsList.take(10).toList(),
-          statistics: paginationState.statistics,
-        );
-      },
-      loading: () => throw Exception('Loading news...'),
-      error: (error, stackTrace) =>
-          throw Exception('Failed to fetch bookmarked news'),
-    );
+      return PaginationState(
+        currentPage: 1,
+        limit: 10,
+        totalCount: totalCount,
+        news: newsList,
+        statistics: statistics,
+      );
+    } else {
+      throw Exception(response.message ?? 'Failed to fetch bookmarked news');
+    }
   }
 
   Future<void> loadNextPage() async {
@@ -311,40 +333,36 @@ class BookmarkedNewsListNotifier extends _$BookmarkedNewsListNotifier {
     final currentState = state.value!;
     if (!currentState.hasMore) return;
 
-    state = const AsyncValue.loading();
-    state = await AsyncValue.guard(() async {
-      final allNewsState = ref.watch(newsListProvider);
-      final secureStorageService = ref.watch(secureStorageServiceProvider);
-      final userId = await secureStorageService.getUserId();
-
-      return allNewsState.when(
-        data: (paginationState) {
-          final bookmarkedNewsList = paginationState.news
-              .where((news) => news.bookmarked?.contains(userId) ?? false)
-              .toList();
-
-          final nextPage = currentState.currentPage + 1;
-          final startIndex = (nextPage - 1) * currentState.limit;
-          final endIndex = startIndex + currentState.limit;
-          final paginatedNews = bookmarkedNewsList.sublist(
-            startIndex,
-            endIndex > bookmarkedNewsList.length
-                ? bookmarkedNewsList.length
-                : endIndex,
-          );
-
-          return currentState.copyWith(
-            currentPage: nextPage,
-            totalCount: bookmarkedNewsList.length,
-            news: [...currentState.news, ...paginatedNews],
-            statistics: paginationState.statistics,
-          );
-        },
-        loading: () => throw Exception('Loading news...'),
-        error: (error, stackTrace) =>
-            throw Exception('Failed to load more bookmarked news'),
+    try {
+      final newsApi = ref.read(newsApiProvider);
+      final nextPage = currentState.currentPage + 1;
+      final response = await newsApi.getBookmarkedNews(
+        pageNo: nextPage,
+        limit: currentState.limit,
       );
-    });
+
+      if (response.success && response.data != null) {
+        final newsList = (response.data!['data']?['news'] as List<dynamic>?)
+                ?.map(
+                    (item) => NewsModel.fromJson(item as Map<String, dynamic>))
+                .toList() ??
+            [];
+        final statistics =
+            (response.data!['data']?['statistics'] as List<dynamic>?) ?? [];
+        final totalCount = response.data!['total_count'] as int? ?? 0;
+
+        state = AsyncValue.data(
+          currentState.copyWith(
+            currentPage: nextPage,
+            totalCount: totalCount,
+            news: [...currentState.news, ...newsList],
+            statistics: statistics,
+          ),
+        );
+      }
+    } catch (_) {
+      // Keep existing page data on pagination failure.
+    }
   }
 
   Future<void> refresh() async {
@@ -356,7 +374,7 @@ class BookmarkedNewsListNotifier extends _$BookmarkedNewsListNotifier {
     if (!state.hasValue) return;
 
     try {
-      final newsApi = ref.watch(newsApiProvider);
+      final newsApi = ref.read(newsApiProvider);
       final response = await newsApi.toggleBookmark(newsId);
 
       if (response.success) {
@@ -370,6 +388,7 @@ class BookmarkedNewsListNotifier extends _$BookmarkedNewsListNotifier {
             totalCount: currentState.totalCount - 1,
           ),
         );
+        ref.invalidate(newsListProvider);
       } else {
         throw Exception(response.message ?? 'Failed to remove bookmark');
       }

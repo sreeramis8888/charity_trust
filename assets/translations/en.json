@@ -129,6 +129,8 @@
   "endDate": "End Date",
   "apply": "Apply",
   "clearFilters": "Clear Filters",
+  "selectBothDates": "Please select both start and end dates",
+  "endBeforeStart": "End date cannot be before start date",
   "noMemberTransactions": "No member transactions",
   "noTransactionsFound": "No transactions found",
   "joined": "Joined",

@@ -12,42 +12,6 @@ enum CustomFieldType {
   email
 }
 
-class _DateInputFormatter extends TextInputFormatter {
-  @override
-  TextEditingValue formatEditUpdate(
-    TextEditingValue oldValue,
-    TextEditingValue newValue,
-  ) {
-    final text = newValue.text;
-
-    if (text.isEmpty) {
-      return newValue;
-    }
-
-    // Extract only digits from the input
-    final digitsOnly = text.replaceAll(RegExp(r'\D'), '');
-
-    // Limit to 8 digits (ddmmyyyy)
-    if (digitsOnly.length > 8) {
-      return oldValue;
-    }
-
-    // Format with hyphens
-    String formatted = '';
-    for (int i = 0; i < digitsOnly.length; i++) {
-      if (i == 2 || i == 4) {
-        formatted += '-';
-      }
-      formatted += digitsOnly[i];
-    }
-
-    return TextEditingValue(
-      text: formatted,
-      selection: TextSelection.collapsed(offset: formatted.length),
-    );
-  }
-}
-
 class InputField extends StatelessWidget {
   final CustomFieldType type;
   final String hint;
@@ -114,7 +78,7 @@ class InputField extends StatelessWidget {
     );
 
     if (picked != null) {
-      controller.text = DateFormat('dd-MM-yyyy').format(picked);
+      controller.text = DateFormat('dd-MM-yyyy', 'en').format(picked);
       onDateSelected?.call(picked);
     }
   }
@@ -130,23 +94,19 @@ class InputField extends StatelessWidget {
       controller: controller,
       focusNode: focusNode,
       maxLines: isText ? maxLines : 1,
-      readOnly: readOnly || type == CustomFieldType.document,
+      readOnly: readOnly || isDate || type == CustomFieldType.document,
       keyboardType: isNumber
           ? TextInputType.numberWithOptions(decimal: allowDecimal)
-          : isDate
-              ? TextInputType.number
-              : isEmail
-                  ? TextInputType.emailAddress
-                  : TextInputType.text,
+          : isEmail
+              ? TextInputType.emailAddress
+              : TextInputType.text,
       inputFormatters: isNumber
           ? [
               FilteringTextInputFormatter.allow(
                 allowDecimal ? RegExp(r'^\d*\.?\d*$') : RegExp(r'\d+'),
               ),
             ]
-          : isDate
-              ? [_DateInputFormatter()]
-              : null,
+          : null,
       validator: validator ??
           (isEmail
               ? (value) {
@@ -163,7 +123,9 @@ class InputField extends StatelessWidget {
       style: kBodyTitleR,
       cursorColor: kPrimaryColor,
       onTap: () async {
-        if (type == CustomFieldType.document) {
+        if (isDate) {
+          await _showDatePicker(context);
+        } else if (type == CustomFieldType.document) {
           onUpload?.call();
         }
       },
@@ -178,9 +140,9 @@ class InputField extends StatelessWidget {
         contentPadding:
             const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
         suffixIcon: isDate
-            ? GestureDetector(
-                onTap: () => _showDatePicker(context),
-                child: const Icon(Icons.calendar_today,
+            ? IconButton(
+                onPressed: () => _showDatePicker(context),
+                icon: const Icon(Icons.calendar_today,
                     size: 20, color: Colors.grey),
               )
             : type == CustomFieldType.document
