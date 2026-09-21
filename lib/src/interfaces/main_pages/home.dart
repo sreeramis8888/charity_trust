@@ -1234,6 +1234,7 @@ class _HomePageState extends ConsumerState<HomePage> {
                           return Padding(
                             padding: const EdgeInsets.only(bottom: 16),
                             child: HomeGradientCampaignCard(
+                              id: campaign.id ?? '',
                               title: campaign.getTitle(preferredLanguage),
                               description:
                                   campaign.getDescription(preferredLanguage),

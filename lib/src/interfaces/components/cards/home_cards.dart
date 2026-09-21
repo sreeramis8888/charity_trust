@@ -1,12 +1,19 @@
+import 'dart:developer';
+
 import 'package:Annujoom/src/data/constants/color_constants.dart';
 import 'package:Annujoom/src/data/constants/style_constants.dart';
+import 'package:Annujoom/src/data/providers/campaigns_provider.dart';
+import 'package:Annujoom/src/data/services/deep_link_service.dart';
+import 'package:Annujoom/src/data/services/snackbar_service.dart';
 import 'package:Annujoom/src/data/utils/currency_formatter.dart';
 import 'package:Annujoom/src/data/utils/date_formatter.dart';
 import 'package:Annujoom/src/interfaces/components/primaryButton.dart';
 import 'package:Annujoom/src/interfaces/components/text_pill.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
+import 'package:share_plus/share_plus.dart';
 
 // ============================================================================
 // WARNING BADGE WITH BLINKING ANIMATION
@@ -430,7 +437,8 @@ class HomeYoutubePlayerCard extends StatelessWidget {
 // ============================================================================
 // HOME GRADIENT CAMPAIGN CARD - For Active Campaigns with Gradient Background
 // ============================================================================
-class HomeGradientCampaignCard extends StatelessWidget {
+class HomeGradientCampaignCard extends ConsumerWidget {
+  final String id;
   final String title;
   final String description;
   final String? image;
@@ -443,6 +451,7 @@ class HomeGradientCampaignCard extends StatelessWidget {
 
   const HomeGradientCampaignCard({
     super.key,
+    this.id = '',
     required this.title,
     required this.description,
     required this.raised,
@@ -461,8 +470,54 @@ class HomeGradientCampaignCard extends StatelessWidget {
 
   bool get _hasDueDate => dueDate.isNotEmpty && dueDate != '-';
 
+  Future<void> _shareCampaign(WidgetRef ref) async {
+    if (id.isEmpty) {
+      SnackbarService().showSnackBar(
+        'Unable to share this campaign',
+        type: SnackbarType.error,
+      );
+      return;
+    }
+
+    try {
+      final campaignsApi = ref.read(campaignsApiProvider);
+      final response = await campaignsApi.getCampaignShareLink(id);
+
+      String shareUrl = ref
+          .read(deepLinkServiceProvider)
+          .generateDeepLink('campaign', id: id);
+
+      if (response.success && response.data != null) {
+        final data = response.data!['data'] as Map<String, dynamic>?;
+        if (data != null) {
+          shareUrl = data['share_url'] as String? ?? shareUrl;
+        }
+      }
+
+      final message = StringBuffer()
+        ..writeln(title)
+        ..writeln();
+
+      final trimmedDescription = description.trim();
+      if (trimmedDescription.isNotEmpty) {
+        message.writeln(trimmedDescription);
+        message.writeln();
+      }
+
+      message.write(shareUrl);
+
+      await Share.share(message.toString(), subject: title);
+    } catch (e) {
+      log('Error sharing campaign: $e');
+      SnackbarService().showSnackBar(
+        'Error sharing campaign',
+        type: SnackbarType.error,
+      );
+    }
+  }
+
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final isGeneralCampaign = category == 'General Campaign';
     final hasGoal = goal != null && goal! > 0;
     final percent = hasGoal ? (raised / goal!).clamp(0.0, 1.0) : 0.0;
@@ -485,26 +540,21 @@ class HomeGradientCampaignCard extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Row(
-                    children: [
-                      // if (isGeneralCampaign && hasDueDate)
-                      if (isGeneralCampaign )
-                        Padding(
-                          padding: const EdgeInsets.only(right: 6),
-                          child: _WarningBadge(),
-                        ),
-                      if (hasDueDate)
-                        Text(
-                          "dueDate".tr(),
-                          style: kSmallerTitleSB.copyWith(
-                            fontSize: 10,
-                            color: kWhite,
-                          ),
-                        ),
-                    ],
-                  ),
+                  if (isGeneralCampaign)
+                    const Padding(
+                      padding: EdgeInsets.only(right: 6),
+                      child: _WarningBadge(),
+                    ),
+                  if (hasDueDate)
+                    Text(
+                      "dueDate".tr(),
+                      style: kSmallerTitleSB.copyWith(
+                        fontSize: 10,
+                        color: kWhite,
+                      ),
+                    ),
+                  const Spacer(),
                   if (hasDueDate)
                     Container(
                       padding: const EdgeInsets.symmetric(
@@ -527,6 +577,20 @@ class HomeGradientCampaignCard extends StatelessWidget {
                           ),
                         ],
                       ),
+                    ),
+                  if (id.isNotEmpty)
+                    IconButton(
+                      padding: EdgeInsets.zero,
+                      constraints: const BoxConstraints(
+                        minWidth: 32,
+                        minHeight: 32,
+                      ),
+                      icon: const Icon(
+                        Icons.share_outlined,
+                        color: kWhite,
+                        size: 20,
+                      ),
+                      onPressed: () => _shareCampaign(ref),
                     ),
                 ],
               ),
@@ -646,17 +710,6 @@ class HomeGradientCampaignCard extends StatelessWidget {
                       buttonHeight: 40,
                     ),
                   ),
-                  // const SizedBox(width: 12),
-                  // Expanded(
-                  //   child: primaryButton(
-                  //     label: "Donate",
-                  //     onPressed: onDonate,
-                  //     buttonColor: kWhite,
-                  //     labelColor: kPrimaryColor,
-                  //     fontSize: 14,
-                  //     buttonHeight: 40,
-                  //   ),
-                  // ),
                 ],
               ),
             ],
