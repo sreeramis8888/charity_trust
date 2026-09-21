@@ -1,5 +1,5 @@
 import 'dart:convert';
-import 'package:Annujoom/src/data/providers/campaigns_provider.dart';
+import 'package:Annujoom/src/data/providers/category_cover_images_provider.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:Annujoom/src/data/constants/color_constants.dart';
 import 'package:Annujoom/src/data/constants/style_constants.dart';
@@ -26,6 +26,7 @@ import 'package:Annujoom/src/interfaces/components/home_quick_access_row.dart';
 import 'package:Annujoom/src/interfaces/components/confirmation_dialog.dart';
 import 'package:Annujoom/src/data/providers/auth_login_provider.dart';
 import 'package:Annujoom/src/data/providers/auth_provider.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -1563,6 +1564,19 @@ class _CategoryNetworkImage extends ConsumerWidget {
     );
   }
 
+  Widget _loadingPlaceholder() {
+    return Container(
+      color: Colors.grey[200],
+      child: const Center(
+        child: SizedBox(
+          width: 18,
+          height: 18,
+          child: CircularProgressIndicator(strokeWidth: 2),
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     if (category == 'General Campaign') {
@@ -1575,36 +1589,28 @@ class _CategoryNetworkImage extends ConsumerWidget {
       );
     }
 
-    final campaignsAsync = ref.watch(categoryCampaignsProvider(category));
+    final coversAsync = ref.watch(categoryCoverImagesProvider);
 
-    return campaignsAsync.when(
-      data: (paginationState) {
-        final coverImage = paginationState.campaigns.isNotEmpty
-            ? paginationState.campaigns.first.coverImage
-            : '';
-
+    return coversAsync.when(
+      data: (covers) {
+        final coverImage = covers[category] ?? '';
         if (coverImage.isEmpty) {
           return _placeholder();
         }
 
-        return Image.network(
-          coverImage,
+        return CachedNetworkImage(
+          imageUrl: coverImage,
           fit: BoxFit.cover,
           width: 70,
           height: 70,
-          errorBuilder: (_, __, ___) => _placeholder(),
+          memCacheWidth: 140,
+          memCacheHeight: 140,
+          fadeInDuration: const Duration(milliseconds: 150),
+          placeholder: (_, __) => _loadingPlaceholder(),
+          errorWidget: (_, __, ___) => _placeholder(),
         );
       },
-      loading: () => Container(
-        color: Colors.grey[200],
-        child: const Center(
-          child: SizedBox(
-            width: 18,
-            height: 18,
-            child: CircularProgressIndicator(strokeWidth: 2),
-          ),
-        ),
-      ),
+      loading: () => _loadingPlaceholder(),
       error: (_, __) => _placeholder(),
     );
   }

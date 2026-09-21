@@ -90,6 +90,7 @@ dependencies:
   geolocator: ^14.0.2
   hadith: ^1.0.1
   easebuzz_flutter: ^0.0.8
+  cached_network_image: ^4.0.0
 
 dev_dependencies:
   flutter_test:
