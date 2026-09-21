@@ -58,6 +58,7 @@ class _NewsListPageState extends ConsumerState<NewsListPage> {
             child: _statItem(
               statistics[i]['count']?.toString() ?? '0',
               statistics[i]['name']?.toString() ?? '',
+              statistics[i],
             ),
           ),
         );
@@ -79,11 +80,12 @@ class _NewsListPageState extends ConsumerState<NewsListPage> {
             child: _statItem(
               statistics[i + 1]['count']?.toString() ?? '0',
               statistics[i + 1]['name']?.toString() ?? '',
+              statistics[i + 1],
             ),
           ),
         );
       } else {
-        row.add(Expanded(child: SizedBox()));
+        row.add(const Expanded(child: SizedBox()));
       }
 
       widgets.add(Row(children: row));
@@ -100,20 +102,165 @@ class _NewsListPageState extends ConsumerState<NewsListPage> {
     return widgets;
   }
 
-  Widget _statItem(String value, String label) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          value,
-          style: kBodyTitleSB.copyWith(color: kBlue),
+  List<String> _detailBulletLines(dynamic statistic) {
+    final rawDetails = statistic is Map ? statistic['details'] : null;
+    if (rawDetails is! List || rawDetails.isEmpty) return const [];
+
+    final lines = <String>[];
+    for (final item in rawDetails) {
+      if (item is! Map) continue;
+      final type = item['type']?.toString() ?? 'dual';
+      final title = item['title']?.toString().trim() ?? '';
+      final value = item['value']?.toString().trim() ?? '';
+
+      String line;
+      if (type == 'single') {
+        line = title.isNotEmpty ? title : value;
+      } else {
+        // dual: title + value
+        if (title.isNotEmpty && value.isNotEmpty) {
+          line = '$title: $value';
+        } else {
+          line = title.isNotEmpty ? title : value;
+        }
+      }
+
+      if (line.isNotEmpty) lines.add(line);
+    }
+    return lines;
+  }
+
+  void _showStatisticDetailsDialog(Map<String, dynamic> statistic) {
+    final name = statistic['name']?.toString() ?? '';
+    final count = statistic['count']?.toString() ?? '';
+    final details = _detailBulletLines(statistic);
+
+    showDialog(
+      context: context,
+      builder: (dialogContext) {
+        return Dialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+          backgroundColor: kWhite,
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(20, 22, 20, 12),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                if (name.isNotEmpty)
+                  Text(
+                    name,
+                    style: kBodyTitleSB.copyWith(color: kTextColor),
+                  ),
+                if (count.isNotEmpty) ...[
+                  const SizedBox(height: 4),
+                  Text(
+                    count,
+                    style: kSmallTitleM.copyWith(color: kBlue),
+                  ),
+                ],
+                const SizedBox(height: 16),
+                if (details.isEmpty)
+                  Text(
+                    'noStatisticDetails'.tr(),
+                    style: kSmallerTitleR.copyWith(color: kSecondaryTextColor),
+                  )
+                else
+                  ConstrainedBox(
+                    constraints: BoxConstraints(
+                      maxHeight: MediaQuery.of(dialogContext).size.height * 0.45,
+                    ),
+                    child: SingleChildScrollView(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: details
+                            .map(
+                              (line) => Padding(
+                                padding: const EdgeInsets.only(bottom: 10),
+                                child: Row(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      '•  ',
+                                      style: kSmallTitleM.copyWith(
+                                        color: kTextColor,
+                                      ),
+                                    ),
+                                    Expanded(
+                                      child: Text(
+                                        line,
+                                        style: kSmallTitleM.copyWith(
+                                          color: kTextColor,
+                                          height: 1.35,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            )
+                            .toList(),
+                      ),
+                    ),
+                  ),
+                const SizedBox(height: 8),
+                Align(
+                  alignment: Alignment.centerRight,
+                  child: TextButton(
+                    onPressed: () => Navigator.of(dialogContext).pop(),
+                    child: Text(
+                      'close'.tr(),
+                      style: kSmallerTitleL.copyWith(
+                        color: kPrimaryColor,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _statItem(
+    String value,
+    String label,
+    dynamic statistic,
+  ) {
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        borderRadius: BorderRadius.circular(10),
+        onTap: () {
+          if (statistic is Map<String, dynamic>) {
+            _showStatisticDetailsDialog(statistic);
+          } else if (statistic is Map) {
+            _showStatisticDetailsDialog(Map<String, dynamic>.from(statistic));
+          }
+        },
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 4),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                value,
+                style: kBodyTitleSB.copyWith(color: kBlue),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                label,
+                style: kSmallTitleM,
+              ),
+            ],
+          ),
         ),
-        const SizedBox(height: 8),
-        Text(
-          label,
-          style: kSmallTitleM,
-        ),
-      ],
+      ),
     );
   }
 

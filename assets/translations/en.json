@@ -10,6 +10,7 @@
   "news1": "News",
   "noNews1": "No News",
   "noNews": "No Updates",
+  "noStatisticDetails": "No details available",
   "errorLoadingNews": "Error loading updates",
   "latestVideos": "Latest Videos",
   "selectLanguage": "Select Language",
