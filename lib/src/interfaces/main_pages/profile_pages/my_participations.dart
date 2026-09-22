@@ -83,7 +83,7 @@ class _MyParticipationsPageState extends ConsumerState<MyParticipationsPage>
     final secureStorage = ref.watch(secureStorageServiceProvider);
     final userRole = GlobalVariables.getUserRole();
     final isNonMember = userRole != 'member';
-    final pageTitle = isNonMember ? "myCampaigns".tr() : "myParticipations".tr();
+    final pageTitle = isNonMember ? "myCampaigns".tr() : "myTransactions".tr();
 
     return Scaffold(
           backgroundColor: kBackgroundColor,

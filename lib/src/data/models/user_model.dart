@@ -1,3 +1,5 @@
+import 'package:Annujoom/src/data/models/participated_campaign_model.dart';
+
 class UserModel {
   final String? id;
   final String? name;
@@ -36,10 +38,12 @@ class UserModel {
   final DateTime? createdAt;
   final DateTime? updatedAt;
   final int? totalCampaignsParticipated;
+  final int? totalDonationsCount;
   final int? totalAmountDonated;
   final int? totalReferrals;
   final int? activeReferrals;
   final String? preferredLanguage;
+  final List<ParticipatedCampaignModel> participatedCampaigns;
 
   UserModel({
     this.id,
@@ -79,10 +83,12 @@ class UserModel {
     this.createdAt,
     this.updatedAt,
     this.totalCampaignsParticipated,
+    this.totalDonationsCount,
     this.totalAmountDonated,
     this.totalReferrals,
     this.activeReferrals,
     this.preferredLanguage,
+    this.participatedCampaigns = const [],
   });
 
   // -------------------------
@@ -131,11 +137,24 @@ class UserModel {
       updatedAt: json["updatedAt"] != null
           ? DateTime.tryParse(json["updatedAt"])
           : null,
-      totalCampaignsParticipated: json["total_campaigns_participated"],
+      totalCampaignsParticipated: json["total_campaigns_participated"] is int
+          ? json["total_campaigns_participated"]
+          : int.tryParse(
+              json["total_campaigns_participated"]?.toString() ?? ''),
+      totalDonationsCount: json["total_donations_count"] is int
+          ? json["total_donations_count"]
+          : int.tryParse(json["total_donations_count"]?.toString() ?? ''),
       totalAmountDonated: json["total_amount_donated"],
       totalReferrals: json["total_referrals"],
       activeReferrals: json["active_referrals"],
       preferredLanguage: json["preferred_language"],
+      participatedCampaigns: (json["participated_campaigns"] as List<dynamic>?)
+              ?.whereType<Map>()
+              .map((item) => ParticipatedCampaignModel.fromJson(
+                    Map<String, dynamic>.from(item),
+                  ))
+              .toList() ??
+          const [],
     );
   }
 
@@ -180,10 +199,23 @@ class UserModel {
       "createdAt": createdAt?.toIso8601String(),
       "updatedAt": updatedAt?.toIso8601String(),
       "total_campaigns_participated": totalCampaignsParticipated,
+      "total_donations_count": totalDonationsCount,
       "total_amount_donated": totalAmountDonated,
       "total_referrals": totalReferrals,
       "active_referrals": activeReferrals,
       "preferred_language": preferredLanguage,
+      "participated_campaigns": participatedCampaigns
+          .map((item) => {
+                "_id": item.id,
+                "campaign_name": item.campaignName,
+                "campaign_status": item.campaignStatus,
+                "cover_image": item.coverImage,
+                "category": item.category,
+                "total_amount": item.totalAmount,
+                "donation_count": item.donationCount,
+                "latest_donation": item.latestDonation?.toIso8601String(),
+              })
+          .toList(),
     };
   }
 
@@ -228,10 +260,12 @@ class UserModel {
     DateTime? createdAt,
     DateTime? updatedAt,
     int? totalCampaignsParticipated,
+    int? totalDonationsCount,
     int? totalAmountDonated,
     int? totalReferrals,
     int? activeReferrals,
     String? preferredLanguage,
+    List<ParticipatedCampaignModel>? participatedCampaigns,
   }) {
     return UserModel(
       id: id ?? this.id,
@@ -272,10 +306,13 @@ class UserModel {
       updatedAt: updatedAt ?? this.updatedAt,
       totalCampaignsParticipated:
           totalCampaignsParticipated ?? this.totalCampaignsParticipated,
+      totalDonationsCount: totalDonationsCount ?? this.totalDonationsCount,
       totalAmountDonated: totalAmountDonated ?? this.totalAmountDonated,
       totalReferrals: totalReferrals ?? this.totalReferrals,
       activeReferrals: activeReferrals ?? this.activeReferrals,
       preferredLanguage: preferredLanguage ?? this.preferredLanguage,
+      participatedCampaigns:
+          participatedCampaigns ?? this.participatedCampaigns,
     );
   }
 }

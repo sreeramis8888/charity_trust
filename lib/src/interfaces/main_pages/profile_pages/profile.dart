@@ -4,6 +4,7 @@ import 'package:Annujoom/src/data/constants/global_variables.dart';
 import 'package:Annujoom/src/data/services/webview_services.dart';
 import 'package:Annujoom/src/interfaces/animations/index.dart' as anim;
 import 'package:Annujoom/src/interfaces/components/loading_indicator.dart';
+import 'package:Annujoom/src/interfaces/main_pages/profile_pages/participated_campaigns_page.dart';
 import 'package:Annujoom/src/interfaces/main_pages/profile_pages/my_participations.dart';
 import 'package:Annujoom/src/interfaces/main_pages/profile_pages/about_us.dart';
 import 'package:Annujoom/src/interfaces/main_pages/profile_pages/documents_page.dart';
@@ -304,9 +305,8 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                         children: [
                           Expanded(
                             child: _StatItem(
-                              value:
-                                  "${userData.totalCampaignsParticipated ?? 0}",
-                              label: "myParticipations",
+                              value: "${userData.totalDonationsCount ?? 0}",
+                              label: "myParticipationCount",
                             ),
                           ),
                           SizedBox(width: 12),
@@ -358,6 +358,21 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                         onTap: () {
                           Navigator.of(context).push(
                             MaterialPageRoute(
+                              builder: (context) =>
+                                  const ParticipatedCampaignsPage(),
+                            ),
+                          );
+                        },
+                        child: _tile(
+                          Icons.handshake_outlined,
+                          "myParticipations".tr(),
+                        ),
+                      ),
+                      _divider(),
+                      GestureDetector(
+                        onTap: () {
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
                               builder: (context) => const MySubscriptionsPage(),
                             ),
                           );
@@ -392,10 +407,10 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                           Icons.volunteer_activism,
                           userData.role != null && userData.role != 'member'
                               ? "myCampaigns".tr()
-                              : "myParticipations".tr(),
+                              : "myTransactions".tr(),
                         ),
                       ),
-                      
+
                       if (userData.role != null &&
                           userData.role != 'member') ...[
                         _divider(),
