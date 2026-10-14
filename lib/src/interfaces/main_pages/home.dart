@@ -220,7 +220,7 @@ class _HomePageState extends ConsumerState<HomePage> {
                       label: 'call'.tr(),
                       onPressed: () {
                         Navigator.pop(context);
-                        launchPhone('+919847914437');
+                        launchPhone('+918891646431');
                       },
                       buttonColor: kPrimaryColor,
                       labelColor: kWhite,
