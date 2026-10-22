@@ -7,6 +7,7 @@ import 'package:Annujoom/src/interfaces/components/input_field.dart';
 import 'package:Annujoom/src/interfaces/components/loading_indicator.dart';
 import 'package:Annujoom/src/interfaces/components/primaryButton.dart';
 import 'package:Annujoom/src/interfaces/main_pages/news_bookmark/bookmark_page.dart';
+import 'package:Annujoom/src/interfaces/animations/index.dart' as anim;
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -208,166 +209,172 @@ class _NewsListPageState extends ConsumerState<NewsOnlyList> {
     final secureStorageService = ref.watch(secureStorageServiceProvider);
     final hasFilter = _hasActiveFilter(dateFilter);
 
-    return Scaffold(
-      backgroundColor: kBackgroundColor,
-      appBar: AppBar(
-        automaticallyImplyLeading: false,
-        backgroundColor: kWhite,
-        scrolledUnderElevation: 0,
-        titleSpacing: 0,
-        title: Padding(
-          padding: const EdgeInsets.only(left: 16.0),
-          child: Text(
-            'news1'.tr(),
-            style: kSubHeadingM,
-          ),
-        ),
-        actions: [
-          IconButton(
-            icon: Badge(
-              isLabelVisible: hasFilter,
-              smallSize: 8,
-              backgroundColor: kPrimaryColor,
-              child: Icon(
-                Icons.filter_list,
-                color: hasFilter ? kPrimaryColor : kTextColor,
-                size: 24,
-              ),
+    return anim.AnimatedWidgetWrapper(
+      animationType: anim.AnimationType.fadeSlideInFromBottom,
+      duration: anim.AnimationDuration.normal,
+      child: Scaffold(
+        backgroundColor: kBackgroundColor,
+        appBar: AppBar(
+          automaticallyImplyLeading: false,
+          backgroundColor: kWhite,
+          scrolledUnderElevation: 0,
+          titleSpacing: 0,
+          title: Padding(
+            padding: const EdgeInsets.only(left: 16.0),
+            child: Text(
+              'news1'.tr(),
+              style: kSubHeadingM,
             ),
-            onPressed: () => _showFilterBottomSheet(context),
           ),
-          Stack(
-            children: [
-              IconButton(
-                icon: const Icon(Icons.bookmark, color: kPrimaryColor, size: 25),
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => BookmarkPage()),
-                  );
-                },
-              ),
-              Positioned(
-                right: 8,
-                top: 8,
-                child: Container(
-                  padding: const EdgeInsets.all(4),
-                  decoration: const BoxDecoration(
-                    color: Color(0xFFF3EFEF),
-                    shape: BoxShape.circle,
-                  ),
-                  constraints: const BoxConstraints(minWidth: 18, minHeight: 18),
-                  child: FutureBuilder<String?>(
-                    future: secureStorageService.getUserId(),
-                    builder: (context, userIdSnapshot) {
-                      final bookmarkCount = asyncNewsState.maybeWhen(
-                        data: (paginationState) {
-                          if (userIdSnapshot.hasData &&
-                              userIdSnapshot.data != null) {
-                            return paginationState.news
-                                .where((news) =>
-                                    news.bookmarked
-                                        ?.contains(userIdSnapshot.data) ??
-                                    false)
-                                .length;
-                          }
-                          return 0;
-                        },
-                        orElse: () => 0,
-                      );
-                      return Text(
-                        '$bookmarkCount',
-                        style: kSmallTitleR.copyWith(fontSize: 10),
-                        textAlign: TextAlign.center,
-                      );
-                    },
-                  ),
+          actions: [
+            IconButton(
+              icon: Badge(
+                isLabelVisible: hasFilter,
+                smallSize: 8,
+                backgroundColor: kPrimaryColor,
+                child: Icon(
+                  Icons.filter_list,
+                  color: hasFilter ? kPrimaryColor : kTextColor,
+                  size: 24,
                 ),
               ),
-            ],
-          ),
-          const SizedBox(width: 8),
-        ],
-      ),
-      body: asyncNewsState.when(
-        data: (paginationState) {
-          if (paginationState.news.isNotEmpty) {
-            return Column(
+              onPressed: () => _showFilterBottomSheet(context),
+            ),
+            Stack(
               children: [
-                const SizedBox(height: 15),
-                Expanded(
-                  child: ListView.builder(
-                    controller: _scrollController,
-                    itemCount: paginationState.news.length +
-                        (paginationState.hasMore ? 1 : 0),
-                    itemBuilder: (context, index) {
-                      if (index == paginationState.news.length) {
-                        return const Padding(
-                          padding: EdgeInsets.all(16),
-                          child: Center(
-                            child: LoadingAnimation(),
-                          ),
+                IconButton(
+                  icon: const Icon(Icons.bookmark,
+                      color: kPrimaryColor, size: 25),
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => BookmarkPage()),
+                    );
+                  },
+                ),
+                Positioned(
+                  right: 8,
+                  top: 8,
+                  child: Container(
+                    padding: const EdgeInsets.all(4),
+                    decoration: const BoxDecoration(
+                      color: Color(0xFFF3EFEF),
+                      shape: BoxShape.circle,
+                    ),
+                    constraints:
+                        const BoxConstraints(minWidth: 18, minHeight: 18),
+                    child: FutureBuilder<String?>(
+                      future: secureStorageService.getUserId(),
+                      builder: (context, userIdSnapshot) {
+                        final bookmarkCount = asyncNewsState.maybeWhen(
+                          data: (paginationState) {
+                            if (userIdSnapshot.hasData &&
+                                userIdSnapshot.data != null) {
+                              return paginationState.news
+                                  .where((news) =>
+                                      news.bookmarked
+                                          ?.contains(userIdSnapshot.data) ??
+                                      false)
+                                  .length;
+                            }
+                            return 0;
+                          },
+                          orElse: () => 0,
                         );
-                      }
-                      return NewsCard(
-                        news: paginationState.news[index],
-                        allNews: paginationState.news,
-                      );
-                    },
+                        return Text(
+                          '$bookmarkCount',
+                          style: kSmallTitleR.copyWith(fontSize: 10),
+                          textAlign: TextAlign.center,
+                        );
+                      },
+                    ),
                   ),
                 ),
               ],
-            );
-          }
-
-          return Center(
-            child: Padding(
-              padding: const EdgeInsets.all(24),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
-                    'noNews1'.tr(),
-                    style: kBodyTitleB,
-                    textAlign: TextAlign.center,
-                  ),
-                  if (hasFilter) ...[
-                    const SizedBox(height: 16),
-                    TextButton(
-                      onPressed: () {
-                        ref.read(newsDateFilterProvider.notifier).state = {
-                          'start_date': null,
-                          'end_date': null,
-                        };
-                      },
-                      child: Text(
-                        'clearFilters'.tr(),
-                        style: kSmallTitleM.copyWith(color: kPrimaryColor),
-                      ),
-                    ),
-                  ],
-                ],
-              ),
             ),
-          );
-        },
-        loading: () => const Center(child: LoadingAnimation()),
-        error: (error, stackTrace) => Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text(
-                'errorLoadingNews'.tr(),
-                style: kBodyTitleB,
+            const SizedBox(width: 8),
+          ],
+        ),
+        body: asyncNewsState.when(
+          data: (paginationState) {
+            if (paginationState.news.isNotEmpty) {
+              return Column(
+                children: [
+                  const SizedBox(height: 15),
+                  Expanded(
+                    child: ListView.builder(
+                      controller: _scrollController,
+                      itemCount: paginationState.news.length +
+                          (paginationState.hasMore ? 1 : 0),
+                      itemBuilder: (context, index) {
+                        if (index == paginationState.news.length) {
+                          return const Padding(
+                            padding: EdgeInsets.all(16),
+                            child: Center(
+                              child: LoadingAnimation(),
+                            ),
+                          );
+                        }
+                        return NewsCard(
+                          news: paginationState.news[index],
+                          allNews: paginationState.news,
+                        );
+                      },
+                    ),
+                  ),
+                ],
+              );
+            }
+
+            return Center(
+              child: Padding(
+                padding: const EdgeInsets.all(24),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      'noNews1'.tr(),
+                      style: kBodyTitleB,
+                      textAlign: TextAlign.center,
+                    ),
+                    if (hasFilter) ...[
+                      const SizedBox(height: 16),
+                      TextButton(
+                        onPressed: () {
+                          ref.read(newsDateFilterProvider.notifier).state = {
+                            'start_date': null,
+                            'end_date': null,
+                          };
+                        },
+                        child: Text(
+                          'clearFilters'.tr(),
+                          style: kSmallTitleM.copyWith(color: kPrimaryColor),
+                        ),
+                      ),
+                    ],
+                  ],
+                ),
               ),
-              const SizedBox(height: 16),
-              ElevatedButton(
-                onPressed: () {
-                  ref.read(newsListProvider.notifier).refresh();
-                },
-                child: Text('retry'.tr()),
-              ),
-            ],
+            );
+          },
+          loading: () => const Center(child: LoadingAnimation()),
+          error: (error, stackTrace) => Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  'errorLoadingNews'.tr(),
+                  style: kBodyTitleB,
+                ),
+                const SizedBox(height: 16),
+                ElevatedButton(
+                  onPressed: () {
+                    ref.read(newsListProvider.notifier).refresh();
+                  },
+                  child: Text('retry'.tr()),
+                ),
+              ],
+            ),
           ),
         ),
       ),
