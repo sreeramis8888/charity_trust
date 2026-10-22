@@ -29,67 +29,75 @@ class TransactionCard extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    return Container(
-      decoration: BoxDecoration(
-        color: kCardBackgroundColor,
-        borderRadius: BorderRadius.circular(22),
-        border: Border.all(color: kBorder),
-      ),
-      padding: const EdgeInsets.all(16),
-      child: Column(
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              TextPill(
-                color: Color(0xFFDBDBDB),
-                text: "transactionId".tr(args: [id]),
-                textStyle: kSmallerTitleR.copyWith(
-                  fontSize: 10,
-                ),
-              ),
-              if (receipt.isNotEmpty)
-                GestureDetector(
-                  onTap: () async {
-                    try {
-                      final filePath = await ref
-                          .read(downloadReceiptProvider(receipt).future);
-                      await ref.read(openPdfProvider(filePath).future);
-                    } catch (e) {
-                      SnackbarService().showSnackBar(
-                        'failedToOpenReceipt'.tr(args: [e.toString()]),
-                        type: SnackbarType.error,
-                      );
-                    }
-                  },
-                  child: Container(
-                    padding: const EdgeInsets.all(4),
-                    decoration: BoxDecoration(
-                      color: kPrimaryColor,
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: const Icon(
-                      Icons.download,
-                      color: kWhite,
-                      size: 14,
-                    ),
+    return GestureDetector(
+      onTap: receipt.isEmpty
+          ? null
+          : () async {
+              try {
+                final filePath =
+                    await ref.read(downloadReceiptProvider(receipt).future);
+                await ref.read(openPdfProvider(filePath).future);
+              } catch (e) {
+                SnackbarService().showSnackBar(
+                  'failedToOpenReceipt'.tr(args: [e.toString()]),
+                  type: SnackbarType.error,
+                );
+              }
+            },
+      child: Container(
+        decoration: BoxDecoration(
+          color: kCardBackgroundColor,
+          borderRadius: BorderRadius.circular(22),
+          border: Border.all(color: kBorder),
+        ),
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                TextPill(
+                  color: Color(0xFFDBDBDB),
+                  text: "transactionId".tr(args: [id]),
+                  textStyle: kSmallerTitleR.copyWith(
+                    fontSize: 10,
                   ),
                 ),
+                if (receipt.isNotEmpty)
+                  IconButton(
+                    onPressed: () async {
+                      try {
+                        final filePath = await ref
+                            .read(downloadReceiptProvider(receipt).future);
+                        await ref.read(openPdfProvider(filePath).future);
+                      } catch (e) {
+                        SnackbarService().showSnackBar(
+                          'failedToOpenReceipt'.tr(args: [e.toString()]),
+                          type: SnackbarType.error,
+                        );
+                      }
+                    },
+                    icon: const Icon(Icons.download),
+                    color: kPrimaryColor,
+                    tooltip: 'downloadReceipt'.tr(),
+                    visualDensity: VisualDensity.compact,
+                  ),
+              ],
+            ),
+            const SizedBox(height: 12),
+            if (donorName.isNotEmpty) ...[
+              _row("name".tr(), donorName),
+              const Divider(),
             ],
-          ),
-          const SizedBox(height: 12),
-          if (donorName.isNotEmpty) ...[
-            _row("name".tr(), donorName),
+            _row("type".tr(), type),
             const Divider(),
+            _row("dateTime".tr(), date),
+            const Divider(),
+            _row("amountPaid".tr(), amount),
+            const Divider(),
+            _row("statusLabel".tr(), status, isStatus: true),
           ],
-          _row("type".tr(), type),
-          const Divider(),
-          _row("dateTime".tr(), date),
-          const Divider(),
-          _row("amountPaid".tr(), amount),
-          const Divider(),
-          _row("statusLabel".tr(), status, isStatus: true),
-        ],
+        ),
       ),
     );
   }
