@@ -635,6 +635,10 @@ class _HomePageState extends ConsumerState<HomePage> {
         final generalCampaigns = homeData.endingCampaigns
             .where((campaign) => campaign.category == 'General Campaign')
             .toList();
+        final screenWidth = MediaQuery.sizeOf(context).width;
+        final textScale = MediaQuery.textScalerOf(context).scale(1);
+        final campaignCardHeight = (screenWidth < 380 ? 440.0 : 460.0) +
+            ((textScale - 1).clamp(0.0, double.infinity) * 200);
 
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -699,30 +703,15 @@ class _HomePageState extends ConsumerState<HomePage> {
                       'title': 'generalFunding'.tr(),
                       'category': 'General Funding'
                     },
-                    {
-                      'title': 'zakat'.tr(),
-                      'category': 'Zakat'
-                    },
-                    {
-                      'title': 'orphan'.tr(),
-                      'category': 'Orphan'
-                    },
-                    {
-                      'title': 'widow'.tr(),
-                      'category': 'Widow'
-                    },
-                    {
-                      'title': 'ghusalMayyit'.tr(),
-                      'category': 'Ghusl Mayyit'
-                    },
+                    {'title': 'zakat'.tr(), 'category': 'Zakat'},
+                    {'title': 'orphan'.tr(), 'category': 'Orphan'},
+                    {'title': 'widow'.tr(), 'category': 'Widow'},
+                    {'title': 'ghusalMayyit'.tr(), 'category': 'Ghusl Mayyit'},
                     {
                       'title': 'patientRelief'.tr(),
                       'category': 'Patient Relief'
                     },
-                    {
-                      'title': 'foodKit'.tr(),
-                      'category': 'Food Kit'
-                    },
+                    {'title': 'foodKit'.tr(), 'category': 'Food Kit'},
                     {
                       'title': 'sadaqahJariyah'.tr(),
                       'category': 'Sadaqah Jariyah'
@@ -751,8 +740,7 @@ class _HomePageState extends ConsumerState<HomePage> {
                             },
                           ),
                           items: categoryItems.map((category) {
-                            final categoryName =
-                                category['category'] as String;
+                            final categoryName = category['category'] as String;
                             return AnimatedWidgetWrapper(
                               animationType: AnimationType.fadeScaleUp,
                               duration: AnimationDuration.normal,
@@ -816,8 +804,7 @@ class _HomePageState extends ConsumerState<HomePage> {
                         child: PageViewDotIndicator(
                           size: Size(8, 8),
                           unselectedSize: Size(7, 7),
-                          currentItem:
-                              _categoryIndex % categoryItems.length,
+                          currentItem: _categoryIndex % categoryItems.length,
                           count: categoryItems.length,
                           unselectedColor: Color(0xFFAEB9E1),
                           selectedColor: Color(0xFF0D74BC),
@@ -1217,10 +1204,10 @@ class _HomePageState extends ConsumerState<HomePage> {
                     ),
                     const SizedBox(height: 12),
                     SizedBox(
-                      height: 470,
+                      height: campaignCardHeight,
                       child: CarouselSlider(
                         options: CarouselOptions(
-                          height: 470,
+                          height: campaignCardHeight,
                           viewportFraction: 1,
                           enableInfiniteScroll: true,
                           autoPlay: false,
@@ -1231,8 +1218,7 @@ class _HomePageState extends ConsumerState<HomePage> {
                         items: generalCampaigns.map((campaign) {
                           final preferredLanguage =
                               GlobalVariables.getPreferredLanguage();
-                          return Padding(
-                            padding: const EdgeInsets.only(bottom: 16),
+                          return SizedBox.expand(
                             child: HomeGradientCampaignCard(
                               id: campaign.id ?? '',
                               title: campaign.getTitle(preferredLanguage),

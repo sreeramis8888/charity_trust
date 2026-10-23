@@ -523,6 +523,8 @@ class HomeGradientCampaignCard extends ConsumerWidget {
     final percent = hasGoal ? (raised / goal!).clamp(0.0, 1.0) : 0.0;
     final displayDueDate = _displayDueDate();
     final hasDueDate = _hasDueDate;
+    final imageHeight = MediaQuery.sizeOf(context).width < 380 ? 130.0 : 150.0;
+    final textScale = MediaQuery.textScalerOf(context).scale(1);
 
     return Stack(
       children: [
@@ -556,26 +558,33 @@ class HomeGradientCampaignCard extends ConsumerWidget {
                     ),
                   const Spacer(),
                   if (hasDueDate)
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 12, vertical: 6),
-                      decoration: BoxDecoration(
-                        color: Colors.black.withOpacity(0.3),
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: Row(
-                        children: [
-                          const Icon(Icons.calendar_today,
-                              color: kWhite, size: 14),
-                          const SizedBox(width: 6),
-                          Text(
-                            displayDueDate,
-                            style: kSmallerTitleM.copyWith(
-                              fontSize: 10,
-                              color: kWhite,
+                    Flexible(
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 12, vertical: 6),
+                        decoration: BoxDecoration(
+                          color: Colors.black.withOpacity(0.3),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const Icon(Icons.calendar_today,
+                                color: kWhite, size: 14),
+                            const SizedBox(width: 6),
+                            Flexible(
+                              child: Text(
+                                displayDueDate,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: kSmallerTitleM.copyWith(
+                                  fontSize: 10,
+                                  color: kWhite,
+                                ),
+                              ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
                     ),
                   if (id.isNotEmpty)
@@ -599,7 +608,7 @@ class HomeGradientCampaignCard extends ConsumerWidget {
                 borderRadius: BorderRadius.circular(12),
                 child: Image.network(
                   image ?? '',
-                  height: 180,
+                  height: imageHeight,
                   width: double.infinity,
                   fit: BoxFit.cover,
                   errorBuilder: (_, __, ___) => Container(
@@ -613,6 +622,8 @@ class HomeGradientCampaignCard extends ConsumerWidget {
               Text(
                 title,
                 style: kBodyTitleSB.copyWith(color: kWhite),
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
               ),
               const SizedBox(height: 8),
               Text(
@@ -637,39 +648,49 @@ class HomeGradientCampaignCard extends ConsumerWidget {
                       ),
                       const SizedBox(height: 8),
                     ],
-                    Row(
+                    Wrap(
+                      spacing: 4,
+                      runSpacing: 4,
                       children: [
                         Text(
                           hasGoal
                               ? "₹${raised > goal! ? goal : raised}"
                               : "₹$raised",
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
                           style: kSmallTitleM.copyWith(
                               color: const Color(0xFFFFD400)),
                         ),
-                        const SizedBox(width: 4),
                         if (hasGoal) ...[
                           Text(
                             "raisedOf".tr(),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
                             style: kSmallTitleR.copyWith(color: kWhite),
                           ),
-                          const SizedBox(width: 4),
                           Text(
                             "₹$goal",
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
                             style: kSmallTitleSB.copyWith(color: kWhite),
                           ),
-                          const SizedBox(width: 4),
                           Text(
                             "goal".tr(),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
                             style: kSmallTitleR.copyWith(color: kWhite),
                           ),
-                          const Spacer(),
                           Text(
                             "${(percent * 100).toInt()}%",
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
                             style: kSmallTitleSB.copyWith(color: kWhite),
                           ),
                         ] else
                           Text(
                             "raised".tr(),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
                             style: kSmallTitleR.copyWith(color: kWhite),
                           ),
                       ],
@@ -680,16 +701,21 @@ class HomeGradientCampaignCard extends ConsumerWidget {
               else
                 Column(
                   children: [
-                    Row(
+                    Wrap(
+                      spacing: 4,
+                      runSpacing: 4,
                       children: [
                         Text(
                           "₹$raised",
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
                           style: kSmallTitleM.copyWith(
                               color: const Color(0xFFFFD400)),
                         ),
-                        const SizedBox(width: 4),
                         Text(
                           "raised".tr(),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
                           style: kSmallTitleR.copyWith(color: kWhite),
                         ),
                       ],
@@ -707,7 +733,7 @@ class HomeGradientCampaignCard extends ConsumerWidget {
                       labelColor: kWhite,
                       sideColor: kWhite,
                       fontSize: 14,
-                      buttonHeight: 40,
+                      buttonHeight: (40 * textScale).ceil(),
                     ),
                   ),
                 ],
