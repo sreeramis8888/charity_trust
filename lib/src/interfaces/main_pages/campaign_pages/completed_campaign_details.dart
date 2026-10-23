@@ -1,4 +1,5 @@
 import 'package:Annujoom/src/data/models/promotions_model.dart';
+import 'package:Annujoom/src/data/services/campaign_share_service.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -6,7 +7,6 @@ import 'package:Annujoom/src/data/constants/color_constants.dart';
 import 'package:Annujoom/src/data/constants/style_constants.dart';
 import 'package:Annujoom/src/data/constants/global_variables.dart';
 import 'package:intl/intl.dart';
-import 'package:share_plus/share_plus.dart';
 
 class CompletedCampaignDetailsPage extends ConsumerWidget {
   final Promotions promotion;
@@ -206,7 +206,11 @@ class CompletedCampaignDetailsPage extends ConsumerWidget {
                       'iOS: $iosLink';
 
                   try {
-                    await Share.share(message, subject: title);
+                    await shareCampaignContent(
+                      title: title,
+                      text: message,
+                      imageUrl: promotion.media,
+                    );
                   } catch (e) {
                     if (context.mounted) {
                       ScaffoldMessenger.of(context).showSnackBar(

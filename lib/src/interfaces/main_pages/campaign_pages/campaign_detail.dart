@@ -21,13 +21,13 @@ import 'package:Annujoom/src/data/providers/campaigns_provider.dart'
         participatedCampaignsProvider,
         campaignsApiProvider;
 import 'package:Annujoom/src/data/services/deep_link_service.dart';
+import 'package:Annujoom/src/data/services/campaign_share_service.dart';
 import 'package:Annujoom/src/data/services/snackbar_service.dart';
 import 'package:Annujoom/src/data/services/secure_storage_service.dart';
 import 'package:Annujoom/src/interfaces/components/additional_pages/payment_success_page.dart';
 import 'package:Annujoom/src/interfaces/components/additional_pages/payment_failed_page.dart';
 import 'package:Annujoom/src/interfaces/components/additional_pages/payment_method_page.dart';
 import 'package:easebuzz_flutter/easebuzz_flutter.dart';
-import 'package:share_plus/share_plus.dart';
 
 class CampaignDetailPage extends ConsumerStatefulWidget {
   final String? id;
@@ -159,7 +159,11 @@ class _CampaignDetailPageState extends ConsumerState<CampaignDetailPage> {
       // Single deep link: opens campaign in-app if installed, else store via backend HTML.
       message.write(shareUrl);
 
-      await Share.share(message.toString(), subject: title);
+      await shareCampaignContent(
+        title: title,
+        text: message.toString(),
+        imageUrl: widget.image,
+      );
     } catch (e) {
       log('Error sharing campaign: $e');
       _showSnackBar(

@@ -3,6 +3,7 @@ import 'dart:developer';
 import 'package:Annujoom/src/data/constants/color_constants.dart';
 import 'package:Annujoom/src/data/constants/style_constants.dart';
 import 'package:Annujoom/src/data/providers/campaigns_provider.dart';
+import 'package:Annujoom/src/data/services/campaign_share_service.dart';
 import 'package:Annujoom/src/data/services/deep_link_service.dart';
 import 'package:Annujoom/src/data/services/snackbar_service.dart';
 import 'package:Annujoom/src/data/utils/currency_formatter.dart';
@@ -13,7 +14,6 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
-import 'package:share_plus/share_plus.dart';
 
 // ============================================================================
 // WARNING BADGE WITH BLINKING ANIMATION
@@ -506,7 +506,11 @@ class HomeGradientCampaignCard extends ConsumerWidget {
 
       message.write(shareUrl);
 
-      await Share.share(message.toString(), subject: title);
+      await shareCampaignContent(
+        title: title,
+        text: message.toString(),
+        imageUrl: image,
+      );
     } catch (e) {
       log('Error sharing campaign: $e');
       SnackbarService().showSnackBar(
